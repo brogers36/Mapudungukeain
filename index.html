@@ -2548,6 +2548,15 @@ const MOUTH=(()=>{
   const arrow=(d)=>`<path d="${d}" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3" marker-end="url(#ah)"/>`;
   const defs=`<defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="${GOLD}"/></marker></defs>`;
   return {
+    "g":{svg:frame(T("M40 76 Q50 72 66 70 Q88 64 100 61 Q108 60 112 68 Q120 88 124 118 L60 110 Q44 100 40 86Z"), defs+arrow("M128 110 V82 Q126 62 108 56 Q84 52 52 58 L18 62")+`<path d="M100 50 l3 3 l3 -3 l3 3" stroke="${GOLD}" stroke-width="1.6" fill="none"/>`),
+         es:"La parte de atrás de la lengua se acerca al velo del paladar, pero sin tocarlo. El aire pasa rozando por la boca, no por la nariz.",
+         en:"The back of the tongue comes close to the soft palate but does not touch it. Air rubs through the gap and out of the mouth, not the nose."},
+    "ll":{svg:frame(T("M40 76 Q46 66 56 54 Q66 44 80 44 Q100 48 110 64 Q120 86 124 118 L60 110 Q44 100 40 86Z"), dot(72,43)),
+         es:"El cuerpo de la lengua se apoya en el paladar duro, más atrás que para la l. El aire sale por los costados de la lengua.",
+         en:"The body of the tongue rests on the hard palate, further back than for l. Air flows out along the sides of the tongue."},
+    "r":{svg:frame(T("M44 80 Q40 70 42 62 Q44 56 50 56 Q54 56 54 59 Q51 61 53 64 Q70 65 96 65 Q112 70 120 90 L124 118 L60 110 Q44 100 44 80Z"), defs+arrow("M128 108 V82 Q124 62 96 59 Q72 58 52 52 L18 60")),
+         es:"La punta de la lengua sube y se curva hacia atrás, cerca de la encía de arriba, pero sin tocarla ni vibrar. A veces se oye un roce.",
+         en:"The tongue tip rises and curls back near the upper gum ridge, without touching it or trilling. Sometimes you hear some friction."},
     "ü":{svg:frame(T("M40 76 Q48 72 58 66 Q76 56 96 60 Q110 64 118 82 L124 118 L60 110 Q44 100 40 86Z"), defs+arrow("M128 108 V74 Q126 52 96 51 Q70 50 44 58 L20 60")),
          es:"La lengua sube en el medio de la boca, ni adelante como en la i ni atrás como en la u. Los labios quedan estirados, no redondos.",
          en:"The tongue rises in the middle of the mouth, not forward as for i nor back as for u. The lips stay spread, not rounded."},
