@@ -353,9 +353,9 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .pt-g{font-family:var(--display);color:var(--gold);font-size:1.3rem;min-width:2.2ch}
 .pt p{margin:0;font-size:.9rem}
 .mouth{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
-.mouth svg{width:120px;height:90px;flex:none;background:var(--ground);border-radius:6px}
+.mouth svg{width:170px;height:136px;flex:none;background:var(--ground);border-radius:6px}
 .mouth p{font-size:.85rem;color:var(--muted);flex:1 1 150px;margin:0}
-.ph .mouth svg{width:160px;height:120px}
+.ph .mouth svg{width:220px;height:176px}
 .pron-ft{display:flex;gap:10px;align-items:center;font-size:.8rem;color:var(--muted)}
 .fc-pron:not(:empty){margin-top:10px}
 .quizcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel-2);color:var(--ink);
@@ -598,6 +598,51 @@ const RKE=[
 ];
 const rkeForm=m=>({m,es:RKE_G[m][0],en:RKE_G[m][1]});
 function genRke(n){ return shuffle(RKE).slice(0,n).map(r=>({...rkeForm(r.m),dist:r.d.map(rkeForm)})); }
+
+// ===== Possession: ñi, mi, iñ, mu, fey ñi =====
+const POS_N=[{m:"ruka",es:"casa",en:"house",f:1},{m:"trewa",es:"perro",en:"dog",f:0},{m:"ñuke",es:"madre",en:"mother",f:1},
+  {m:"kawellu",es:"caballo",en:"horse",f:0},{m:"lamngen",es:"hermana",en:"sister",f:1},{m:"chaw",es:"padre",en:"father",f:0}];
+const POS_P=[
+  {p:"ñi",es:n=>`mi ${n.es}`,en:n=>`my ${n.en}`},
+  {p:"mi",es:n=>`tu ${n.es}`,en:n=>`your ${n.en}`},
+  {p:"iñ",es:n=>`${n.f?"nuestra":"nuestro"} ${n.es}`,en:n=>`our ${n.en}`},
+  {p:"mu",es:n=>`${n.f?"la":"el"} ${n.es} de ustedes`,en:n=>`your (pl.) ${n.en}`},
+  {p:"fey ñi",es:n=>`su ${n.es} (de él o de ella)`,en:n=>`his or her ${n.en}`}];
+const posForm=(n,k)=>({m:`${POS_P[k].p} ${n.m}`,es:POS_P[k].es(n),en:POS_P[k].en(n)});
+function genPos(n){ const out=[],seen=new Set();
+  while(out.length<n){ const nn=POS_N[Math.floor(Math.random()*POS_N.length)], k=Math.floor(Math.random()*POS_P.length);
+    if(seen.has(nn.m+k)) continue; seen.add(nn.m+k);
+    out.push({...posForm(nn,k),dist:shuffle(POS_P.map((_,j)=>j).filter(j=>j!==k)).slice(0,3).map(j=>posForm(nn,j))}); }
+  return out; }
+
+// ===== Possessor + -(a)el: purpose, obligation, wanting (Spanish subjunctive, English "so (that)…", "want… to") =====
+const AEL_G={
+  "Fey ta mi chillkatuael":["Esto es para que estudies","This is so you can study"],
+  "Fey ta ñi chillkatuael":["Esto es para que yo estudie","This is so I can study"],
+  "Fey ta mi chillkatuel":["Esto es lo que estudiaste","This is what you studied"],
+  "Müley mi amuael":["Tienes que ir","You have to go"],
+  "Müley ñi amuael":["Tengo que ir","I have to go"],
+  "Ayün mi küpayael":["Quiero que vengas","I want you to come"],
+  "Ayün ñi küpayael":["Quiero venir","I want to come"],
+  "Tüfa mi iyael":["Esta es tu comida (lo que vas a comer)","This is your food (what you will eat)"],
+  "Tüfa ñi iyael":["Esta es mi comida (lo que voy a comer)","This is my food (what I will eat)"],
+  "Elufiñ kofke ñi iyael":["Le di pan para que comiera","I gave her/him bread to eat"],
+  "Pifiñ ñi küpayael":["Le dije que viniera","I told her/him to come"]
+};
+const AEL=[
+  {m:"Fey ta mi chillkatuael",d:["Fey ta ñi chillkatuael","Fey ta mi chillkatuel","Ayün mi küpayael"]},
+  {m:"Fey ta ñi chillkatuael",d:["Fey ta mi chillkatuael","Fey ta mi chillkatuel","Müley ñi amuael"]},
+  {m:"Müley mi amuael",d:["Müley ñi amuael","Ayün mi küpayael","Fey ta mi chillkatuael"]},
+  {m:"Müley ñi amuael",d:["Müley mi amuael","Ayün ñi küpayael","Fey ta ñi chillkatuael"]},
+  {m:"Ayün mi küpayael",d:["Ayün ñi küpayael","Müley mi amuael","Pifiñ ñi küpayael"]},
+  {m:"Ayün ñi küpayael",d:["Ayün mi küpayael","Müley ñi amuael","Pifiñ ñi küpayael"]},
+  {m:"Tüfa mi iyael",d:["Tüfa ñi iyael","Fey ta mi chillkatuael","Elufiñ kofke ñi iyael"]},
+  {m:"Tüfa ñi iyael",d:["Tüfa mi iyael","Fey ta ñi chillkatuael","Müley ñi amuael"]},
+  {m:"Elufiñ kofke ñi iyael",d:["Tüfa ñi iyael","Pifiñ ñi küpayael","Tüfa mi iyael"]},
+  {m:"Pifiñ ñi küpayael",d:["Ayün mi küpayael","Ayün ñi küpayael","Elufiñ kofke ñi iyael"]}
+];
+const aelForm=m=>({m,es:AEL_G[m][0],en:AEL_G[m][1]});
+function genAel(n){ return shuffle(AEL).slice(0,n).map(r=>({...aelForm(r.m),dist:r.d.map(aelForm)})); }
 
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
@@ -1220,6 +1265,11 @@ const STAGES = [
     {m:"foki",pic:{svg:NAT.plant("foki")},es:"enredadera, boqui",en:"vine (boqui)"}]}
  ]},
  {id:"adv", es:"Avanzado", en:"Advanced", need:30, levels:[
+  { id:"pos", mt:"Ñi, mi, iñ", es:"Lo mío, lo tuyo: posesión", en:"Mine, yours: possession", kind:"verb",
+    gen:()=>genPos(8),
+    examples:()=>[0,1,2,3,4].map(k=>posForm(POS_N[0],k)).concat([{m:"tañi chaw",es:"mi padre",en:"my father"},{m:"tami ñuke",es:"tu madre",en:"your mother"}]),
+    rule:{es:"El posesivo va antes del sustantivo: <b>ñi ruka</b> “mi casa”, <b>mi ruka</b> “tu casa”, <b>iñ ruka</b> “nuestra casa”, <b>mu ruka</b> “la casa de ustedes”. <b>ñi</b> también es “su” (de él o ella); para dejarlo claro se dice <b>fey ñi ruka</b>. En el habla son muy comunes las formas con <b>ta-</b>: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (en AVENUE, <b>tañi</b> aparece 8.493 veces y <b>tami</b> 3.404).",
+          en:"The possessive goes before the noun: <b>ñi ruka</b> “my house”, <b>mi ruka</b> “your house”, <b>iñ ruka</b> “our house”, <b>mu ruka</b> “your (pl.) house”. <b>ñi</b> is also “his/her”; to make that clear, say <b>fey ñi ruka</b>. In speech the forms with <b>ta-</b> are very common: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (in AVENUE, <b>tañi</b> occurs 8,493 times and <b>tami</b> 3,404)."}},
   { id:"pres", mt:"Inche, eymi, fey", es:"Verbos: yo, tú, él/ella", en:"Verbs: I, you, she/he", kind:"verb", tenses:["pres"],
     gen:()=>genVerbs(["pres"],8),
     rule:{es:"Raíz vocálica + <b>-n</b> (yo), <b>-ymi</b> (tú), <b>-y</b> (él/ella). Raíz consonántica + <b>-ün</b>, <b>-imi</b>, <b>-i</b>.",
@@ -1263,6 +1313,11 @@ const STAGES = [
     examples:()=>[0,1,2].map(p=>fiForm(FI[0],false,p)).concat([0,1,2].map(p=>fiForm(FI[0],true,p)),[0,1,2].map(p=>fiForm(FI[4],false,p))),
     rule:{es:"<b>-fi-</b> marca un objeto de 3.ª persona: <b>pe-fi-ñ</b> “lo vi”. Persona: <b>-ñ</b> (yo), <b>-mi</b> (tú), nada (él/ella). La negación <b>-la-</b> va antes: <b>pe-la-fi-ñ</b> “no lo vi”. Ojo: sin otra marca, un verbo de evento como <b>pe-</b> o <b>ngilla-</b> se entiende en pasado.",
           en:"<b>-fi-</b> marks a third-person object: <b>pe-fi-ñ</b> “I saw it”. Person: <b>-ñ</b> (I), <b>-mi</b> (you), nothing (she/he). Negation <b>-la-</b> comes first: <b>pe-la-fi-ñ</b> “I didn't see it”. Note: with no other marker, an event verb like <b>pe-</b> or <b>ngilla-</b> is read as past."}},
+  { id:"ael", mt:"ñi … -ael", es:"Para que…, quiero que…", en:"So that…, I want you to…", kind:"verb",
+    gen:()=>genAel(8),
+    examples:()=>["Fey ta mi chillkatuael","Ayün mi küpayael","Müley ñi amuael","Tüfa mi iyael"].map(aelForm).concat([{m:"mi chillkatu-a-el",es:"(lo que) vas a estudiar",en:"(what) you will study"},{m:"mi chillkatu-el",es:"(lo que) estudiaste",en:"(what) you studied"}]),
+    rule:{es:"Un posesivo + verbo con <b>-ael</b> habla de algo que todavía no pasa: un propósito, un deseo o una obligación. El posesivo dice <b>quién</b> lo hace. En español corresponde al subjuntivo y en inglés a “so (that)…” o “want… to”: <b>Fey ta mi chillkatuael</b> “Esto es para que estudies / This is so you can study”; <b>Ayün mi küpayael</b> “Quiero que vengas”; <b>Müley ñi amuael</b> “Tengo que ir”. Después de <b>a</b> aparece una <b>y</b>: <b>küpa-y-ael</b>. Sin la <b>-a-</b>, <b>-el</b> habla de algo real o pasado: <b>mi chillkatuel</b> “lo que estudiaste”. En AVENUE se escribe a menudo <b>-al</b>: <b>müli ñi amual</b> “tiene que ir”, <b>tañi kimal</b> “para aprender”.",
+          en:"A possessive + a verb with <b>-ael</b> talks about something that has not happened yet: a purpose, a wish or an obligation. The possessive says <b>who</b> does it. Spanish uses the subjunctive here and English “so (that)…” or “want… to”: <b>Fey ta mi chillkatuael</b> “This is so you can study”; <b>Ayün mi küpayael</b> “I want you to come”; <b>Müley ñi amuael</b> “I have to go”. After <b>a</b> a <b>y</b> appears: <b>küpa-y-ael</b>. Without the <b>-a-</b>, <b>-el</b> talks about something real or past: <b>mi chillkatuel</b> “what you studied”. AVENUE often spells it <b>-al</b>: <b>müli ñi amual</b> “she/he has to go”, <b>tañi kimal</b> “in order to learn”."}},
   { id:"plural", mt:"Iñchiw, iñchiñ", es:"Dual y plural", en:"Dual and plural", kind:"verb",
     gen:()=>genPl(8),
     examples:()=>[0,1,2,3,4,5].map(i=>plForm(PL_VERBS[0],i)),
@@ -2629,44 +2684,55 @@ function epewRead(i,st){
 // ===== Word-by-word pronunciation guide (generated from the Unificado spelling) =====
 // Mid-sagittal mouth diagrams (face to the left). Shared outline + per-sound tongue, contact point and airflow.
 const MOUTH=(()=>{
-  const OUT="#a9a3c8", TONG="#d77a7a", GOLD="#e8b53a", SKIN="#c98a5a";
-  const frame=(tongue,extra)=>`<svg viewBox="0 0 160 120" width="160" height="120" role="img" aria-hidden="true">
-    <path d="M22 8 Q8 24 16 38 L26 41" fill="none" stroke="${SKIN}" stroke-width="3"/>
-    <path d="M26 41 Q30 30 46 30 H118 Q134 30 134 46 V118" fill="none" stroke="${OUT}" stroke-width="2.5"/>
-    <path d="M34 52 Q38 46 44 47 Q50 48 52 46 Q74 38 98 44 Q112 48 114 62" fill="none" stroke="${OUT}" stroke-width="2.5"/>
-    <path d="M98 44 Q112 48 114 62" fill="none" stroke="${OUT}" stroke-width="6" opacity=".35"/>
-    <path d="M30 84 Q48 104 80 107 Q112 110 134 117" fill="none" stroke="${OUT}" stroke-width="2.5"/>
-    ${tongue}
-    <path d="M26 46 Q14 48 14 58 Q22 62 30 60 Z" fill="${SKIN}"/><path d="M14 72 Q14 82 24 84 Q30 82 30 76 Z" fill="${SKIN}"/>
-    <path d="M30 51 L35 51 L35 63 L31 62Z" fill="#f3efe6"/><path d="M31 69 L35 68 L35 80 L30 80Z" fill="#f3efe6"/>
-    ${extra}</svg>`;
-  const T=d=>`<path d="${d}" fill="${TONG}" stroke="#b55a5a" stroke-width="1.5"/>`;
-  const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="5" fill="none" stroke="${GOLD}" stroke-width="2.5"/>`;
-  const arrow=(d)=>`<path d="${d}" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3" marker-end="url(#ah)"/>`;
-  const defs=`<defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="${GOLD}"/></marker></defs>`;
-  return {
-    "g":{svg:frame(T("M40 76 Q50 72 66 70 Q88 64 100 61 Q108 60 112 68 Q120 88 124 118 L60 110 Q44 100 40 86Z"), defs+arrow("M128 110 V82 Q126 62 108 56 Q84 52 52 58 L18 62")+`<path d="M100 50 l3 3 l3 -3 l3 3" stroke="${GOLD}" stroke-width="1.6" fill="none"/>`),
-         es:"La parte de atrás de la lengua se acerca al velo del paladar, pero sin tocarlo. El aire pasa rozando por la boca, no por la nariz.",
-         en:"The back of the tongue comes close to the soft palate but does not touch it. Air rubs through the gap and out of the mouth, not the nose."},
-    "ll":{svg:frame(T("M40 76 Q46 66 56 54 Q66 44 80 44 Q100 48 110 64 Q120 86 124 118 L60 110 Q44 100 40 86Z"), dot(72,43)),
-         es:"El cuerpo de la lengua se apoya en el paladar duro, más atrás que para la l. El aire sale por los costados de la lengua.",
-         en:"The body of the tongue rests on the hard palate, further back than for l. Air flows out along the sides of the tongue."},
-    "r":{svg:frame(T("M44 80 Q40 70 42 62 Q44 56 50 56 Q54 56 54 59 Q51 61 53 64 Q70 65 96 65 Q112 70 120 90 L124 118 L60 110 Q44 100 44 80Z"), defs+arrow("M128 108 V82 Q124 62 96 59 Q72 58 52 52 L18 60")),
-         es:"La punta de la lengua sube y se curva hacia atrás, cerca de la encía de arriba, pero sin tocarla ni vibrar. A veces se oye un roce.",
-         en:"The tongue tip rises and curls back near the upper gum ridge, without touching it or trilling. Sometimes you hear some friction."},
-    "ü":{svg:frame(T("M40 76 Q48 72 58 66 Q76 56 96 60 Q110 64 118 82 L124 118 L60 110 Q44 100 40 86Z"), defs+arrow("M128 108 V74 Q126 52 96 51 Q70 50 44 58 L20 60")),
-         es:"La lengua sube en el medio de la boca, ni adelante como en la i ni atrás como en la u. Los labios quedan estirados, no redondos.",
-         en:"The tongue rises in the middle of the mouth, not forward as for i nor back as for u. The lips stay spread, not rounded."},
-    "ng":{svg:frame(T("M40 76 Q50 72 66 70 Q90 64 104 56 Q112 52 115 62 Q120 84 124 118 L60 110 Q44 100 40 86Z"), defs+dot(112,57)+arrow("M128 110 V50 Q128 36 112 36 H44 Q32 36 28 42 L14 40")),
-         es:"La parte de atrás de la lengua toca el velo del paladar, donde se hace la k. El aire sale por la nariz.",
-         en:"The back of the tongue touches the soft palate, where k is made. The air comes out through the nose."},
-    "tr":{svg:frame(T("M44 80 Q40 70 42 60 Q44 50 50 48 Q55 47 55 51 Q51 54 53 60 Q70 62 96 64 Q112 70 120 90 L124 118 L60 110 Q44 100 44 80Z"), dot(49,47)),
-         es:"La punta de la lengua se curva hacia atrás y toca detrás de la encía de arriba. Es un solo sonido, no t + r.",
-         en:"The tip of the tongue curls back and touches behind the upper gum ridge. It is one sound, not t + r."},
-    "d":{svg:frame(T("M24 66 Q27 63 36 64 Q60 62 90 62 Q112 66 120 90 L124 118 L60 110 Q42 100 36 82 Q32 72 24 66Z"), defs+dot(30,64)+arrow("M22 61 L4 61")),
-         es:"La punta de la lengua va entre los dientes y el aire sale rozando, como la z de “zapato” en España o la th de “think”.",
-         en:"The tip of the tongue goes between the teeth and air flows over it, like th in “think”."}
+  const SKIN="#c98a5a", SKIN2="#b5774a", CAV="#2b1a24", BONE="#efe3cf", VEL="#c46a6a", TONG="#e48a83", TONG2="#b8585a", GOLD="#e8b53a", INK="#f3efe6";
+  const head=`<path d="M200 0 H64 Q54 16 50 30 L22 54 Q17 60 25 63 L35 65 Q25 70 25 75 Q25 79 35 80 Q25 83 26 89 Q29 96 40 98 Q31 110 41 120 Q62 129 94 130 L106 160 H200Z" fill="${SKIN}"/>`;
+  const nasal=`<path d="M28 59 Q40 44 70 40 L124 40 Q136 42 137 54 L137 58 L106 58 Q80 57 54 62 Q40 64 30 62Z" fill="${CAV}"/>`;
+  const pharynx=`<path d="M124 50 Q140 50 140 64 L142 160 H124 L122 118 Z" fill="${CAV}"/>`;
+  const oral=`<path d="M46 70 Q60 66 106 63 Q122 66 126 82 L126 122 Q92 118 62 106 Q46 98 46 84Z" fill="${CAV}"/>`;
+  const palate=`<path d="M46 66 Q50 61 58 60 Q84 55 106 57 L106 63 Q84 60 58 66 Q52 68 48 71Z" fill="${BONE}"/>`;
+  const velum={up:`<path d="M104 57 Q120 52 136 50 L137 57 Q122 62 106 64Z" fill="${VEL}"/>`,
+               down:`<path d="M104 57 Q118 60 122 76 Q122 84 117 82 Q113 70 104 64Z" fill="${VEL}"/>`};
+  const teeth=`<path d="M40 65 L48 66 L47 79 L41 78Z" fill="${INK}"/><path d="M41 82 L47 81 L48 94 L40 94Z" fill="${INK}"/>`;
+  const lipShade=`<path d="M25 75 Q30 77 35 80 Q30 81 26 83" stroke="${SKIN2}" stroke-width="1.5" fill="none"/>`;
+  const T=d=>`<path d="${d}" fill="${TONG}" stroke="${TONG2}" stroke-width="1.5"/>`;
+  const ring=(x,y)=>`<circle cx="${x}" cy="${y}" r="5.5" fill="none" stroke="${GOLD}" stroke-width="2.5"/>`;
+  const label=(x,y,lines,pos="tl")=>{ const bx=4, by=pos==="tl"?12:136, lh=10;
+    const t=lines.map((ln,i)=>`<text x="${bx}" y="${by+i*lh}" font-size="9" font-family="sans-serif" fill="${INK}">${ln}</text>`).join("");
+    const ly=pos==="tl"?by+(lines.length-1)*lh+3:by-9; return `<path d="M${bx+2} ${ly} L${x} ${y}" stroke="${GOLD}" stroke-width="1.2"/>`+t; };
+  const draw=(id,{tongue,vel="up",extra=""},lab)=>{
+    const ah=`ah-${id}`;
+    const arrow=d=>`<path d="${d}" fill="none" stroke="${GOLD}" stroke-width="2.4" stroke-dasharray="5 3" marker-end="url(#${ah})"/>`;
+    return lang=>`<svg viewBox="0 0 200 160" role="img" aria-hidden="true"><defs><marker id="${ah}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="${GOLD}"/></marker></defs>
+      ${head}${nasal}${pharynx}${oral}${T(tongue)}${palate}${velum[vel]}${teeth}${lipShade}${extra(arrow,ring)}${lab(lang)}</svg>`;
   };
+  const L=(es,en)=>lang=>lang==="es"?es:en;
+  const D={
+    "ü":draw("u",{tongue:"M44 90 Q46 84 54 82 Q70 70 86 69 Q104 70 116 82 Q124 94 126 106 L128 140 Q100 134 70 118 Q50 106 44 98Z",
+        extra:(a)=>a("M132 150 V110 Q130 86 112 76 Q90 64 60 72 L20 78")}, l=>label(86,69,l==="es"?["lengua alta","en el centro"]:["tongue high","in the middle"])),
+    "ng":draw("ng",{tongue:"M44 92 Q48 86 56 86 Q80 82 100 76 Q112 70 118 76 Q124 90 126 106 L128 140 Q100 134 70 118 Q50 106 44 98Z",vel:"down",
+        extra:(a,r)=>r(117,76)+a("M132 150 V60 Q130 46 116 46 H50 Q36 48 30 56 L14 54")}, l=>label(117,76,l==="es"?["velo bajado,","aire por la nariz"]:["velum lowered,","air through nose"])),
+    "g":draw("g",{tongue:"M44 92 Q48 86 56 86 Q80 82 98 74 Q108 68 116 72 Q124 88 126 106 L128 140 Q100 134 70 118 Q50 106 44 98Z",
+        extra:(a)=>a("M132 150 V100 Q130 78 112 69 Q90 62 60 70 L20 78")+`<path d="M104 62 l3 3 l3 -3 l3 3" stroke="${GOLD}" stroke-width="1.6" fill="none"/>`}, l=>label(112,66,l==="es"?["casi toca","el velo"]:["almost touches","the velum"])),
+    "d":draw("d",{tongue:"M22 81 Q24 79 40 79.5 Q60 76 86 74 Q108 76 120 90 Q126 100 126 108 L128 140 Q100 134 70 118 Q50 106 44 98 Q40 90 36 86 Q26 84 22 81Z",
+        extra:(a,r)=>r(30,81)+a("M24 77 L2 74")}, l=>label(30,81,l==="es"?["punta entre","los dientes"]:["tip between","the teeth"],"bl")),
+    "tr":draw("tr",{tongue:"M46 100 Q44 88 47 78 Q49 70 55 68 Q60 68 58 72 Q55 76 60 79 Q84 75 104 77 Q120 84 124 98 L128 140 Q100 134 70 118 Q52 108 46 100Z",
+        extra:(a,r)=>r(52,68)}, l=>label(52,68,l==="es"?["la punta curvada","toca aquí"]:["curled tip","touches here"])),
+    "r":draw("r",{tongue:"M46 100 Q44 90 47 81 Q49 74 55 73 Q60 73 58 77 Q55 80 60 82 Q84 78 104 80 Q120 86 124 100 L128 140 Q100 134 70 118 Q52 108 46 100Z",
+        extra:(a)=>a("M132 150 V104 Q128 84 104 74 Q76 66 56 70 L20 78")}, l=>label(54,72,l==="es"?["punta curvada,","sin tocar"]:["curled tip,","no contact"])),
+    "ll":draw("ll",{tongue:"M44 92 Q46 84 56 76 Q66 66 80 64 Q98 64 110 76 Q122 90 126 106 L128 140 Q100 134 70 118 Q50 106 44 98Z",
+        extra:(a,r)=>r(78,63)}, l=>label(78,63,l==="es"?["lengua contra el","paladar duro"]:["tongue against","the hard palate"]))
+  };
+  const TXT={
+    "ü":{es:"La lengua sube en el medio de la boca, ni adelante como en la i ni atrás como en la u. Los labios quedan estirados, no redondos.",en:"The tongue rises in the middle of the mouth, not forward as for i nor back as for u. The lips stay spread, not rounded."},
+    "ng":{es:"La parte de atrás de la lengua toca el velo del paladar, donde se hace la k. El velo baja y el aire sale por la nariz.",en:"The back of the tongue touches the soft palate, where k is made. The velum lowers and air comes out through the nose."},
+    "g":{es:"La parte de atrás de la lengua se acerca al velo del paladar, pero sin tocarlo. El aire pasa rozando y sale por la boca, no por la nariz.",en:"The back of the tongue comes close to the soft palate but does not touch it. Air rubs through the gap and out of the mouth, not the nose."},
+    "d":{es:"La punta de la lengua va entre los dientes y el aire sale rozando, como la z de “zapato” en España o la th de “think”.",en:"The tip of the tongue goes between the teeth and air flows over it, like th in “think”."},
+    "tr":{es:"La punta de la lengua se curva hacia atrás y toca detrás de la encía de arriba. Es un solo sonido, no t + r.",en:"The tip of the tongue curls back and touches behind the upper gum ridge. It is one sound, not t + r."},
+    "r":{es:"La punta de la lengua sube y se curva hacia atrás, cerca de la encía de arriba, pero sin tocarla ni vibrar. A veces se oye un roce.",en:"The tongue tip rises and curls back near the upper gum ridge, without touching it or trilling. Sometimes you hear some friction."},
+    "ll":{es:"El cuerpo de la lengua se apoya en el paladar duro, más atrás que para la l. El aire sale por los costados de la lengua.",en:"The body of the tongue rests on the hard palate, further back than for l. Air flows out along the sides of the tongue."}
+  };
+  const out={}; for(const k in D) out[k]={svg:()=>D[k](typeof lang!=="undefined"?lang:"es"),...TXT[k]};
+  return out;
 })();
 // Unificado -> syllables, stress (general rule), IPA, and which hard sounds a word contains
 const PRON=(()=>{
@@ -2699,7 +2765,7 @@ function pronHTML(text){
   const line=r=>r.sg.map((s,i)=>{ const t=s.map(([gr])=>PRON.HARD.includes(gr)?`<span class="hl">${esc(i===r.st?gr.toUpperCase():gr)}</span>`:esc(i===r.st?gr.toUpperCase():gr)).join("");
     return i===r.st?`<span class="st">${t}</span>`:t; }).join("·");
   const tip=h=>{ const ph=PHON.find(x=>x.g===h); const m=MOUTH[h];
-    return `<div class="pt"><span class="pt-g">${esc(h)}</span><div><p>${ph?`<span class="pw-i">${esc(ph.ipa)}</span> ${esc(gl(ph))}`:""}</p>${m?`<div class="mouth">${m.svg}<p>${esc(gl(m))}</p></div>`:""}</div></div>`; };
+    return `<div class="pt"><span class="pt-g">${esc(h)}</span><div><p>${ph?`<span class="pw-i">${esc(ph.ipa)}</span> ${esc(gl(ph))}`:""}</p>${m?`<div class="mouth">${m.svg()}<p>${esc(gl(m))}</p></div>`:""}</div></div>`; };
   return `<div class="pron">
     ${ws.map(r=>`<div class="pw"><span class="pw-w">${line(r)}</span>${pronIPA?`<span class="pw-i">[${r.ipa.map((x,i)=>(i===r.st?"ˈ":"")+x).join(".")}]</span>`:""}</div>`).join("")}
     ${hard.map(tip).join("")}
@@ -2749,7 +2815,7 @@ function pronunciation(){
     <div class="phon">${PHON.map(x=>`
       <div class="ph"><div class="g"><span>${esc(x.g)}</span><code>${esc(x.ipa)}</code></div>
         <p>${esc(gl(x))}</p>
-        ${MOUTH[x.g]?`<div class="mouth">${MOUTH[x.g].svg}<p>${esc(gl(MOUTH[x.g]))}</p></div>`:""}
+        ${MOUTH[x.g]?`<div class="mouth">${MOUTH[x.g].svg()}<p>${esc(gl(MOUTH[x.g]))}</p></div>`:""}
         <div class="ex">${x.ex.map(e=>`<span><b>${esc(e[0])}</b> ${esc(lang==="es"?e[1]:e[2])}</span>`).join("")}</div>
         ${x.cmp?`<p class="cmp">${x.cmp[lang]}</p>`:""}</div>`).join("")}</div>
     <div class="rule"><b>${t().stressH}</b> ${t().stress}
