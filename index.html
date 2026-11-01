@@ -553,6 +553,32 @@ function genAm(n){
   return out;
 }
 
+// ===== Reportative / mirative -(ü)rke- (all forms attested in AVENUE) =====
+const RKE_G={
+  "mülerkefuy":["había (dicen)","there was (they say)"],"mülefuy":["había","there was"],"mülekefuy":["solía haber","there used to be"],
+  "mülerkey":["dicen que hay","they say there is"],"müley":["hay","there is"],"mülekey":["suele haber","there usually is"],
+  "nierkefuy":["dicen que tenía","they say she/he had"],"niefuy":["tenía","she/he had"],"niekefuy":["solía tener","she/he used to have"],
+  "nierkey":["dicen que tiene","they say she/he has"],"niey":["tiene","she/he has"],"niekey":["suele tener","she/he usually has"],
+  "nierkeymi":["resulta que tienes","it turns out you have"],"nieymi":["tienes","you have"],
+  "kimürkey":["dicen que sabe","they say she/he knows"],"kimi":["sabe","she/he knows"],"kimkey":["suele saber","she/he usually knows"],"kimürkefuy":["dicen que sabía","they say she/he knew"],
+  "femürkey":["dicen que lo hizo así","they say she/he did it that way"],"femi":["lo hizo así","she/he did it that way"],"femkey":["suele hacerlo así","she/he usually does it that way"],
+  "femürken":["resulta que lo hice así","it turns out I did it that way"],
+  "konürkey":["dicen que entró","they say she/he went in"],"koni":["entró","she/he went in"],"konkey":["suele entrar","she/he usually goes in"],
+  "kümerkey":["resulta que es bueno","it turns out it is good"],"kümey":["es bueno","it is good"],"kümekey":["suele ser bueno","it is usually good"],"kümerkelay":["resulta que no es bueno","it turns out it is not good"],
+  "küparkey":["dicen que vino","they say she/he came"],"küpay":["vino","she/he came"],"küpakey":["suele venir","she/he usually comes"],
+  "pirkey":["dicen que dijo","they say she/he said"],"piy":["dijo","she/he said"],"pikey":["suele decir","she/he usually says"]
+};
+const RKE=[
+  {m:"mülerkefuy",d:["mülefuy","mülekefuy","mülerkey"]},{m:"nierkefuy",d:["niefuy","niekefuy","nierkey"]},
+  {m:"mülerkey",d:["müley","mülekey","mülerkefuy"]},{m:"nierkey",d:["niey","niekey","nierkeymi"]},
+  {m:"nierkeymi",d:["nieymi","nierkey","niey"]},{m:"kimürkey",d:["kimi","kimkey","kimürkefuy"]},
+  {m:"femürkey",d:["femi","femkey","femürken"]},{m:"femürken",d:["femürkey","femi","femkey"]},
+  {m:"konürkey",d:["koni","konkey","küparkey"]},{m:"kümerkey",d:["kümey","kümekey","kümerkelay"]},
+  {m:"küparkey",d:["küpay","küpakey","konürkey"]},{m:"pirkey",d:["piy","pikey","küparkey"]}
+];
+const rkeForm=m=>({m,es:RKE_G[m][0],en:RKE_G[m][1]});
+function genRke(n){ return shuffle(RKE).slice(0,n).map(r=>({...rkeForm(r.m),dist:r.d.map(rkeForm)})); }
+
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
   {v:"amu",vg:{es:"ir",en:"go"},m:"amulün",es:"hacer andar, poner en movimiento",en:"to make go, set in motion"},
@@ -1169,6 +1195,11 @@ const STAGES = [
     examples:()=>COMBOS.slice(0,8).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
     rule:{es:"Los sufijos se suman en un orden fijo: raíz, movimiento (<b>-me-/-pa-</b>), aspecto (<b>-ke-</b>), negación (<b>-la-</b>), futuro (<b>-a-</b>), objeto (<b>-fi-</b>) y persona. <b>pe-me-la-fi-ñ</b> “no fui a verlo”.",
           en:"Suffixes stack in a fixed order: root, motion (<b>-me-/-pa-</b>), aspect (<b>-ke-</b>), negation (<b>-la-</b>), future (<b>-a-</b>), object (<b>-fi-</b>) and person. <b>pe-me-la-fi-ñ</b> “I didn't go to see it”."}},
+  { id:"rke", mt:"-(ü)rke-", es:"Dicen que…, resulta que…", en:"They say…, it turns out…", kind:"verb",
+    gen:()=>genRke(8),
+    examples:()=>[["müle-rke-fu-y","mülerkefuy"],["nie-rke-y","nierkey"],["kim-ürke-y","kimürkey"],["fem-ürke-n","femürken"],["küme-rke-y","kümerkey"],["pi-rke-y","pirkey"]].map(([s,m])=>({m:s,es:RKE_G[m][0],en:RKE_G[m][1]})),
+    rule:{es:"<b>-(ü)rke-</b> marca que lo dicho viene de otros (“dicen que”) o que el hablante se da cuenta de algo (“resulta que”, “es que”). Va antes de la persona: <b>nie-rke-y</b> “dicen que tiene”. Después de consonante es <b>-ürke-</b>: <b>kim-ürke-y</b>. Con <b>-fu-</b> es típico de los relatos: <b>müle-rke-fu-y</b> “había (dicen)”. También se usa con <b>inche</b>: <b>fem-ürke-n</b> “resulta que lo hice así”.",
+          en:"<b>-(ü)rke-</b> marks that what is said comes from others (“they say”) or that the speaker realises something (“it turns out”). It goes before the person ending: <b>nie-rke-y</b> “they say she/he has”. After a consonant it is <b>-ürke-</b>: <b>kim-ürke-y</b>. With <b>-fu-</b> it is typical of stories: <b>müle-rke-fu-y</b> “there was (they say)”. It is also used with <b>inche</b>: <b>fem-ürke-n</b> “it turns out I did it that way”."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
