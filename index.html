@@ -332,12 +332,32 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .pali{transition:cx .4s}
 .pali.goal{fill:var(--gold)} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:3}
 .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 14px}
-.vrow{display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--panel-2);padding:6px 2px}
+.vrow{border-bottom:1px solid var(--panel-2);padding:6px 2px}
+.vrow summary{display:flex;gap:10px;align-items:baseline;cursor:pointer;list-style:none}
+.vrow summary::-webkit-details-marker{display:none}
+.vrow summary::after{content:"🗣";margin-left:auto;font-size:.8rem;opacity:.55}
+.vrow[open] summary::after{opacity:1}
+.vpr .pron{margin-top:8px}
 .vrow b{font-family:var(--display);font-weight:400;font-size:1.05rem}
 .vrow span{color:var(--muted);font-size:.9rem}
 .vgrp{margin-top:14px}
 .vbar-top{flex-wrap:wrap;gap:8px}
 .vbar-top input{flex:1 1 160px;min-width:0;background:var(--panel);color:var(--ink);border:1.5px solid var(--panel-2);border-radius:6px;padding:9px 12px;font:inherit}
+.pron{background:var(--panel);border:1.5px solid var(--panel-2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.pw{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.pw-w{font-family:var(--display);font-size:1.45rem;letter-spacing:.02em;overflow-wrap:anywhere}
+.pw-w .st{text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:5px}
+.pron .hl{color:var(--gold)}
+.pw-i{color:var(--muted);font-size:.95rem}
+.pt{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--panel-2);padding-top:8px}
+.pt-g{font-family:var(--display);color:var(--gold);font-size:1.3rem;min-width:2.2ch}
+.pt p{margin:0;font-size:.9rem}
+.mouth{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.mouth svg{width:120px;height:90px;flex:none;background:var(--ground);border-radius:6px}
+.mouth p{font-size:.85rem;color:var(--muted);flex:1 1 150px;margin:0}
+.ph .mouth svg{width:160px;height:120px}
+.pron-ft{display:flex;gap:10px;align-items:center;font-size:.8rem;color:var(--muted)}
+.fc-pron:not(:empty){margin-top:10px}
 .quizcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel-2);color:var(--ink);
   border:2px dashed var(--gold);border-radius:6px;padding:12px 14px;cursor:pointer;transition:transform .12s}
 .quizcard:hover:not(:disabled){transform:translateY(-2px)}
@@ -1698,7 +1718,8 @@ function intro(lvl){
         <button class="btn ghost" id="fcAgain">${t().fcAgain}</button>
         <button class="btn ghost" id="fcNext" aria-label="${t().fcNext}">→</button>
       </div>
-      <div class="fc-opts"><button class="chip" id="fcShuf">${t().fcShuffle}</button><button class="chip" id="fcSide" aria-pressed="false">${t().fcSide}</button><span class="fc-known" id="fcK"></span></div>
+      <div class="fc-opts"><button class="chip" id="fcShuf">${t().fcShuffle}</button><button class="chip" id="fcSide" aria-pressed="false">${t().fcSide}</button>${lvl.id==="quiz-fon"?"":`<button class="chip" id="fcPr" aria-pressed="${pronOn}">${L2("Cómo se pronuncia","How to say it")}</button>`}<span class="fc-known" id="fcK"></span></div>
+      <div class="fc-pron" id="fcPron"></div>
     </section>` : "";
   body = deckHTML + body;
   app.innerHTML=`
@@ -1716,7 +1737,8 @@ function intro(lvl){
       document.getElementById("fc").classList.toggle("flipped",flipped);
       document.getElementById("fcN").textContent=`${at+1} / ${order.length}`;
       document.getElementById("fcK").textContent=known.size?t().fcKnown(known.size,deck.length):"";
-      document.getElementById("fcKnow").setAttribute("aria-pressed",known.has(order[at])); };
+      document.getElementById("fcKnow").setAttribute("aria-pressed",known.has(order[at]));
+      const pp=document.getElementById("fcPron"); if(pp){ pp.innerHTML=pronOn&&lvl.id!=="quiz-fon"?pronHTML(c.m):""; bindPron(pp,show); } };
     const go=d=>{ at=(at+d+order.length)%order.length; flipped=false; show(); };
     document.getElementById("fc").onclick=()=>{ flipped=!flipped; show(); };
     document.getElementById("fcPrev").onclick=()=>go(-1);
@@ -1724,6 +1746,7 @@ function intro(lvl){
     document.getElementById("fcKnow").onclick=()=>{ known.add(order[at]); go(1); };
     document.getElementById("fcAgain").onclick=()=>{ known.delete(order[at]); const i=order.splice(at,1)[0]; order.push(i); if(at>=order.length) at=0; flipped=false; show(); };
     document.getElementById("fcShuf").onclick=()=>{ order=shuffle(order); at=0; flipped=false; show(); };
+    const prb=document.getElementById("fcPr"); if(prb) prb.onclick=e=>{ pronOn=!pronOn; e.currentTarget.setAttribute("aria-pressed",pronOn); show(); };
     document.getElementById("fcSide").onclick=e=>{ meaningFirst=!meaningFirst; e.currentTarget.setAttribute("aria-pressed",meaningFirst); flipped=false; show(); };
     intro.keys=e=>{ if(!document.getElementById("fc")) return; if(e.key==="ArrowRight") go(1); else if(e.key==="ArrowLeft") go(-1); };
     show();
@@ -2505,6 +2528,80 @@ function epewRead(i,st){
 }
 
 // ===== Pronunciation (Grafemario Unificado) =====
+
+// ===== Word-by-word pronunciation guide (generated from the Unificado spelling) =====
+// Mid-sagittal mouth diagrams (face to the left). Shared outline + per-sound tongue, contact point and airflow.
+const MOUTH=(()=>{
+  const OUT="#a9a3c8", TONG="#d77a7a", GOLD="#e8b53a", SKIN="#c98a5a";
+  const frame=(tongue,extra)=>`<svg viewBox="0 0 160 120" width="160" height="120" role="img" aria-hidden="true">
+    <path d="M22 8 Q8 24 16 38 L26 41" fill="none" stroke="${SKIN}" stroke-width="3"/>
+    <path d="M26 41 Q30 30 46 30 H118 Q134 30 134 46 V118" fill="none" stroke="${OUT}" stroke-width="2.5"/>
+    <path d="M34 52 Q38 46 44 47 Q50 48 52 46 Q74 38 98 44 Q112 48 114 62" fill="none" stroke="${OUT}" stroke-width="2.5"/>
+    <path d="M98 44 Q112 48 114 62" fill="none" stroke="${OUT}" stroke-width="6" opacity=".35"/>
+    <path d="M30 84 Q48 104 80 107 Q112 110 134 117" fill="none" stroke="${OUT}" stroke-width="2.5"/>
+    ${tongue}
+    <path d="M26 46 Q14 48 14 58 Q22 62 30 60 Z" fill="${SKIN}"/><path d="M14 72 Q14 82 24 84 Q30 82 30 76 Z" fill="${SKIN}"/>
+    <path d="M30 51 L35 51 L35 63 L31 62Z" fill="#f3efe6"/><path d="M31 69 L35 68 L35 80 L30 80Z" fill="#f3efe6"/>
+    ${extra}</svg>`;
+  const T=d=>`<path d="${d}" fill="${TONG}" stroke="#b55a5a" stroke-width="1.5"/>`;
+  const dot=(x,y)=>`<circle cx="${x}" cy="${y}" r="5" fill="none" stroke="${GOLD}" stroke-width="2.5"/>`;
+  const arrow=(d)=>`<path d="${d}" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3" marker-end="url(#ah)"/>`;
+  const defs=`<defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="${GOLD}"/></marker></defs>`;
+  return {
+    "ü":{svg:frame(T("M40 76 Q48 72 58 66 Q76 56 96 60 Q110 64 118 82 L124 118 L60 110 Q44 100 40 86Z"), defs+arrow("M128 108 V74 Q126 52 96 51 Q70 50 44 58 L20 60")),
+         es:"La lengua sube en el medio de la boca, ni adelante como en la i ni atrás como en la u. Los labios quedan estirados, no redondos.",
+         en:"The tongue rises in the middle of the mouth, not forward as for i nor back as for u. The lips stay spread, not rounded."},
+    "ng":{svg:frame(T("M40 76 Q50 72 66 70 Q90 64 104 56 Q112 52 115 62 Q120 84 124 118 L60 110 Q44 100 40 86Z"), defs+dot(112,57)+arrow("M128 110 V50 Q128 36 112 36 H44 Q32 36 28 42 L14 40")),
+         es:"La parte de atrás de la lengua toca el velo del paladar, donde se hace la k. El aire sale por la nariz.",
+         en:"The back of the tongue touches the soft palate, where k is made. The air comes out through the nose."},
+    "tr":{svg:frame(T("M44 80 Q40 70 42 60 Q44 50 50 48 Q55 47 55 51 Q51 54 53 60 Q70 62 96 64 Q112 70 120 90 L124 118 L60 110 Q44 100 44 80Z"), dot(49,47)),
+         es:"La punta de la lengua se curva hacia atrás y toca detrás de la encía de arriba. Es un solo sonido, no t + r.",
+         en:"The tip of the tongue curls back and touches behind the upper gum ridge. It is one sound, not t + r."},
+    "d":{svg:frame(T("M24 66 Q27 63 36 64 Q60 62 90 62 Q112 66 120 90 L124 118 L60 110 Q42 100 36 82 Q32 72 24 66Z"), defs+dot(30,64)+arrow("M22 61 L4 61")),
+         es:"La punta de la lengua va entre los dientes y el aire sale rozando, como la z de “zapato” en España o la th de “think”.",
+         en:"The tip of the tongue goes between the teeth and air flows over it, like th in “think”."}
+  };
+})();
+// Unificado -> syllables, stress (general rule), IPA, and which hard sounds a word contains
+const PRON=(()=>{
+  const SEG=[["tr","ʈʂ"],["ch","tʃ"],["ng","ŋ"],["ll","ʎ"],["sh","ʃ"],["a","a"],["e","e"],["i","i"],["o","o"],["u","u"],["ü","ɨ"],["k","k"],["p","p"],["t","t"],["f","f"],["d","θ"],["g","ɣ"],["l","l"],["m","m"],["n","n"],["ñ","ɲ"],["r","ɻ"],["s","s"],["w","w"],["y","j"],["b","b"],["v","f"],["z","s"],["c","k"],["j","x"],["x","ks"],["h",""]];
+  const V=new Set(["a","e","i","o","u","ü"]);
+  const HARD=["ü","ng","tr","d","ll","r","g"];
+  const OVR={};   // word -> stressed-syllable index, for analyst corrections
+  const clean=w=>w.toLowerCase().normalize("NFC").replace(/[áàâ]/g,"a").replace(/[éè]/g,"e").replace(/[íì]/g,"i").replace(/[óò]/g,"o").replace(/[úù]/g,"u").replace(/[^a-zñü]/g,"");
+  function segs(w){ const out=[]; let i=0; while(i<w.length){ const s=SEG.find(([g])=>w.startsWith(g,i)); if(s){out.push(s);i+=s[0].length}else i++; } return out; }
+  function syll(sg){
+    const vi=sg.map((s,i)=>V.has(s[0])?i:-1).filter(i=>i>=0);
+    if(!vi.length) return [sg];
+    const cuts=[];
+    for(let k=0;k<vi.length-1;k++){ const a=vi[k], b=vi[k+1], run=b-a-1; cuts.push(run===0?b:b-1); }
+    const out=[]; let st=0; for(const c of cuts){ out.push(sg.slice(st,c)); st=c; } out.push(sg.slice(st)); return out;
+  }
+  function word(raw){
+    const w=clean(raw); if(!w) return null;
+    const sg=segs(w), sy=syll(sg);
+    let st = w in OVR ? OVR[w] : (sy.length<2 ? 0 : (V.has(sg[sg.length-1][0]) ? sy.length-2 : sy.length-1));
+    return {w, sg:sy, sy:sy.map(s=>s.map(x=>x[0]).join("")), ipa:sy.map(s=>s.map(x=>x[1]).join("")), st, hard:HARD.filter(h=>sg.some(x=>x[0]===h))};
+  }
+  function phrase(text){ return text.replace(/-/g,"").split(/[\s«»“”"¿?¡!.,;:…()]+/).map(word).filter(Boolean); }
+  return {word, phrase, HARD};
+})();
+let pronIPA=!!load("ipa"), pronOn=false;
+function pronHTML(text){
+  const ws=PRON.phrase(text); if(!ws.length) return "";
+  const hard=[...new Set(ws.flatMap(r=>r.hard))];
+  const line=r=>r.sg.map((s,i)=>{ const t=s.map(([gr])=>PRON.HARD.includes(gr)?`<span class="hl">${esc(i===r.st?gr.toUpperCase():gr)}</span>`:esc(i===r.st?gr.toUpperCase():gr)).join("");
+    return i===r.st?`<span class="st">${t}</span>`:t; }).join("·");
+  const tip=h=>{ const ph=PHON.find(x=>x.g===h); const m=MOUTH[h];
+    return `<div class="pt"><span class="pt-g">${esc(h)}</span><div><p>${ph?`<span class="pw-i">${esc(ph.ipa)}</span> ${esc(gl(ph))}`:""}</p>${m?`<div class="mouth">${m.svg}<p>${esc(gl(m))}</p></div>`:""}</div></div>`; };
+  return `<div class="pron">
+    ${ws.map(r=>`<div class="pw"><span class="pw-w">${line(r)}</span>${pronIPA?`<span class="pw-i">[${r.ipa.map((x,i)=>(i===r.st?"ˈ":"")+x).join(".")}]</span>`:""}</div>`).join("")}
+    ${hard.map(tip).join("")}
+    <div class="pron-ft"><button class="chip" data-ipa aria-pressed="${pronIPA}">IPA</button><small>${L2("La sílaba en mayúsculas lleva el acento, según la regla general; puede variar.","The capitalised syllable carries the stress, by the general rule; it can vary.")}</small></div>
+  </div>`;
+}
+function bindPron(el, rerender){ el.onclick=e=>{ if(e.target.closest("[data-ipa]")){ e.stopPropagation(); pronIPA=!pronIPA; save("ipa",pronIPA); rerender(); } }; }
+
 const PHON = [
   {g:"a", ipa:"[a]", es:"Como en español.", en:"As in Spanish “casa”; like a in “father”.", ex:[["antü","sol","sun"],["kachu","pasto","grass"],["lafken","mar","sea"],["mapu","tierra","land"],["waka","vaca","cow"]]},
   {g:"e", ipa:"[e]", es:"Como en español.", en:"As in Spanish; like e in “they”, without the glide.", ex:[["epu","dos","two"],["trewa","perro","dog"],["wenu","arriba","above"],["kechu","cinco","five"],["regle","siete","seven"]]},
@@ -2546,6 +2643,7 @@ function pronunciation(){
     <div class="phon">${PHON.map(x=>`
       <div class="ph"><div class="g"><span>${esc(x.g)}</span><code>${esc(x.ipa)}</code></div>
         <p>${esc(gl(x))}</p>
+        ${MOUTH[x.g]?`<div class="mouth">${MOUTH[x.g].svg}<p>${esc(gl(MOUTH[x.g]))}</p></div>`:""}
         <div class="ex">${x.ex.map(e=>`<span><b>${esc(e[0])}</b> ${esc(lang==="es"?e[1]:e[2])}</span>`).join("")}</div>
         ${x.cmp?`<p class="cmp">${x.cmp[lang]}</p>`:""}</div>`).join("")}</div>
     <div class="rule"><b>${t().stressH}</b> ${t().stress}
@@ -2571,7 +2669,7 @@ function vocab(){
   const all=vocabWords();
   const q=vocabQ.trim().toLowerCase();
   const list=all.filter(w=>!q||[w.m,w.es,w.en].some(s=>String(s).toLowerCase().includes(q)));
-  const row=w=>`<div class="vrow"><b>${esc(w.m)}</b><span>${esc(lang==="es"?w.es:w.en)}</span></div>`;
+  const row=w=>`<details class="vrow"><summary><b>${esc(w.m)}</b><span>${esc(lang==="es"?w.es:w.en)}</span></summary><div class="vpr" data-m="${esc(w.m)}"></div></details>`;
   let body;
   if(!all.length) body=`<p class="note">${L2("Completa un nivel para empezar tu lista de palabras.","Finish a level to start your word list.")}</p>`;
   else if(!list.length) body=`<p class="note">${L2("No hay palabras que coincidan.","No matching words.")}</p>`;
@@ -2588,6 +2686,8 @@ function vocab(){
   bindLang(vocab);
   document.getElementById("bk").onclick=menu;
   document.getElementById("vs").onclick=()=>{ vocabSort=vocabSort==="az"?"src":"az"; vocab(); };
+  app.querySelectorAll("details.vrow").forEach(d=>d.addEventListener("toggle",()=>{ const box=d.querySelector(".vpr"); if(!d.open) return;
+    const fill=()=>{ box.innerHTML=pronHTML(box.dataset.m); bindPron(box,fill); }; fill(); }));
   const inp=document.getElementById("vq");
   inp.oninput=()=>{ vocabQ=inp.value; vocab(); const i2=document.getElementById("vq"); i2.focus(); i2.setSelectionRange(i2.value.length,i2.value.length); };
 }
