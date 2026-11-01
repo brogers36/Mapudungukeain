@@ -2685,15 +2685,15 @@ function epewRead(i,st){
 // Mid-sagittal mouth diagrams (face to the left). Shared outline + per-sound tongue, contact point and airflow.
 const MOUTH=(()=>{
   const SKIN="#c98a5a", SKIN2="#b5774a", CAV="#2b1a24", BONE="#efe3cf", VEL="#c46a6a", TONG="#e48a83", TONG2="#b8585a", GOLD="#e8b53a", INK="#f3efe6";
-  const head=`<path d="M200 0 H64 Q54 16 50 30 L22 54 Q17 60 25 63 L35 65 Q25 70 25 75 Q25 79 35 80 Q25 83 26 89 Q29 96 40 98 Q31 110 41 120 Q62 129 94 130 L106 160 H200Z" fill="${SKIN}"/>`;
+  const head=`<path d="M200 0 H64 Q54 16 50 30 L22 54 Q17 60 25 63 L35 65 Q23 69 23 73 Q23 76 31 76 L41 76 L41 86 L31 86.5 Q23 87 25 91 Q29 96 40 98 Q31 110 41 120 Q62 129 94 130 L106 160 H200Z" fill="${SKIN}"/>`;
   const nasal=`<path d="M28 59 Q40 44 70 40 L124 40 Q136 42 137 54 L137 58 L106 58 Q80 57 54 62 Q40 64 30 62Z" fill="${CAV}"/>`;
   const pharynx=`<path d="M124 50 Q140 50 140 64 L142 160 H124 L122 118 Z" fill="${CAV}"/>`;
-  const oral=`<path d="M46 70 Q60 66 106 63 Q122 66 126 82 L126 122 Q92 118 62 106 Q46 98 46 84Z" fill="${CAV}"/>`;
+  const oral=`<path d="M31 76 L41 76 L46 70 Q60 66 106 63 Q122 66 126 82 L126 122 Q92 118 62 106 Q46 98 46 86 L41 86 L31 86.5 Q27 81 31 76Z" fill="${CAV}"/>`;
   const palate=`<path d="M46 66 Q50 61 58 60 Q84 55 106 57 L106 63 Q84 60 58 66 Q52 68 48 71Z" fill="${BONE}"/>`;
   const velum={up:`<path d="M104 57 Q120 52 136 50 L137 57 Q122 62 106 64Z" fill="${VEL}"/>`,
                down:`<path d="M104 57 Q118 60 122 76 Q122 84 117 82 Q113 70 104 64Z" fill="${VEL}"/>`};
   const teeth=`<path d="M40 65 L48 66 L47 79 L41 78Z" fill="${INK}"/><path d="M41 82 L47 81 L48 94 L40 94Z" fill="${INK}"/>`;
-  const lipShade=`<path d="M25 75 Q30 77 35 80 Q30 81 26 83" stroke="${SKIN2}" stroke-width="1.5" fill="none"/>`;
+  const lipShade=`<path d="M23 73 Q23 76 31 76 M25 91 Q23 87 31 86.5" stroke="${SKIN2}" stroke-width="2" fill="none"/>`;
   const T=d=>`<path d="${d}" fill="${TONG}" stroke="${TONG2}" stroke-width="1.5"/>`;
   const ring=(x,y)=>`<circle cx="${x}" cy="${y}" r="5.5" fill="none" stroke="${GOLD}" stroke-width="2.5"/>`;
   const label=(x,y,lines,pos="tl")=>{ const bx=4, by=pos==="tl"?12:136, lh=10;
