@@ -1656,7 +1656,8 @@ const T = {
       quizIntro:l=>`Doce preguntas mezcladas de: ${l}. Cada respuesta correcta vale <b>2 ngülliw</b> y cada estrella <b>4 más</b>, el doble que un nivel normal. Las estrellas de la prueba no cuentan para abrir etapas.`,
       bonus:"extra ganados",fcTitle:"Tarjetas de estudio",fcFlip:"Toca la tarjeta para darla vuelta",fcPrev:"Anterior",fcNext:"Siguiente",
       fcKnow:"Me la sé",fcAgain:"Repasar otra vez",fcShuffle:"Barajar",fcSide:"Empezar por el significado",fcKnown:(k,n)=>`${k} de ${n} ya te las sabes`,fcAll:"Ver todas las palabras",howTitle:"Cómo se juega",howBtn:"Cómo se juega",howGo:"¡Empezar!",howHi:"Te acompañaremos en cada nivel.",
-      how:l=>l.quiz?"Prueba de la etapa: 12 preguntas de todos sus niveles. Si la pasas, verás un video."
+      how:l=>l.repaso?"Estas son palabras que fallaste antes. Repásalas y juega: cada una sale de la lista cuando la aciertas dos veces seguidas, aquí o en cualquier nivel."
+        :l.quiz?"Prueba de la etapa: 12 preguntas de todos sus niveles. Si la pasas, verás un video."
         :l.kind==="convo"?"Verás una pregunta en mapudungun. Elige la respuesta que corresponde."
         :l.id==="frases"?"Verás una frase en español. Elige la frase en mapudungun que dice lo mismo."
         :l.kind==="derive"?"Lee la regla y los ejemplos. Luego verás la raíz y el significado: elige la forma correcta."
@@ -1682,7 +1683,8 @@ const T = {
       quizIntro:l=>`Twelve mixed questions from: ${l}. Each correct answer is worth <b>2 ngülliw</b> and each star <b>4 more</b>, double a regular level. Quiz stars do not count toward opening stages.`,
       bonus:"bonus earned",fcTitle:"Study cards",fcFlip:"Tap the card to flip it",fcPrev:"Previous",fcNext:"Next",
       fcKnow:"I know it",fcAgain:"Review again",fcShuffle:"Shuffle",fcSide:"Show the meaning first",fcKnown:(k,n)=>`${k} of ${n} known`,fcAll:"See all the words",howTitle:"How to play",howBtn:"How to play",howGo:"Start!",howHi:"We'll be with you in every level.",
-      how:l=>l.quiz?"Stage quiz: 12 questions from all its levels. Pass it to watch a video."
+      how:l=>l.repaso?"These are words you missed before. Review them and play: each one leaves the list once you get it right twice in a row, here or in any level."
+        :l.quiz?"Stage quiz: 12 questions from all its levels. Pass it to watch a video."
         :l.kind==="convo"?"You'll see a question in Mapudungun. Choose the answer that fits."
         :l.id==="frases"?"You'll see a sentence in English. Choose the Mapudungun sentence that says the same."
         :l.kind==="derive"?"Read the rule and the examples. Then you'll see the root and the meaning: choose the right form."
@@ -1776,6 +1778,7 @@ function menu(){
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
+      ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
       ["help",t().howBtn,L2("Instrucciones","Instructions")]
     ].map(([id,n,d])=>`<button class="tcard" id="${id}"><b>${esc(n)}</b><small>${esc(d)}</small></button>`).join("")}</nav>
     ${STAGES.map(st=>{
@@ -1801,6 +1804,7 @@ function menu(){
   document.getElementById("pron").onclick=pronunciation;
   document.getElementById("read").onclick=readingList;
   document.getElementById("vocab").onclick=()=>vocab();
+  document.getElementById("repaso").onclick=()=>openRepaso();
   document.getElementById("help").onclick=help;
   document.getElementById("x-lof").onclick=()=>lof();
   document.getElementById("x-palin").onclick=()=>palin();
@@ -1837,12 +1841,12 @@ function intro(lvl){
       <div class="cards">${ex.map(w=>`<div class="card">${picHTML(w,lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div>`;
   }else{
     body=`${lvl.rule?`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>`:""}<details class="all"><summary>${t().fcAll}</summary><div class="cards">${lvl.words.map(w=>`
-        <div class="card">${lvl.kind==="scene"?"":picHTML(w,lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div></details>`;
+        <div class="card">${(w._lvl||lvl).kind==="scene"?"":picHTML(w,w._lvl||lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div></details>`;
   }
   // individual flashcards, studied one at a time before playing
   let deck=[];
   if(!lvl.quiz){
-    if(lvl.words) deck=lvl.words.map(w=>({m:w.m, pic:lvl.kind==="scene"?"":picHTML(w,lvl), g:gl(w)}));
+    if(lvl.words) deck=lvl.words.map(w=>({m:w.m, pic:(w._lvl||lvl).kind==="scene"||((w._lvl||lvl).kind==="verb")?"":picHTML(w,w._lvl||lvl), g:gl(w)}));
     else if(lvl.kind==="count") deck=genCount(8).map(w=>({m:w.m, pic:picHTML(w,lvl), g:gl(w)}));
     else if(lvl.examples) deck=lvl.examples().map(f=>({m:f.m, pic:"", g:gl(f)}));
     else if(lvl.kind==="verb"){ const ex=[VERBS[0],VERBS[4]], sets=lvl.tenses.length>1?["pres","neg","fut"]:[lvl.tenses[0]];
@@ -1933,12 +1937,12 @@ function answer(w,btn,btns,opts){
   const fb=document.getElementById("fb");
   if(ok){
     btn.classList.add("pop");
-    S.queue.shift(); S.done++; if(!q.retry) S.correct++;
+    S.queue.shift(); S.done++; if(!q.retry){ S.correct++; logRight(q.w,S.lvl); }
     const word = PRAISE[praiseIdx++ % PRAISE.length];
     fb.innerHTML=coach(`<b>¡${word}!</b><small>${t().rightG}</small>`, true);
   }else{
     btn.classList.add("bad","shake");
-    S.hearts--; S.missed.add(q.w);
+    S.hearts--; S.missed.add(q.w); logMiss(q.w,S.lvl);
     S.queue.shift();
     S.queue.splice(Math.min(2,S.queue.length),0,{w:q.w,type:(q.w.oneWay||q.type==="word2pic")?"pic2word":"word2pic",retry:true});
     fb.innerHTML=coach(`<b class="bad">¡Fotrü!</b><small>${t().wrong}: <b>${esc(q.w.m)}</b> · ${esc(gl(q.w))} · ${t().keep}</small>`, false);
@@ -1981,7 +1985,7 @@ function result(){
     </div>
     <div class="row">${nl?`<button class="btn" id="nl">${L2("Siguiente","Next")}: ${esc(title(nl))} →</button>`:""}<button class="btn${nl?" ghost":""}" id="ag">${t().again}</button><button class="btn ghost" id="wd">${t().wardrobe}</button><button class="btn ghost" id="mn">${t().menu}</button></div>`;
   if(nl) document.getElementById("nl").onclick=()=>intro(nl);
-  document.getElementById("ag").onclick=()=>start(lvl);
+  document.getElementById("ag").onclick=()=>lvl.repaso?openRepaso():start(lvl);
   document.getElementById("mn").onclick=menu;
   document.getElementById("wd").onclick=wardrobe;
   };
@@ -2824,6 +2828,34 @@ function pronunciation(){
   bindLang(pronunciation);
   document.getElementById("bk").onclick=menu;
   document.getElementById("pq").onclick=()=>intro(PRON_LVL);
+}
+
+// ===== Repaso: words missed anywhere come back until they are answered right twice in a row =====
+let missLog=load("miss")||{};
+const findLevel=id=>ALL_LEVELS.find(l=>l.id===id)||(PRON_LVL.id===id?PRON_LVL:null);
+function logMiss(w,lvl){
+  const src=w._lvl||lvl; if(!src||src.repaso||w.prompt) return;
+  if(!src.words && !(w.dist&&w.dist.length)) return;            // generated items are only kept when they carry their own options
+  const k=src.id+"|"+w.m, e=missLog[k]||{lvl:src.id,m:w.m,n:0};
+  e.n++; e.streak=0; e.t=Date.now();
+  if(!src.words){ e.es=w.es; e.en=w.en; e.ow=!!w.oneWay; e.d=w.dist.map(x=>({m:x.m,es:x.es,en:x.en})); }
+  missLog[k]=e; save("miss",missLog);
+}
+function logRight(w,lvl){
+  const src=w._lvl||lvl; if(!src) return; const k=src.id+"|"+w.m, e=missLog[k]; if(!e) return;
+  e.streak=(e.streak||0)+1; if(e.streak>=2) delete missLog[k]; save("miss",missLog);
+}
+function repasoItems(){
+  return Object.values(missLog).sort((a,b)=>(b.n-a.n)||(a.t-b.t)).map(e=>{
+    const L=findLevel(e.lvl); if(!L) return null;
+    if(L.words){ const w=L.words.find(x=>x.m===e.m); return w?{...w,_lvl:L}:null; }
+    return e.d?{m:e.m,es:e.es,en:e.en,oneWay:e.ow,dist:e.d,_lvl:L}:null;
+  }).filter(Boolean);
+}
+function openRepaso(){
+  const items=repasoItems().slice(0,10);
+  if(!items.length){ menu(); return; }
+  intro({id:"quiz-repaso",repaso:true,mt:"Repaso",es:"Palabras que fallaste",en:"Words you missed",kind:"mixed",words:items,gen:()=>shuffle(items),backTo:menu});
 }
 
 // ===== Running vocabulary list: every word from completed levels, read lecturas and owned epew chapters =====
