@@ -331,6 +331,13 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .score{font-family:var(--display);font-size:1.3rem;font-variant-numeric:tabular-nums}
 .pali{transition:cx .4s}
 .pali.goal{fill:var(--gold)} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:3}
+.vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 14px}
+.vrow{display:flex;gap:10px;align-items:baseline;border-bottom:1px solid var(--panel-2);padding:6px 2px}
+.vrow b{font-family:var(--display);font-weight:400;font-size:1.05rem}
+.vrow span{color:var(--muted);font-size:.9rem}
+.vgrp{margin-top:14px}
+.vbar-top{flex-wrap:wrap;gap:8px}
+.vbar-top input{flex:1 1 160px;min-width:0;background:var(--panel);color:var(--ink);border:1.5px solid var(--panel-2);border-radius:6px;padding:9px 12px;font:inherit}
 .quizcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--panel-2);color:var(--ink);
   border:2px dashed var(--gold);border-radius:6px;padding:12px 14px;cursor:pointer;transition:transform .12s}
 .quizcard:hover:not(:disabled){transform:translateY(-2px)}
@@ -793,6 +800,105 @@ return {
 };
 })();
 
+// ===== More pictures for the Intermedio II levels (same figure family) =====
+const ACT2=(()=>{
+const SK="#c98a5a", HAIR="#2a1a10", BODY="#c8322f", LIMB="#f3efe6", GOLD="#e8b53a", WOOD="#9a5b2e", DARK="#2a2652", BLUE="#2f5fd0", MUTE="#6f6a96";
+const W=(vb,inner)=>`<svg viewBox="${vb}" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+const head=(x,y,face="")=>`<circle cx="${x}" cy="${y}" r="7" fill="${SK}"/><path d="M${x-7} ${y-2} Q${x} ${y-11} ${x+7} ${y-2}" fill="${HAIR}"/>${face}`;
+const torso=(x1,y1,x2,y2,c=BODY)=>`<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${c}" stroke-width="7"/>`;
+const limb=d=>`<path d="${d}" stroke="${LIMB}" stroke-width="3.5" fill="none"/>`;
+const eye=(x,y)=>`<circle cx="${x}" cy="${y}" r="1.6" fill="${HAIR}"/>`;
+const hut=(x)=>`<path d="M${x} 56 V24 L${x+24} 10 L${x+48} 24 V56Z" fill="#c9a25a"/><path d="M${x} 24 L${x+24} 10 L${x+48} 24" stroke="#8a6a3a" stroke-width="3" fill="none"/><rect x="${x+16}" y="34" width="16" height="22" fill="${HAIR}"/>`;
+const bench=(x,w)=>`<rect x="${x}" y="40" width="${w}" height="5" rx="1.5" fill="${WOOD}"/><path d="M${x+4} 45 V56 M${x+w-4} 45 V56" stroke="${WOOD}" stroke-width="3.5"/>`;
+const NEW={
+ come:W("0 0 100 60", head(78,12,eye(75,11))+torso(78,20,78,38,BLUE)+limb("M78 38 L72 56 M78 38 L84 56 M78 24 L68 12 M78 24 L86 34")+
+   head(28,12,eye(31,11))+torso(28,20,28,36)+limb("M28 36 L22 56 M28 36 L38 54 M28 24 L36 34 M28 24 L20 32")+
+   `<path d="M42 30 H62 M55 23 L63 30 L55 37" stroke="${GOLD}" stroke-width="3.5" fill="none"/>`),
+ exit:W("0 0 100 60", hut(2)+head(42,32,eye(45,31))+torso(42,39,42,50)+limb("M42 50 L38 56 M42 50 L48 56")+
+   `<path d="M58 40 H90 M82 32 L92 40 L82 48" stroke="${GOLD}" stroke-width="4" fill="none"/>`),
+ sit:W("0 0 100 60", bench(26,48)+head(46,14,eye(49,13))+torso(46,22,46,38)+limb("M46 38 L62 38 L62 56 M46 26 L58 32")),
+ stand:W("0 0 100 60", bench(14,40)+head(36,8,eye(39,7))+torso(36,16,36,34)+limb("M36 34 L32 56 M36 34 L42 56 M36 20 L28 30 M36 20 L44 30")+
+   `<path d="M74 54 V14 M66 22 L74 12 L82 22" stroke="${GOLD}" stroke-width="4" fill="none"/>`),
+ cry:W("0 0 100 60", `<circle cx="50" cy="30" r="24" fill="${GOLD}"/><path d="M37 22 q5 4 10 0 M53 22 q5 4 10 0" stroke="${HAIR}" stroke-width="3" fill="none"/>`+
+   `<path d="M40 44 Q50 36 60 44" stroke="#7a2a20" stroke-width="3.5" fill="none"/>`+
+   `<path d="M40 27 q-3 8 0 12 q3 -4 0 -12Z M60 27 q-3 8 0 12 q3 -4 0 -12Z" fill="#7fb7e0"/>`+
+   `<path d="M14 30 q-4 6 0 12 M86 30 q4 6 0 12" stroke="#7fb7e0" stroke-width="3" fill="none"/>`),
+ shout:W("0 0 100 60", head(26,26,eye(29,24)+`<ellipse cx="31" cy="30" rx="3" ry="4" fill="#7a2a20"/>`)+torso(26,34,26,58)+limb("M26 38 L36 32 M26 38 L16 44")+
+   `<path d="M40 24 L56 14 M42 30 H62 M40 36 L56 46" stroke="${GOLD}" stroke-width="3"/>`+
+   `<path d="M66 8 L74 18 L82 6 L86 20 L96 16 L90 28 L98 34 L86 36 L88 48 L78 40 L70 50 L68 38 L60 40 L66 30 L58 22 L68 20Z" fill="#f3efe6"/>`+
+   `<path d="M78 20 V30 M78 34 V35" stroke="${BODY}" stroke-width="3.5"/>`),
+ walk:W("0 0 100 60", head(70,10,eye(73,9))+torso(70,18,70,36)+limb("M70 36 L62 56 M70 36 L78 56 M70 22 L62 34 M70 22 L78 34")+
+   `<g fill="#8a6a3a">${[[8,52],[20,46],[32,52],[44,46]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="4" ry="2.4"/>`).join("")}</g>`),
+ search:W("0 0 100 60", head(34,18,eye(37,17))+torso(34,26,34,46)+limb("M34 46 L28 58 M34 46 L40 58 M34 30 L46 14 M34 30 L24 38")+
+   `<path d="M42 12 H52" stroke="${LIMB}" stroke-width="3"/>`+
+   `<text x="72" y="40" font-size="34" font-weight="700" font-family="sans-serif" fill="${GOLD}" text-anchor="middle">?</text>`),
+ weave:W("0 0 100 60", `<path d="M52 4 V56 M94 4 V56" stroke="${WOOD}" stroke-width="4"/><path d="M48 8 H98 M48 52 H98" stroke="${WOOD}" stroke-width="3.5"/>`+
+   `<rect x="56" y="10" width="34" height="40" fill="${BODY}"/><path d="M73 14 L84 28 L73 42 L62 28Z" fill="#14122a"/><path d="M73 21 L78 28 L73 35 L68 28Z" fill="#f3efe6"/>`+
+   head(22,18,eye(25,17))+torso(22,26,22,46)+limb("M22 46 L16 58 M22 46 L28 58 M22 30 L48 26 M22 34 L48 36")),
+ sweep:W("0 0 100 60", head(30,10,eye(33,9))+torso(30,18,32,36)+limb("M32 36 L26 56 M32 36 L40 56 M30 22 L44 30 M30 24 L46 38")+
+   `<path d="M38 18 L60 50" stroke="${WOOD}" stroke-width="3"/><path d="M54 46 L68 44 L72 58 L56 58Z" fill="${GOLD}"/>`+
+   `<g fill="#8a6a3a" opacity=".8"><circle cx="80" cy="54" r="2"/><circle cx="86" cy="50" r="1.6"/><circle cx="90" cy="55" r="2.2"/></g>`),
+ wash:W("0 0 100 60", head(26,12,eye(29,11))+torso(26,20,30,38)+limb("M30 38 L24 56 M30 38 L36 56 M26 24 L50 34 M26 26 L46 40")+
+   `<path d="M40 38 H92 L86 56 H46Z" fill="#a9a3c8"/><rect x="44" y="36" width="46" height="6" rx="2" fill="#7fb7e0"/><path d="M50 36 Q58 30 66 36" fill="${BODY}"/>`+
+   `<g fill="none" stroke="#f3efe6" stroke-width="1.6"><circle cx="70" cy="28" r="4"/><circle cx="80" cy="22" r="3"/><circle cx="86" cy="30" r="2.5"/></g>`),
+ cut:W("0 0 100 60", `<rect x="40" y="44" width="56" height="7" rx="2" fill="${WOOD}"/>`+
+   `<path d="M44 44 Q44 32 56 32 H64 Q68 32 68 44Z" fill="#c9a25a"/><path d="M72 44 Q72 32 80 32 H86 Q92 32 92 44Z" fill="#c9a25a"/>`+
+   head(20,12,eye(23,11))+torso(20,20,20,40)+limb("M20 40 L14 58 M20 40 L26 58 M20 24 L56 12 M20 28 L46 40")+
+   `<path d="M56 12 L62 8" stroke="${HAIR}" stroke-width="5"/><path d="M62 6 L66 10 L72 44 L69 44Z" fill="#c9c4bc"/>`),
+ buy:W("0 0 100 60", head(22,14,eye(25,13))+torso(22,22,22,42)+limb("M22 42 L18 58 M22 42 L28 58 M22 26 L40 30")+
+   head(78,14,eye(75,13))+torso(78,22,78,42,BLUE)+limb("M78 42 L74 58 M78 42 L82 58 M78 26 L60 30")+
+   `<circle cx="44" cy="30" r="5" fill="${GOLD}" stroke="#a87a1a" stroke-width="1.5"/>`+
+   `<path d="M50 24 Q56 14 64 22 Q60 30 52 30Z" fill="#c9a25a"/><path d="M54 22 l4 -2 M56 26 l4 -2" stroke="#8a6a3a" stroke-width="1.2"/>`),
+ build:W("0 0 100 60", `<path d="M54 56 V22 M90 56 V22 M50 22 L72 6 L94 22" stroke="${WOOD}" stroke-width="4" fill="none"/>`+
+   `<path d="M54 34 H90 M54 46 H90" stroke="#c9a25a" stroke-width="3"/>`+
+   head(26,12,eye(29,11))+torso(26,20,26,38)+limb("M26 38 L20 56 M26 38 L32 56 M26 24 L48 18 M26 26 L46 28")+
+   `<path d="M48 18 L56 16" stroke="${LIMB}" stroke-width="2.5"/>`),
+ read:W("0 0 100 60", head(30,16,eye(33,17))+torso(30,24,30,46)+limb("M30 46 L24 58 M30 46 L36 58 M30 28 L48 34 M30 30 L56 40")+
+   `<path d="M44 26 L60 32 L76 26 L76 46 L60 52 L44 46Z" fill="#f3efe6"/><path d="M60 32 V52" stroke="${MUTE}" stroke-width="1.5"/>`+
+   `<path d="M48 32 L57 35 M48 37 L57 40 M48 42 L57 45 M63 35 L72 32 M63 40 L72 37 M63 45 L72 42" stroke="${DARK}" stroke-width="1.5"/>`),
+ cook:W("0 0 100 60", head(24,14,eye(27,13))+torso(24,22,24,42)+limb("M24 42 L18 58 M24 42 L30 58 M24 26 L46 30 L52 22")+
+   `<path d="M52 22 L60 34" stroke="${WOOD}" stroke-width="3"/>`+
+   `<path d="M50 32 Q48 54 66 54 Q84 54 82 32Z" fill="#9a5b2e"/><ellipse cx="66" cy="32" rx="16" ry="4" fill="#7a4522"/>`+
+   `<path d="M54 56 L58 50 L62 56 L66 48 L70 56 L74 50 L78 56" fill="${GOLD}"/>`+
+   `<path d="M60 22 q-3 -6 0 -12 M70 22 q-3 -6 0 -12" stroke="${LIMB}" stroke-width="2" fill="none" opacity=".7"/>`)
+};
+// Body diagrams: one figure, the named part in gold
+const BODYPART=(part)=>{
+  if(part==="ange") return W("0 0 100 60",`<rect x="28" y="2" width="44" height="56" rx="20" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3"/><ellipse cx="50" cy="31" rx="17" ry="22" fill="${GOLD}"/><path d="M33 22 Q50 2 67 22 Q60 14 50 14 Q40 14 33 22Z" fill="${HAIR}"/><circle cx="43" cy="28" r="2.2" fill="${HAIR}"/><circle cx="57" cy="28" r="2.2" fill="${HAIR}"/><path d="M50 30 v7" stroke="#a87a1a" stroke-width="2"/><path d="M43 43 Q50 47 57 43" stroke="#7a2a20" stroke-width="2.5" fill="none"/>`);
+  if(part==="mollfun") return W("0 0 100 60",`<path d="M50 4 C62 22 68 34 66 42 C64 52 56 56 50 56 C44 56 36 52 34 42 C32 34 38 22 50 4Z" fill="${BODY}"/><path d="M42 40 Q42 48 48 50" stroke="#f3a0a0" stroke-width="3" fill="none"/>`);
+  const hl=p=>p===part?GOLD:MUTE;
+  const back=part==="furi";
+  let s=`<circle cx="50" cy="12" r="8" fill="${hl("lonko")}"/>`;
+  if(back) s=`<circle cx="50" cy="12" r="8" fill="${HAIR}"/>`;
+  if(part==="ange") s+=`<circle cx="50" cy="12" r="8" fill="${GOLD}"/>`;
+  if(!back) s+=`<circle cx="47" cy="11" r="1.3" fill="${HAIR}"/><circle cx="53" cy="11" r="1.3" fill="${HAIR}"/><path d="M47 15 Q50 17 53 15" stroke="${HAIR}" stroke-width="1.2" fill="none"/>`;
+  s+=`<rect x="42" y="21" width="16" height="20" rx="4" fill="${back?GOLD:MUTE}"/>`;
+  if(part==="putra") s+=`<ellipse cx="50" cy="35" rx="7" ry="5" fill="${GOLD}"/>`;
+  s+=`<path d="M42 24 L32 40 M58 24 L68 40" stroke="${hl("lipang")}" stroke-width="5" fill="none"/>`;
+  s+=`<path d="M46 41 L44 58 M54 41 L56 58" stroke="${hl("chang")}" stroke-width="5.5" fill="none"/>`;
+  if(part==="piwke") s+=`<path d="M53 26 c2 -3 6 -1 4 3 l-4 4 l-4 -4 c-2 -4 2 -6 4 -3Z" fill="${BODY}"/>`;
+  if(part==="mollfun") s+=`<path d="M74 14 C80 24 82 30 76 34 C70 30 72 24 74 14Z" fill="${BODY}" transform="translate(4 6)"/><path d="M68 40 l4 0" stroke="${BODY}" stroke-width="2"/>`;
+  if(back) s+=`<path d="M30 6 h10 M30 6 l3 -3 M30 6 l3 3" stroke="${LIMB}" stroke-width="1.5"/>`;
+  return W("0 0 100 60",s);
+};
+// Colour + noun: silhouettes filled with the colour, light outline so dark colours show
+const SIL={
+ apple:c=>`<path d="M50 18 C38 10 26 18 28 34 C30 50 42 56 50 52 C58 56 70 50 72 34 C74 18 62 10 50 18Z" fill="${c}" stroke="#f3efe6" stroke-width="1.5"/><path d="M50 18 Q50 8 56 4" stroke="${WOOD}" stroke-width="3" fill="none"/><path d="M52 10 Q62 4 66 10 Q58 14 52 10Z" fill="#2f9a4f"/>`,
+ sheep:c=>`<path d="M30 46 V56 M38 46 V56 M58 46 V56 M66 46 V56" stroke="#2a2018" stroke-width="3.5"/><ellipse cx="48" cy="36" rx="24" ry="14" fill="${c}" stroke="#f3efe6" stroke-width="1.5"/>${[30,40,50,60,66].map(x=>`<circle cx="${x}" cy="24" r="6" fill="${c}"/>`).join("")}<ellipse cx="76" cy="30" rx="8" ry="6" fill="#2a2018" stroke="#f3efe6" stroke-width="1"/>`,
+ horse:c=>`<path d="M20 26 Q8 30 10 46" stroke="${c}" stroke-width="4" fill="none"/><path d="M18 30 Q17 21 27 20 H58 Q63 12 70 7 L75 3 L77 9 L86 15 Q89 20 84 22 H77 Q73 26 73 32 V36 Q73 40 69 41 L71 56 H65 L63 42 H37 L35 56 H29 L28 42 Q19 40 18 34Z" fill="${c}" stroke="#f3efe6" stroke-width="1.5"/><circle cx="78" cy="13" r="1.4" fill="#f3efe6"/>`,
+ flower:c=>`<path d="M50 30 V58" stroke="#2f9a4f" stroke-width="3"/><path d="M50 46 Q60 40 64 46 Q58 50 50 46Z" fill="#2f9a4f"/>${[0,72,144,216,288].map(a=>`<ellipse cx="50" cy="16" rx="7" ry="11" fill="${c}" stroke="#f3efe6" stroke-width="1" transform="rotate(${a} 50 26)"/>`).join("")}<circle cx="50" cy="26" r="5" fill="${c==="#e8c21f"?"#9a5b2e":GOLD}"/>`
+};
+const CN=(shape,c)=>W("0 0 100 60",SIL[shape](c));
+// Foods
+const FOOD={
+ murke:W("0 0 100 60",`<path d="M22 32 Q22 56 50 56 Q78 56 78 32Z" fill="${WOOD}"/><path d="M26 32 Q50 12 74 32Z" fill="#c9a26a"/><g fill="#a07a46">${[[38,26],[48,22],[58,26],[44,30],[54,29]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.2"/>`).join("")}</g><path d="M76 24 L90 10" stroke="#c9c4bc" stroke-width="3"/><ellipse cx="74" cy="27" rx="5" ry="3" fill="#c9c4bc"/>`),
+ multrun:W("0 0 100 60",`<rect x="8" y="44" width="84" height="8" rx="3" fill="${WOOD}"/><ellipse cx="34" cy="36" rx="22" ry="8" fill="#e8d6a0" stroke="#c9a26a" stroke-width="1.5" transform="rotate(-8 34 36)"/><ellipse cx="66" cy="34" rx="22" ry="8" fill="#e8d6a0" stroke="#c9a26a" stroke-width="1.5" transform="rotate(10 66 34)"/><path d="M20 34 q14 -4 28 0 M54 30 q14 2 26 8" stroke="#c9a26a" stroke-width="1.2" fill="none"/>`),
+ muday:W("0 0 100 60",`<path d="M34 12 H66 L62 54 H38Z" fill="#a9a3c8" opacity=".85"/><path d="M36 22 H64 L61 52 H39Z" fill="#e8c21f"/><ellipse cx="50" cy="22" rx="14" ry="2.5" fill="#f3e3a0"/><g transform="translate(78 8)"><path d="M0 46 V8" stroke="#2f9a4f" stroke-width="2"/>${[12,18,24,30].map(y=>`<ellipse cx="-3" cy="${y}" rx="3" ry="4.5" fill="${GOLD}"/><ellipse cx="3" cy="${y+3}" rx="3" ry="4.5" fill="${GOLD}"/>`).join("")}</g>`),
+ kako:W("0 0 100 60",`<path d="M22 32 Q22 56 50 56 Q78 56 78 32Z" fill="#7a4522"/><ellipse cx="50" cy="32" rx="28" ry="6" fill="#5a3a22"/><g fill="#f3efe6">${Array.from({length:18},(_,i)=>`<ellipse cx="${28+(i%6)*9}" cy="${28+Math.floor(i/6)*3}" rx="3.6" ry="2.6"/>`).join("")}</g><path d="M42 18 q-2 -5 0 -10 M58 18 q-2 -5 0 -10" stroke="${LIMB}" stroke-width="1.6" fill="none" opacity=".6"/>`)
+};
+return {...NEW, body:BODYPART, cn:CN, food:FOOD};
+})();
+
 // ===== Content: stages and levels (Grafemario Unificado) =====
 const STAGES = [
  {id:"beg", es:"Principiante", en:"Beginner", need:0, levels:[
@@ -912,6 +1018,80 @@ const STAGES = [
     {m:"ruka mew",pic:"🧍🛖",es:"en la casa",en:"in the house"},{m:"lafken mew",pic:"🧍🌊",es:"en el mar",en:"at the sea"},
     {m:"mawida mew",pic:"🧍🌲",es:"en el monte",en:"in the woods"},{m:"wingkul mew",pic:"🧍⛰️",es:"en el cerro",en:"on the hill"},
     {m:"kütral mew",pic:"🧍🔥",es:"junto al fuego",en:"by the fire"},{m:"wenu mew",pic:"🪁☁️",es:"arriba, en el cielo",en:"up in the sky"}]}
+ ]},
+ {id:"int2", es:"Intermedio II", en:"Intermediate II", need:24, levels:[
+  { id:"chalin2", mt:"Chalin II", es:"Más saludos", en:"More greetings", kind:"scene", words:[
+    {m:"Chumleymi?", es:"¿Cómo estás?", en:"How are you?"},
+    {m:"Kümelkalen", es:"Estoy bien", en:"I'm well"},
+    {m:"Iney pingeymi?", es:"¿Cómo te llamas?", en:"What's your name?"},
+    {m:"Rayen pingen", es:"Me llamo Rayen", en:"My name is Rayen"},
+    {m:"Chew tuwimi?", es:"¿De dónde eres?", en:"Where are you from?"},
+    {m:"Temuko tuwün", es:"Soy de Temuco", en:"I'm from Temuco"},
+    {m:"Mari mari kom pu che", es:"Hola a todos", en:"Hello, everyone"},
+    {m:"Pewkallal", es:"Hasta luego", en:"See you later"}]},
+  { id:"color2", mt:"", es:"Colores II", en:"Colors II", kind:"pic",
+    rule:{es:"El color va antes del sustantivo: <b>kelü mansana</b> “manzana roja”, <b>kurü ufisa</b> “oveja negra”.",
+          en:"The colour goes before the noun: <b>kelü mansana</b> “red apple”, <b>kurü ufisa</b> “black sheep”."}, words:[
+    {m:"kelü mansana",pic:{svg:ACT2.cn("apple","#c8322f")},es:"manzana roja",en:"red apple"},
+    {m:"karü mansana",pic:{svg:ACT2.cn("apple","#2f9a4f")},es:"manzana verde",en:"green apple"},
+    {m:"lig ufisa",pic:{svg:ACT2.cn("sheep","#f6f4ee")},es:"oveja blanca",en:"white sheep"},
+    {m:"kurü ufisa",pic:{svg:ACT2.cn("sheep","#111111")},es:"oveja negra",en:"black sheep"},
+    {m:"kolü kawellu",pic:{svg:ACT2.cn("horse","#8a4b2a")},es:"caballo café",en:"brown horse"},
+    {m:"kurü kawellu",pic:{svg:ACT2.cn("horse","#111111")},es:"caballo negro",en:"black horse"},
+    {m:"chod rayen",pic:{svg:ACT2.cn("flower","#e8c21f")},es:"flor amarilla",en:"yellow flower"},
+    {m:"kallfü rayen",pic:{svg:ACT2.cn("flower","#2f5fd0")},es:"flor azul",en:"blue flower"}]},
+  { id:"kalul2", mt:"Kalül II", es:"Más del cuerpo", en:"More of the body", kind:"pic", words:[
+    {m:"lonko",pic:{svg:ACT2.body("lonko")},es:"cabeza",en:"head"},
+    {m:"ange",pic:{svg:ACT2.body("ange")},es:"cara",en:"face"},
+    {m:"lipang",pic:{svg:ACT2.body("lipang")},es:"brazo",en:"arm"},
+    {m:"chang",pic:{svg:ACT2.body("chang")},es:"pierna",en:"leg"},
+    {m:"furi",pic:{svg:ACT2.body("furi")},es:"espalda",en:"back"},
+    {m:"pütra",pic:{svg:ACT2.body("putra")},es:"estómago, barriga",en:"stomach, belly"},
+    {m:"piwke",pic:{svg:ACT2.body("piwke")},es:"corazón",en:"heart"},
+    {m:"mollfüñ",pic:{svg:ACT2.body("mollfun")},es:"sangre",en:"blood"}]},
+  { id:"familia2", mt:"", es:"La familia II", en:"Family II", kind:"scene", words:[
+    {m:"malle", es:"tío paterno (hermano del padre)", en:"paternal uncle (father's brother)"},
+    {m:"weku", es:"tío materno (hermano de la madre)", en:"maternal uncle (mother's brother)"},
+    {m:"palu", es:"tía paterna (hermana del padre)", en:"paternal aunt (father's sister)"},
+    {m:"fotüm", es:"hijo (respecto al padre)", en:"son (of a father)"},
+    {m:"füta", es:"esposo, marido", en:"husband"},
+    {m:"kure", es:"esposa", en:"wife"},
+    {m:"pichikeche", es:"niños, niñas", en:"children"},
+    {m:"füchake che", es:"personas mayores", en:"elders"}]},
+  { id:"iyael2", mt:"Iyael II", es:"Más comida", en:"More food", kind:"pic", words:[
+    {m:"mürke",pic:{svg:ACT2.food.murke},es:"harina tostada",en:"toasted flour"},
+    {m:"mültrün",pic:{svg:ACT2.food.multrun},es:"catuto (pan de trigo cocido)",en:"catuto (cooked-wheat bread)"},
+    {m:"muday",pic:{svg:ACT2.food.muday},es:"muday (bebida de trigo o maíz)",en:"muday (wheat or maize drink)"},
+    {m:"kako",pic:{svg:ACT2.food.kako},es:"mote (trigo pelado)",en:"hulled wheat (mote)"},
+    {m:"chadi",pic:"🧂",es:"sal",en:"salt"},
+    {m:"trapi",pic:"🌶️",es:"ají",en:"chili pepper"},
+    {m:"lichi",pic:"🥛",es:"leche",en:"milk"},
+    {m:"kuram",pic:"🥚",es:"huevo",en:"egg"}]},
+  { id:"kudaw2", mt:"Küdaw II", es:"Más trabajos", en:"More work", kind:"pic", words:[
+    {m:"ngüren",pic:{svg:ACT2.weave},es:"tejer",en:"to weave"},
+    {m:"lepün",pic:{svg:ACT2.sweep},es:"barrer",en:"to sweep"},
+    {m:"küchan",pic:{svg:ACT2.wash},es:"lavar",en:"to wash"},
+    {m:"katrün",pic:{svg:ACT2.cut},es:"cortar",en:"to cut"},
+    {m:"ngillan",pic:{svg:ACT2.buy},es:"comprar",en:"to buy"},
+    {m:"dewman",pic:{svg:ACT2.build},es:"hacer, construir",en:"to make, to build"},
+    {m:"chillkatun",pic:{svg:ACT2.read},es:"leer, estudiar",en:"to read, to study"},
+    {m:"afümün",pic:{svg:ACT2.cook},es:"cocinar, cocer",en:"to cook"}]},
+  { id:"dungu2", mt:"Dungu II", es:"Más acciones", en:"More actions", kind:"pic", words:[
+    {m:"küpan",pic:{svg:ACT2.come},es:"venir",en:"to come"},
+    {m:"tripan",pic:{svg:ACT2.exit},es:"salir",en:"to go out"},
+    {m:"anün",pic:{svg:ACT2.sit},es:"sentarse",en:"to sit down"},
+    {m:"witrapüran",pic:{svg:ACT2.stand},es:"levantarse, ponerse de pie",en:"to stand up"},
+    {m:"ngüman",pic:{svg:ACT2.cry},es:"llorar",en:"to cry"},
+    {m:"wirarün",pic:{svg:ACT2.shout},es:"gritar",en:"to shout"},
+    {m:"trekan",pic:{svg:ACT2.walk},es:"caminar, dar pasos",en:"to walk, to take steps"},
+    {m:"kintun",pic:{svg:ACT2.search},es:"buscar",en:"to look for"}]},
+  { id:"chem2", mt:"Chem? II", es:"Más preguntas", en:"More questions", kind:"scene", words:[
+    {m:"chumngechi?",es:"¿cómo? (de qué manera)",en:"how? (in what way)"},
+    {m:"chuchi?",es:"¿cuál?",en:"which?"},
+    {m:"Chem pingey tüfa?",es:"¿Cómo se llama esto?",en:"What is this called?"},
+    {m:"Chew müley?",es:"¿Dónde está?",en:"Where is it?"},
+    {m:"Tunten tripantu nieymi?",es:"¿Cuántos años tienes?",en:"How old are you?"},
+    {m:"Chem dungu?",es:"¿Qué pasa? ¿Qué novedad hay?",en:"What's going on? Any news?"}]}
  ]},
  {id:"adv", es:"Avanzado", en:"Advanced", need:30, levels:[
   { id:"pres", mt:"Inche, eymi, fey", es:"Verbos: yo, tú, él/ella", en:"Verbs: I, you, she/he", kind:"verb", tenses:["pres"],
@@ -1405,6 +1585,7 @@ function menu(){
     <nav class="hub tools" aria-label="${L2("Aprende y practica","Learn and practice")}">${[
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
+      ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
       ["help",t().howBtn,L2("Instrucciones","Instructions")]
     ].map(([id,n,d])=>`<button class="tcard" id="${id}"><b>${esc(n)}</b><small>${esc(d)}</small></button>`).join("")}</nav>
     ${STAGES.map(st=>{
@@ -1429,6 +1610,7 @@ function menu(){
   document.getElementById("ward").onclick=wardrobe;
   document.getElementById("pron").onclick=pronunciation;
   document.getElementById("read").onclick=readingList;
+  document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("help").onclick=help;
   document.getElementById("x-lof").onclick=()=>lof();
   document.getElementById("x-palin").onclick=()=>palin();
@@ -1464,7 +1646,7 @@ function intro(lvl){
       <p class="eyebrow">${t().examples}</p>
       <div class="cards">${ex.map(w=>`<div class="card">${picHTML(w,lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div>`;
   }else{
-    body=`<details class="all"><summary>${t().fcAll}</summary><div class="cards">${lvl.words.map(w=>`
+    body=`${lvl.rule?`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>`:""}<details class="all"><summary>${t().fcAll}</summary><div class="cards">${lvl.words.map(w=>`
         <div class="card">${lvl.kind==="scene"?"":picHTML(w,lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div></details>`;
   }
   // individual flashcards, studied one at a time before playing
@@ -1603,6 +1785,23 @@ function result(){
 
 // ===== Stage videos (animated SVG scenes with timed captions) =====
 const VIDEOS = {
+ int2:{ title:{es:"Trafkintu",en:"Trafkintu"}, scene:()=>`
+  <rect width="360" height="220" fill="#2a3a63"/>
+  <circle class="v-drift" cx="300" cy="40" r="18" fill="#e8b53a"/>
+  <path d="M0 140 Q90 110 180 132 T360 124 V220 H0Z" fill="#2f4a33"/><rect y="176" width="360" height="44" fill="#3a5a3a"/>
+  ${[[70,"#c8322f"],[290,"#2f5fd0"]].map(([x,c],i)=>`<g>
+    <circle cx="${x}" cy="104" r="13" fill="#c98a5a"/><path d="M${x-13} 100 Q${x} 84 ${x+13} 100" fill="#2a1a10"/>
+    <path d="M${x-18} 182 L${x-14} 120 L${x+14} 120 L${x+18} 182Z" fill="${c}"/>
+    <path d="M${x+(i?-14:14)} 130 L${x+(i?-34:34)} 146" stroke="#f3efe6" stroke-width="6" stroke-linecap="round"/>
+    <path d="M${x+(i?-50:20)} 146 h30 l-4 18 h-22Z" fill="#9a5b2e"/></g>`).join("")}
+  <g class="v-ball"><g transform="translate(130 120)"><path d="M0 0 h18 l-2 14 h-14Z" fill="#e8d6a0"/><path d="M2 2 h14" stroke="#9a5b2e" stroke-width="2"/>
+    <g fill="#f3efe6"><ellipse cx="6" cy="-4" rx="3" ry="4"/><ellipse cx="12" cy="-4" rx="3" ry="4"/></g></g></g>
+  ${[[120,200],[180,206],[240,198]].map(([x,y],i)=>`<g class="v-sway" style="animation-delay:${-i*.7}s;transform-origin:${x}px ${y}px"><path d="M${x} ${y} V${y-26}" stroke="#2f9a4f" stroke-width="3"/><ellipse cx="${x}" cy="${y-30}" rx="5" ry="8" fill="#e8b53a"/></g>`).join("")}`,
+  caps:[
+   {es:"¡Kümey! Terminaste la etapa Intermedio II.",en:"Kümey! You finished the Intermediate II stage."},
+   {es:"El trafkintu es un intercambio: se dan y se reciben semillas, alimentos y otros bienes.",en:"A trafkintu is an exchange: people give and receive seeds, food and other goods."},
+   {es:"No se trata de vender: importa la reciprocidad y el encuentro entre familias y comunidades.",en:"It is not about selling: what matters is reciprocity and families and communities meeting."},
+   {es:"Hoy muchas comunidades hacen trafkintu de semillas para cuidar sus propias variedades.",en:"Today many communities hold seed trafkintu to look after their own varieties."}]},
  kch:{ title:{es:"Epew",en:"Epew"}, scene:()=>`
   <rect width="360" height="220" fill="#141530"/>
   ${[[24,22],[70,46],[120,18],[160,40],[330,30],[300,64],[240,16],[200,58]].map(([x,y],i)=>`<circle class="v-twinkle" style="animation-delay:${i*.31}s" cx="${x}" cy="${y}" r="1.5" fill="#f3efe6"/>`).join("")}
@@ -1780,6 +1979,19 @@ const READINGS = [
     {es:"¿Qué decide Ayelen?",en:"What does Ayelen decide?",o:{es:["Ir también","Quedarse en la casa","Hacer pan"],en:["To go too","To stay home","To make bread"]}},
     {es:"¿Por qué Ayelen dice «lamngen» y no «peñi»?",en:"Why does Ayelen say «lamngen» and not «peñi»?",o:{es:["Porque ella es mujer","Porque Nawel es pequeño","Porque es de mañana"],en:["Because she is a woman","Because Nawel is small","Because it's morning"]}},
     {es:"¿Cuántas personas irán, según «amuayu»?",en:"How many people will go, according to «amuayu»?",o:{es:["Dos","Una","Tres o más"],en:["Two","One","Three or more"]}}]},
+ { id:"read-palu", stage:"int2", title:"Ñi palu", sub:{es:"Una visita en familia",en:"A family visit"},
+   lines:[
+    {m:"Tüfa ñi palu. Ayelen pingey.", es:"Esta es mi tía paterna. Se llama Ayelen.", en:"This is my paternal aunt. Her name is Ayelen."},
+    {m:"Ñi palu ngürey witral mew.", es:"Mi tía teje en el telar.", en:"My aunt weaves at the loom."},
+    {m:"Ñi malle mültrün dewmay.", es:"Mi tío paterno hizo catuto.", en:"My paternal uncle made catuto."},
+    {m:"Inche muday pütokon.", es:"Yo bebí muday.", en:"I drank muday."},
+    {m:"Pu pichikeche awkantuyngün ruka mew.", es:"Los niños jugaron en la casa.", en:"The children played at the house."}],
+   gloss:[["palu","tía paterna","paternal aunt"],["pingey","se llama","is called"],["ngürey","teje","weaves"],["malle","tío paterno","paternal uncle"],["dewmay","hizo","made"],["pu pichikeche","los niños","the children"],["awkantuyngün","jugaron (ellos)","they played"]],
+   qs:[
+    {es:"¿Quién es Ayelen?",en:"Who is Ayelen?",o:{es:["La tía paterna","La madre","La abuela"],en:["The paternal aunt","The mother","The grandmother"]}},
+    {es:"¿Qué hace la tía?",en:"What does the aunt do?",o:{es:["Teje","Barre","Lee"],en:["She weaves","She sweeps","She reads"]}},
+    {es:"¿Quién hizo catuto?",en:"Who made catuto?",o:{es:["El tío paterno","El tío materno","Los niños"],en:["The paternal uncle","The maternal uncle","The children"]}},
+    {es:"¿Qué bebió el narrador?",en:"What did the narrator drink?",o:{es:["Muday","Leche","Agua"],en:["Muday","Milk","Water"]}}]},
  { id:"read-laku", stage:"adv", title:"Ñi laku", sub:{es:"Mi abuelo",en:"My grandfather"},
    lines:[
     {m:"Ñi laku nütramkakey.", es:"Mi abuelo suele conversar y contar historias.", en:"My grandfather usually talks and tells stories."},
@@ -1879,6 +2091,20 @@ const READINGS = [
     {es:"¿Por qué no compra papas?",en:"Why doesn't she buy potatoes?",o:{es:["Tiene papas en la casa","No le gustan","Son muy caras"],en:["She has potatoes at home","She doesn't like them","They're too expensive"]}},
     {es:"¿Quién dice «chaltu may»?",en:"Who says «chaltu may»?",o:{es:["Millaray","Ayelen","Las dos"],en:["Millaray","Ayelen","Both"]}},
     {es:"¿Qué marca el futuro en «ngillaan»?",en:"What marks the future in «ngillaan»?",o:{es:["-a-","-n","ngilla-"],en:["-a-","-n","ngilla-"]}}]},
+ { id:"read-trafkintu", stage:"int2", title:"Trafkintu", sub:{es:"Un intercambio",en:"An exchange"},
+   lines:[
+    {m:"Mari mari kom pu che!", es:"¡Hola a todos!", en:"Hello, everyone!"},
+    {m:"Fachantü trafkintu müley.", es:"Hoy hay trafkintu.", en:"Today there is a trafkintu."},
+    {m:"Inche mürke küpalün.", es:"Yo traje harina tostada.", en:"I brought toasted flour."},
+    {m:"Kiñe kuku kuram küpali.", es:"Una abuela trajo huevos.", en:"A grandmother brought eggs."},
+    {m:"Trafkintuiñ, ka kom ayüwiñ.", es:"Intercambiamos, y todos nos alegramos.", en:"We exchanged, and we were all happy."},
+    {m:"Pewkallal, pu che!", es:"¡Hasta luego, gente!", en:"See you later, everyone!"}],
+   gloss:[["fachantü","hoy","today"],["trafkintu","intercambio","exchange"],["küpalün","traje","I brought"],["küpali","trajo","brought"],["trafkintuiñ","intercambiamos","we exchanged"],["ayüwiñ","nos alegramos","we were happy"]],
+   qs:[
+    {es:"¿Qué hay hoy?",en:"What is happening today?",o:{es:["Un trafkintu","Un partido de palin","Una carrera"],en:["A trafkintu","A palin match","A race"]}},
+    {es:"¿Qué trajo el narrador?",en:"What did the narrator bring?",o:{es:["Harina tostada","Huevos","Pan"],en:["Toasted flour","Eggs","Bread"]}},
+    {es:"¿Qué trajo la abuela?",en:"What did the grandmother bring?",o:{es:["Huevos","Harina tostada","Leche"],en:["Eggs","Toasted flour","Milk"]}},
+    {es:"¿Cómo se sintieron todos?",en:"How did everyone feel?",o:{es:["Contentos","Cansados","Tristes"],en:["Happy","Tired","Sad"]}}]},
  { id:"read-kupange", stage:"adv", title:"Küpange!", sub:{es:"La hora de comer",en:"Time to eat"},
    lines:[
     {who:"Ñuke", m:"Nawel! Küpange!", es:"¡Nawel! ¡Ven!", en:"Nawel! Come here!"},
@@ -2297,6 +2523,42 @@ function pronunciation(){
   bindLang(pronunciation);
   document.getElementById("bk").onclick=menu;
   document.getElementById("pq").onclick=()=>intro(PRON_LVL);
+}
+
+// ===== Running vocabulary list: every word from completed levels, read lecturas and owned epew chapters =====
+function vocabWords(){
+  const out=[], seen=new Set();
+  const add=(m,es,en,src)=>{ const k=m.toLowerCase(); if(seen.has(k)) return; seen.add(k); out.push({m,es,en,src}); };
+  STAGES.forEach(st=>st.levels.forEach(l=>{ if(l.words && (best[l.id]||0)>0) l.words.forEach(w=>add(w.m,w.es,w.en,title(l))); }));
+  READINGS.forEach(r=>{ if((best[readKey(r)]||0)>0 && r.gloss) r.gloss.forEach(([m,es,en])=>add(m,es,en,r.title)); });
+  EPEW.forEach((c,i)=>{ if(epewOwned.includes(i) && c.gloss) c.gloss.forEach(([m,es,en])=>add(m,es,en,"Epew: "+c.t)); });
+  return out;
+}
+let vocabSort="src", vocabQ="";
+function vocab(){
+  S=null;
+  const all=vocabWords();
+  const q=vocabQ.trim().toLowerCase();
+  const list=all.filter(w=>!q||[w.m,w.es,w.en].some(s=>String(s).toLowerCase().includes(q)));
+  const row=w=>`<div class="vrow"><b>${esc(w.m)}</b><span>${esc(lang==="es"?w.es:w.en)}</span></div>`;
+  let body;
+  if(!all.length) body=`<p class="note">${L2("Completa un nivel para empezar tu lista de palabras.","Finish a level to start your word list.")}</p>`;
+  else if(!list.length) body=`<p class="note">${L2("No hay palabras que coincidan.","No matching words.")}</p>`;
+  else if(vocabSort==="az") body=`<div class="vlist">${list.slice().sort((a,b)=>a.m.localeCompare(b.m,"es")).map(row).join("")}</div>`;
+  else { const groups=[]; list.forEach(w=>{ let g=groups.find(x=>x.src===w.src); if(!g){g={src:w.src,ws:[]};groups.push(g)} g.ws.push(w); });
+    body=groups.map(g=>`<p class="eyebrow vgrp">${esc(g.src)} · ${g.ws.length}</p><div class="vlist">${g.ws.map(row).join("")}</div>`).join(""); }
+  app.innerHTML=`
+    <div class="top"><div><p class="eyebrow">${L2("Tu vocabulario","Your vocabulary")}</p><h2>${L2("Mis palabras","My words")}</h2></div>${langToggle()}</div>
+    <p>${L2(`Llevas <b>${all.length}</b> palabras y frases. La lista crece con cada nivel que completas, cada lectura que lees y cada capítulo de epew.`,`You have <b>${all.length}</b> words and phrases. The list grows with every level you finish, every reading you complete and every epew chapter.`)}</p>
+    <div class="bar-top vbar-top"><input id="vq" type="search" value="${esc(vocabQ)}" placeholder="${L2("Buscar…","Search…")}" aria-label="${L2("Buscar","Search")}">
+      <button class="btn ghost" id="vs" style="padding:8px 14px">${vocabSort==="az"?L2("Por nivel","By level"):"A–Z"}</button>
+      <button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div id="vbody">${body}</div>`;
+  bindLang(vocab);
+  document.getElementById("bk").onclick=menu;
+  document.getElementById("vs").onclick=()=>{ vocabSort=vocabSort==="az"?"src":"az"; vocab(); };
+  const inp=document.getElementById("vq");
+  inp.oninput=()=>{ vocabQ=inp.value; vocab(); const i2=document.getElementById("vq"); i2.focus(); i2.setSelectionRange(i2.value.length,i2.value.length); };
 }
 
 // ===== Wardrobe =====
