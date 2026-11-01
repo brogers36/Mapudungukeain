@@ -731,6 +731,68 @@ const ICON = {
     <path d="M14 34 Q30 40 46 34" stroke="#c98a5a" stroke-width="2" fill="none"/></svg>`
 };
 
+// ===== Action-verb pictures: one consistent figure family =====
+const ACT=(()=>{
+const SK="#c98a5a", HAIR="#2a1a10", BODY="#c8322f", LIMB="#f3efe6", GOLD="#e8b53a", WOOD="#9a5b2e", DARK="#2a2652";
+const W=(vb,inner)=>`<svg viewBox="${vb}" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+const head=(x,y,face="")=>`<circle cx="${x}" cy="${y}" r="7" fill="${SK}"/><path d="M${x-7} ${y-2} Q${x} ${y-11} ${x+7} ${y-2}" fill="${HAIR}"/>${face}`;
+const torso=(x1,y1,x2,y2)=>`<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${BODY}" stroke-width="7"/>`;
+const limb=d=>`<path d="${d}" stroke="${LIMB}" stroke-width="3.5" fill="none"/>`;
+return {
+ work:W("0 0 100 60", head(36,12)+torso(36,20,38,38)+limb("M38 38 L30 56 M38 38 L46 56")+
+   limb("M36 24 L52 18")+`<path d="M52 18 L66 4" stroke="${WOOD}" stroke-width="3.5"/><path d="M61 2 L71 9 L67 13 L58 6Z" fill="#a9a3c8"/>`+
+   `<rect x="56" y="44" width="30" height="12" rx="3" fill="${WOOD}"/><circle cx="86" cy="50" r="6" fill="#c98a5a" stroke="${WOOD}" stroke-width="2"/><path d="M83 50 h6 M86 47 v6" stroke="${WOOD}" stroke-width="1"/>`+
+   `<path d="M70 38 l4 -6 M78 40 l6 -4" stroke="${GOLD}" stroke-width="2.5"/>`),
+ laugh:W("0 0 100 60", `<circle cx="50" cy="30" r="24" fill="${GOLD}"/><path d="M36 24 q5 -6 10 0 M54 24 q5 -6 10 0" stroke="${HAIR}" stroke-width="3" fill="none"/>`+
+   `<path d="M36 34 Q50 54 64 34Z" fill="#7a2a20"/><path d="M38 35 H62" stroke="#f3efe6" stroke-width="3"/>`+
+   `<path d="M14 18 l-8 -4 M12 30 h-9 M14 42 l-8 4 M86 18 l8 -4 M88 30 h9 M86 42 l8 4" stroke="${LIMB}" stroke-width="2.5"/>`),
+ play:W("0 0 100 60", head(34,10)+torso(34,18,36,36)+limb("M36 36 L28 56 M36 36 L54 44")+limb("M34 22 L22 30 M34 22 L48 16")+
+   `<circle cx="66" cy="44" r="9" fill="#f3efe6"/><path d="M66 35 L66 53 M57 44 H75 M60 38 Q66 44 60 50 M72 38 Q66 44 72 50" stroke="${DARK}" stroke-width="1.5" fill="none"/>`+
+   `<path d="M80 40 h12 M80 46 h16 M80 52 h10" stroke="${GOLD}" stroke-width="2.5"/>`),
+ write:W("0 0 100 60", `<rect x="34" y="18" width="46" height="36" rx="2" fill="#f3efe6" transform="rotate(-6 57 36)"/>`+
+   `<path d="M40 30 q4 -6 8 0 t8 0 t8 0 M40 40 q4 -6 8 0 t8 0" stroke="#2a2652" stroke-width="2" fill="none"/>`+
+   `<path d="M64 40 L84 10" stroke="${GOLD}" stroke-width="5"/><path d="M64 40 l-2 6 l5 -3Z" fill="${HAIR}"/>`+
+   `<path d="M84 10 L92 0" stroke="#c8322f" stroke-width="5"/>`+`<ellipse cx="80" cy="18" rx="8" ry="6" fill="${SK}"/>`),
+ know:W("0 0 100 60", head(40,32)+torso(40,40,40,58)+limb("M40 44 L56 34 L48 24")+
+   `<circle cx="64" cy="12" r="8" fill="${GOLD}"/><rect x="60" y="19" width="8" height="5" rx="1" fill="#a9a3c8"/>`+
+   `<path d="M64 0 v-2 M52 4 l-3 -3 M76 4 l3 -3 M50 14 h-4 M78 14 h4" stroke="${GOLD}" stroke-width="2.5"/>`+
+   `<path d="M48 24 Q56 20 58 18" stroke="${LIMB}" stroke-width="1.5" stroke-dasharray="2 3" fill="none"/>`),
+ see:W("0 0 100 60", head(22,24,`<circle cx="26" cy="23" r="1.8" fill="${HAIR}"/>`)+torso(22,32,22,52)+limb("M22 36 L32 30 M22 36 L14 46")+
+   `<path d="M30 22 L70 16 M30 25 L70 30" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3 3"/>`+
+   `<path d="M66 22 Q76 10 90 18 Q78 18 76 28 Q72 22 66 22Z" fill="#a9a3c8"/><circle cx="84" cy="17" r="1.5" fill="${HAIR}"/><path d="M89 18 l5 1 l-5 2" fill="${GOLD}"/>`),
+ enter:W("0 0 100 60", `<path d="M44 56 V22 L70 8 L96 22 V56Z" fill="#c9a25a"/><path d="M44 22 L70 8 L96 22" stroke="#8a6a3a" stroke-width="3" fill="none"/>`+
+   `<rect x="62" y="30" width="20" height="26" fill="${HAIR}"/>`+head(66,36)+torso(66,43,66,52)+limb("M66 52 L62 56 M66 52 L72 56")+
+   `<path d="M10 44 H38 M30 36 L40 44 L30 52" stroke="${GOLD}" stroke-width="4" fill="none"/>`),
+ go:W("0 0 100 60", head(30,10)+torso(30,18,30,36)+limb("M30 36 L24 56 M30 36 L38 56 M30 22 L22 34 M30 22 L38 34")+
+   `<path d="M0 57 H100" stroke="#8a6a3a" stroke-width="2" stroke-dasharray="5 4"/>`+
+   `<path d="M52 30 H80 M72 22 L82 30 L72 38" stroke="${GOLD}" stroke-width="4" fill="none"/>`),
+ eat:W("0 0 100 60", head(30,18,`<circle cx="33" cy="17" r="1.6" fill="${HAIR}"/><circle cx="35" cy="22" r="2.4" fill="#7a2a20"/>`)+torso(30,26,30,48)+
+   limb("M30 30 L46 34 L40 22")+`<ellipse cx="40" cy="21" rx="3" ry="2" fill="#a9a3c8"/>`+
+   `<path d="M50 40 Q66 58 82 40Z" fill="${WOOD}"/><ellipse cx="66" cy="40" rx="16" ry="4" fill="#e8d6a0"/>`+
+   `<path d="M60 34 q2 -4 0 -8 M68 32 q2 -4 0 -8" stroke="${LIMB}" stroke-width="1.5" fill="none" opacity=".7"/>`),
+ drink:W("0 0 100 60", head(36,22,`<circle cx="39" cy="21" r="1.6" fill="${HAIR}"/>`)+torso(36,30,36,54)+limb("M36 34 L52 32 L48 24")+
+   `<path d="M44 14 L58 10 L62 26 L50 30Z" fill="#a9a3c8" opacity=".9"/><path d="M46 20 L56 17 L60 26 L50 29Z" fill="#7fb7e0"/>`+
+   `<path d="M44 16 q-3 4 -1 8" stroke="#7fb7e0" stroke-width="2.5" fill="none"/>`),
+ sleep:W("0 0 100 60", `<rect x="8" y="38" width="76" height="10" rx="3" fill="${WOOD}"/><path d="M10 48 V56 M82 48 V56" stroke="${WOOD}" stroke-width="4"/>`+
+   `<rect x="12" y="32" width="14" height="7" rx="3" fill="#f3efe6"/><path d="M26 34 H78 Q82 34 82 38 H26Z" fill="${BODY}"/>`+
+   `<circle cx="20" cy="28" r="7" fill="${SK}"/><path d="M13 26 Q20 17 27 26" fill="${HAIR}"/><path d="M18 29 q2 2 4 0" stroke="${HAIR}" stroke-width="1.5" fill="none"/>`+
+   `<g fill="${GOLD}" font-family="sans-serif" font-weight="700"><text x="34" y="28" font-size="10">z</text><text x="46" y="21" font-size="12">z</text><text x="59" y="15" font-size="15">Z</text></g>`),
+ run:W("0 0 100 60", head(46,10)+torso(44,18,38,34)+limb("M38 34 L52 44 L50 56 M38 34 L24 42 L14 38 M44 22 L56 28 M44 22 L32 18")+
+   `<path d="M2 18 H22 M0 28 H18 M4 38 H12" stroke="${GOLD}" stroke-width="3"/>`+`<circle cx="62" cy="55" r="3" fill="#8a6a3a" opacity=".6"/><circle cx="70" cy="53" r="2" fill="#8a6a3a" opacity=".5"/>`),
+ dance:W("0 0 100 60", head(50,14)+torso(50,22,50,40)+limb("M50 40 L40 56 M50 40 L62 46 L60 56 M50 26 L36 12 M50 26 L64 12")+
+   `<path d="M42 40 Q50 48 58 40 L60 46 Q50 52 40 46Z" fill="${DARK}"/>`+
+   `<path d="M22 22 q-6 8 0 16 M78 22 q6 8 0 16 M14 18 q-8 12 0 24 M86 18 q8 12 0 24" stroke="${GOLD}" stroke-width="2.5" fill="none"/>`),
+ speak:W("0 0 100 60", head(22,30,`<circle cx="25" cy="29" r="1.6" fill="${HAIR}"/><ellipse cx="27" cy="34" rx="2" ry="2.6" fill="#7a2a20"/>`)+torso(22,38,22,58)+
+   `<path d="M40 6 H94 Q98 6 98 10 V32 Q98 36 94 36 H52 L40 44 L44 36 H40 Q36 36 36 32 V10 Q36 6 40 6Z" fill="#f3efe6"/>`+
+   `<path d="M44 15 H90 M44 22 H84 M44 29 H70" stroke="${DARK}" stroke-width="3"/>`),
+ listen:W("0 0 100 60", head(72,30)+`<ellipse cx="65" cy="31" rx="3" ry="4.5" fill="${SK}" stroke="#8a5a3a" stroke-width="1.2"/>`+torso(72,38,72,58)+
+   limb("M72 42 L62 40 L60 30")+`<path d="M58 26 q-4 6 0 12" stroke="${LIMB}" stroke-width="3" fill="none"/>`+
+   `<path d="M8 8 H36 Q40 8 40 12 V24 Q40 28 36 28 H18 L10 34 L12 28 H8 Q4 28 4 24 V12 Q4 8 8 8Z" fill="#f3efe6"/>`+
+   `<path d="M10 15 H34 M10 21 H28" stroke="${DARK}" stroke-width="2.5"/>`+
+   `<path d="M44 22 q4 8 0 16 M50 18 q6 12 0 24" stroke="${GOLD}" stroke-width="2.5" fill="none"/>`)
+};
+})();
+
 // ===== Content: stages and levels (Grafemario Unificado) =====
 const STAGES = [
  {id:"beg", es:"Principiante", en:"Beginner", need:0, levels:[
@@ -803,10 +865,10 @@ const STAGES = [
     {m:"dewü",pic:"🐭",es:"ratón",en:"mouse"},{m:"üñüm",pic:"🐦",es:"pájaro",en:"bird"},
     {m:"chiñge",pic:"🦨",es:"chingue, zorrillo",en:"skunk"}]},
   { id:"kudaw", mt:"Küdaw", es:"Lo que hacemos", en:"Everyday actions", kind:"pic", words:[
-    {m:"küdawün",pic:"🔨",es:"trabajar",en:"to work"},{m:"ayen",pic:"😂",es:"reírse",en:"to laugh"},
-    {m:"awkantun",pic:"⚽",es:"jugar",en:"to play"},{m:"wirin",pic:"✍️",es:"escribir, dibujar",en:"to write, to draw"},
-    {m:"kimün",pic:"💡",es:"saber, conocer",en:"to know"},{m:"pen",pic:"👀",es:"ver, encontrar",en:"to see, to find"},
-    {m:"konün",pic:"➡️🚪",es:"entrar",en:"to enter"},{m:"ülkantun",pic:{svg:ICON.sing},es:"cantar",en:"to sing"}]},
+    {m:"küdawün",pic:{svg:ACT.work},es:"trabajar",en:"to work"},{m:"ayen",pic:{svg:ACT.laugh},es:"reírse",en:"to laugh"},
+    {m:"awkantun",pic:{svg:ACT.play},es:"jugar",en:"to play"},{m:"wirin",pic:{svg:ACT.write},es:"escribir, dibujar",en:"to write, to draw"},
+    {m:"kimün",pic:{svg:ACT.know},es:"saber, conocer",en:"to know"},{m:"pen",pic:{svg:ACT.see},es:"ver, encontrar",en:"to see, to find"},
+    {m:"konün",pic:{svg:ACT.enter},es:"entrar",en:"to enter"},{m:"ülkantun",pic:{svg:ICON.sing},es:"cantar",en:"to sing"}]},
   { id:"ropa", mt:"", es:"La ropa", en:"Clothing", kind:"pic", words:[
     {m:"makuñ",pic:{fig:"makun"},es:"manta, poncho",en:"poncho"},{m:"ikülla",pic:{fig:"ikulla"},es:"rebozo",en:"shawl"},
     {m:"küpam",pic:{fig:"kupam"},es:"vestido de lana",en:"wool dress"},{m:"chiripa",pic:{fig:"chiripa"},es:"prenda de lana para la cintura",en:"wool waist wrap"},
@@ -825,10 +887,10 @@ const STAGES = [
     {m:"metawe",pic:"🏺",es:"cántaro",en:"jug"},{m:"challa",pic:{svg:ICON.pot},es:"olla",en:"pot"},
     {m:"kultrun",pic:KULTRUN_PIC,es:"tambor ceremonial",en:"ceremonial drum"}]},
   { id:"dungu", mt:"Dungu", es:"Acciones", en:"Actions", kind:"pic", words:[
-    {m:"amun",pic:"🚶",es:"ir",en:"to go"},{m:"in",pic:"😋",es:"comer",en:"to eat"},
-    {m:"pütokon",pic:"🥛",es:"beber",en:"to drink"},{m:"umawtun",pic:"😴",es:"dormir",en:"to sleep"},
-    {m:"lefün",pic:"🏃",es:"correr",en:"to run"},{m:"pürun",pic:"💃",es:"bailar",en:"to dance"},
-    {m:"dungun",pic:"🗣️",es:"hablar",en:"to speak"},{m:"allkütun",pic:"👂💬",es:"escuchar",en:"to listen"}]},
+    {m:"amun",pic:{svg:ACT.go},es:"ir",en:"to go"},{m:"in",pic:{svg:ACT.eat},es:"comer",en:"to eat"},
+    {m:"pütokon",pic:{svg:ACT.drink},es:"beber",en:"to drink"},{m:"umawtun",pic:{svg:ACT.sleep},es:"dormir",en:"to sleep"},
+    {m:"lefün",pic:{svg:ACT.run},es:"correr",en:"to run"},{m:"pürun",pic:{svg:ACT.dance},es:"bailar",en:"to dance"},
+    {m:"dungun",pic:{svg:ACT.speak},es:"hablar",en:"to speak"},{m:"allkütun",pic:{svg:ACT.listen},es:"escuchar",en:"to listen"}]},
   { id:"kinerakin", mt:"Rakin chem", es:"Contar cosas", en:"Counting things", kind:"count",
     gen:()=>genCount(8),
     rule:{es:"El número va antes del sustantivo, y el sustantivo no cambia: <b>küla trewa</b> “tres perros”.",
@@ -2096,7 +2158,7 @@ const EPEW=[
   ["Kiñe antü, ngürü amuy mawida mew.","Un día, el zorro fue al monte.","One day, the fox went to the woods."],
   ["Fey pefi kiñe fücha pewen.","Vio un pewen grande.","He saw a big pewen."],
   ["Pewen mew müley fentren ngülliw.","En el pewen había muchos piñones.","There were many pine nuts in the pewen."],
-  ["Welu ngürü pichi kulliñ; pewen fücha.","Pero el zorro es un animal pequeño; el pewen es grande.","But the fox is a small animal; the pewen is big."],
+  ["Welu ngürü pichi kulliñ; pewen füchangey.","Pero el zorro es un animal pequeño; el pewen es grande.","But the fox is a small animal; the pewen is big."],
   ["Ngürü pi: «Ngülliw kintun.»","El zorro dijo: «Busco piñones.»","The fox said: «I'm looking for pine nuts.»"],
   ["Fey umawtuy pewen mew.","Se durmió junto al pewen.","He slept by the pewen."]],
   gloss:[["kiñe antü","un día","one day"],["pefi","lo vio","saw it"],["fentren","mucho(s)","many"],["welu","pero","but"],["kintun","busco","I look for"]],
