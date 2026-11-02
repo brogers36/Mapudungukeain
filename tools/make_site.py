@@ -23,8 +23,24 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
 })();
 </script>
 '''
+GC = '''<script>
+/* Visit and install counts (GoatCounter: no cookies, no personal data). Events: a new install (Android/desktop Chrome)
+   and one launch per session from the home screen (all platforms, including iPhone). Nothing is sent when opened from a file. */
+(function(){
+  if(location.protocol!=='https:') return;
+  function gc(path,title){ var n=0; (function send(){
+    if(window.goatcounter && window.goatcounter.count){ try{ window.goatcounter.count({path:path,title:title,event:true}); }catch(e){} }
+    else if(n++<40) setTimeout(send,250); })(); }
+  window.addEventListener('appinstalled',function(){ gc('app-installed','App installed'); });
+  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  var seen=false; try{ seen=sessionStorage.getItem('mpk_gc_launch')==='1'; }catch(e){}
+  if(standalone && !seen){ try{ sessionStorage.setItem('mpk_gc_launch','1'); }catch(e){} gc('home-screen-launch','Opened from home screen'); }
+})();
+</script>
+<script data-goatcounter="https://brogers36.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+'''
 assert s.count('<meta charset="utf-8">') >= 1 and s.count('</body>') == 1
-s = s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + head, 1).replace('</body>', tail + '</body>', 1)
+s = s.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n' + head, 1).replace('</body>', tail + ('' if 'goatcounter' in s else GC) + '</body>', 1)
 os.makedirs(out, exist_ok=True)
 open(os.path.join(out, 'index.html'), 'w').write(s)
 here = os.path.dirname(os.path.abspath(__file__))
