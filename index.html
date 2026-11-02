@@ -1859,7 +1859,7 @@ function menu(){
   bindLang(menu);
   document.getElementById("ward").onclick=wardrobe;
   document.getElementById("pron").onclick=pronunciation;
-  document.getElementById("tpl").onclick=template;
+  document.getElementById("tpl").onclick=()=>template();
   document.getElementById("read").onclick=readingList;
   document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("repaso").onclick=()=>openRepaso();
@@ -2934,7 +2934,7 @@ const TPL_EX=[
 let tplSel=null;
 const TPL_LINK=new Set(["orden","segm","combo"]);
 function template(back){
-  S=null; back=back||menu;
+  S=null; if(typeof back!=="function") back=menu;
   const cs=k=>`border-color:${TPL_CAT[k].c};background:${TPL_CAT[k].bg}`;
   const catOf={}; TPL_S.forEach(x=>catOf[x[0]]=x[1]);
   app.innerHTML=`
