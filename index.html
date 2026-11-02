@@ -597,6 +597,37 @@ const RKE=[
   {m:"küparkey",d:["küpay","küpakey","konürkey"]},{m:"pirkey",d:["piy","pikey","küparkey"]}
 ];
 const rkeForm=m=>({m,es:RKE_G[m][0],en:RKE_G[m][1]});
+// ===== Discourse particles: nga, may, ta, tati, chi, am, kay =====
+// Glosses follow Smeets (2008: 14.3, 32.1-32.5) and Zúñiga (2006: 92-93, 255-258); nga's reportative/closing uses are from the AVENUE corpus (Ready & Rogers).
+// Example sources: S = Smeets, Z = Zúñiga, H = Harmelink via Zúñiga, A = AVENUE corpus.
+const DM=[
+ {m:"nga",es:"recuerda algo pasado, a menudo con pena; también afirma, cierra la idea o marca lo que alguien dijo",en:"recalls something past, often with sorrow; also affirms, closes a point or marks what someone said"},
+ {m:"may",es:"«sí, pues»: busca un sí o suaviza una orden",en:"“yes, then”: invites a yes or softens a command"},
+ {m:"ta",es:"«el, la (que ya sabes)»: algo ya mencionado; comprueba que el oyente sigue",en:"“the (you know)”: something already mentioned; checks that the listener follows"},
+ {m:"tati",es:"«el, ese» (ta + ti): algo ya mencionado y conocido",en:"“the, that” (ta + ti): something already mentioned and known"},
+ {m:"chi",es:"expresa duda: una pregunta que uno se hace a sí mismo",en:"expresses doubt: a question you ask yourself"},
+ {m:"am",es:"pregunta pidiendo precisión o con sorpresa: «¿acaso…?»",en:"asks for precision or with surprise: “so…?”"},
+ {m:"kay",es:"«¿y…?»: contrasta con lo anterior o propone algo",en:"“and…?”: contrasts with what came before, or proposes something"}];
+const DM_S=[
+ {s:"Femkefuy ___ yiñ chaw.",a:"nga",es:"«Así hacía las cosas nuestro padre.» (ya falleció)",en:"“That is how our father used to do things.” (he has passed away)"},
+ {s:"Wiya ___ mawüni.",a:"nga",es:"«Ayer sí que llovió.»",en:"“It did rain yesterday.”"},
+ {s:"Pipeymi ___.",a:"nga",es:"«Eso dijiste.» (repite lo que dijo otro)",en:"“That's what you said.” (repeats what someone said)"},
+ {s:"Müleki ___.",a:"may",es:"«Sí, existen.»",en:"“Yes, they exist.”"},
+ {s:"Amuchi ___.",a:"may",es:"«Ya me voy.» (así se despide uno)",en:"“I'm off, then.” (the usual way to take your leave)"},
+ {s:"Mülefuy ___ lawentukufulu che.",a:"ta",es:"«Había gente que daba remedios.» (como sabes)",en:"“There were people who gave remedies.” (as you know)"},
+ {s:"___ kofke tami küpalelfiel, afi.",a:"tati",es:"«Se terminó el pan que me trajiste.»",en:"“The bread you brought me is finished.”"},
+ {s:"Mawünay ___?",a:"chi",es:"«¿Lloverá?» (se lo pregunta uno mismo)",en:"“Will it rain?” (asking yourself)"},
+ {s:"Amuy ___.",a:"chi",es:"«Quizás se fue.»",en:"“Maybe he went away.”"},
+ {s:"Nepeley ñi püñeñ ___?",a:"am",es:"«¿Acaso está despierto mi niño?»",en:"“Is my child awake, then?”"},
+ {s:"Iñche amutuan, eymi ___?",a:"kay",es:"«Yo me vuelvo, ¿y tú?»",en:"“I'm going back, and you?”"},
+ {s:"Kom amufuliyiñ ___?",a:"kay",es:"«¿Y si fuéramos todos?»",en:"“What if we all went?”"}];
+function dmFill(x){ return {m:x.a,es:x.es,en:x.en,oneWay:true,
+  prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(x.s)}</span><div class="scene">${esc(gl(x))}</div>`,
+  dist:shuffle(DM.filter(d=>d.m!==x.a)).slice(0,3).map(d=>({m:d.m,es:d.es,en:d.en}))}; }
+function genDm(n){
+  const f=shuffle(DM_S).slice(0,Math.ceil(n/2)).map(dmFill);
+  const g=shuffle(DM).slice(0,n-f.length).map(d=>({m:d.m,es:d.es,en:d.en,oneWay:true,dist:shuffle(DM.filter(x=>x!==d)).slice(0,3).map(x=>({m:x.m,es:x.es,en:x.en}))}));
+  return shuffle(f.concat(g)); }
 function genRke(n){ return shuffle(RKE).slice(0,n).map(r=>({...rkeForm(r.m),dist:r.d.map(rkeForm)})); }
 
 // ===== Possession: ñi, mi, iñ, mu, fey ñi =====
@@ -1355,6 +1386,11 @@ const STAGES = [
     examples:()=>[["müle-rke-fu-y","mülerkefuy"],["nie-rke-y","nierkey"],["kim-ürke-y","kimürkey"],["fem-ürke-n","femürken"],["küme-rke-y","kümerkey"],["pi-rke-y","pirkey"]].map(([s,m])=>({m:s,es:RKE_G[m][0],en:RKE_G[m][1]})),
     rule:{es:"<b>-(ü)rke-</b> marca que lo dicho viene de otros (“dicen que”) o que el hablante se da cuenta de algo (“resulta que”, “es que”). Va antes de la persona: <b>nie-rke-y</b> “dicen que tiene”. Después de consonante es <b>-ürke-</b>: <b>kim-ürke-y</b>. Con <b>-fu-</b> es típico de los relatos: <b>müle-rke-fu-y</b> “había (dicen)”. También se usa con <b>inche</b>: <b>fem-ürke-n</b> “resulta que lo hice así”.",
           en:"<b>-(ü)rke-</b> marks that what is said comes from others (“they say”) or that the speaker realises something (“it turns out”). It goes before the person ending: <b>nie-rke-y</b> “they say she/he has”. After a consonant it is <b>-ürke-</b>: <b>kim-ürke-y</b>. With <b>-fu-</b> it is typical of stories: <b>müle-rke-fu-y</b> “there was (they say)”. It is also used with <b>inche</b>: <b>fem-ürke-n</b> “it turns out I did it that way”."}},
+  { id:"dm", mt:"nga, may, ta, chi", es:"Partículas del discurso", en:"Discourse particles", kind:"verb",
+    gen:()=>genDm(8),
+    examples:()=>DM.map(d=>({m:d.m,es:d.es,en:d.en})),
+    rule:{es:"El mapudungun tiene partículas propias que guían la conversación; van después de la palabra o frase a la que se refieren. <b>nga</b> recuerda algo pasado, a menudo con pena (<b>femkefuy nga yiñ chaw</b> “así hacía nuestro padre”), y también afirma o marca lo que alguien dijo. <b>may</b> busca un sí o suaviza una orden: <b>amuchi may</b> “ya me voy”. <b>ta</b> es como “el, la (que ya sabes)”: señala algo ya mencionado, y <b>tati</b> (ta + ti) también funciona como artículo: <b>tati kofke</b> “el pan”. <b>chi</b> expresa duda: <b>mawünay chi?</b> “¿lloverá?”. Ojo: la <b>-chi</b> de <b>fey-chi</b> o <b>küme-chi</b> es un sufijo, no esta partícula. <b>am</b> pregunta con sorpresa o pidiendo precisión, y <b>kay</b> contrasta o propone: <b>eymi kay?</b> “¿y tú?”. Los hablantes usan también <i>pu</i> (del español <i>pues</i>), pero <b>nga</b> sigue siendo la partícula para recordar y para repetir lo dicho.",
+          en:"Mapudungun has its own particles that guide conversation; they follow the word or phrase they relate to. <b>nga</b> recalls something past, often with sorrow (<b>femkefuy nga yiñ chaw</b> “that is how our father used to do things”), and also affirms or marks what someone said. <b>may</b> invites a yes or softens a command: <b>amuchi may</b> “I'm off, then”. <b>ta</b> is like “the (you know)”: it points to something already mentioned, and <b>tati</b> (ta + ti) also works as an article: <b>tati kofke</b> “the bread”. <b>chi</b> expresses doubt: <b>mawünay chi?</b> “will it rain?”. Note: the <b>-chi</b> in <b>fey-chi</b> or <b>küme-chi</b> is a suffix, not this particle. <b>am</b> asks with surprise or for precision, and <b>kay</b> contrasts or proposes: <b>eymi kay?</b> “and you?”. Speakers also use <i>pu</i> (from Spanish <i>pues</i>), but <b>nga</b> is still the particle for remembering and for repeating what was said."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
