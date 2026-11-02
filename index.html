@@ -3085,20 +3085,23 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
 })();
 </script>
 <script>
-/* Visit and install counts (GoatCounter: no cookies, no personal data). Events: a new install (Android/desktop Chrome)
-   and one launch per session from the home screen (all platforms, including iPhone). Nothing is sent when opened from a file. */
+/* Visit, install and lesson counts sent to GoatCounter as a 1x1 image request (no cookies, no personal data, no third-party
+   script, so script blockers that stop gc.zgo.at don't stop it). Nothing is sent from a file copy or while offline. */
 (function(){
   if(location.protocol!=='https:') return;
-  window.mpkCount=function(p,t){gc(p,t);};
-  function gc(path,title){ var n=0; (function send(){
-    if(window.goatcounter && window.goatcounter.count){ try{ window.goatcounter.count({path:path,title:title,event:true}); }catch(e){} }
-    else if(n++<40) setTimeout(send,250); })(); }
-  window.addEventListener('appinstalled',function(){ gc('app-installed','App installed'); });
+  var BASE='https://brogers36.goatcounter.com/count';
+  function gc(path,title,event){ try{
+    var u=BASE+'?p='+encodeURIComponent(path)+'&t='+encodeURIComponent(title||'')+(event?'&e=true':'')+
+      (event?'':'&r='+encodeURIComponent(document.referrer||''))+'&s='+encodeURIComponent(screen.width+','+screen.height+','+(window.devicePixelRatio||1))+
+      '&rnd='+Math.random().toString(36).slice(2);
+    var img=new Image(); img.src=u; }catch(e){} }
+  window.mpkCount=function(p,t){ gc(p,t,true); };
+  gc(location.pathname||'/', document.title, false);
+  window.addEventListener('appinstalled',function(){ gc('app-installed','App installed',true); });
   var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
   var seen=false; try{ seen=sessionStorage.getItem('mpk_gc_launch')==='1'; }catch(e){}
-  if(standalone && !seen){ try{ sessionStorage.setItem('mpk_gc_launch','1'); }catch(e){} gc('home-screen-launch','Opened from home screen'); }
+  if(standalone && !seen){ try{ sessionStorage.setItem('mpk_gc_launch','1'); }catch(e){} gc('home-screen-launch','Opened from home screen',true); }
 })();
 </script>
-<script data-goatcounter="https://brogers36.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
