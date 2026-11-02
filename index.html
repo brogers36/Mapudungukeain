@@ -1858,15 +1858,15 @@ function menu(){
     <p class="note">${t().note}</p>`;
   bindLang(menu);
   document.getElementById("ward").onclick=wardrobe;
-  document.getElementById("pron").onclick=pronunciation;
-  document.getElementById("tpl").onclick=()=>template();
-  document.getElementById("read").onclick=readingList;
+  document.getElementById("pron").onclick=()=>{track("open/pronunciation","Pronunciación");pronunciation();};
+  document.getElementById("tpl").onclick=()=>{track("open/template","Plantilla verbal");template();};
+  document.getElementById("read").onclick=()=>{track("open/readings","Lecturas");readingList();};
   document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("repaso").onclick=()=>openRepaso();
   document.getElementById("help").onclick=help;
-  document.getElementById("x-lof").onclick=()=>lof();
-  document.getElementById("x-palin").onclick=()=>palin();
-  document.getElementById("x-epew").onclick=()=>epew();
+  document.getElementById("x-lof").onclick=()=>{track("open/lof","Lof");lof();};
+  document.getElementById("x-palin").onclick=()=>{track("open/palin","Palin");palin();};
+  document.getElementById("x-epew").onclick=()=>{track("open/epew","Epew");epew();};
   app.querySelectorAll(".lvl:not(:disabled)").forEach(b=>b.onclick=()=>intro(ALL_LEVELS.find(l=>l.id===b.dataset.id)));
   app.querySelectorAll(".vidbtn").forEach(b=>b.onclick=()=>playVideo(b.dataset.vid,menu));
   app.querySelectorAll(".quizcard:not(:disabled)").forEach(b=>b.onclick=()=>intro(QUIZZES.find(q=>q.id===b.dataset.quiz)));
@@ -1929,7 +1929,7 @@ function intro(lvl){
     ${body}
     <div class="row"><button class="btn" id="go">${t().start}</button>${TPL_LINK.has(lvl.id)?`<button class="btn ghost" id="tplb">${L2("Ver la plantilla verbal","See the verb template")}</button>`:""}<button class="btn ghost" id="bk">${t().back}</button></div>`;
   bindLang(()=>intro(lvl));
-  const tplb=document.getElementById("tplb"); if(tplb) tplb.onclick=()=>template(()=>intro(lvl));
+  const tplb=document.getElementById("tplb"); if(tplb) tplb.onclick=()=>{track("open/template","Plantilla verbal");template(()=>intro(lvl));};
   if(deck.length){
     let order=deck.map((_,i)=>i), at=0, flipped=false, meaningFirst=false; const known=new Set();
     const show=()=>{ const c=deck[order[at]];
@@ -1958,7 +1958,10 @@ function intro(lvl){
 }
 
 // ===== Play =====
+// usage counts for GoatCounter (no personal data); no-op offline or from a file
+const track=(path,title)=>{ try{ if(window.mpkCount) window.mpkCount(path,title); }catch(e){} };
 function start(lvl){
+  track('start/'+lvl.id, 'Inicio: '+(lvl.es||lvl.id));
   const items = lvl.gen ? lvl.gen() : shuffle(lvl.words).slice(0,Math.min(8,lvl.words.length));
   const queue=items.map((w,i)=>({w,type:(w.oneWay||i%2===0)?"pic2word":"word2pic",retry:false}));
   S={lvl,queue,total:items.length,done:0,correct:0,hearts:3,missed:new Set(),pool:items};
@@ -2028,6 +2031,7 @@ function result(){
   const earned = lvl.quiz ? S.correct*2 + stars*4 : S.correct + stars*2;
   nuts += earned; save("nuts",nuts);
   if(stars>(best[lvl.id]||0)){best[lvl.id]=stars;save("best",best)}
+  track((lost?'lost/':'done/')+lvl.id+(lost?'':'/'+stars), (lost?'Perdido: ':'Completado ('+stars+'★): ')+(lvl.es||lvl.id));
   const missed=[...S.missed];
   const nl=lost?null:nextLevel(lvl);
   const show=()=>{
@@ -2440,7 +2444,7 @@ function readingList(){
         ${open?starsHTML(best[readKey(r)]||0):`<span class="gl">🔒 ${t().locked(st.need)}</span>`}</button>`}).join("")}</div>`;
   bindLang(readingList);
   document.getElementById("bk").onclick=menu;
-  app.querySelectorAll(".rcard:not(:disabled)").forEach(b=>b.onclick=()=>reading(READINGS.find(r=>r.id===b.dataset.r)));
+  app.querySelectorAll(".rcard:not(:disabled)").forEach(b=>b.onclick=()=>{const r=READINGS.find(r=>r.id===b.dataset.r); track("reading/"+r.id,"Lectura: "+r.title); reading(r);});
 }
 
 function reading(r, state){
@@ -3085,6 +3089,7 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navi
    and one launch per session from the home screen (all platforms, including iPhone). Nothing is sent when opened from a file. */
 (function(){
   if(location.protocol!=='https:') return;
+  window.mpkCount=function(p,t){gc(p,t);};
   function gc(path,title){ var n=0; (function send(){
     if(window.goatcounter && window.goatcounter.count){ try{ window.goatcounter.count({path:path,title:title,event:true}); }catch(e){} }
     else if(n++<40) setTimeout(send,250); })(); }

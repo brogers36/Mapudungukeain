@@ -28,6 +28,7 @@ GC = '''<script>
    and one launch per session from the home screen (all platforms, including iPhone). Nothing is sent when opened from a file. */
 (function(){
   if(location.protocol!=='https:') return;
+  window.mpkCount=function(p,t){gc(p,t);};
   function gc(path,title){ var n=0; (function send(){
     if(window.goatcounter && window.goatcounter.count){ try{ window.goatcounter.count({path:path,title:title,event:true}); }catch(e){} }
     else if(n++<40) setTimeout(send,250); })(); }
