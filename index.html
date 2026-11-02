@@ -1927,8 +1927,9 @@ function intro(lvl){
     <div class="top"><div><p class="eyebrow">${esc(gl(lvl))}</p><h2>${esc(title(lvl))}</h2></div>${langToggle()}</div>
     <p class="howline">${t().how(lvl)}</p>
     ${body}
-    <div class="row"><button class="btn" id="go">${t().start}</button><button class="btn ghost" id="bk">${t().back}</button></div>`;
+    <div class="row"><button class="btn" id="go">${t().start}</button>${TPL_LINK.has(lvl.id)?`<button class="btn ghost" id="tplb">${L2("Ver la plantilla verbal","See the verb template")}</button>`:""}<button class="btn ghost" id="bk">${t().back}</button></div>`;
   bindLang(()=>intro(lvl));
+  const tplb=document.getElementById("tplb"); if(tplb) tplb.onclick=()=>template(()=>intro(lvl));
   if(deck.length){
     let order=deck.map((_,i)=>i), at=0, flipped=false, meaningFirst=false; const known=new Set();
     const show=()=>{ const c=deck[order[at]];
@@ -2931,14 +2932,15 @@ const TPL_EX=[
  {w:"pi-rke-y",es:"«dijo, dicen»",en:"“she/he said, it is said”",m:[["pi",0],["rke",12],["y",2]]},
  {w:"sapatu-tu-ke-la-fu-y",es:"«no solía usar zapatos»",en:"“she/he did not use to wear shoes”",m:[["sapatu",0],["tu",36],["ke",14],["la",10],["fu",8],["y",2]]}];
 let tplSel=null;
-function template(){
-  S=null;
+const TPL_LINK=new Set(["orden","segm","combo"]);
+function template(back){
+  S=null; back=back||menu;
   const cs=k=>`border-color:${TPL_CAT[k].c};background:${TPL_CAT[k].bg}`;
   const catOf={}; TPL_S.forEach(x=>catOf[x[0]]=x[1]);
   app.innerHTML=`
     <div class="top"><div><p class="eyebrow">Smeets (2008)</p><h2>${L2("Plantilla verbal","Verb template")}</h2></div>${langToggle()}</div>
     <p>${L2("Los sufijos siguen a la raíz en un orden fijo, numerado desde el 36 (junto a la raíz) hasta el 1 (el final de la palabra). Los colores muestran qué hace cada posición. Toca una función para resaltarla.","Suffixes follow the root in a fixed order, numbered from 36 (next to the root) down to 1 (the end of the word). Colors show what each slot does. Tap a function to highlight it.")}</p>
-    <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${back===menu?t().menu:t().back}</button></div>
     <div class="tpl-key">${TPL_ORDER.map(k=>`<button data-k="${k}" aria-pressed="${tplSel===k}"><span class="tpl-sw" style="${cs(k)}"></span>${esc(TPL_CAT[k][lang])}</button>`).join("")}</div>
     ${TPL_Z.map((z,i)=>{const zl=z[lang];
       const cells=TPL_S.filter(x=>x[0]<=z.from&&x[0]>=z.to).map(x=>`<div class="tpl-cell${tplSel===x[1]?" hit":""}" style="${cs(x[1])}"><b>${x[0]}</b><span>${esc(lang==="es"?x[2]:x[3])}</span><code>${esc(x[4])}</code></div>`).join("");
@@ -2948,9 +2950,9 @@ function template(){
       ${TPL_EX.map(x=>`<div><b>${esc(x.w)}</b> <i style="color:var(--muted)">${esc(x[lang])}</i><div class="tpl-chips">${x.m.map(([f,n])=>n?`<span class="tpl-chip" style="${cs(catOf[n])}">${esc(f)}<small>${n}</small></span>`:`<span class="tpl-chip root">${esc(f)}<small>${L2("raíz","root")}</small></span>`).join("")}</div></div>`).join("")}
     </section>
     <p class="note">${L2("Zonas y etiquetas: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 y 177, capítulo 26. Varias formas aparecen en más de una posición (-tu- en 36, 33 y 16; -nge- en 36 y 23): la posición, no la forma, decide la función.","Zones and labels: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 and 177, chapter 26. Several forms occur in more than one slot (-tu- in 36, 33 and 16; -nge- in 36 and 23): the slot, not the form, decides the function.")}</p>`;
-  bindLang(template);
-  document.getElementById("bk").onclick=menu;
-  app.querySelectorAll(".tpl-key button").forEach(b=>b.onclick=()=>{tplSel=tplSel===b.dataset.k?null:b.dataset.k; template();});
+  bindLang(()=>template(back));
+  document.getElementById("bk").onclick=back;
+  app.querySelectorAll(".tpl-key button").forEach(b=>b.onclick=()=>{tplSel=tplSel===b.dataset.k?null:b.dataset.k; template(back);});
 }
 
 // ===== Repaso: words missed anywhere come back until they are answered right twice in a row =====
