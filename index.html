@@ -144,6 +144,13 @@ button{font-family:var(--body)}
 .gain .nut{width:26px;height:26px}
 .rule{background:var(--panel);border-radius:6px;padding:12px 14px;font-size:.95rem}
 .rule b{color:var(--gold)}
+.grafs{display:grid;gap:12px;margin:12px 0}
+.graf{background:var(--panel);border-radius:8px;padding:12px 14px;border:2px solid transparent}
+.graf.on{border-color:var(--gold)}
+.graf-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.graf-h h3{margin:0}
+.graf-ex b{color:var(--gold);font-weight:700}
+.g-uni{display:block;font-size:.7rem;color:var(--muted)}
 .tbl-wrap{overflow-x:auto}
 table.par{border-collapse:collapse;width:100%;font-size:.95rem}
 table.par th,table.par td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--panel-2)}
@@ -538,7 +545,7 @@ const DERIV=[
 ];
 function dForm(d){
   const w={m:d.n+d.suf, es:d.es, en:d.en, oneWay:true,
-    prompt:()=>`<div class="pic">${d.pic}</div><span class="big" style="font-size:1.5rem">${esc(d.n)} → ?</span><div class="scene">“${esc(gl(d))}”</div>`};
+    prompt:()=>`<div class="pic">${d.pic}</div><span class="big" style="font-size:1.5rem">${esc(G(d.n))} → ?</span><div class="scene">“${esc(gl(d))}”</div>`};
   const vowel=/[aeiouü]$/.test(d.n);
   const all=vowel?["n","tun","ngen",""]:["ün","tun","ngen",""];
   w.dist=all.filter(x=>x!==d.suf).map(x=>({m:d.n+x,es:"",en:""}));
@@ -642,7 +649,7 @@ const DM_S=[
  {s:"Iñche amutuan, eymi ___?",a:"kay",es:"«Yo me vuelvo, ¿y tú?»",en:"“I'm going back, and you?”"},
  {s:"Kom amufuliyiñ ___?",a:"kay",es:"«¿Y si fuéramos todos?»",en:"“What if we all went?”"}];
 function dmFill(x){ return {m:x.a,es:x.es,en:x.en,oneWay:true,
-  prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(x.s)}</span><div class="scene">${esc(gl(x))}</div>`,
+  prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(G(x.s))}</span><div class="scene">${esc(gl(x))}</div>`,
   dist:shuffle(DM.filter(d=>d.m!==x.a)).slice(0,3).map(d=>({m:d.m,es:d.es,en:d.en}))}; }
 function genDm(n){
   const f=shuffle(DM_S).slice(0,Math.ceil(n/2)).map(dmFill);
@@ -705,7 +712,7 @@ const CAUS=[
 ];
 function causItem(c){
   const w={m:c.m,es:c.es,en:c.en,oneWay:true,
-    prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(c.v)}- “${esc(gl(c.vg))}” → ?</span><div class="scene">“${esc(gl(c))}”</div>`};
+    prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(G(c.v))}- “${esc(gl(c.vg))}” → ?</span><div class="scene">“${esc(gl(c))}”</div>`};
   w.dist=[c.v+"tun",c.v+"len",c.v+"men"].map(m=>({m,es:"",en:""}));
   return w;
 }
@@ -722,7 +729,7 @@ const CONVO=[
 ];
 function convoItem(c){
   return {m:c.m, es:c.es, en:c.en, oneWay:true,
-    prompt:()=>`<span class="big" style="font-size:1.7rem">${esc(c.q)}</span><div class="scene">${esc(gl(c.qg))}</div>`,
+    prompt:()=>`<span class="big" style="font-size:1.7rem">${esc(G(c.q))}</span><div class="scene">${esc(gl(c.qg))}</div>`,
     dist:shuffle(CONVO.filter(x=>x!==c)).slice(0,3).map(x=>({m:x.m,es:x.es,en:x.en}))};
 }
 
@@ -812,12 +819,12 @@ function segWrong(c,n){
 }
 function genOrder(n){
   return shuffle(COMBOS.filter(c=>c.seg.length>3)).slice(0,n).map(c=>({m:cForm(c),es:c.es,en:c.en,oneWay:true,
-    prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(c.seg[0])}- + ${c.seg.slice(1).map(x=>"-"+esc(x)).sort().join(" ")}</span><div class="scene">“${esc(gl(c))}”</div>`,
+    prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(G(c.seg[0]))}- + ${c.seg.slice(1).map(x=>"-"+esc(G(x))).sort().join(" ")}</span><div class="scene">“${esc(gl(c))}”</div>`,
     dist:permuteWrong(c,3).map(m=>({m,es:"",en:""}))}));
 }
 function genSeg(n){
   return shuffle(COMBOS).slice(0,n).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en,oneWay:true,
-    prompt:()=>`<span class="big" style="font-size:1.8rem">${esc(cForm(c))}</span><div class="scene">“${esc(gl(c))}”</div>`,
+    prompt:()=>`<span class="big" style="font-size:1.8rem">${esc(G(cForm(c)))}</span><div class="scene">“${esc(gl(c))}”</div>`,
     dist:segWrong(c,3).map(m=>({m,es:"",en:""}))}));
 }
 function genCombo(n){
@@ -1721,11 +1728,11 @@ const T = {
         :l.kind==="scene"?"Aprende las palabras. Luego verás un significado y eliges la palabra, o al revés."
         :"Aprende las palabras. Luego verás una imagen y eliges la palabra, o al revés.",reading:"Lectura",readSub:"Textos cortos en mapudungun con preguntas. Se abren junto con cada etapa. La traducción aparece al comprobar.",
       glossary:"Palabras útiles",check:"Comprobar",readDone:"Entendiste el texto.",readRetry:"Lee otra vez con las palabras útiles.",replay:"Ver otra vez",cont:"Continuar",watch:"Ver video",
-      pron:"Pronunciación",pronSub:"Cómo suenan las letras del grafemario Unificado, con ejemplos del juego. Las vocales a, e, i, o, u suenan como en español; la ü es la vocal nueva.",
+      pron:"Pronunciación",pronSub:"Cómo suenan las letras del grafemario elegido, con ejemplos del juego. Las vocales a, e, i, o, u suenan como en español; la ü es la vocal nueva.",
       pronQuiz:"Practicar los sonidos",stressH:"Acento.",
       stress:"La regla que suele citarse es: en la última sílaba si la palabra termina en consonante (<b>kütral</b>), y en la penúltima si termina en vocal (<b>ruka</b>). Hay variación y excepciones.",
       pronNote:"El juego todavía no tiene audio. Lo mejor es escuchar a hablantes o grabaciones.",
-      note:"Escritura: grafemario Unificado. Sin audio todavía. Las formas verbales del nivel avanzado se generan por regla (raíz + sufijos)."},
+      note:"Escritura: grafemario Unificado, Azümchefe o Ragileo (elígelo en «Grafemarios»). Sin audio todavía. Las formas verbales del nivel avanzado se generan por regla (raíz + sufijos)."},
   en:{sub:"A game for learning Mapudungun",learn:"Words in this level",rule:"How it works",examples:"Examples",
       start:"Play",back:"Back",which:"How do you say it?",whichPic:"What does it mean?",rightG:"Well done!",
       wrong:"It was",next:"Next",done:"Level complete",again:"Play again",menu:"Levels",missed:"To review",
@@ -1748,7 +1755,7 @@ const T = {
         :l.kind==="scene"?"Learn the words. Then you'll see a meaning and choose the word, or the other way round."
         :"Learn the words. Then you'll see a picture and choose the word, or the other way round.",reading:"Reading",readSub:"Short texts in Mapudungun with questions. Each opens with its stage. The translation appears when you check.",
       glossary:"Useful words",check:"Check",readDone:"You understood the text.",readRetry:"Read it again with the useful words.",replay:"Watch again",cont:"Continue",watch:"Watch video",
-      pron:"Pronunciation",pronSub:"How the letters of the Grafemario Unificado sound, with examples from the game. The vowels a, e, i, o, u sound as in Spanish; ü is the new vowel.",
+      pron:"Pronunciation",pronSub:"How the letters of the chosen grafemario sound, with examples from the game. The vowels a, e, i, o, u sound as in Spanish; ü is the new vowel.",
       pronQuiz:"Practice the sounds",stressH:"Stress.",
       stress:"The rule usually cited: on the last syllable if the word ends in a consonant (<b>kütral</b>), on the second-to-last if it ends in a vowel (<b>ruka</b>). There is variation and there are exceptions.",
       pronNote:"The game has no audio yet. Listening to speakers or recordings is the best guide.",
@@ -1774,6 +1781,22 @@ const shuffle = a => {a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.flo
 const totalStars = () => Object.entries(best).filter(([k])=>!k.startsWith("quiz-")).reduce((a,[,b])=>a+b,0);
 const purse = () => `<span class="purse" aria-label="${nuts} ngülliw">${NUT}<span>${nuts}</span></span>`;
 const title = l => l.mt || gl(l);
+
+// ===== Grafemarios: all Mapudungun is stored in Unificado and shown in the player's chosen grafemario =====
+let graf = ["uni","azu","rag"].includes(load("graf")) ? load("graf") : "uni";
+const GRAF_MAP = {
+  azu:{ng:"g", g:"q", d:"z", tr:"tx"},
+  rag:{ng:"g", g:"q", d:"z", tr:"x", ch:"c", ll:"j", "ü":"v", sh:"s"}
+};
+// letter-by-letter conversion from Unificado; keeps capitals (Tr → Tx, TR → TX)
+const G = s => { if(s==null || graf==="uni") return s; const m=GRAF_MAP[graf];
+  return String(s).replace(/ng|tr|ch|ll|sh|[gdü]/gi, x=>{ const lo=x.toLowerCase(), r=m[lo]; if(r==null) return x;
+    if(x!==lo && x===x.toUpperCase()) return r.toUpperCase();
+    if(x[0]!==lo[0]) return r[0].toUpperCase()+r.slice(1);
+    return r; }); };
+// converts only the bold Mapudungun forms inside rule HTML, leaving tags and entities alone
+const GB = html => graf==="uni" ? html : String(html).replace(/<b>(.*?)<\/b>/g,(a,x)=>"<b>"+x.split(/(&[#a-z0-9]+;|<[^>]+>)/i).map((p,i)=>i%2?p:G(p)).join("")+"</b>");
+const titleM = l => l.mt ? G(l.mt) : gl(l);
 
 // 1-10: a ten-frame, first five red and next five gold, empty places shown as rings
 function tenFrame(n){
@@ -1833,6 +1856,7 @@ function menu(){
     <nav class="hub tools" aria-label="${L2("Aprende y practica","Learn and practice")}">${[
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
+      ["graf",L2("Grafemarios","Writing systems"),L2(`Ahora: ${GRAF_INFO[graf].name}`,`Now: ${GRAF_INFO[graf].name}`)],
       ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
@@ -1844,7 +1868,7 @@ function menu(){
         <div class="stage-head"><h2>${esc(gl(st))}</h2>${locked?`<span class="req">🔒 ${t().locked(st.need)}</span>`:""}</div>
         <div class="levels">${st.levels.map(l=>`
           <button class="lvl" data-id="${l.id}" ${locked?"disabled":""}>
-            <span class="mt">${esc(title(l))}</span>
+            <span class="mt">${esc(titleM(l))}</span>
             <span class="gl">${l.mt?esc(gl(l)):"&nbsp;"}</span>
             ${starsHTML(best[l.id]||0)}
           </button>`).join("")}</div>
@@ -1859,6 +1883,7 @@ function menu(){
   bindLang(menu);
   document.getElementById("ward").onclick=wardrobe;
   document.getElementById("pron").onclick=()=>{track("open/pronunciation","Pronunciación");pronunciation();};
+  document.getElementById("graf").onclick=()=>{track("open/grafemarios","Grafemarios");grafemarios();};
   document.getElementById("tpl").onclick=()=>{track("open/template","Plantilla verbal");template();};
   document.getElementById("read").onclick=()=>{track("open/readings","Lecturas");readingList();};
   document.getElementById("vocab").onclick=()=>vocab();
@@ -1877,29 +1902,29 @@ document.addEventListener("keydown",e=>{ if(intro.keys && !/INPUT|TEXTAREA/.test
 function intro(lvl){
   let body="";
   if(lvl.quiz){
-    body=`<div class="rule">${t().quizIntro(lvl.stage.levels.map(l=>esc(title(l))).join(", "))}</div>`;
+    body=`<div class="rule">${t().quizIntro(lvl.stage.levels.map(l=>esc(titleM(l))).join(", "))}</div>`;
   }else if(lvl.examples){
-    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>
+    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${GB(lvl.rule[lang])}</div>
       <p class="eyebrow">${t().examples}</p>
       <div class="tbl-wrap"><table class="par"><thead><tr><th>${t().form}</th><th>${esc(gl({es:"Significado",en:"Meaning"}))}</th></tr></thead><tbody>
-      ${lvl.examples().map(f=>`<tr><td class="m">${esc(f.m)}</td><td>${esc(gl(f))}</td></tr>`).join("")}
+      ${lvl.examples().map(f=>`<tr><td class="m">${esc(G(f.m))}</td><td>${esc(gl(f))}</td></tr>`).join("")}
       </tbody></table></div>`;
   }else if(lvl.kind==="verb"){
     const tense=lvl.tenses[0], ex=[VERBS[0],VERBS[4]];
     const sets = lvl.tenses.length>1 ? ["pres","neg","fut"] : [tense];
-    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>
+    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${GB(lvl.rule[lang])}</div>
       <p class="eyebrow">${t().examples}</p>
       <div class="tbl-wrap"><table class="par"><thead><tr><th>${t().form}</th><th>${esc(gl({es:"Significado",en:"Meaning"}))}</th></tr></thead><tbody>
-      ${sets.flatMap(ts=>ex.flatMap(vb=>[0,1,2].map(p=>{const f=vform(vb,ts,p);return `<tr><td class="m">${esc(f.m)}</td><td>${esc(gl(f))}</td></tr>`}))).join("")}
+      ${sets.flatMap(ts=>ex.flatMap(vb=>[0,1,2].map(p=>{const f=vform(vb,ts,p);return `<tr><td class="m">${esc(G(f.m))}</td><td>${esc(gl(f))}</td></tr>`}))).join("")}
       </tbody></table></div>`;
   }else if(lvl.kind==="count"){
     const ex=genCount(6);
-    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>
+    body=`<p class="eyebrow">${t().rule}</p><div class="rule">${GB(lvl.rule[lang])}</div>
       <p class="eyebrow">${t().examples}</p>
-      <div class="cards">${ex.map(w=>`<div class="card">${picHTML(w,lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div>`;
+      <div class="cards">${ex.map(w=>`<div class="card">${picHTML(w,lvl)}<span class="w">${esc(G(w.m))}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div>`;
   }else{
-    body=`${lvl.rule?`<p class="eyebrow">${t().rule}</p><div class="rule">${lvl.rule[lang]}</div>`:""}<details class="all"><summary>${t().fcAll}</summary><div class="cards">${lvl.words.map(w=>`
-        <div class="card">${(w._lvl||lvl).kind==="scene"?"":picHTML(w,w._lvl||lvl)}<span class="w">${esc(w.m)}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div></details>`;
+    body=`${lvl.rule?`<p class="eyebrow">${t().rule}</p><div class="rule">${GB(lvl.rule[lang])}</div>`:""}<details class="all"><summary>${t().fcAll}</summary><div class="cards">${lvl.words.map(w=>`
+        <div class="card">${(w._lvl||lvl).kind==="scene"?"":picHTML(w,w._lvl||lvl)}<span class="w">${esc(G(w.m))}</span><span class="g">${esc(gl(w))}</span></div>`).join("")}</div></details>`;
   }
   // individual flashcards, studied one at a time before playing
   let deck=[];
@@ -1924,7 +1949,7 @@ function intro(lvl){
     </section>` : "";
   body = deckHTML + body;
   app.innerHTML=`
-    <div class="top"><div><p class="eyebrow">${esc(gl(lvl))}</p><h2>${esc(title(lvl))}</h2></div>${langToggle()}</div>
+    <div class="top"><div><p class="eyebrow">${esc(gl(lvl))}</p><h2>${esc(titleM(lvl))}</h2></div>${langToggle()}</div>
     <p class="howline">${t().how(lvl)}</p>
     ${body}
     <div class="row"><button class="btn" id="go">${t().start}</button>${TPL_LINK.has(lvl.id)?`<button class="btn ghost" id="tplb">${L2("Ver la plantilla verbal","See the verb template")}</button>`:""}<button class="btn ghost" id="bk">${t().back}</button></div>`;
@@ -1933,7 +1958,7 @@ function intro(lvl){
   if(deck.length){
     let order=deck.map((_,i)=>i), at=0, flipped=false, meaningFirst=false; const known=new Set();
     const show=()=>{ const c=deck[order[at]];
-      const faceM=`<span class="fc-m">${esc(c.m)}</span>`, faceG=`${c.pic}<span class="fc-g">${esc(c.g)}</span>`;
+      const faceM=`<span class="fc-m">${esc(G(c.m))}</span>`, faceG=`${c.pic}<span class="fc-g">${esc(c.g)}</span>`;
       const front=meaningFirst?faceG:faceM, back=meaningFirst?faceM:faceG;
       document.getElementById("fcIn").innerHTML=flipped?`<span class="fc-face back">${front}${back}</span>`:`<span class="fc-face">${front}</span>`;
       document.getElementById("fc").classList.toggle("flipped",flipped);
@@ -1983,10 +2008,10 @@ function round(){
     </div>
     <div class="prompt pop">
       <span class="ask">${pic2word?t().which:t().whichPic}</span>
-      ${pic2word?picHTML(q.w,lvl):`<span class="big">${esc(q.w.m)}</span>`}
+      ${pic2word?picHTML(q.w,lvl):`<span class="big">${esc(G(q.w.m))}</span>`}
     </div>
     <div class="opts">${opts.map((w,i)=>`
-      <button class="opt ${pic2word||textual?"":"pic-opt"}" data-i="${i}" style="${!pic2word&&textual?"font-family:var(--body);font-weight:700;font-size:1rem":""}">${pic2word?esc(w.m):(textual?esc(gl(w)):picHTML(w,lvl))}</button>`).join("")}</div>
+      <button class="opt ${pic2word||textual?"":"pic-opt"}" data-i="${i}" style="${!pic2word&&textual?"font-family:var(--body);font-weight:700;font-size:1rem":""}">${pic2word?esc(G(w.m)):(textual?esc(gl(w)):picHTML(w,lvl))}</button>`).join("")}</div>
     <div class="feedback" id="fb" aria-live="polite"></div>`;
   document.getElementById("bk").onclick=menu;
   const btns=[...app.querySelectorAll(".opt")];
@@ -2000,14 +2025,14 @@ function answer(w,btn,btns,opts){
   if(ok){
     btn.classList.add("pop");
     S.queue.shift(); S.done++; if(!q.retry){ S.correct++; logRight(q.w,S.lvl); }
-    const word = PRAISE[praiseIdx++ % PRAISE.length];
+    const word = G(PRAISE[praiseIdx++ % PRAISE.length]);
     fb.innerHTML=coach(`<b>¡${word}!</b><small>${t().rightG}</small>`, true);
   }else{
     btn.classList.add("bad","shake");
     S.hearts--; S.missed.add(q.w); logMiss(q.w,S.lvl);
     S.queue.shift();
     S.queue.splice(Math.min(2,S.queue.length),0,{w:q.w,type:(q.w.oneWay||q.type==="word2pic")?"pic2word":"word2pic",retry:true});
-    fb.innerHTML=coach(`<b class="bad">¡Fotrü!</b><small>${t().wrong}: <b>${esc(q.w.m)}</b> · ${esc(gl(q.w))} · ${t().keep}</small>`, false);
+    fb.innerHTML=coach(`<b class="bad">¡${G("Fotrü")}!</b><small>${t().wrong}: <b>${esc(G(q.w.m))}</b> · ${esc(gl(q.w))} · ${t().keep}</small>`, false);
   }
   const nx=document.createElement("button");
   nx.className="btn"; nx.textContent=t().next; nx.onclick=round;
@@ -2042,11 +2067,11 @@ function result(){
       ${starsHTML(stars)}
       <p>${t().score(S.correct,S.total)}</p>
       <span class="gain">+${earned} ${NUT}<span style="font-family:var(--body);font-size:1rem;color:var(--muted)">ngülliw ${lvl.quiz?t().bonus:t().earned}</span></span>
-      ${coach(lost?`<b>${t().keepB}</b>`:`<b>¡${PRAISE[praiseIdx++ % PRAISE.length]}!</b><small>${t().rightG}</small>`, !lost)}
+      ${coach(lost?`<b>${t().keepB}</b>`:`<b>¡${G(PRAISE[praiseIdx++ % PRAISE.length])}!</b><small>${t().rightG}</small>`, !lost)}
       ${missed.length?`<p class="eyebrow">${t().missed}</p>
-        <div class="missed">${missed.map(w=>`<span><b>${esc(w.m)}</b> · ${esc(gl(w))}</span>`).join("")}</div>`:""}
+        <div class="missed">${missed.map(w=>`<span><b>${esc(G(w.m))}</b> · ${esc(gl(w))}</span>`).join("")}</div>`:""}
     </div>
-    <div class="row">${nl?`<button class="btn" id="nl">${L2("Siguiente","Next")}: ${esc(title(nl))} →</button>`:""}<button class="btn${nl?" ghost":""}" id="ag">${t().again}</button><button class="btn ghost" id="wd">${t().wardrobe}</button><button class="btn ghost" id="mn">${t().menu}</button></div>`;
+    <div class="row">${nl?`<button class="btn" id="nl">${L2("Siguiente","Next")}: ${esc(titleM(nl))} →</button>`:""}<button class="btn${nl?" ghost":""}" id="ag">${t().again}</button><button class="btn ghost" id="wd">${t().wardrobe}</button><button class="btn ghost" id="mn">${t().menu}</button></div>`;
   if(nl) document.getElementById("nl").onclick=()=>intro(nl);
   document.getElementById("ag").onclick=()=>lvl.repaso?openRepaso():start(lvl);
   document.getElementById("mn").onclick=menu;
@@ -2440,7 +2465,7 @@ function readingList(){
     <div class="readlist">${READINGS.slice().sort((a,b)=>STAGES.findIndex(s=>s.id===a.stage)-STAGES.findIndex(s=>s.id===b.stage)).map(r=>{const open=readOpen(r), st=STAGES.find(x=>x.id===r.stage);
       return `<button class="rcard" data-r="${r.id}" ${open?"":"disabled"}>
         <span class="lvlname">${esc(gl(st))}</span>
-        <span class="mt">${esc(r.title)}</span><span class="gl">${esc(gl(r.sub))}</span>
+        <span class="mt">${esc(G(r.title))}</span><span class="gl">${esc(gl(r.sub))}</span>
         ${open?starsHTML(best[readKey(r)]||0):`<span class="gl">🔒 ${t().locked(st.need)}</span>`}</button>`}).join("")}</div>`;
   bindLang(readingList);
   document.getElementById("bk").onclick=menu;
@@ -2452,9 +2477,9 @@ function reading(r, state){
   const done=st.checked;
   const score = done ? st.pick.filter(x=>x===0).length : 0;
   app.innerHTML=`
-    <div class="top"><div><p class="eyebrow">${esc(gl(r.sub))}</p><h2>${esc(r.title)}</h2></div>${langToggle()}</div>
-    <div class="passage">${r.lines.map(l=>`<p class="line">${l.who?`<span class="who">${esc(l.who)}:</span> `:""}<span class="mz">${esc(l.m)}</span>${done?`<span class="tr">${esc(gl(l))}</span>`:""}</p>`).join("")}</div>
-    <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${r.gloss.map(g=>`<span><b>${esc(g[0])}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
+    <div class="top"><div><p class="eyebrow">${esc(gl(r.sub))}</p><h2>${esc(G(r.title))}</h2></div>${langToggle()}</div>
+    <div class="passage">${r.lines.map(l=>`<p class="line">${l.who?`<span class="who">${esc(G(l.who))}:</span> `:""}<span class="mz">${esc(G(l.m))}</span>${done?`<span class="tr">${esc(gl(l))}</span>`:""}</p>`).join("")}</div>
+    <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${r.gloss.map(g=>`<span><b>${esc(G(g[0]))}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
     <div class="qs">${r.qs.map((q,qi)=>`
       <fieldset class="q"><legend>${qi+1}. ${esc(gl(q))}</legend>
         <div class="choices">${st.order[qi].map(oi=>{
@@ -2478,7 +2503,7 @@ function reading(r, state){
     }
     document.getElementById("rfb").innerHTML=`<div class="result">${starsHTML(st.stars)}<p>${t().score(score,total)}</p>
       <span class="gain">+${st.earned} ${NUT}</span>
-      ${coach(score>=total-1?`<b>¡${PRAISE[praiseIdx++ % PRAISE.length]}!</b><small>${t().readDone}</small>`:`<b>${t().keepB}</b><small>${t().readRetry}</small>`, score>=total-1)}</div>`;
+      ${coach(score>=total-1?`<b>¡${G(PRAISE[praiseIdx++ % PRAISE.length])}!</b><small>${t().readDone}</small>`:`<b>${t().keepB}</b><small>${t().readRetry}</small>`, score>=total-1)}</div>`;
   }else{
     const c=document.getElementById("rc"); if(c) c.onclick=()=>{st.checked=true; reading(r,st)};
   }
@@ -2557,7 +2582,7 @@ function lofScene(sel){
   return `<svg viewBox="0 0 360 220" class="lofsvg" role="img" aria-label="lof">
     <rect width="360" height="220" fill="#6a9ad0"/><circle cx="312" cy="26" r="13" fill="#e8b53a"/>
     <path d="M0 96 Q70 62 140 88 Q220 56 360 86 V220 H0Z" fill="#4f7d45"/><path d="M0 120 Q120 104 240 120 T360 118 V220 H0Z" fill="#5a8d4a"/>
-    ${LOF.filter(p=>has(p.id)).map(p=>`<g transform="translate(${p.x} ${p.y})"><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.m)}">${p.s}</g></g>`).join("")}
+    ${LOF.filter(p=>has(p.id)).map(p=>`<g transform="translate(${p.x} ${p.y})"><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(G(p.m))}">${p.s}</g></g>`).join("")}
   </svg>`;
 }
 function lof(sel,msg){
@@ -2569,10 +2594,10 @@ function lof(sel,msg){
     <div class="bar-top">${purse()}<span class="purse">${lofOwned.length} / ${LOF.length}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     <div class="lofwrap">${lofScene(sel)}</div>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
-    ${p?`<div class="lofcard"><b>${esc(p.m)}</b> <span class="muted">${esc(gl(p))}</span><p class="lofsent">${esc(p.ma)}</p><p class="muted">${esc(L2(p.ses,p.sen))}</p></div>`
+    ${p?`<div class="lofcard"><b>${esc(G(p.m))}</b> <span class="muted">${esc(gl(p))}</span><p class="lofsent">${esc(G(p.ma))}</p><p class="muted">${esc(L2(p.ses,p.sen))}</p></div>`
        :`<p class="muted">${lofOwned.length?L2("Toca algo de tu lof para leer su frase.","Tap something in your lof to read its sentence."):L2("Compra la primera pieza para empezar tu lof.","Buy the first piece to start your lof.")}</p>`}
     <div class="items">${LOF.map(x=>{ const own=lofOwned.includes(x.id);
-      return `<div class="item${own?" on":""}"><span class="nm">${esc(x.m)}</span><span class="gl">${esc(gl(x))}</span>
+      return `<div class="item${own?" on":""}"><span class="nm">${esc(G(x.m))}</span><span class="gl">${esc(gl(x))}</span>
         ${own?`<button class="btn ghost" data-see="${x.id}">${L2("Ver","View")}</button>`
              :`<button class="btn" data-lbuy="${x.id}" ${!open||nuts<x.price?"disabled":""}>${NUT}${x.price} · ${t().buy}</button>`}</div>`}).join("")}</div>
     ${lofOwned.length===LOF.length?`<div class="rule">${L2("¡Tu lof está completo! Kümey.","Your lof is complete! Kümey.")}</div>`:""}`;
@@ -2626,8 +2651,8 @@ function palinRound(fb){
       <span class="score">${L2("Tú","You")} ${P.us} – ${P.them} ${L2("Rival","Rival")}</span><span class="muted">${P.i+1}/${P.qs.length} · ${L2("salvadas","saves")} ${P.saves}</span></div>
     ${palinField(P.ball,team,fb||null)}
     <div class="prompt"><span class="ask">${showForm?t().whichPic:t().which}</span>
-      ${showForm?`<span class="big" style="font-size:1.9rem">${esc(q.m)}</span>`:`<div class="scene">${esc(gl(q))}</div>`}</div>
-    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}" style="${showForm?"font-family:var(--body);font-weight:700;font-size:1rem":""}">${esc(showForm?gl(o):o.m)}</button>`).join("")}</div>`;
+      ${showForm?`<span class="big" style="font-size:1.9rem">${esc(G(q.m))}</span>`:`<div class="scene">${esc(gl(q))}</div>`}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}" style="${showForm?"font-family:var(--body);font-weight:700;font-size:1rem":""}">${esc(showForm?gl(o):G(o.m))}</button>`).join("")}</div>`;
   document.getElementById("bk").onclick=()=>palin();
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
     const ok=opts[+b.dataset.i]===q; let flash=ok?"fwd":"back";
@@ -2645,7 +2670,7 @@ function palinEnd(){
   app.innerHTML=`<div class="result pop"><p class="eyebrow">Palin</p><h2>${win?L2("¡Ganaste el partido!","You won the match!"):draw?L2("Empate","Draw"):L2("Ganó el rival","The rival won")}</h2>
     <p class="score">${P.us} – ${P.them}</p><p>${t().score(P.right,P.qs.length)}</p>
     <span class="gain">+${earned} ${NUT}</span>
-    ${coach(win?`<b>¡${PRAISE[praiseIdx++%PRAISE.length]}!</b>`:`<b>${t().keepB}</b>`, win)}</div>
+    ${coach(win?`<b>¡${G(PRAISE[praiseIdx++ % PRAISE.length])}!</b>`:`<b>${t().keepB}</b>`, win)}</div>
     <div class="row"><button class="btn" id="ag">${L2("Otro partido","Another match")}</button><button class="btn ghost" id="pb">Palin</button></div>`;
   document.getElementById("ag").onclick=()=>{ P={qs:palinQs(),i:0,ball:0,us:0,them:0,saves:team,right:0}; palinRound(); };
   document.getElementById("pb").onclick=()=>palin();
@@ -2713,7 +2738,7 @@ function epew(msg){
     <p class="muted">${L2("Compra cada capítulo con ngülliw. Las preguntas al final pagan 3 ngülliw por respuesta correcta.","Buy each chapter with ngülliw. The questions at the end pay 3 ngülliw per right answer.")}</p>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
     <div class="readlist">${EPEW.map((c,i)=>{ const own=epewOwned.includes(i), next=i===0||epewOwned.includes(i-1);
-      return `<div class="item${own?" on":""}"><span class="gl">${L2("Capítulo","Chapter")} ${i+1}</span><span class="nm">${esc(c.t)}</span>
+      return `<div class="item${own?" on":""}"><span class="gl">${L2("Capítulo","Chapter")} ${i+1}</span><span class="nm">${esc(G(c.t))}</span>
         ${own?`<button class="btn" data-read="${i}">${L2("Leer","Read")}${epewDone[i]?" ✓":""}</button>`
              :`<button class="btn" data-ebuy="${i}" ${!open||!next||nuts<c.price?"disabled":""}>${next?`${NUT}${c.price} · ${t().buy}`:"🔒"}</button>`}</div>`}).join("")}</div>`;
   bindLang(()=>epew());
@@ -2725,10 +2750,10 @@ function epew(msg){
 function epewRead(i,st){
   const c=EPEW[i]; st=st||{show:{},pick:c.qs.map(()=>null),order:c.qs.map(q=>shuffle(q.o.es.map((_,k)=>k))),checked:false};
   const score=st.checked?st.pick.filter(x=>x===0).length:0;
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">Epew · ${L2("Capítulo","Chapter")} ${i+1}</p><h2>${esc(c.t)}</h2></div>${langToggle()}</div>
+  app.innerHTML=`<div class="top"><div><p class="eyebrow">Epew · ${L2("Capítulo","Chapter")} ${i+1}</p><h2>${esc(G(c.t))}</h2></div>${langToggle()}</div>
     <p class="muted">${L2("Toca una línea para ver la traducción.","Tap a line to see its translation.")}</p>
-    <div class="passage">${c.lines.map((l,k)=>`<p class="line" data-k="${k}" style="cursor:pointer"><span class="mz">${esc(l[0])}</span>${st.show[k]||st.checked?`<span class="tr">${esc(lang==="es"?l[1]:l[2])}</span>`:""}</p>`).join("")}</div>
-    <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${c.gloss.map(g=>`<span><b>${esc(g[0])}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
+    <div class="passage">${c.lines.map((l,k)=>`<p class="line" data-k="${k}" style="cursor:pointer"><span class="mz">${esc(G(l[0]))}</span>${st.show[k]||st.checked?`<span class="tr">${esc(lang==="es"?l[1]:l[2])}</span>`:""}</p>`).join("")}</div>
+    <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${c.gloss.map(g=>`<span><b>${esc(G(g[0]))}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
     <div class="qs">${c.qs.map((q,qi)=>`<fieldset class="q"><legend>${qi+1}. ${esc(gl(q))}</legend><div class="choices">${st.order[qi].map(oi=>{
       const sel=st.pick[qi]===oi, cls=st.checked?(oi===0?" ok":sel?" bad":""):"";
       return `<button class="choice${cls}" data-q="${qi}" data-o="${oi}" aria-pressed="${sel}" ${st.checked?"disabled":""}>${esc(q.o[lang][oi])}</button>`}).join("")}</div></fieldset>`).join("")}</div>
@@ -2829,10 +2854,10 @@ let pronIPA=!!load("ipa"), pronOn=false;
 function pronHTML(text){
   const ws=PRON.phrase(text); if(!ws.length) return "";
   const hard=[...new Set(ws.flatMap(r=>r.hard))];
-  const line=r=>r.sg.map((s,i)=>{ const t=s.map(([gr])=>PRON.HARD.includes(gr)?`<span class="hl">${esc(i===r.st?gr.toUpperCase():gr)}</span>`:esc(i===r.st?gr.toUpperCase():gr)).join("");
+  const line=r=>r.sg.map((s,i)=>{ const t=s.map(([gr])=>PRON.HARD.includes(gr)?`<span class="hl">${esc(G(i===r.st?gr.toUpperCase():gr))}</span>`:esc(G(i===r.st?gr.toUpperCase():gr))).join("");
     return i===r.st?`<span class="st">${t}</span>`:t; }).join("·");
   const tip=h=>{ const ph=PHON.find(x=>x.g===h); const m=MOUTH[h];
-    return `<div class="pt"><span class="pt-g">${esc(h)}</span><div><p>${ph?`<span class="pw-i">${esc(ph.ipa)}</span> ${esc(gl(ph))}`:""}</p>${m?`<div class="mouth">${m.svg()}<p>${esc(gl(m))}</p></div>`:""}</div></div>`; };
+    return `<div class="pt"><span class="pt-g">${esc(G(h))}</span><div><p>${ph?`<span class="pw-i">${esc(ph.ipa)}</span> ${esc(gl(ph))}`:""}</p>${m?`<div class="mouth">${m.svg()}<p>${esc(gl(m))}</p></div>`:""}</div></div>`; };
   return `<div class="pron">
     ${ws.map(r=>`<div class="pw"><span class="pw-w">${line(r)}</span>${pronIPA?`<span class="pw-i">[${r.ipa.map((x,i)=>(i===r.st?"ˈ":"")+x).join(".")}]</span>`:""}</div>`).join("")}
     ${hard.map(tip).join("")}
@@ -2875,22 +2900,60 @@ const PRON_LVL = { id:"quiz-fon", mt:"", es:"Pronunciación", en:"Pronunciation"
 function pronunciation(){
   S=null;
   app.innerHTML=`
-    <div class="top"><div><p class="eyebrow">Grafemario Unificado</p><h2>${t().pron}</h2></div>${langToggle()}</div>
+    <div class="top"><div><p class="eyebrow">Grafemario ${GRAF_INFO[graf].name}</p><h2>${t().pron}</h2></div>${langToggle()}</div>
     <p>${t().pronSub}</p>
     <div class="bar-top"><button class="btn" id="pq" style="padding:10px 16px">${t().pronQuiz}</button>
       ${starsHTML(best[PRON_LVL.id]||0)}<button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     <div class="phon">${PHON.map(x=>`
-      <div class="ph"><div class="g"><span>${esc(x.g)}</span><code>${esc(x.ipa)}</code></div>
+      <div class="ph"><div class="g"><span>${esc(G(x.g))}</span>${G(x.g)!==x.g?`<small class="g-uni">Unificado ${esc(x.g)}</small>`:""}<code>${esc(x.ipa)}</code></div>
         <p>${esc(gl(x))}</p>
         ${MOUTH[x.g]?`<div class="mouth">${MOUTH[x.g].svg()}<p>${esc(gl(MOUTH[x.g]))}</p></div>`:""}
-        <div class="ex">${x.ex.map(e=>`<span><b>${esc(e[0])}</b> ${esc(lang==="es"?e[1]:e[2])}</span>`).join("")}</div>
-        ${x.cmp?`<p class="cmp">${x.cmp[lang]}</p>`:""}</div>`).join("")}</div>
+        <div class="ex">${x.ex.map(e=>`<span><b>${esc(G(e[0]))}</b> ${esc(lang==="es"?e[1]:e[2])}</span>`).join("")}</div>
+        ${x.cmp?`<p class="cmp">${GB(x.cmp[lang])}</p>`:""}</div>`).join("")}</div>
     <div class="rule"><b>${t().stressH}</b> ${t().stress}
-      <div class="stress">${STRESS_EX.map(([w,s])=>`<span><b>${esc(w)}</b> ${esc(s)}</span>`).join("")}</div></div>
+      <div class="stress">${STRESS_EX.map(([w,s])=>`<span><b>${esc(G(w))}</b> ${esc(G(s))}</span>`).join("")}</div></div>
     <p class="note">${t().pronNote}</p>`;
   bindLang(pronunciation);
   document.getElementById("bk").onclick=menu;
   document.getElementById("pq").onclick=()=>intro(PRON_LVL);
+}
+
+
+// ===== Grafemarios page: choose a writing system, with an explanation of each =====
+const GRAF_INFO = {
+ uni:{name:"Unificado",
+  es:"El Alfabeto Mapuche Unificado (1986). Usa dígrafos parecidos al español: ch, ll, ng, tr. Es el más común en la lingüística, y lo usan muchos diccionarios y gramáticas, como las de Smeets y Zúñiga. Es el grafemario en que el juego guarda sus palabras.",
+  en:"The Unified Mapuche Alphabet (1986). It uses Spanish-like digraphs: ch, ll, ng, tr. It is the most common system in linguistics and is used in many dictionaries and grammars, such as Smeets's and Zúñiga's. The game stores its words in this grafemario."},
+ azu:{name:"Azümchefe",
+  es:"Propuesto por la CONADI en 2003 a partir de propuestas anteriores. Es el que usa el Ministerio de Educación de Chile en sus programas de estudio. Escribe z, q, g y tx donde el Unificado escribe d, g, ng y tr.",
+  en:"Proposed by CONADI, Chile's indigenous development agency, in 2003, drawing on earlier proposals. Chile's Ministry of Education uses it in its school programs. It writes z, q, g and tx where Unificado writes d, g, ng and tr."},
+ rag:{name:"Ragileo",
+  es:"Creado por el lingüista y poeta mapuche Anselmo Raguileo Lincopil. Usa una sola letra para cada sonido: c, x, j, v, q, z, g. Lo usan muchas organizaciones mapuche, como el Consejo de Todas las Tierras. No distingue s de sh.",
+  en:"Created by the Mapuche linguist and poet Anselmo Raguileo Lincopil. It uses one letter for each sound: c, x, j, v, q, z, g. Many Mapuche organizations use it, such as the Consejo de Todas las Tierras. It does not distinguish s from sh."}
+};
+const GRAF_ROWS = [["[θ]","d"],["[ɣ]","g"],["[ŋ]","ng"],["[ʈʂ]","tr"],["[tʃ]","ch"],["[ʎ]","ll"],["[ɨ]","ü"],["[ʃ]","sh"]];
+const GRAF_EX = ["mapudungun","trewa","ngürü","kawellu","chod","kug","dungun"];
+function grafemarios(){
+  S=null;
+  const inG=(k,s)=>{ const o=graf; graf=k; const r=G(s); graf=o; return r; };
+  app.innerHTML=`
+    <div class="top"><div><p class="eyebrow">Mapudungun</p><h2>${L2("Grafemarios","Writing systems (grafemarios)")}</h2></div>${langToggle()}</div>
+    <p>${L2("El mapudungun se escribe con varios grafemarios, y cada uno tiene su historia y sus usuarios. Elige el que prefieras: todo el juego cambia de inmediato y tu progreso se mantiene.","Mapudungun is written in several grafemarios, each with its own history and users. Choose the one you prefer: the whole game switches at once, and your progress is kept.")}</p>
+    <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div class="grafs">${Object.entries(GRAF_INFO).map(([k,v])=>`
+      <section class="graf${graf===k?" on":""}">
+        <div class="graf-h"><h3>${v.name}</h3><button class="btn${graf===k?"":" ghost"}" data-g="${k}" aria-pressed="${graf===k}">${graf===k?L2("En uso","In use"):L2("Usar este","Use this one")}</button></div>
+        <p>${esc(v[lang])}</p>
+        <p class="graf-ex">${GRAF_EX.map(w=>`<b>${esc(inG(k,w))}</b>`).join(" · ")}</p>
+      </section>`).join("")}</div>
+    <p class="eyebrow">${L2("Dónde se diferencian","Where they differ")}</p>
+    <div class="tbl-wrap"><table class="par"><thead><tr><th>${L2("Sonido","Sound")}</th><th>Unificado</th><th>Azümchefe</th><th>Ragileo</th></tr></thead><tbody>
+      ${GRAF_ROWS.map(([ipa,u])=>`<tr><td><code>${ipa}</code></td><td class="m">${esc(u)}</td><td class="m">${esc(inG("azu",u))}</td><td class="m">${esc(inG("rag",u))}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="note">${L2("Las demás letras se escriben igual en los tres. Las consonantes interdentales (t, n, l con la lengua entre los dientes) también se marcan de forma distinta en cada sistema, pero el juego todavía no las distingue. La conversión es automática, letra por letra, desde el Unificado.","All other letters are the same in all three. The interdental consonants (t, n, l with the tongue between the teeth) are also marked differently in each system, but the game does not distinguish them yet. Conversion is automatic, letter by letter, from Unificado.")}</p>`;
+  bindLang(grafemarios);
+  document.getElementById("bk").onclick=menu;
+  app.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ graf=b.dataset.g; save("graf",graf); track("graf/"+graf,"Grafemario: "+GRAF_INFO[graf].name); grafemarios(); });
 }
 
 // ===== Verb template reference (Smeets 2008, ch. 26; zones from pp. 17 and 177) =====
@@ -2947,11 +3010,11 @@ function template(back){
     <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${back===menu?t().menu:t().back}</button></div>
     <div class="tpl-key">${TPL_ORDER.map(k=>`<button data-k="${k}" aria-pressed="${tplSel===k}"><span class="tpl-sw" style="${cs(k)}"></span>${esc(TPL_CAT[k][lang])}</button>`).join("")}</div>
     ${TPL_Z.map((z,i)=>{const zl=z[lang];
-      const cells=TPL_S.filter(x=>x[0]<=z.from&&x[0]>=z.to).map(x=>`<div class="tpl-cell${tplSel===x[1]?" hit":""}" style="${cs(x[1])}"><b>${x[0]}</b><span>${esc(lang==="es"?x[2]:x[3])}</span><code>${esc(x[4])}</code></div>`).join("");
+      const cells=TPL_S.filter(x=>x[0]<=z.from&&x[0]>=z.to).map(x=>`<div class="tpl-cell${tplSel===x[1]?" hit":""}" style="${cs(x[1])}"><b>${x[0]}</b><span>${esc(lang==="es"?x[2]:x[3])}</span><code>${esc(G(x[4]))}</code></div>`).join("");
       return `<section class="tpl-zone"><h3>${esc(zl[0])}</h3><span class="zr">${esc(zl[1])}</span><p>${esc(zl[2])}</p>
         <div class="tpl-strip${tplSel?" tpl-dim":""}"><div class="tpl-cells">${i===0?`<div class="tpl-cell root"><b>${L2("RAÍZ","ROOT")}</b><span>${L2("verbo, sustantivo o adjetivo","verb, noun or adjective")}</span><code>kintu, pe</code></div>`:""}${cells}</div></div></section>`}).join("")}
     <section class="tpl-zone"><h3>${L2("Ejemplos","Examples")}</h3><p>${L2("Los números solo disminuyen de la raíz al final.","Slot numbers only decrease from the root to the end.")}</p>
-      ${TPL_EX.map(x=>`<div><b>${esc(x.w)}</b> <i style="color:var(--muted)">${esc(x[lang])}</i><div class="tpl-chips">${x.m.map(([f,n])=>n?`<span class="tpl-chip" style="${cs(catOf[n])}">${esc(f)}<small>${n}</small></span>`:`<span class="tpl-chip root">${esc(f)}<small>${L2("raíz","root")}</small></span>`).join("")}</div></div>`).join("")}
+      ${TPL_EX.map(x=>`<div><b>${esc(G(x.w))}</b> <i style="color:var(--muted)">${esc(x[lang])}</i><div class="tpl-chips">${x.m.map(([f,n])=>n?`<span class="tpl-chip" style="${cs(catOf[n])}">${esc(G(f))}<small>${n}</small></span>`:`<span class="tpl-chip root">${esc(G(f))}<small>${L2("raíz","root")}</small></span>`).join("")}</div></div>`).join("")}
     </section>
     <p class="note">${L2("Zonas y etiquetas: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 y 177, capítulo 26. Varias formas aparecen en más de una posición (-tu- en 36, 33 y 16; -nge- en 36 y 23): la posición, no la forma, decide la función.","Zones and labels: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 and 177, chapter 26. Several forms occur in more than one slot (-tu- in 36, 33 and 16; -nge- in 36 and 23): the slot, not the form, decides the function.")}</p>`;
   bindLang(()=>template(back));
@@ -3001,12 +3064,12 @@ function vocab(){
   S=null;
   const all=vocabWords();
   const q=vocabQ.trim().toLowerCase();
-  const list=all.filter(w=>!q||[w.m,w.es,w.en].some(s=>String(s).toLowerCase().includes(q)));
-  const row=w=>`<details class="vrow"><summary><b>${esc(w.m)}</b><span>${esc(lang==="es"?w.es:w.en)}</span></summary><div class="vpr" data-m="${esc(w.m)}"></div></details>`;
+  const list=all.filter(w=>!q||[w.m,G(w.m),w.es,w.en].some(s=>String(s).toLowerCase().includes(q)));
+  const row=w=>`<details class="vrow"><summary><b>${esc(G(w.m))}</b><span>${esc(lang==="es"?w.es:w.en)}</span></summary><div class="vpr" data-m="${esc(w.m)}"></div></details>`;
   let body;
   if(!all.length) body=`<p class="note">${L2("Completa un nivel para empezar tu lista de palabras.","Finish a level to start your word list.")}</p>`;
   else if(!list.length) body=`<p class="note">${L2("No hay palabras que coincidan.","No matching words.")}</p>`;
-  else if(vocabSort==="az") body=`<div class="vlist">${list.slice().sort((a,b)=>a.m.localeCompare(b.m,"es")).map(row).join("")}</div>`;
+  else if(vocabSort==="az") body=`<div class="vlist">${list.slice().sort((a,b)=>G(a.m).localeCompare(G(b.m),"es")).map(row).join("")}</div>`;
   else { const groups=[]; list.forEach(w=>{ let g=groups.find(x=>x.src===w.src); if(!g){g={src:w.src,ws:[]};groups.push(g)} g.ws.push(w); });
     body=groups.map(g=>`<p class="eyebrow vgrp">${esc(g.src)} · ${g.ws.length}</p><div class="vlist">${g.ws.map(row).join("")}</div>`).join(""); }
   app.innerHTML=`
@@ -3049,7 +3112,7 @@ function wardrobe(msg){
                  : `<button class="btn" data-on="${it.id}">${t().wear}</button>`;
           return `<div class="item${on?" on":""}">
             <div class="th"><svg viewBox="${it.vb}" aria-hidden="true">${it.svg}</svg></div>
-            <span class="nm">${esc(it.m)}</span><span class="gl">${esc(gl(it))}</span>${btn}</div>`}).join("")}</div>
+            <span class="nm">${esc(G(it.m))}</span><span class="gl">${esc(gl(it))}</span>${btn}</div>`}).join("")}</div>
       </div>
     </div>`;
   bindLang(()=>wardrobe());
