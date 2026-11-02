@@ -374,6 +374,26 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .shake{animation:shake .3s}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.opt{font-size:1.05rem}}
+
+/* verb template reference screen */
+.tpl-key{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.tpl-key button{font:600 .82rem var(--body);display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--panel-2);background:var(--panel);color:var(--ink);cursor:pointer}
+.tpl-key button[aria-pressed="true"]{border-color:var(--ink)}
+.tpl-sw{width:12px;height:12px;border-radius:2px;border:1px solid}
+.tpl-zone{display:grid;gap:6px;margin-top:14px}
+.tpl-zone h3{margin:0;font-size:1.05rem}
+.tpl-zone .zr{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tpl-zone p{margin:0;color:var(--muted);font-size:.92rem}
+.tpl-strip{background:var(--panel);border-radius:6px;padding:8px}
+.tpl-cells{display:flex;flex-wrap:wrap;gap:5px}
+.tpl-cell{width:78px;min-height:118px;border:1px solid;border-radius:4px;padding:6px 5px;display:flex;flex-direction:column;gap:3px;text-align:center}
+.tpl-cell b{font-size:1rem}.tpl-cell span{font-size:.74rem;line-height:1.25;flex:1;overflow-wrap:anywhere;hyphens:auto}.tpl-cell code{font-size:.7rem;opacity:.85;white-space:normal}
+.tpl-cell.root{border:2px solid var(--ink);background:transparent}
+.tpl-dim .tpl-cell:not(.hit):not(.root){opacity:.2}
+.tpl-chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}
+.tpl-chip{display:inline-flex;flex-direction:column;align-items:center;min-width:40px;padding:3px 7px;border:1px solid;border-radius:4px;font-weight:700}
+.tpl-chip small{font-weight:400;font-size:.68rem;opacity:.8}
+.tpl-chip.root{border-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -1813,6 +1833,7 @@ function menu(){
     <nav class="hub tools" aria-label="${L2("Aprende y practica","Learn and practice")}">${[
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
+      ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
       ["help",t().howBtn,L2("Instrucciones","Instructions")]
@@ -1838,6 +1859,7 @@ function menu(){
   bindLang(menu);
   document.getElementById("ward").onclick=wardrobe;
   document.getElementById("pron").onclick=pronunciation;
+  document.getElementById("tpl").onclick=template;
   document.getElementById("read").onclick=readingList;
   document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("repaso").onclick=()=>openRepaso();
@@ -2864,6 +2886,71 @@ function pronunciation(){
   bindLang(pronunciation);
   document.getElementById("bk").onclick=menu;
   document.getElementById("pq").onclick=()=>intro(PRON_LVL);
+}
+
+// ===== Verb template reference (Smeets 2008, ch. 26; zones from pp. 17 and 177) =====
+const TPL_CAT={
+ add:{es:"agrega un participante",en:"adds a participant",c:"#7cc4b1",bg:"#1f3a33"},
+ sub:{es:"quita un participante",en:"removes a participant",c:"#e09a7c",bg:"#3f2a21"},
+ idx:{es:"indexa a los participantes",en:"indexes the participants",c:"#b7a6ea",bg:"#2e2845"},
+ asp:{es:"aspecto",en:"aspect",c:"#d2cf86",bg:"#33321b"},
+ mot:{es:"movimiento y dirección",en:"motion and direction",c:"#8dbbe6",bg:"#1c2f40"},
+ tam:{es:"tiempo y modo",en:"tense and mood",c:"#e5a1c4",bg:"#3d2232"},
+ pol:{es:"polaridad y valor de verdad",en:"polarity and truth value",c:"#e2b871",bg:"#3b2d17"},
+ sem:{es:"modificador semántico",en:"semantic modifier",c:"#b5bdb8",bg:"#2a2e2b"}};
+const TPL_ORDER=["add","sub","idx","asp","mot","tam","pol","sem"];
+const TPL_S=[
+ [36,"add","verbalizador","verbalizer","-nge- -tu- -ye- -l-"],[35,"add","experiencia / objeto oblicuo","experience / oblique object","-(ñ)ma- -ye-"],
+ [34,"add","causativo","causative","-(ü)m- -(ü)l-"],[33,"add","transitivizador / factitivo","transitivizer / factitive","-tu- -ka-"],
+ [32,"asp","persistente; V2 compuesto","persistent; compound V2","-nie- -künu-"],[31,"sub","reflexivo / recíproco","reflexive / reciprocal","-w- -uw-"],
+ [30,"mot","movimiento circular; intensivo","circular movement; intensive","-(k)iaw- -(kü)tie-"],[29,"add","objeto más involucrado","more involved object","-(ü)l-"],
+ [28,"asp","estativo / progresivo","stative / progressive","-(kü)le- -meke-"],[27,"add","beneficiario","beneficiary","-(l)el-"],
+ [26,"add","objeto indirecto","indirect object","-(ü)ñma-"],[25,"sem","fuerza / satisfacción","force / satisfaction","-fal- -(ü)ñmu-"],
+ [24,"sem","pluralizador","pluralizer","-ye-"],[23,"sub","pasiva; agente implícito","passive; implied agent","-nge- -(u)w- -mu-"],
+ [22,"sem","juego / simulación","play / simulation","-kantu- -faluw-"],[21,"sem","inmediato / repentino","immediate / sudden","-fem- -rume-"],
+ [20,"mot","hacia allá","thither","-me-"],[19,"asp","persistencia","persistence","-we-"],
+ [18,"mot","interruptivo","interruptive","-(ü)r- -yekü-"],[17,"mot","hacia acá / locativo","hither / locative","-pa- -pu-"],
+ [16,"asp","repetitivo / continuativo","repetitive / continuative","-tu- -ka-"],[15,"asp","pluscuamperfecto","pluperfect","-(ü)wye-"],
+ [14,"asp","rasgo constante (habitual)","constant feature (habitual)","-ke-"],[13,"pol","proximidad","proximity","-pe-"],
+ [12,"pol","reportativo","reportative","-(ü)rke-"],[11,"pol","afirmativo","affirmative","-lle-"],
+ [10,"pol","negación","negation","-la- -no- -kil-"],[9,"tam","no realizado (futuro)","non-realized (future)","-a-"],
+ [8,"tam","impeditivo","impeditive","-fu-"],[7,"asp","pluscuamperfecto","pluperfect","-mu-"],
+ [6,"idx","objeto directo / alineamiento","direct object / alignment","-fi- -e- -fiñ -enew"],[5,"asp","rasgo constante","constant feature","-ye-"],
+ [4,"tam","modo / nominalizador","mood / nominalizer","-l- -lu -el -n"],[3,"idx","sujeto (persona)","subject (person)","-y- -i-"],
+ [2,"idx","número; persona final","number; final person","-n -mi -iñ -y"],[1,"idx","sujeto dativo","dative subject","-mew -ew"]];
+const TPL_Z=[
+ {from:36,to:28,es:["Posiciones 36–28 · valencia y aspecto","derivación, orden fijo","Aquí se construye el tema: qué tipo de evento es y quiénes participan."],
+               en:["Slots 36–28 · valency and aspect","derivation, fixed order","This is where the stem is built: what kind of event it is and who takes part."]},
+ {from:27,to:16,es:["Posiciones 27–16 · modificadores semánticos","derivación, algunos móviles","Participantes tardíos, la pasiva y el movimiento asociado."],
+               en:["Slots 27–16 · semantic modifiers","derivation, some mobile","Late participants, the passive, and associated motion."]},
+ {from:15,to:1,es:["Posiciones 15–1 · flexión","flexión, orden fijo","Tiempo, aspecto, polaridad, modo y quién actúa sobre quién. Un verbo finito llena la posición 3 junto con la 4."],
+              en:["Slots 15–1 · inflection","flection, fixed order","Tense, aspect, polarity, mood, and who acts on whom. A finite verb fills slot 3 together with slot 4."]}];
+const TPL_EX=[
+ {w:"amu-l-nge-fu-y",es:"«la enviaban»",en:"“they used to send it”",m:[["amu",0],["l",34],["nge",23],["fu",8],["y",2]]},
+ {w:"pe-me-la-fi-ñ",es:"«no fui a verlo/a»",en:"“I did not go to see him/her”",m:[["pe",0],["me",20],["la",10],["fi",6],["ñ",2]]},
+ {w:"pi-rke-y",es:"«dijo, dicen»",en:"“she/he said, it is said”",m:[["pi",0],["rke",12],["y",2]]},
+ {w:"sapatu-tu-ke-la-fu-y",es:"«no solía usar zapatos»",en:"“she/he did not use to wear shoes”",m:[["sapatu",0],["tu",36],["ke",14],["la",10],["fu",8],["y",2]]}];
+let tplSel=null;
+function template(){
+  S=null;
+  const cs=k=>`border-color:${TPL_CAT[k].c};background:${TPL_CAT[k].bg}`;
+  const catOf={}; TPL_S.forEach(x=>catOf[x[0]]=x[1]);
+  app.innerHTML=`
+    <div class="top"><div><p class="eyebrow">Smeets (2008)</p><h2>${L2("Plantilla verbal","Verb template")}</h2></div>${langToggle()}</div>
+    <p>${L2("Los sufijos siguen a la raíz en un orden fijo, numerado desde el 36 (junto a la raíz) hasta el 1 (el final de la palabra). Los colores muestran qué hace cada posición. Toca una función para resaltarla.","Suffixes follow the root in a fixed order, numbered from 36 (next to the root) down to 1 (the end of the word). Colors show what each slot does. Tap a function to highlight it.")}</p>
+    <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div class="tpl-key">${TPL_ORDER.map(k=>`<button data-k="${k}" aria-pressed="${tplSel===k}"><span class="tpl-sw" style="${cs(k)}"></span>${esc(TPL_CAT[k][lang])}</button>`).join("")}</div>
+    ${TPL_Z.map((z,i)=>{const zl=z[lang];
+      const cells=TPL_S.filter(x=>x[0]<=z.from&&x[0]>=z.to).map(x=>`<div class="tpl-cell${tplSel===x[1]?" hit":""}" style="${cs(x[1])}"><b>${x[0]}</b><span>${esc(lang==="es"?x[2]:x[3])}</span><code>${esc(x[4])}</code></div>`).join("");
+      return `<section class="tpl-zone"><h3>${esc(zl[0])}</h3><span class="zr">${esc(zl[1])}</span><p>${esc(zl[2])}</p>
+        <div class="tpl-strip${tplSel?" tpl-dim":""}"><div class="tpl-cells">${i===0?`<div class="tpl-cell root"><b>${L2("RAÍZ","ROOT")}</b><span>${L2("verbo, sustantivo o adjetivo","verb, noun or adjective")}</span><code>kintu, pe</code></div>`:""}${cells}</div></div></section>`}).join("")}
+    <section class="tpl-zone"><h3>${L2("Ejemplos","Examples")}</h3><p>${L2("Los números solo disminuyen de la raíz al final.","Slot numbers only decrease from the root to the end.")}</p>
+      ${TPL_EX.map(x=>`<div><b>${esc(x.w)}</b> <i style="color:var(--muted)">${esc(x[lang])}</i><div class="tpl-chips">${x.m.map(([f,n])=>n?`<span class="tpl-chip" style="${cs(catOf[n])}">${esc(f)}<small>${n}</small></span>`:`<span class="tpl-chip root">${esc(f)}<small>${L2("raíz","root")}</small></span>`).join("")}</div></div>`).join("")}
+    </section>
+    <p class="note">${L2("Zonas y etiquetas: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 y 177, capítulo 26. Varias formas aparecen en más de una posición (-tu- en 36, 33 y 16; -nge- en 36 y 23): la posición, no la forma, decide la función.","Zones and labels: Smeets (2008), <i>A Grammar of Mapuche</i>, pp. 17 and 177, chapter 26. Several forms occur in more than one slot (-tu- in 36, 33 and 16; -nge- in 36 and 23): the slot, not the form, decides the function.")}</p>`;
+  bindLang(template);
+  document.getElementById("bk").onclick=menu;
+  app.querySelectorAll(".tpl-key button").forEach(b=>b.onclick=()=>{tplSel=tplSel===b.dataset.k?null:b.dataset.k; template();});
 }
 
 // ===== Repaso: words missed anywhere come back until they are answered right twice in a row =====
