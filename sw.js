@@ -1,7 +1,7 @@
 /* Mapudungukeaiñ Fill Püle: offline support.
    The game page is fetched from the network first, so updates arrive as soon as there is a connection,
    and served from the cache when offline. Icons and Google Fonts are served from the cache. */
-const CACHE = 'mapudungukeain-v20261103120501';
+const CACHE = 'mapudungukeain-v20261103123910';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

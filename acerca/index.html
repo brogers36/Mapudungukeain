@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14122a">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:title" content="Mapudungukeaiñ Fill Püle">
+<meta property="og:description" content="Un juego gratuito para aprender mapudungun, en español y en inglés. Funciona sin conexión.">
+<meta property="og:image" content="https://brogers36.github.io/Mapudungukeain/acerca/img/menu.jpg">
+<title>Mapudungukeaiñ Fill Püle</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Un juego gratuito para aprender mapudungun: 60 niveles, lecturas, epew, pronunciación con diagramas, y funciona sin conexión.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one long night-sky scroll, cut by the game's woven red band between sections; phone screenshots sit beside short copy. */
+:root{
+  --night:#14122a; --panel:#1f1c3d; --panel2:#2a2652;
+  --ink:#f3efe6; --muted:#b9b3d6; --gold:#e8b53a; --red:#c8322f; --green:#5fae6a;
+  --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.band{height:22px;background-color:var(--red);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22'%3E%3Cpath d='M22 2 L34 11 L22 20 L10 11Z' fill='%2314122a'/%3E%3Cpath d='M22 7 L28 11 L22 15 L16 11Z' fill='%23f3efe6'/%3E%3Cpath d='M0 11 h6 M38 11 h6' stroke='%2314122a' stroke-width='2'/%3E%3C/svg%3E");background-repeat:repeat-x;background-position:center}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(1.7rem,4vw,2.4rem)}
+h3{font-size:1.2rem;letter-spacing:.01em}
+p{margin:0}
+a{color:var(--gold)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.lead{font-size:1.15rem;color:var(--ink);max-width:60ch}
+.muted{color:var(--muted)}
+section{padding-block:clamp(48px,8vw,88px)}
+/* language toggle */
+.lang{display:inline-flex;border:1.5px solid var(--panel2);border-radius:999px;overflow:hidden}
+.lang button{all:unset;cursor:pointer;padding:6px 14px;font-weight:700;font-size:.85rem;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--night)}
+html[data-l="en"] .es, html:not([data-l="en"]) .en{display:none}
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:18px}
+.brand{font-family:var(--display);font-size:1.05rem}
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,64px);align-items:center;padding-block:clamp(28px,6vw,64px) clamp(40px,7vw,80px)}
+.hero h1{font-size:clamp(2.6rem,7.4vw,4.9rem);letter-spacing:-.01em}
+.hero h1 span{display:block;color:var(--gold)}
+.hero .copy{display:flex;flex-direction:column;gap:20px;min-width:0}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:13px 22px;border-radius:999px;background:var(--red);color:var(--ink)}
+.btn.ghost{background:transparent;border:2px solid var(--panel2);color:var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.95rem;color:var(--muted)}
+.facts b{font-family:var(--display);font-weight:400;color:var(--ink);font-size:1.3rem;margin-right:4px;font-variant-numeric:tabular-nums}
+.phone{justify-self:center;width:min(300px,100%);aspect-ratio:390/760;border-radius:34px;border:8px solid #0b0a18;box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 2px var(--panel2);overflow:hidden;background:var(--panel);max-width:100%}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.hero .phone{transform:rotate(2deg)}
+@media (prefers-reduced-motion:no-preference){.hero .phone{animation:settle .9s ease-out both}@keyframes settle{from{transform:rotate(6deg) translateY(18px)}to{transform:rotate(2deg)}}}
+/* features: alternating screenshot + copy */
+.feat{display:grid;grid-template-columns:240px 1fr;gap:clamp(20px,4vw,48px);align-items:center}
+.feat + .feat{margin-top:clamp(40px,6vw,64px)}
+.feat:nth-child(even){grid-template-columns:1fr 240px}
+.feat:nth-child(even) .phone{order:2}
+.feat .phone{width:240px;border-width:6px;border-radius:28px}
+.feat .copy{display:flex;flex-direction:column;gap:12px;min-width:0}
+.feat ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.feat ul b{color:var(--ink)}
+.mapu{font-style:italic;color:var(--gold)}
+/* path of stages */
+.path{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:22px}
+.stage{background:var(--panel);border:1.5px solid var(--panel2);border-radius:8px;padding:12px 10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.stage b{font-size:.95rem}
+.stage span{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage:last-child{border-color:var(--gold)}
+/* how built */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);margin-top:24px}
+.split > div{display:flex;flex-direction:column;gap:14px;min-width:0}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--muted)}
+.checks li::before{content:"";width:12px;height:12px;margin-top:7px;background:var(--gold);transform:rotate(45deg)}
+.checks b{color:var(--ink)}
+/* uses */
+.uses{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}
+.use{background:var(--panel);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.use h3{color:var(--gold)}
+.use p{color:var(--muted);font-size:.95rem}
+/* install */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.step{border:1.5px solid var(--panel2);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;overflow-wrap:anywhere}
+.step ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.step ol b{color:var(--ink)}
+.note{background:var(--panel);border-left:4px solid var(--gold);border-radius:6px;padding:14px 16px;color:var(--muted);max-width:70ch}
+.note b{color:var(--ink)}
+/* sources */
+.refs{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.93rem;max-width:80ch}
+.refs i{color:var(--ink)}
+footer{padding-block:28px 40px;color:var(--muted);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .hero .phone{width:min(260px,80%)}
+  .path{grid-template-columns:repeat(4,1fr)}
+  .uses{grid-template-columns:1fr 1fr}
+  .split,.steps{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .feat,.feat:nth-child(even){grid-template-columns:1fr}
+  .feat:nth-child(even) .phone{order:0}
+  .feat .phone{justify-self:center;width:min(230px,70%)}
+  .path{grid-template-columns:1fr 1fr}
+  .uses{grid-template-columns:1fr}
+}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Mapudungukeaiñ Fill Püle</span>
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button id="l-es" type="button" aria-pressed="true">ES</button><button id="l-en" type="button" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main>
+  <section class="hero" aria-labelledby="t">
+    <div class="copy">
+      <p class="eyebrow"><span class="es">Un juego para aprender mapudungun</span><span class="en">A game for learning Mapudungun</span></p>
+      <h1 id="t">Mapudungukeaiñ <span>Fill Püle</span></h1>
+      <p class="lead"><span class="es">«Hablamos mapudungun por todas partes.» Un juego gratuito, en español y en inglés, que lleva paso a paso desde el primer <span class="mapu">mari mari</span> hasta formar verbos con varios sufijos. Funciona en el teléfono y sin conexión.</span><span class="en">“We speak Mapudungun everywhere.” A free game, in Spanish and English, that goes step by step from a first <span class="mapu">mari mari</span> to building verbs with several suffixes. It runs on your phone and works offline.</span></p>
+      <div class="cta">
+        <a class="btn" href="https://brogers36.github.io/Mapudungukeain/" target="_blank" rel="noopener"><span class="es">Jugar ahora</span><span class="en">Play now</span></a>
+        <a class="btn ghost" href="#instalar"><span class="es">Instalar en el teléfono</span><span class="en">Install on your phone</span></a>
+      </div>
+      <div class="facts" aria-label="En cifras">
+        <span><b>60</b><span class="es">niveles</span><span class="en">levels</span></span>
+        <span><b>7</b><span class="es">etapas</span><span class="en">stages</span></span>
+        <span><b>230</b><span class="es">palabras y frases</span><span class="en">words and phrases</span></span>
+        <span><b>14</b><span class="es">lecturas</span><span class="en">readings</span></span>
+        <span><b>5</b><span class="es">capítulos de epew</span><span class="en">epew chapters</span></span>
+      </div>
+    </div>
+    <div class="phone"><img src="img/menu.jpg" alt="Menú del juego con las etapas, las recompensas y las herramientas de aprendizaje" width="390" height="760"></div>
+  </section>
+  </main>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-trae">
+    <p class="eyebrow"><span class="es">Qué trae</span><span class="en">What's inside</span></p>
+    <h2 id="h-trae"><span class="es">Aprender jugando, con cuidado por la lengua</span><span class="en">Learning by playing, with care for the language</span></h2>
+
+    <div class="path" aria-label="Etapas">
+      <div class="stage"><b>Principiante</b><span class="es">9 niveles</span><span class="en">9 levels</span></div>
+      <div class="stage"><b>Básico</b><span class="es">6 niveles</span><span class="en">6 levels</span></div>
+      <div class="stage"><b>Intermedio</b><span class="es">9 niveles</span><span class="en">9 levels</span></div>
+      <div class="stage"><b>Intermedio II</b><span class="es">10 niveles</span><span class="en">10 levels</span></div>
+      <div class="stage"><b>Avanzado</b><span class="es">9 niveles</span><span class="en">9 levels</span></div>
+      <div class="stage"><b>Experto</b><span class="es">8 niveles</span><span class="en">8 levels</span></div>
+      <div class="stage"><b>Kimche</b><span class="es">9 niveles</span><span class="en">9 levels</span></div>
+    </div>
+
+    <div style="margin-top:clamp(40px,6vw,64px)">
+      <div class="feat">
+        <div class="phone"><img src="img/level.jpg" alt="Pregunta del nivel Dungu II: un dibujo de una persona que se levanta y cuatro opciones" width="390" height="760" loading="lazy"></div>
+        <div class="copy">
+          <h3><span class="es">Vocabulario y gramática, nivel por nivel</span><span class="en">Vocabulary and grammar, level by level</span></h3>
+          <p class="muted"><span class="es">Cada nivel empieza con tarjetas de estudio y sigue con preguntas en las dos direcciones: de la imagen a la palabra y de la palabra al significado. Al terminar, el botón «Siguiente» lleva al nivel que sigue.</span><span class="en">Each level opens with study cards and then asks questions both ways: picture to word and word to meaning. When you finish, the “Next” button takes you on to the next level.</span></p>
+          <ul>
+            <li><span class="es"><b>Palabras:</b> saludos, familia, cuerpo, colores, comida, animales, plantas y acciones, con dibujos propios.</span><span class="en"><b>Words:</b> greetings, family, body, colours, food, animals, plants and actions, with original drawings.</span></li>
+            <li><span class="es"><b>Gramática:</b> pronombres, las nueve personas del verbo, negación, futuro, posesión, plurales con <span class="mapu">pu</span> y <span class="mapu">-ke</span>, movimiento asociado, inversos, <span class="mapu">-ñma-</span>, <span class="mapu">-(ü)rke-</span> y cómo se forman verbos.</span><span class="en"><b>Grammar:</b> pronouns, all nine verb persons, negation, future, possession, plurals with <span class="mapu">pu</span> and <span class="mapu">-ke</span>, associated motion, inverse forms, <span class="mapu">-ñma-</span>, <span class="mapu">-(ü)rke-</span> and how words become verbs.</span></li>
+            <li><span class="es"><b>Plantilla verbal:</b> las posiciones de los sufijos del verbo, para consultar en cualquier momento.</span><span class="en"><b>Verb template:</b> the slots of the verb's suffixes, to look up at any time.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feat">
+        <div class="phone"><img src="img/pron.jpg" alt="Guía de pronunciación de la palabra ngürü, con sílabas, acento y diagramas de la boca" width="390" height="760" loading="lazy"></div>
+        <div class="copy">
+          <h3><span class="es">Pronunciación que se ve</span><span class="en">Pronunciation you can see</span></h3>
+          <p class="muted"><span class="es">El juego no usa voces sintéticas, porque pronunciarían mal justo los sonidos difíciles. En cambio, cada palabra tiene su guía: sílabas, acento, los sonidos nuevos destacados y, si se quiere, la transcripción en AFI.</span><span class="en">The game uses no synthetic voices, because they would mispronounce exactly the hard sounds. Instead every word has its own guide: syllables, stress, the new sounds highlighted and, if you want it, the IPA transcription.</span></p>
+          <ul>
+            <li><span class="es"><b>Diagramas de la boca</b> para <span class="mapu">ü, ng, g, d, tr, r</span> y <span class="mapu">ll</span>: dónde va la lengua y por dónde sale el aire.</span><span class="en"><b>Mouth diagrams</b> for <span class="mapu">ü, ng, g, d, tr, r</span> and <span class="mapu">ll</span>: where the tongue goes and where the air comes out.</span></li>
+            <li><span class="es"><b>Tres grafemarios:</b> Unificado, Azümchefe y Ragileo. Cada jugador elige con cuál leer.</span><span class="en"><b>Three grafemarios:</b> Unificado, Azümchefe and Ragileo. Each player chooses which to read in.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feat">
+        <div class="phone"><img src="img/reading.jpg" alt="Lectura «Trafkintu» con seis líneas en mapudungun y preguntas de comprensión" width="390" height="760" loading="lazy"></div>
+        <div class="copy">
+          <h3><span class="es">Lecturas, epew y cultura</span><span class="en">Readings, epew and culture</span></h3>
+          <p class="muted"><span class="es">Catorce lecturas cortas con palabras útiles y preguntas, un epew del zorro en cinco capítulos, y un video animado al final de cada etapa sobre el pewen, el witral, la ruka, el palin, el We Tripantu o el trafkintu.</span><span class="en">Fourteen short readings with key words and questions, an epew about the fox in five chapters, and an animated video at the end of each stage about the pewen, the witral, the ruka, palin, We Tripantu or trafkintu.</span></p>
+        </div>
+      </div>
+
+      <div class="feat">
+        <div class="phone"><img src="img/wardrobe.jpg" alt="Vestuario: doce personajes, entre ellos Leftraru y Kallfürüngi, con ropa para elegir" width="390" height="760" loading="lazy"></div>
+        <div class="copy">
+          <h3><span class="es">Recompensas que enseñan</span><span class="en">Rewards that teach</span></h3>
+          <p class="muted"><span class="es">Cada respuesta gana <span class="mapu">ngülliw</span>, los piñones del pewen. Con ellos se viste a doce personajes con makuñ, trarilonko, trapelakucha y más, se construye un lof, se juega al palin y se abren los capítulos del epew.</span><span class="en">Every answer earns <span class="mapu">ngülliw</span>, the pewen's pine nuts. They pay for dressing twelve characters in makuñ, trarilonko, trapelakucha and more, building a lof, playing palin and opening the epew chapters.</span></p>
+          <ul>
+            <li><span class="es"><b>Mis palabras:</b> una lista que crece con cada nivel terminado.</span><span class="en"><b>My words:</b> a list that grows with every level you finish.</span></li>
+            <li><span class="es"><b>Repaso:</b> las palabras que fallaste vuelven hasta que las aciertas dos veces seguidas.</span><span class="en"><b>Review:</b> words you missed come back until you get them right twice in a row.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-hizo">
+    <p class="eyebrow"><span class="es">Cómo se hizo</span><span class="en">How it was made</span></p>
+    <h2 id="h-hizo"><span class="es">Cada forma, revisada contra el habla real</span><span class="en">Every form checked against real speech</span></h2>
+    <div class="split">
+      <div>
+        <p class="lead"><span class="es">El juego lo diseñó Brandon Rogers, lingüista de la Universidad Brigham Young que estudia el mapudungun y aprende la lengua desde hace unos ocho años. Lo construyó junto con Claude, un asistente de inteligencia artificial, y revisó a mano el contenido.</span><span class="en">The game was designed by Brandon Rogers, a linguist at Brigham Young University who studies Mapudungun and has been learning the language for about eight years. He built it together with Claude, an AI assistant, and checked the content by hand.</span></p>
+        <p class="muted"><span class="es">Todo el juego es un solo archivo web, sin cuentas, sin anuncios y sin descargas aparte. El progreso queda en el navegador de cada persona.</span><span class="en">The whole game is a single web file, with no accounts, no ads and nothing extra to download. Progress stays in each player's own browser.</span></p>
+      </div>
+      <div>
+        <ul class="checks">
+          <li><span><span class="es"><b>Palabras atestiguadas.</b> El vocabulario y las formas verbales se comprobaron en el corpus AVENUE, unas 142 horas de habla mapuche transcrita, y en el diccionario de Augusta (1916).</span><span class="en"><b>Attested words.</b> Vocabulary and verb forms were checked against the AVENUE corpus, about 142 hours of transcribed Mapudungun speech, and Augusta's 1916 dictionary.</span></span></li>
+          <li><span><span class="es"><b>Un analizador propio.</b> Un analizador morfológico del mapudungun, hecho para la investigación, separa cada palabra en raíz y sufijos para verificar las formas.</span><span class="en"><b>A purpose-built parser.</b> A Mapudungun morphological parser built for research splits each word into root and suffixes to verify the forms.</span></span></li>
+          <li><span><span class="es"><b>Frases revisadas una por una.</b> Las frases compuestas para el juego (más de doscientas) pasaron por una lista de revisión y se corrigieron donde hacía falta.</span><span class="en"><b>Sentences reviewed one by one.</b> The sentences written for the game (over two hundred) went through a review list and were corrected where needed.</span></span></li>
+          <li><span><span class="es"><b>Cuando algo es incierto, se dice.</b> Las formas armadas por regla, que no aparecen en el corpus, llevan un asterisco.</span><span class="en"><b>Uncertainty is marked.</b> Forms built by rule that do not appear in the corpus carry an asterisk.</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-para">
+    <p class="eyebrow"><span class="es">Para qué sirve</span><span class="en">What it's for</span></p>
+    <h2 id="h-para"><span class="es">Para quien quiera empezar, o seguir</span><span class="en">For anyone starting out, or keeping going</span></h2>
+    <div class="uses">
+      <div class="use"><h3><span class="es">Aprender por tu cuenta</span><span class="en">Learning on your own</span></h3><p><span class="es">Diez minutos al día, en el teléfono, aunque no haya señal.</span><span class="en">Ten minutes a day on your phone, even with no signal.</span></p></div>
+      <div class="use"><h3><span class="es">En familia</span><span class="en">At home</span></h3><p><span class="es">Para familias que quieren mantener la lengua viva en casa, también lejos del Wallmapu.</span><span class="en">For families keeping the language alive at home, including far from Wallmapu.</span></p></div>
+      <div class="use"><h3><span class="es">En el aula</span><span class="en">In the classroom</span></h3><p><span class="es">Como práctica entre clases de mapudungun, o en cursos de lingüística para ver morfología aglutinante en acción.</span><span class="en">As practice between Mapudungun classes, or in linguistics courses to see agglutinative morphology at work.</span></p></div>
+      <div class="use"><h3><span class="es">En talleres</span><span class="en">In workshops</span></h3><p><span class="es">Como apoyo en talleres comunitarios, junto a hablantes que enseñan.</span><span class="en">As support in community workshops, alongside speakers who teach.</span></p></div>
+    </div>
+    <p class="note" style="margin-top:28px"><span class="es"><b>Un complemento, no un reemplazo.</b> El mapudungun se aprende de verdad con su gente. El juego sirve para practicar, ordenar lo aprendido y no perder el hilo entre una conversación y otra.</span><span class="en"><b>A companion, not a replacement.</b> Mapudungun is really learned from its people. The game is for practising, organising what you have learned and keeping the thread between one conversation and the next.</span></p>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section id="instalar" aria-labelledby="h-inst">
+    <p class="eyebrow"><span class="es">Instalar</span><span class="en">Install</span></p>
+    <h2 id="h-inst"><span class="es">Llévalo en el teléfono</span><span class="en">Put it on your phone</span></h2>
+    <div class="steps">
+      <div class="step"><h3>Android</h3>
+        <ol><li><span class="es">Abre <b>brogers36.github.io/Mapudungukeain</b> en Chrome.</span><span class="en">Open <b>brogers36.github.io/Mapudungukeain</b> in Chrome.</span></li>
+            <li><span class="es">Toca <b>Instalar la app</b> (o el menú ⋮ → <b>Instalar app</b>).</span><span class="en">Tap <b>Install the app</b> (or the ⋮ menu → <b>Install app</b>).</span></li>
+            <li><span class="es">Ábrelo desde la pantalla de inicio. Funciona sin conexión.</span><span class="en">Open it from your home screen. It works offline.</span></li></ol></div>
+      <div class="step"><h3>iPhone / iPad</h3>
+        <ol><li><span class="es">Abre <b>brogers36.github.io/Mapudungukeain</b> en Safari.</span><span class="en">Open <b>brogers36.github.io/Mapudungukeain</b> in Safari.</span></li>
+            <li><span class="es">Toca <b>Compartir</b> → <b>Añadir a pantalla de inicio</b>.</span><span class="en">Tap <b>Share</b> → <b>Add to Home Screen</b>.</span></li>
+            <li><span class="es">Ábrelo desde el ícono. Funciona sin conexión.</span><span class="en">Open it from the icon. It works offline.</span></li></ol></div>
+    </div>
+    <p class="muted" style="margin-top:18px;max-width:70ch"><span class="es">Cuando el juego se actualiza, la app instalada recibe la versión nueva la próxima vez que se abre con internet. El sitio público cuenta visitas de forma anónima, sin cookies ni datos personales.</span><span class="en">When the game is updated, the installed app gets the new version the next time it opens online. The public site counts visits anonymously, with no cookies and no personal data.</span></p>
+    <div class="cta" style="margin-top:22px"><a class="btn" href="https://brogers36.github.io/Mapudungukeain/" target="_blank" rel="noopener"><span class="es">Abrir el juego</span><span class="en">Open the game</span></a></div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-fuentes" style="padding-block:clamp(36px,6vw,56px)">
+    <p class="eyebrow" id="h-fuentes"><span class="es">Fuentes</span><span class="en">Sources</span></p>
+    <ol class="refs" style="margin-top:14px">
+      <li>Augusta, F. J. de. (1916). <i>Diccionario araucano-español y español-araucano</i>. Imprenta Universitaria.</li>
+      <li>Duan, M., Fasola, C., Rallabandi, S. K., Vega, R., Anastasopoulos, A., Levin, L., &amp; Black, A. W. (2020). A resource for computational experiments on Mapudungun. In <i>Proceedings of the Twelfth Language Resources and Evaluation Conference</i> (pp. 2872–2877). European Language Resources Association. <a href="https://aclanthology.org/2020.lrec-1.350/" target="_blank" rel="noopener">aclanthology.org/2020.lrec-1.350</a></li>
+      <li>Smeets, I. (2008). <i>A grammar of Mapuche</i>. Mouton de Gruyter.</li>
+    </ol>
+  </section>
+  <footer>
+    <span>Mapudungukeaiñ Fill Püle · <span class="es">gratuito</span><span class="en">free</span></span>
+    <span><span class="es">Diseño y contenido: Brandon Rogers. Construido con Claude.</span><span class="en">Design and content: Brandon Rogers. Built with Claude.</span></span>
+  </footer>
+</div>
+<div class="band" aria-hidden="true"></div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(l){ root.setAttribute("data-l",l); root.lang=l;
+    document.getElementById("l-es").setAttribute("aria-pressed",l==="es");
+    document.getElementById("l-en").setAttribute("aria-pressed",l==="en");
+    try{ localStorage.setItem("mpk_promo_lang",l); }catch(e){} }
+  var saved=null; try{ saved=localStorage.getItem("mpk_promo_lang"); }catch(e){}
+  set(saved==="en"?"en":"es");
+  document.getElementById("l-es").onclick=function(){ set("es"); };
+  document.getElementById("l-en").onclick=function(){ set("en"); };
+})();
+</script>
+
+</body>
+</html>
