@@ -1116,6 +1116,41 @@ const NAT=(()=>{
   };
 })();
 
+// ===== Person pictures for the pronoun lesson =====
+// Person pictures: S = speaker (red, speech bubble), L = listener (blue), O = other (green). Ringed = included in the pronoun.
+const PERS_PIC=(()=>{
+  const COL={S:"#c8322f",L:"#2f5fd0",O:"#3d8a52"}, SK="#c98a5a", HAIR="#2a1a10", GOLD="#e8b53a";
+  const fig=(x,r)=>`<circle cx="${x}" cy="23" r="5.2" fill="${SK}"/><path d="M${x-5.2} 21.5 Q${x} 14.5 ${x+5.2} 21.5" fill="${HAIR}"/>
+    <path d="M${x-6} 49 L${x-4.5} 31 Q${x} 28 ${x+4.5} 31 L${x+6} 49Z" fill="${COL[r]}"/><path d="M${x-3} 49 V56 M${x+3} 49 V56" stroke="#f3efe6" stroke-width="2.4" stroke-linecap="round"/>`;
+  const bubble=x=>`<path d="M${x+3} 4 h14 q3 0 3 3 v6 q0 3 -3 3 h-8 l-4 4 l1 -4 h-3 q-3 0 -3 -3 v-6 q0 -3 3 -3Z" fill="#f3efe6"/><path d="M${x+5} 9 h10 M${x+5} 12.5 h6" stroke="#2a2652" stroke-width="1.3"/>`;
+  return spec=>{ // spec like "S*|L|O" ; * = included
+    const items=spec.split("|"); const gap=100/(items.length+1); let svg="", ring=[];
+    items.forEach((it,i)=>{ const x=Math.round(gap*(i+1)); const r=it[0]; svg+=fig(x,r); if(r==="S") svg+=bubble(x); if(it.includes("*")) ring.push(x); });
+    const rx=Math.min(...ring)-10, rw=Math.max(...ring)-Math.min(...ring)+20;
+    const frame=`<rect x="${rx}" y="14" width="${rw}" height="45" rx="7" fill="${GOLD}" fill-opacity=".12" stroke="${GOLD}" stroke-width="2" stroke-dasharray="4 2.5"/>`;
+    return `<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true">${frame}${svg}</svg>`; };
+})();
+
+// ===== Full person paradigm (lesson after the pronouns) =====
+const CONJ_PRON=["inche","eymi","fey","inchiw","eymu","fey engu","inchiñ","eymün","fey engün"];
+const CONJ_ES=["yo","tú","él/ella","nosotros dos","ustedes dos","ellos dos","nosotros","ustedes","ellos"];
+const CONJ_EN=["I","you","she/he","we two","you two","they two","we","you all","they"];
+const CONJ_V=["n","ymi","y","yu","ymu","yngu","iñ","ymün","yngün"], CONJ_C=["ün","imi","i","iyu","imu","ingu","iñ","imün","ingün"];
+const CONJ_VERBS=[
+  {s:"amu",v:1,es:["voy","vas","va","vamos","van","van"],en:["go","goes"]},
+  {s:"küpa",v:1,es:["vengo","vienes","viene","venimos","vienen","vienen"],en:["come","comes"]},
+  {s:"awkantu",v:1,es:["juego","juegas","juega","jugamos","juegan","juegan"],en:["play","plays"]},
+  {s:"ülkantu",v:1,es:["canto","cantas","canta","cantamos","cantan","cantan"],en:["sing","sings"]},
+  {s:"küdaw",v:0,es:["trabajo","trabajas","trabaja","trabajamos","trabajan","trabajan"],en:["work","works"]},
+  {s:"kon",v:0,es:["entro","entras","entra","entramos","entran","entran"],en:["go in","goes in"]}];
+const CONJ_ESI=[0,1,2,3,4,5,3,4,5];
+function conjForm(vb,i){ return {m:`${CONJ_PRON[i]} ${vb.s}${(vb.v?CONJ_V:CONJ_C)[i]}`, es:`${CONJ_ES[i]} ${vb.es[CONJ_ESI[i]]}`, en:`${CONJ_EN[i]} ${vb.en[i===2?1:0]}`}; }
+function genConj(n){ const out=[],seen=new Set();
+  while(out.length<n){ const vb=CONJ_VERBS[Math.floor(Math.random()*CONJ_VERBS.length)], i=Math.floor(Math.random()*9);
+    if(seen.has(vb.s+i)) continue; seen.add(vb.s+i);
+    out.push({...conjForm(vb,i),dist:shuffle([0,1,2,3,4,5,6,7,8].filter(x=>x!==i)).slice(0,3).map(x=>conjForm(vb,x))}); }
+  return out; }
+
 // ===== Content: stages and levels (Grafemario Unificado) =====
 const STAGES = [
  {id:"beg", es:"Principiante", en:"Beginner", need:0, levels:[
@@ -1128,6 +1163,18 @@ const STAGES = [
     {m:"eymi", es:"Tú", en:"You (one person)"},
     {m:"ñuke", es:"Madre", en:"Mother"},
     {m:"chaw", es:"Padre", en:"Father"}]},
+  { id:"pronombres", mt:"Inche, inchiw, inchiñ", es:"Los pronombres personales", en:"Personal pronouns", kind:"pic",
+    rule:{es:"En las imágenes, <b style=\"color:#e05a50\">rojo</b> es quien habla, <b style=\"color:#6f9bff\">azul</b> a quien se habla y <b style=\"color:#5fae6a\">verde</b> otra persona; el marco dorado marca a quiénes incluye el pronombre. El mapudungun distingue <b>singular</b> (uno), <b>dual</b> (dos) y <b>plural</b> (tres o más): <b>inche</b> “yo”, <b>inchiw</b> “nosotros dos”, <b>inchiñ</b> “nosotros”. <b>fey</b> sirve para él y para ella. En el Grafemario Unificado también se escribe <b>iñche</b>, <b>iñchiw</b>, <b>iñchiñ</b>, y <b>feyengu</b>, <b>feyengün</b> en una palabra.",
+          en:"In the pictures, <b style=\"color:#e05a50\">red</b> is the speaker, <b style=\"color:#6f9bff\">blue</b> the person spoken to and <b style=\"color:#5fae6a\">green</b> someone else; the gold frame shows who the pronoun includes. Mapudungun distinguishes <b>singular</b> (one), <b>dual</b> (two) and <b>plural</b> (three or more): <b>inche</b> “I”, <b>inchiw</b> “we two”, <b>inchiñ</b> “we”. <b>fey</b> covers both he and she. The Grafemario Unificado also writes <b>iñche</b>, <b>iñchiw</b>, <b>iñchiñ</b>, and <b>feyengu</b>, <b>feyengün</b> as one word."}, words:[
+    {m:"inche",pic:{svg:PERS_PIC("S*|L|O")},es:"yo",en:"I"},
+    {m:"eymi",pic:{svg:PERS_PIC("S|L*|O")},es:"tú",en:"you (one person)"},
+    {m:"fey",pic:{svg:PERS_PIC("S|L|O*")},es:"él, ella",en:"she, he"},
+    {m:"inchiw",pic:{svg:PERS_PIC("S*|O*|L")},es:"nosotros dos",en:"we two"},
+    {m:"eymu",pic:{svg:PERS_PIC("S|L*|L*|O")},es:"ustedes dos",en:"you two"},
+    {m:"fey engu",pic:{svg:PERS_PIC("S|L|O*|O*")},es:"ellos dos, ellas dos",en:"they two"},
+    {m:"inchiñ",pic:{svg:PERS_PIC("S*|O*|O*|L")},es:"nosotros (tres o más)",en:"we (three or more)"},
+    {m:"eymün",pic:{svg:PERS_PIC("S|L*|L*|L*")},es:"ustedes (tres o más)",en:"you all (three or more)"},
+    {m:"fey engün",pic:{svg:PERS_PIC("S|O*|O*|O*")},es:"ellos, ellas (tres o más)",en:"they (three or more)"}]},
   { id:"rakin", mt:"Rakin", es:"Números 1 a 10", en:"Numbers 1 to 10", kind:"num", words:[
     {m:"kiñe",pic:{n:1},es:"uno",en:"one"},{m:"epu",pic:{n:2},es:"dos",en:"two"},
     {m:"küla",pic:{n:3},es:"tres",en:"three"},{m:"meli",pic:{n:4},es:"cuatro",en:"four"},
@@ -1192,6 +1239,11 @@ const STAGES = [
     {m:"awkantun",pic:{svg:ACT.play},es:"jugar",en:"to play"},{m:"wirin",pic:{svg:ACT.write},es:"escribir, dibujar",en:"to write, to draw"},
     {m:"kimün",pic:{svg:ACT.know},es:"saber, conocer",en:"to know"},{m:"pen",pic:{svg:ACT.see},es:"ver, encontrar",en:"to see, to find"},
     {m:"konün",pic:{svg:ACT.enter},es:"entrar",en:"to enter"},{m:"ülkantun",pic:{svg:ICON.sing},es:"cantar",en:"to sing"}]},
+  { id:"conj", mt:"Amun, amuymi, amuy…", es:"Conjugar: las nueve personas", en:"Conjugating: all nine persons", kind:"verb",
+    gen:()=>genConj(8),
+    examples:()=>[0,1,2,3,4,5,6,7,8].map(i=>conjForm(CONJ_VERBS[0],i)).concat([0,2,6].map(i=>conjForm(CONJ_VERBS[4],i))),
+    rule:{es:"La terminación del verbo dice quién hace la acción, y cambia con cada pronombre. Si la raíz termina en vocal (<b>amu-</b>): <b>-n</b> (inche), <b>-ymi</b> (eymi), <b>-y</b> (fey), <b>-yu</b> (inchiw), <b>-ymu</b> (eymu), <b>-yngu</b> (fey engu), <b>-iñ</b> (inchiñ), <b>-ymün</b> (eymün), <b>-yngün</b> (fey engün). Si termina en consonante (<b>küdaw-</b>), la <b>y</b> pasa a <b>i</b> y <b>-n</b> pasa a <b>-ün</b>: <b>küdaw-ün</b>, <b>küdaw-imi</b>, <b>küdaw-i</b>, <b>küdaw-iyu</b>… Sin otro sufijo, la forma puede ser presente o pasado: <b>amun</b> “voy” o “fui”. El pronombre se puede omitir, porque la terminación ya lo dice.",
+          en:"The verb ending says who does the action, and it changes with each pronoun. If the root ends in a vowel (<b>amu-</b>): <b>-n</b> (inche), <b>-ymi</b> (eymi), <b>-y</b> (fey), <b>-yu</b> (inchiw), <b>-ymu</b> (eymu), <b>-yngu</b> (fey engu), <b>-iñ</b> (inchiñ), <b>-ymün</b> (eymün), <b>-yngün</b> (fey engün). If it ends in a consonant (<b>küdaw-</b>), <b>y</b> becomes <b>i</b> and <b>-n</b> becomes <b>-ün</b>: <b>küdaw-ün</b>, <b>küdaw-imi</b>, <b>küdaw-i</b>, <b>küdaw-iyu</b>… With no other suffix the form can be present or past: <b>amun</b> “I go” or “I went”. The pronoun can be left out, because the ending already says it."}},
   { id:"ropa", mt:"", es:"La ropa", en:"Clothing", kind:"pic", words:[
     {m:"makuñ",pic:{fig:"makun"},es:"manta, poncho",en:"poncho"},{m:"ikülla",pic:{fig:"ikulla"},es:"rebozo",en:"shawl"},
     {m:"küpam",pic:{fig:"kupam"},es:"vestido de lana",en:"wool dress"},{m:"chiripa",pic:{fig:"chiripa"},es:"prenda de lana para la cintura",en:"wool waist wrap"},
