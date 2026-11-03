@@ -707,6 +707,29 @@ const AEL=[
 const aelForm=m=>({m,es:AEL_G[m][0],en:AEL_G[m][1]});
 function genAel(n){ return shuffle(AEL).slice(0,n).map(r=>({...aelForm(r.m),dist:r.d.map(aelForm)})); }
 
+// ===== Verbalization: how non-verbal words become verbs (Kimche). Target forms attested in AVENUE except where noted =====
+const VERBAL=[
+  {b:"küme",c:{es:"adjetivo",en:"adjective"},m:"kümey",es:"es bueno",en:"it is good",d:["kümetuy","kümewi","kümen"]},
+  {b:"pichi",c:{es:"adjetivo",en:"adjective"},m:"pichiy",es:"es pequeño",en:"it is small",d:["pichituy","pichiwi","pichin"]},
+  {b:"machi",c:{es:"sustantivo",en:"noun"},m:"machingen",es:"soy machi",en:"I am a machi",d:["machiwün","machin","machiy"]},
+  {b:"mapuche",c:{es:"sustantivo",en:"noun"},m:"mapuchengen",es:"soy mapuche",en:"I am Mapuche",d:["mapuchetun","mapuchewün","mapuchen"]},
+  {b:"wentru",c:{es:"sustantivo",en:"noun"},m:"wentrungey",es:"es hombre",en:"he is a man",d:["wentrutuy","wentruwi","wentruy"]},
+  {b:"ilo",c:{es:"sustantivo",en:"noun"},m:"ilotun",es:"comer carne",en:"to eat meat",d:["ilongen","ilowün","iloy"]},
+  {b:"lawen",c:{es:"sustantivo",en:"noun"},m:"lawentun",es:"curar o curarse con remedios",en:"to treat (oneself) with medicine",d:["lawengen","lawenün","lawenwün"]},
+  {b:"kawellu",c:{es:"sustantivo",en:"noun"},m:"kawellutun",es:"andar a caballo",en:"to ride a horse",d:["kawellungen","kawelluwün","kawellun"]},
+  {b:"ruka",c:{es:"sustantivo",en:"noun"},m:"rukan",es:"hacer una casa",en:"to build a house",d:["rukangen","rukawün","rukay"]},
+  {b:"kiñe",c:{es:"número",en:"numeral"},m:"kiñewün",es:"unirse, juntarse",en:"to come together, unite",d:["kiñengen","kiñetun","kiñen"]},
+  {b:"chum",c:{es:"palabra de pregunta",en:"question word"},m:"chumleymi?",es:"¿cómo estás?",en:"how are you?",d:["chumtuymi?","chumwimi?","chumymi?"]},
+  {b:"pasa- (pasar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"pasay",es:"pasó",en:"it passed, she/he passed",d:["pasangey","pasatuy","pasawi"]},
+  {b:"kampia- (cambiar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"kampiay",es:"cambió",en:"it changed, she/he changed",d:["kampiangey","kampiatuy","kampiawi"]}
+];
+function verbalForm(v){
+  return {m:v.m,es:v.es,en:v.en,oneWay:true,
+    prompt:()=>`<span class="big" style="font-size:1.5rem">${esc(v.b)} → ?</span><div class="scene">“${esc(gl(v))}”</div><small style="color:var(--muted)">${esc(gl(v.c))}</small>`,
+    dist:v.d.map(m=>({m,es:"",en:""}))};
+}
+function genVerbal(n){ return shuffle(VERBAL).slice(0,n).map(verbalForm); }
+
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
   {v:"amu",vg:{es:"ir",en:"go"},m:"amulün",es:"hacer andar, poner en movimiento",en:"to make go, set in motion"},
@@ -1475,6 +1498,11 @@ const STAGES = [
     examples:()=>DM.map(d=>({m:d.m,es:d.es,en:d.en})),
     rule:{es:"El mapudungun tiene partículas propias que guían la conversación; van después de la palabra o frase a la que se refieren. <b>nga</b> recuerda algo pasado, a menudo con pena (<b>femkefuy nga yiñ chaw</b> “así hacía nuestro padre”), y también afirma o marca lo que alguien dijo. <b>may</b> busca un sí o suaviza una orden: <b>amuchi may</b> “ya me voy”. <b>ta</b> es como “el, la (que ya sabes)”: señala algo ya mencionado, y <b>tati</b> (ta + ti) también funciona como artículo: <b>tati kofke</b> “el pan”. <b>chi</b> expresa duda: <b>mawünay chi?</b> “¿lloverá?”. Ojo: la <b>-chi</b> de <b>fey-chi</b> o <b>küme-chi</b> es un sufijo, no esta partícula. <b>am</b> pregunta con sorpresa o pidiendo precisión, y <b>kay</b> contrasta o propone: <b>eymi kay?</b> “¿y tú?”. Los hablantes usan también <i>pu</i> (del español <i>pues</i>), pero <b>nga</b> sigue siendo la partícula para recordar y para repetir lo dicho.",
           en:"Mapudungun has its own particles that guide conversation; they follow the word or phrase they relate to. <b>nga</b> recalls something past, often with sorrow (<b>femkefuy nga yiñ chaw</b> “that is how our father used to do things”), and also affirms or marks what someone said. <b>may</b> invites a yes or softens a command: <b>amuchi may</b> “I'm off, then”. <b>ta</b> is like “the (you know)”: it points to something already mentioned, and <b>tati</b> (ta + ti) also works as an article: <b>tati kofke</b> “the bread”. <b>chi</b> expresses doubt: <b>mawünay chi?</b> “will it rain?”. Note: the <b>-chi</b> in <b>fey-chi</b> or <b>küme-chi</b> is a suffix, not this particle. <b>am</b> asks with surprise or for precision, and <b>kay</b> contrasts or proposes: <b>eymi kay?</b> “and you?”. Speakers also use <i>pu</i> (from Spanish <i>pues</i>), but <b>nga</b> is still the particle for remembering and for repeating what was said."}},
+  { id:"verbal", mt:"Kümey, machingen, ilotun", es:"Cómo se hacen verbos", en:"How words become verbs", kind:"derive",
+    gen:()=>genVerbal(8),
+    examples:()=>VERBAL.map(v=>({m:`${v.b} → ${v.m}`,es:`${v.es} (${gl(v.c)})`,en:`${v.en} (${gl(v.c)})`})),
+    rule:{es:"En mapudungun casi cualquier palabra puede funcionar como verbo. Las rutas principales son: <b>adjetivo + persona</b>, sin nada más: <b>küme → kümey</b> “es bueno” (905 veces en AVENUE). <b>Sustantivo + -nge-</b> “ser”: <b>machi → machingen</b> “soy machi”, <b>mapuche → mapuchengen</b> “soy mapuche” (251 veces). <b>Sustantivo + -tu-</b> “comer, usar, tomar”: <b>ilo → ilotun</b> “comer carne”, <b>lawen → lawentun</b> “curar con remedios”. <b>Sustantivo + -n</b> “hacer”: <b>ruka → rukan</b> “hacer una casa”. <b>Número + -w-</b>: <b>kiñe → kiñewün</b> “unirse”. <b>Palabra de pregunta + -le-</b>: <b>chum</b> “cómo” → <b>chumleymi?</b> “¿cómo estás?”. Y los <b>préstamos del español</b> entran como raíces y llevan terminaciones mapuche: <b>pasa- → pasay</b> “pasó”, <b>kampia- → kampiay</b> “cambió”. Elige la ruta que da el significado pedido.",
+          en:"In Mapudungun almost any word can work as a verb. The main routes are: <b>adjective + person ending</b>, with nothing else: <b>küme → kümey</b> “it is good” (905 times in AVENUE). <b>Noun + -nge-</b> “to be”: <b>machi → machingen</b> “I am a machi”, <b>mapuche → mapuchengen</b> “I am Mapuche” (251 times). <b>Noun + -tu-</b> “eat, use, take”: <b>ilo → ilotun</b> “to eat meat”, <b>lawen → lawentun</b> “to treat with medicine”. <b>Noun + -n</b> “make”: <b>ruka → rukan</b> “to build a house”. <b>Numeral + -w-</b>: <b>kiñe → kiñewün</b> “to unite”. <b>Question word + -le-</b>: <b>chum</b> “how” → <b>chumleymi?</b> “how are you?”. And <b>Spanish loans</b> come in as roots and take Mapudungun endings: <b>pasa- → pasay</b> “it passed”, <b>kampia- → kampiay</b> “it changed”. Choose the route that gives the meaning asked for."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
