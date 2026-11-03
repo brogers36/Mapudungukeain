@@ -1579,7 +1579,7 @@ const STAGES = [
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
     rule:{es:"Te damos la raíz y los sufijos desordenados. Elige la palabra con el orden correcto: <b>pe</b> + <b>-fi -me -ñ</b> → <b>pemefiñ</b>.",
           en:"You get the root and the suffixes out of order. Choose the word with the correct order: <b>pe</b> + <b>-fi -me -ñ</b> → <b>pemefiñ</b>."}},
-  { id:"segm", mt:"Trokiñ", es:"Separar la palabra", en:"Splitting the word", kind:"derive",
+  { id:"segm", mt:"Pu pichi troy", es:"Separar la palabra", en:"Splitting the word", kind:"derive",
     gen:()=>genSeg(8),
     examples:()=>COMBOS.slice(8,14).map(c=>({m:`${c.seg.join("")} = ${c.seg.join("-")}`,es:c.es,en:c.en})),
     rule:{es:"Elige dónde se separan la raíz y cada sufijo: <b>kintupafimi</b> = <b>kintu-pa-fi-mi</b> “viniste a buscarlo”.",
