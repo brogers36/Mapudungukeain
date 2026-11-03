@@ -661,29 +661,34 @@ function genRke(n){ return shuffle(RKE).slice(0,n).map(r=>({...rkeForm(r.m),dist
 const POS_N=[{m:"ruka",es:"casa",en:"house",f:1},{m:"trewa",es:"perro",en:"dog",f:0},{m:"ñuke",es:"madre",en:"mother",f:1},
   {m:"kawellu",es:"caballo",en:"horse",f:0},{m:"lamngen",es:"hermana",en:"sister",f:1},{m:"chaw",es:"padre",en:"father",f:0}];
 const POS_P=[
-  {p:"ñi",es:n=>`mi ${n.es}`,en:n=>`my ${n.en}`},
+  {p:"ñi",amb:1,es:n=>`mi ${n.es}, o su ${n.es} (de él, de ella o de ellos)`,en:n=>`my ${n.en}, or his/her/their ${n.en}`},
+  {p:"inche ñi",es:n=>`mi ${n.es} (la mía, sin duda)`.replace("la mía",n.f?"la mía":"el mío"),en:n=>`my ${n.en} (clearly mine)`},
+  {p:"fey ñi",es:n=>`su ${n.es} (la de él o de ella)`.replace("la de",n.f?"la de":"el de"),en:n=>`his or her ${n.en}`},
+  {p:"fey engün ñi",es:n=>`su ${n.es} (la de ellos)`.replace("la de",n.f?"la de":"el de"),en:n=>`their ${n.en}`},
   {p:"mi",es:n=>`tu ${n.es}`,en:n=>`your ${n.en}`},
   {p:"iñ",es:n=>`${n.f?"nuestra":"nuestro"} ${n.es}`,en:n=>`our ${n.en}`},
-  {p:"mu",es:n=>`${n.f?"la":"el"} ${n.es} de ustedes`,en:n=>`your (pl.) ${n.en}`},
-  {p:"fey ñi",es:n=>`su ${n.es} (de él o de ella)`,en:n=>`his or her ${n.en}`}];
+  {p:"mu",es:n=>`${n.f?"la":"el"} ${n.es} de ustedes`,en:n=>`your (pl.) ${n.en}`}];
 const posForm=(n,k)=>({m:`${POS_P[k].p} ${n.m}`,es:POS_P[k].es(n),en:POS_P[k].en(n)});
+// bare ñi is ambiguous, so it never appears as an option next to a form it could also mean
+const posClash=(a,b)=>/ñi$/.test(POS_P[a].p)&&/ñi$/.test(POS_P[b].p)&&(POS_P[a].amb||POS_P[b].amb);
 function genPos(n){ const out=[],seen=new Set();
   while(out.length<n){ const nn=POS_N[Math.floor(Math.random()*POS_N.length)], k=Math.floor(Math.random()*POS_P.length);
     if(seen.has(nn.m+k)) continue; seen.add(nn.m+k);
-    out.push({...posForm(nn,k),dist:shuffle(POS_P.map((_,j)=>j).filter(j=>j!==k)).slice(0,3).map(j=>posForm(nn,j))}); }
+    const pick=[k]; for(const j of shuffle(POS_P.map((_,j)=>j))){ if(pick.length===4) break; if(!pick.includes(j)&&!pick.some(x=>posClash(x,j))) pick.push(j); }
+    out.push({...posForm(nn,k),dist:pick.slice(1).map(j=>posForm(nn,j))}); }
   return out; }
 
 // ===== Possessor + -(a)el: purpose, obligation, wanting (Spanish subjunctive, English "so (that)…", "want… to") =====
 const AEL_G={
   "Fey ta mi chillkatuael":["Esto es para que estudies","This is so you can study"],
-  "Fey ta ñi chillkatuael":["Esto es para que yo estudie","This is so I can study"],
+  "Fey ta ñi chillkatuael":["Esto es para que yo estudie (o: para que él/ella estudie)","This is so I can study (or: so she/he can study)"],
   "Fey ta mi chillkatukeel":["Esto es lo que estudias","This is what you study"],
   "Müley mi amuael":["Tienes que ir","You have to go"],
-  "Müley ñi amuael":["Tengo que ir","I have to go"],
+  "Müley ñi amuael":["Tengo que ir (o: tiene que ir)","I have to go (or: she/he has to go)"],
   "Ayün mi küpayael":["Quiero que vengas","I want you to come"],
-  "Ayün ñi küpayael":["Quiero venir","I want to come"],
+  "Ayün ñi küpayael":["Quiero venir (o: quiero que venga él/ella)","I want to come (or: I want her/him to come)"],
   "Tüfa mi iyael":["Esta es tu comida (lo que vas a comer)","This is your food (what you will eat)"],
-  "Tüfa ñi iyael":["Esta es mi comida (lo que voy a comer)","This is my food (what I will eat)"],
+  "Tüfa ñi iyael":["Esta es mi comida (o: su comida)","This is my food (or: her/his food)"],
   "Elufiñ kofke ñi iyael":["Le di pan para que comiera","I gave her/him bread to eat"],
   "Pifiñ ñi küpayael":["Le dije que viniera","I told her/him to come"]
 };
@@ -1325,9 +1330,9 @@ const STAGES = [
  {id:"adv", es:"Avanzado", en:"Advanced", need:30, levels:[
   { id:"pos", mt:"Ñi, mi, iñ", es:"Lo mío, lo tuyo: posesión", en:"Mine, yours: possession", kind:"verb",
     gen:()=>genPos(8),
-    examples:()=>[0,1,2,3,4].map(k=>posForm(POS_N[0],k)).concat([{m:"tañi chaw",es:"mi padre",en:"my father"},{m:"tami ñuke",es:"tu madre",en:"your mother"}]),
-    rule:{es:"El posesivo va antes del sustantivo: <b>ñi ruka</b> “mi casa”, <b>mi ruka</b> “tu casa”, <b>iñ ruka</b> “nuestra casa”, <b>mu ruka</b> “la casa de ustedes”. <b>ñi</b> también es “su” (de él o ella); para dejarlo claro se dice <b>fey ñi ruka</b>. En el habla son muy comunes las formas con <b>ta-</b>: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (en AVENUE, <b>tañi</b> aparece 8.493 veces y <b>tami</b> 3.404).",
-          en:"The possessive goes before the noun: <b>ñi ruka</b> “my house”, <b>mi ruka</b> “your house”, <b>iñ ruka</b> “our house”, <b>mu ruka</b> “your (pl.) house”. <b>ñi</b> is also “his/her”; to make that clear, say <b>fey ñi ruka</b>. In speech the forms with <b>ta-</b> are very common: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (in AVENUE, <b>tañi</b> occurs 8,493 times and <b>tami</b> 3,404)."}},
+    examples:()=>[0,1,2,3,4,5,6].map(k=>posForm(POS_N[0],k)).concat([{m:"tañi chaw",es:"mi padre, o su padre",en:"my father, or his/her/their father"},{m:"tami ñuke",es:"tu madre",en:"your mother"}]),
+    rule:{es:"El posesivo va antes del sustantivo: <b>mi ruka</b> “tu casa”, <b>iñ ruka</b> “nuestra casa”, <b>mu ruka</b> “la casa de ustedes”. Ojo: <b>ñi ruka</b> es ambiguo; puede ser “mi casa” o “su casa” (de él, de ella o de ellos), y el contexto decide. Para dejarlo claro se pone el pronombre delante: <b>inche ñi ruka</b> “mi casa”, <b>fey ñi ruka</b> “su casa (de él o de ella)”, <b>fey engün ñi ruka</b> “su casa (de ellos)”. En AVENUE <b>inche/iñche ñi</b> aparece 259 veces, como en <b>iñche ñi chawem</b> “mi padre”. En el habla son muy comunes las formas con <b>ta-</b>: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (en AVENUE, <b>tañi</b> aparece 8.493 veces y <b>tami</b> 3.404); <b>tañi</b> es ambiguo igual que <b>ñi</b>.",
+          en:"The possessive goes before the noun: <b>mi ruka</b> “your house”, <b>iñ ruka</b> “our house”, <b>mu ruka</b> “your (pl.) house”. Careful: <b>ñi ruka</b> is ambiguous; it can be “my house” or “his/her/their house”, and context decides. To make it clear, put the pronoun first: <b>inche ñi ruka</b> “my house”, <b>fey ñi ruka</b> “his/her house”, <b>fey engün ñi ruka</b> “their house”. In AVENUE <b>inche/iñche ñi</b> occurs 259 times, as in <b>iñche ñi chawem</b> “my father”. In speech the forms with <b>ta-</b> are very common: <b>tañi</b>, <b>tami</b>, <b>taiñ</b>, <b>tamu</b> (in AVENUE, <b>tañi</b> occurs 8,493 times and <b>tami</b> 3,404); <b>tañi</b> is ambiguous just like <b>ñi</b>."}},
   { id:"pres", mt:"Inche, eymi, fey", es:"Verbos: yo, tú, él/ella", en:"Verbs: I, you, she/he", kind:"verb", tenses:["pres"],
     gen:()=>genVerbs(["pres"],8),
     rule:{es:"Raíz vocálica + <b>-n</b> (yo), <b>-ymi</b> (tú), <b>-y</b> (él/ella). Raíz consonántica + <b>-ün</b>, <b>-imi</b>, <b>-i</b>.",
