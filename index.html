@@ -730,6 +730,61 @@ function verbalForm(v){
 }
 function genVerbal(n){ return shuffle(VERBAL).slice(0,n).map(verbalForm); }
 
+// ===== Four grammar lessons: pu/-ke (Intermedio), -kil-/-no- (Avanzado), -ñma- and -kantu-/-faluw- (Kimche) =====
+// Each lesson: G = glosses for every form shown; L = target + three distractors. Forms marked * are built by rule (not in AVENUE).
+const GRAM={
+ puke:{G:{
+   "che":["persona o gente (sin marcar número)","person or people (number unmarked)"],
+   "pu che":["las personas, la gente (plural)","the people (plural)"],
+   "pu lamngen":["las hermanas, los hermanos","the brothers and sisters"],
+   "pu pichikeche":["los niños (todos ellos)","the children (all of them)"],
+   "pichikeche":["niños (pichi + -ke + che)","children (pichi + -ke + che)"],
+   "füchake che":["los ancianos, la gente mayor","the elders"],
+   "kümeke che":["gente buena (cada uno bueno)","good people (each one good)"],
+   "kiñeke che":["algunas personas","some people"],
+   "wedake dungu":["cosas malas","bad things"],
+   "fütake ruka":["casas grandes*","big houses*"]},
+  L:[["pu che",["che","kiñeke che","kümeke che"]],["che",["pu che","kiñeke che","füchake che"]],["pu lamngen",["pu che","kiñeke che","pu pichikeche"]],
+     ["pu pichikeche",["pichikeche","pu che","füchake che"]],["pichikeche",["pu pichikeche","füchake che","kümeke che"]],["füchake che",["pichikeche","kümeke che","pu che"]],
+     ["kümeke che",["kiñeke che","füchake che","pu che"]],["kiñeke che",["kümeke che","pu che","che"]],["wedake dungu",["fütake ruka","kümeke che","kiñeke che"]],["fütake ruka",["wedake dungu","kümeke che","pu che"]]]},
+ kilno:{G:{
+   "amukilnge":["¡no vayas!","don't go!"],"amunge":["¡ve!","go!"],"amulaymi":["no fuiste","you didn't go"],"amunolu":["el que no va","the one who doesn't go"],
+   "femkilnge":["¡no lo hagas!","don't do it!"],"femnge":["¡hazlo!","do it!"],"femlay":["no lo hizo","she/he didn't do it"],"femnolu":["el que no lo hizo","the one who didn't do it"],
+   "amukilpe":["¡que no vaya!","may she/he not go!"],"amupe":["¡que vaya!","let her/him go!"],
+   "konkilpe":["¡que no entre!","may she/he not come in!"],"konpe":["¡que entre!","let her/him come in!"],"konlay":["no entró","she/he didn't come in"],
+   "kimnolu":["el que no sabe","the one who doesn't know"],"kimlu":["el que sabe","the one who knows"],"kimlay":["no sabe","she/he doesn't know"],
+   "kimnole":["si no sabe","if she/he doesn't know"],"kimle":["si sabe","if she/he knows"],
+   "nienolu":["el que no tiene","the one who has none"],"nielu":["el que tiene","the one who has"],"nienole":["si no tiene","if she/he doesn't have"],
+   "penole":["si no ve","if she/he doesn't see"],"pele":["si ve","if she/he sees"],"pelay":["no ve","she/he doesn't see"],"penolu":["el que no ve","the one who doesn't see"],
+   "akunolu":["el que no llegó","the one who didn't arrive"],"akulu":["el que llegó","the one who arrived"],"akulay":["no llegó","she/he didn't arrive"],
+   "kimnofiel":["lo que no sabía","what she/he didn't know"],"kimfiel":["lo que sabía","what she/he knew"]},
+  L:[["amukilnge",["amunge","amulaymi","amunolu"]],["femkilnge",["femnge","femlay","femnolu"]],["amukilpe",["amupe","amukilnge","amulaymi"]],["konkilpe",["konpe","konlay","amukilpe"]],
+     ["kimnolu",["kimlu","kimlay","kimnole"]],["kimnole",["kimle","kimnolu","kimlay"]],["nienolu",["nielu","nienole","kimnolu"]],["penole",["pele","penolu","pelay"]],
+     ["akunolu",["akulu","akulay","amunolu"]],["kimnofiel",["kimfiel","kimnolu","kimlay"]]]},
+ nma:{G:{
+   "nentuñmangen":["me lo sacaron (a mí)","they took it out of me / from me"],"nentungen":["me sacaron (a mí)","they took me out"],
+   "nentuñmafiñ":["se lo saqué (a él o ella)*","I took it from her/him*"],"nentufiñ":["lo saqué","I took it out"],
+   "entuñmangi":["se lo sacaron (a él o ella)","they took it from her/him"],"entungi":["lo sacaron","it was taken out"],"entuy":["lo sacó","she/he took it out"],
+   "kimüñmalafiñ":["no le sé (algo suyo, p. ej. el nombre)","I don't know her/his (e.g. name)"],"kimlafiñ":["no lo sé","I don't know it"],
+   "kimüñmafiñ":["le sé (algo suyo)*","I know her/his (something)*"],"kimlan":["no sé","I don't know"],
+   "peñmangelay":["no se le ve (algo suyo)","her/his (thing) can't be seen"],"pengelay":["no se ve","it can't be seen"],"peñmafiñ":["le vi (algo suyo)*","I saw her/his (thing)*"],"pelay":["no vio","she/he didn't see"],
+   "ngillatuñmangi":["rogaron por él o ella","they prayed for her/him"],"ngillatungi":["se hizo rogativa","a prayer was held"],"ngillatuy":["hizo rogativa","she/he prayed"],
+   "ngillañmafiñ":["se lo compré (a él o ella)*","I bought it from her/him*"],"ngillafiñ":["lo compré","I bought it"],"ngillay":["compró","she/he bought"]},
+  L:[["nentuñmangen",["nentungen","nentuñmafiñ","nentufiñ"]],["entuñmangi",["entungi","entuy","nentuñmangen"]],["kimüñmalafiñ",["kimlafiñ","kimüñmafiñ","kimlan"]],
+     ["peñmangelay",["pengelay","peñmafiñ","pelay"]],["ngillatuñmangi",["ngillatungi","ngillatuy","ngillañmafiñ"]],["ngillañmafiñ",["ngillafiñ","ngillay","ngillatuñmangi"]]]},
+ kantu:{G:{
+   "kutranfaluwi":["se hace el enfermo","she/he pretends to be sick"],"kutrani":["está enfermo","she/he is sick"],"kutrankantuy":["juega a estar enfermo*","she/he plays at being sick*"],
+   "kimfaluwi":["se hace el que sabe","she/he pretends to know"],"kimi":["sabe","she/he knows"],"kimlay":["no sabe","she/he doesn't know"],
+   "umawtufaluwi":["se hace el dormido*","she/he pretends to sleep*"],"umawtuy":["duerme","she/he sleeps"],"umawtukantuy":["juega a dormir*","she/he plays at sleeping*"],
+   "feypikantuy":["lo dijo en broma","she/he said it as a joke"],"feypiy":["lo dijo","she/he said it"],"feypifaluwi":["fingió decirlo*","she/he pretended to say it*"],
+   "kütralkantuy":["juega a hacer fuego","she/he plays at making a fire"],"awkantuy":["juega","she/he plays"]},
+  L:[["kutranfaluwi",["kutrani","kutrankantuy","kimfaluwi"]],["kimfaluwi",["kimi","kimlay","kutranfaluwi"]],["umawtufaluwi",["umawtuy","umawtukantuy","kutranfaluwi"]],
+     ["feypikantuy",["feypiy","feypifaluwi","awkantuy"]],["kütralkantuy",["awkantuy","umawtukantuy","feypikantuy"]],["kutrankantuy",["kutranfaluwi","kutrani","awkantuy"]],["awkantuy",["kütralkantuy","umawtuy","feypikantuy"]]]}
+};
+const gramForm=(k,m)=>({m,es:GRAM[k].G[m][0],en:GRAM[k].G[m][1]});
+function genGram(k,n){ return shuffle(GRAM[k].L).slice(0,n).map(([m,d])=>({...gramForm(k,m),dist:d.map(x=>gramForm(k,x))})); }
+const gramExamples=k=>GRAM[k].L.map(([m])=>gramForm(k,m));
+
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
   {v:"amu",vg:{es:"ir",en:"go"},m:"amulün",es:"hacer andar, poner en movimiento",en:"to make go, set in motion"},
@@ -1301,6 +1356,10 @@ const STAGES = [
     {m:"küme",pic:"👍",es:"bueno",en:"good"},{m:"kochi",pic:"🍯",es:"dulce",en:"sweet"},
     {m:"kotrü",pic:"🧂",es:"salado",en:"salty"},{m:"are",pic:"🥵",es:"muy caliente",en:"very hot"},
     {m:"we",pic:"🌱",es:"nuevo, fresco",en:"new, fresh"},{m:"kuyfi",pic:"📜",es:"antiguo",en:"old, long ago"}]},
+  { id:"puke", mt:"pu, -ke", es:"Plurales: pu y -ke", en:"Plurals: pu and -ke", kind:"verb",
+    gen:()=>genGram("puke",8), examples:()=>gramExamples("puke"),
+    rule:{es:"Un sustantivo solo no dice cuántos hay: <b>che</b> es “persona” o “gente”. Para marcar plural se pone <b>pu</b> delante, sobre todo con personas: <b>pu che</b> “la gente”, <b>pu lamngen</b> “los hermanos” (en AVENUE, <b>pu che</b> aparece 376 veces). El sufijo <b>-ke</b> va en adjetivos y números e indica “cada uno, varios”: <b>kümeke che</b> “gente buena”, <b>kiñeke che</b> “algunas personas”, <b>füchake che</b> “los ancianos”; <b>pichikeche</b> “niños” es <b>pichi + -ke + che</b>. El verbo también puede marcar el plural: <b>amuyngün</b> “ellos fueron”. (* = forma formada por regla.)",
+          en:"A noun by itself doesn't say how many: <b>che</b> is “person” or “people”. To mark plural, put <b>pu</b> in front, especially with people: <b>pu che</b> “the people”, <b>pu lamngen</b> “the siblings” (in AVENUE, <b>pu che</b> occurs 376 times). The suffix <b>-ke</b> goes on adjectives and numbers and means “each one, several”: <b>kümeke che</b> “good people”, <b>kiñeke che</b> “some people”, <b>füchake che</b> “the elders”; <b>pichikeche</b> “children” is <b>pichi + -ke + che</b>. The verb can mark plural too: <b>amuyngün</b> “they went”. (* = form built by rule.)"}},
   { id:"nutramkan", mt:"Nütramkan", es:"Conversar", en:"Conversation", kind:"convo",
     gen:()=>shuffle(CONVO).map(convoItem),
     examples:()=>CONVO.map(c=>({m:`${c.q} → ${c.m}`,es:`${c.qg.es} → ${c.es}`,en:`${c.qg.en} → ${c.en}`})),
@@ -1416,6 +1475,10 @@ const STAGES = [
     gen:()=>genVerbs(["neg"],8),
     rule:{es:"Para negar, se agrega <b>-la-</b> después de la raíz: <b>amu-la-n</b> “no voy”.",
           en:"To negate, add <b>-la-</b> after the stem: <b>amu-la-n</b> “I don't go”."}},
+  { id:"kilno", mt:"-kil-, -no-", es:"Otras negaciones: -kil- y -no-", en:"Other negatives: -kil- and -no-", kind:"verb",
+    gen:()=>genGram("kilno",8), examples:()=>gramExamples("kilno"),
+    rule:{es:"<b>-la-</b> niega lo que se afirma: <b>amulay</b> “no fue”. Para prohibir se usa <b>-kil-</b> con las terminaciones del imperativo: <b>amu-kil-nge</b> “¡no vayas!”, <b>fem-kil-nge</b> “¡no lo hagas!”, <b>amu-kil-pe</b> “¡que no vaya!”. En las formas que no son verbo principal (el que…, si…, lo que…) se usa <b>-no-</b> (a veces <b>-nu-</b>): <b>kim-no-lu</b> “el que no sabe” (183 veces en AVENUE), <b>kim-no-le</b> “si no sabe”, <b>kim-no-fiel</b> “lo que no sabía”. Compara <b>kimlu</b> “el que sabe”, <b>kimle</b> “si sabe”, <b>kimlay</b> “no sabe”.",
+          en:"<b>-la-</b> negates a statement: <b>amulay</b> “she/he didn't go”. To forbid, use <b>-kil-</b> with the command endings: <b>amu-kil-nge</b> “don't go!”, <b>fem-kil-nge</b> “don't do it!”, <b>amu-kil-pe</b> “may she/he not go!”. In forms that are not the main verb (the one who…, if…, what…) use <b>-no-</b> (sometimes <b>-nu-</b>): <b>kim-no-lu</b> “the one who doesn't know” (183 times in AVENUE), <b>kim-no-le</b> “if she/he doesn't know”, <b>kim-no-fiel</b> “what she/he didn't know”. Compare <b>kimlu</b> “the one who knows”, <b>kimle</b> “if she/he knows”, <b>kimlay</b> “she/he doesn't know”."}},
   { id:"fut", mt:"-a-", es:"Futuro", en:"Future", kind:"verb", tenses:["fut"],
     gen:()=>genVerbs(["fut"],8),
     rule:{es:"Para el futuro, se agrega <b>-a-</b> después de la raíz: <b>amu-a-n</b> “iré”.",
@@ -1503,6 +1566,14 @@ const STAGES = [
     examples:()=>VERBAL.map(v=>({m:`${v.b} → ${v.m}`,es:`${v.es} (${gl(v.c)})`,en:`${v.en} (${gl(v.c)})`})),
     rule:{es:"En mapudungun casi cualquier palabra puede funcionar como verbo. Las rutas principales son: <b>adjetivo + persona</b>, sin nada más: <b>küme → kümey</b> “es bueno” (905 veces en AVENUE). <b>Sustantivo + -nge-</b> “ser”: <b>machi → machingen</b> “soy machi”, <b>mapuche → mapuchengen</b> “soy mapuche” (251 veces). <b>Sustantivo + -tu-</b> “comer, usar, tomar”: <b>ilo → ilotun</b> “comer carne”, <b>lawen → lawentun</b> “curar con remedios”. <b>Sustantivo + -n</b> “hacer”: <b>ruka → rukan</b> “hacer una casa”. <b>Número + -w-</b>: <b>kiñe → kiñewün</b> “unirse”. <b>Palabra de pregunta + -le-</b>: <b>chum</b> “cómo” → <b>chumleymi?</b> “¿cómo estás?”. Y los <b>préstamos del español</b> entran como raíces y llevan terminaciones mapuche: <b>pasa- → pasay</b> “pasó”, <b>kampia- → kampiay</b> “cambió”. Elige la ruta que da el significado pedido.",
           en:"In Mapudungun almost any word can work as a verb. The main routes are: <b>adjective + person ending</b>, with nothing else: <b>küme → kümey</b> “it is good” (905 times in AVENUE). <b>Noun + -nge-</b> “to be”: <b>machi → machingen</b> “I am a machi”, <b>mapuche → mapuchengen</b> “I am Mapuche” (251 times). <b>Noun + -tu-</b> “eat, use, take”: <b>ilo → ilotun</b> “to eat meat”, <b>lawen → lawentun</b> “to treat with medicine”. <b>Noun + -n</b> “make”: <b>ruka → rukan</b> “to build a house”. <b>Numeral + -w-</b>: <b>kiñe → kiñewün</b> “to unite”. <b>Question word + -le-</b>: <b>chum</b> “how” → <b>chumleymi?</b> “how are you?”. And <b>Spanish loans</b> come in as roots and take Mapudungun endings: <b>pasa- → pasay</b> “it passed”, <b>kampia- → kampiay</b> “it changed”. Choose the route that gives the meaning asked for."}},
+  { id:"nma", mt:"-ñma-", es:"A otra persona le afecta: -ñma-", en:"Someone else is affected: -ñma-", kind:"verb",
+    gen:()=>genGram("nma",6), examples:()=>gramExamples("nma"),
+    rule:{es:"<b>-ñma-</b> agrega a una persona afectada: aquella a quien se le quita algo o de quien es lo que se nombra. En español suele traducirse con <b>le</b> o <b>me</b>: <b>nentu-ñma-ngen</b> “me lo sacaron”, <b>kimü-ñma-lafiñ</b> “no le sé (el nombre)”, <b>pe-ñma-ngelay tañi kutran</b> “no se le ve la enfermedad”. Compara <b>nentungen</b> “me sacaron (a mí)”: sin <b>-ñma-</b>, la persona es lo sacado; con <b>-ñma-</b>, es a quien se lo sacan. Muchas palabras con <b>ñma</b> no llevan este sufijo (<b>rumeñma</b>). (* = forma formada por regla.)",
+          en:"<b>-ñma-</b> adds an affected person: the one something is taken from, or whose thing is meant. Spanish usually renders it with <b>le</b> or <b>me</b>: <b>nentu-ñma-ngen</b> “they took it out of me”, <b>kimü-ñma-lafiñ</b> “I don't know her/his (name)”, <b>pe-ñma-ngelay tañi kutran</b> “her/his illness can't be seen”. Compare <b>nentungen</b> “they took me out”: without <b>-ñma-</b> the person is what is taken; with it, the person is the one it is taken from. Many words containing <b>ñma</b> do not have this suffix (<b>rumeñma</b>). (* = form built by rule.)"}},
+  { id:"kantu", mt:"-kantu-, -faluw-", es:"De juego o fingido: -kantu- y -faluw-", en:"In play or pretended: -kantu- and -faluw-", kind:"verb",
+    gen:()=>genGram("kantu",7), examples:()=>gramExamples("kantu"),
+    rule:{es:"<b>-kantu-</b> dice que algo se hace de juego o en broma, sin que sea en serio: <b>feypi-kantu-y</b> “lo dijo en broma”, <b>kütral-kantu-y</b> “juega a hacer fuego”; <b>awkantun</b> “jugar” ya lo lleva. <b>-faluw-</b> dice que se finge para que otros lo crean: <b>kutran-faluw-i</b> “se hace el enfermo”, <b>kim-faluw-i</b> “se hace el que sabe”. La diferencia: con <b>-kantu-</b> todos saben que es juego; con <b>-faluw-</b> se quiere engañar. (* = forma formada por regla.)",
+          en:"<b>-kantu-</b> says something is done in play or in jest, not seriously: <b>feypi-kantu-y</b> “she/he said it as a joke”, <b>kütral-kantu-y</b> “she/he plays at making a fire”; <b>awkantun</b> “to play” already contains it. <b>-faluw-</b> says someone pretends so that others will believe it: <b>kutran-faluw-i</b> “she/he pretends to be sick”, <b>kim-faluw-i</b> “she/he pretends to know”. The difference: with <b>-kantu-</b> everyone knows it is play; with <b>-faluw-</b> the aim is to deceive. (* = form built by rule.)"}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
