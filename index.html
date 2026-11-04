@@ -813,6 +813,42 @@ Object.assign(GRAM,{
      ["trüntrüni",["poypoyi","wedwedngi","tripatripangi"]],["poypoyi",["trüntrüni","wedwedngi","tripay"]],["wedwedngi",["dungudunguy","trüntrüni","poypoyi"]]]}
 });
 
+// ===== Three Experto lessons on associated motion beyond -me-/-pa-: -pu- (pu), -(k)iaw- (kiaw), -rpa-/-rpu- (rpu) =====
+// All forms attested in AVENUE (types.json counts); elürpuy normalizes AVENUE elurpuy.
+Object.assign(GRAM,{
+ pu:{G:{
+   "konpuy":["entró allá","she/he went in (over there)"],"konpay":["entró (hacia acá)","she/he came in (toward here)"],"konmey":["fue a entrar","she/he went to go in"],
+   "tripapuy":["salió allá","she/he came out (over there)"],"tripapay":["salió (hacia acá), se asomó","she/he came out (toward here)"],
+   "pepufiñ":["llegué a verlo (allá)","I got to see her/him (there)"],"pemefiñ":["fui a verlo","I went to see her/him"],"pepay":["vino a ver","she/he came to see"],
+   "mülepuy":["está allá","she/he is over there"],"müley":["hay, está","there is; she/he is"],
+   "fentepuay":["hasta aquí llega (así terminan los relatos)","this is where it ends (how stories close)"],
+   "dungupuy":["habló allá","she/he spoke (over there)"],"dunguy":["habló","she/he spoke"]},
+  L:[["konpuy",["konpay","konmey","tripapuy"]],["konpay",["konpuy","konmey","tripapay"]],["tripapuy",["tripapay","konpuy","mülepuy"]],
+     ["tripapay",["tripapuy","konpay","pepay"]],["pepufiñ",["pemefiñ","pepay","tripapuy"]],["pemefiñ",["pepufiñ","pepay","konmey"]],
+     ["mülepuy",["müley","konpuy","fentepuay"]],["fentepuay",["mülepuy","tripapuy","dungupuy"]],["dungupuy",["dunguy","mülepuy","pepay"]]]},
+ kiaw:{G:{
+   "miawi":["anda","she/he goes about"],
+   "trekayawi":["anda caminando, pasea","she/he walks around"],"trekay":["caminó","she/he walked"],
+   "lefkiawi":["anda corriendo","she/he runs around"],"lefi":["corrió","she/he ran"],
+   "küdawkiawi":["anda trabajando","she/he goes about working"],"küdawi":["trabajó","she/he worked"],
+   "dunguyawi":["anda hablando","she/he goes around talking"],"dunguy":["habló","she/he spoke"],
+   "kintuyawi":["anda buscando","she/he goes around looking"],"kintuy":["buscó","she/he looked for it"],
+   "femiawi":["anda así","she/he goes about like that"],"femi":["así es, así lo hizo","that's how it is; she/he did so"]},
+  L:[["trekayawi",["trekay","lefkiawi","miawi"]],["trekay",["trekayawi","lefi","küdawi"]],["lefkiawi",["lefi","trekayawi","küdawkiawi"]],
+     ["lefi",["lefkiawi","trekay","femi"]],["küdawkiawi",["küdawi","dunguyawi","lefkiawi"]],["dunguyawi",["dunguy","küdawkiawi","kintuyawi"]],
+     ["kintuyawi",["kintuy","trekayawi","dunguyawi"]],["femiawi",["femi","miawi","trekayawi"]],["miawi",["femiawi","trekayawi","trekay"]]]},
+ rpu:{G:{
+   "yerpay":["pasó a buscar (de camino hacia acá)","she/he stopped by to pick up (on the way here)"],"yepay":["vino a buscar","she/he came to fetch"],"yemey":["fue a buscar","she/he went to fetch"],
+   "elürpay":["vino a dejar de paso","she/he dropped it off on the way here"],"elpay":["vino a dejar","she/he came to leave it"],"elürpuy":["lo dejó de paso (yendo)","she/he left it on the way there"],
+   "felerpuy":["resultó así, quedó así","it turned out that way"],"feley":["así es","that's how it is"],
+   "amulerpuy":["siguió avanzando","it kept advancing"],"amuley":["va, avanza","it is going, advancing"],
+   "machingerpun":["llegué a ser machi","I ended up becoming a machi"],"machingen":["soy machi","I am a machi"],
+   "chumlerpual":["cómo irá a quedar","how it would turn out"]},
+  L:[["yerpay",["yepay","yemey","elürpay"]],["yepay",["yerpay","yemey","elpay"]],["elürpay",["elpay","elürpuy","yerpay"]],
+     ["elürpuy",["elürpay","elpay","felerpuy"]],["felerpuy",["feley","amulerpuy","chumlerpual"]],["amulerpuy",["amuley","felerpuy","machingerpun"]],
+     ["machingerpun",["machingen","felerpuy","amulerpuy"]],["chumlerpual",["felerpuy","amulerpuy","yerpay"]]]}
+});
+
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
   {v:"amu",vg:{es:"ir",en:"go"},m:"amulün",es:"hacer andar, poner en movimiento",en:"to make go, set in motion"},
@@ -1562,6 +1598,18 @@ const STAGES = [
     examples:()=>[0,1,2].map(p=>amForm(AM_VERBS[0],"me",p)).concat([0,1,2].map(p=>amForm(AM_VERBS[0],"pa",p))),
     rule:{es:"El movimiento asociado se marca en el verbo: <b>-me-</b> “ir a hacer” (<b>pe-me-n</b> “fui a ver”) y <b>-pa-</b> “venir a hacer” (<b>pe-pa-n</b> “vine a ver”).",
           en:"Associated motion is marked on the verb: <b>-me-</b> “go and do” (<b>pe-me-n</b> “I went to see”) and <b>-pa-</b> “come and do” (<b>pe-pa-n</b> “I came to see”)."}},
+  { id:"pu", mt:"-pu-", es:"Allá: -pu-", en:"Over there: -pu-", kind:"verb",
+    gen:()=>genGram("pu",8), examples:()=>gramExamples("pu"),
+    rule:{es:"<b>-pu-</b> dice que la acción ocurre <b>allá</b>, en un lugar lejos de quien habla: <b>kon-pu-y</b> “entró allá”, <b>tripa-pu-y</b> “salió allá”, <b>pe-pu-fiñ</b> “llegué a verlo (allá)”, <b>müle-pu-y</b> “está allá” (60 veces en AVENUE). Compara con <b>-pa-</b> “hacia acá”: <b>tripa-pa-y</b> “salió (hacia acá)”, <b>kon-pa-y</b> “entró (acá)”; y con <b>-me-</b> “ir a”: <b>pe-me-fiñ</b> “fui a verlo”. Con algunos verbos <b>-pu-</b> significa “llegar hasta un punto”: <b>fente-pu-a-y</b> “hasta aquí llega”, la frase con que se cierran muchos relatos (84 veces).",
+          en:"<b>-pu-</b> says the action happens <b>over there</b>, at a place away from the speaker: <b>kon-pu-y</b> “she/he went in over there”, <b>tripa-pu-y</b> “she/he came out over there”, <b>pe-pu-fiñ</b> “I got to see her/him (there)”, <b>müle-pu-y</b> “she/he is over there” (60 times in AVENUE). Compare <b>-pa-</b> “toward here”: <b>tripa-pa-y</b> “she/he came out (toward here)”, <b>kon-pa-y</b> “she/he came in”; and <b>-me-</b> “go and”: <b>pe-me-fiñ</b> “I went to see her/him”. With some verbs <b>-pu-</b> means “reach a point”: <b>fente-pu-a-y</b> “this is where it ends”, the phrase that closes many stories (84 times)."}},
+  { id:"kiaw", mt:"-(k)iaw-", es:"Andar haciendo: -(k)iaw-", en:"Going about doing: -(k)iaw-", kind:"verb",
+    gen:()=>genGram("kiaw",8), examples:()=>gramExamples("kiaw"),
+    rule:{es:"<b>-(k)iaw-</b> dice que la acción se hace <b>andando</b> de un lado a otro, sin un rumbo fijo: <b>treka-yaw-i</b> “anda caminando, pasea”, <b>lef-kiaw-i</b> “anda corriendo”, <b>küdaw-kiaw-i</b> “anda trabajando”, <b>dungu-yaw-i</b> “anda hablando”. Después de vocal es <b>-yaw-</b>; después de consonante puede ser <b>-kiaw-</b>, <b>-iaw-</b> o <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “anda así”). Viene del verbo <b>miawün</b> “andar” (<b>miawi</b> “anda”, 145 veces en AVENUE).",
+          en:"<b>-(k)iaw-</b> says the action is done while <b>going about</b> from place to place, with no fixed direction: <b>treka-yaw-i</b> “she/he walks around”, <b>lef-kiaw-i</b> “she/he runs around”, <b>küdaw-kiaw-i</b> “she/he goes about working”, <b>dungu-yaw-i</b> “she/he goes around talking”. After a vowel it is <b>-yaw-</b>; after a consonant it can be <b>-kiaw-</b>, <b>-iaw-</b> or <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “she/he goes about like that”). It comes from the verb <b>miawün</b> “to go about” (<b>miawi</b> “she/he goes about”, 145 times in AVENUE)."}},
+  { id:"rpu", mt:"-rpa-, -rpu-", es:"De paso: -rpa- y -rpu-", en:"On the way: -rpa- and -rpu-", kind:"verb",
+    gen:()=>genGram("rpu",8), examples:()=>gramExamples("rpu"),
+    rule:{es:"<b>-rpa-</b> y <b>-rpu-</b> juntan dos piezas: <b>-(ü)r-</b> “de paso, en el camino” y <b>-pa-</b> “hacia acá” o <b>-pu-</b> “allá”. <b>-rpa-</b> es “de paso, viniendo hacia acá”: <b>ye-rpa-y</b> “pasó a buscar”, <b>el-ürpa-y</b> “vino a dejar de paso” (compara <b>ye-pa-y</b> “vino a buscar”, <b>ye-me-y</b> “fue a buscar”). <b>-rpu-</b> es “de paso, yendo hacia allá”, y muy a menudo “llegar a, terminar”: <b>fele-rpu-y</b> “resultó así”, <b>amule-rpu-y</b> “siguió avanzando”, <b>machinge-rpu-n</b> “llegué a ser machi”, <b>chumle-rpu-a-l</b> “cómo irá a quedar”. En AVENUE <b>-rpu-</b> es unas diez veces más común que <b>-rpa-</b>, y <b>fele-rpu-</b> solo es más de la cuarta parte de los <b>-rpu-</b>.",
+          en:"<b>-rpa-</b> and <b>-rpu-</b> join two pieces: <b>-(ü)r-</b> “in passing, on the way” and <b>-pa-</b> “toward here” or <b>-pu-</b> “over there”. <b>-rpa-</b> is “in passing, on the way here”: <b>ye-rpa-y</b> “she/he stopped by to pick up”, <b>el-ürpa-y</b> “she/he dropped it off on the way” (compare <b>ye-pa-y</b> “she/he came to fetch”, <b>ye-me-y</b> “she/he went to fetch”). <b>-rpu-</b> is “in passing, on the way there”, and very often “end up, come to”: <b>fele-rpu-y</b> “it turned out that way”, <b>amule-rpu-y</b> “it kept advancing”, <b>machinge-rpu-n</b> “I ended up becoming a machi”, <b>chumle-rpu-a-l</b> “how it would turn out”. In AVENUE <b>-rpu-</b> is about ten times as common as <b>-rpa-</b>, and <b>fele-rpu-</b> alone is over a quarter of all <b>-rpu-</b>."}},
   { id:"caus", mt:"-l-, -el-", es:"Causativos", en:"Causatives", kind:"derive",
     gen:()=>shuffle(CAUS).map(causItem),
     examples:()=>CAUS.map(c=>({m:`${c.v}- → ${c.m}`,es:c.es,en:c.en})),
