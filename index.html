@@ -1834,31 +1834,47 @@ const ITEMS = [
 const SLOT_ORDER=["body","belt","cloak","neck","chest","pin","head","ears","hand","pet"];
 const fits=(it,p)=>!(p.blades&&it.slot==="hand") && (it.for.includes(p.type)||it.for.includes(p.id)||(p.role&&it.for.includes(p.role)));
 
+function shd(h,a){ const n=parseInt(h.slice(1),16); let r=n>>16,g=n>>8&255,b=n&255; const f=a<0?0:255,t=Math.abs(a);
+  r=Math.round(r+(f-r)*t); g=Math.round(g+(f-g)*t); b=Math.round(b+(f-b)*t); return "#"+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1); }
 function figureSVG(p,outfit){
-  const domo=p.type==="domo";
+  const domo=p.type==="domo", sk=p.skin, skD=shd(sk,-.22), skL=shd(sk,.18), hr=p.hair, hrL=shd(hr,.28), SH="#d9d0bd", SHD="#b9ae97", PA="#3b3548", PAD="#2b2636";
+  const braid=x=>Array.from({length:9},(_,i)=>`<ellipse cx="${x+(i%2?.9:-.9)}" cy="${42+i*5.2}" rx="3.3" ry="3.1" fill="${hr}"/><path d="M${x-2.4} ${41+i*5.2} q2.4 2 4.6 .4" stroke="${hrL}" stroke-width=".7" fill="none"/>`).join("")+`<path d="M${x-2.4} 88 h4.8 l-.6 3 h-3.6Z" fill="#c8322f"/><path d="M${x-1.6} 91 l-.6 4 M${x} 91 v4.4 M${x+1.6} 91 l.6 4" stroke="#c8322f" stroke-width=".8"/>`;
   const hair = domo
-    ? `<path d="M46 34 Q46 20 60 20 Q74 20 74 34 Q70 26 60 26 Q50 26 46 34Z" fill="${p.hair}"/><rect x="42" y="32" width="6" height="54" rx="3" fill="${p.hair}"/><rect x="72" y="32" width="6" height="54" rx="3" fill="${p.hair}"/>`
-    : `<path d="M46 38 Q45 20 60 20 Q75 20 74 38 L72 31 Q60 24 48 31Z" fill="${p.hair}"/>`;
+    ? `${braid(45)}${braid(75)}<path d="M45.4 37 Q44.6 20.4 60 20 Q75.4 20.4 74.6 37 Q72.6 28 66.4 25.6 Q61.6 27.4 60 25 Q58.4 27.4 53.6 25.6 Q47.4 28 45.4 37Z" fill="${hr}"/><path d="M60 20.4 V25" stroke="${shd(hr,-.3)}" stroke-width=".8"/><path d="M63 22 Q70 23 72.4 30" stroke="${hrL}" stroke-width="1" fill="none" opacity=".8"/>`
+    : `<path d="M45.6 39 Q43.4 20 60 19.4 Q76.6 20 74.4 39 L72.8 31 Q67 25.6 60 27 Q53 25.6 47.2 31Z" fill="${hr}"/><path d="M47 31 L46.4 38 M73 31 L73.6 38" stroke="${hr}" stroke-width="1.6"/><path d="M62 21.4 Q70 22.6 72.6 29" stroke="${hrL}" stroke-width="1.1" fill="none" opacity=".8"/>`;
   const bgIt = ITEMS.find(i=>i.id===outfit.bg);
   const layers = SLOT_ORDER.filter(s=>s!=="pet").map(s=>{const id=outfit[s];const it=ITEMS.find(i=>i.id===id);return it?it.svg:""}).join("");
   const petIt = ITEMS.find(i=>i.id===outfit.pet);
-  const elder = p.elder ? `<path d="M50 31 Q53 29 56 31 M64 31 Q67 29 70 31" stroke="#6e5040" stroke-width="1" fill="none"/>` : "";
+  const elder = p.elder ? `<path d="M53 28.6 Q60 27 67 28.6 M54.6 30.4 Q60 29.2 65.4 30.4" stroke="${skD}" stroke-width=".7" fill="none"/><path d="M49.4 36 l-1.6 -.8 M49.4 38 l-1.8 .4 M70.6 36 l1.6 -.8 M70.6 38 l1.8 .4" stroke="${skD}" stroke-width=".6"/>` : "";
   const sc = p.child ? `transform="translate(60 163) scale(.74) translate(-60 -163)"` : "";
+  const hand=(x,f)=>`<g transform="translate(${x} 106) scale(${f} 1)"><path d="M-3.6 -4.6 Q-5.4 -.4 -3.4 3.6 Q0 6 3.4 3.4 Q5 0 3.6 -4.6Z" fill="${sk}"/><path d="M3.6 -3 q2.6 .6 2 3.4" stroke="${sk}" stroke-width="2.2" stroke-linecap="round" fill="none"/><path d="M-3.4 3.6 Q0 6 3.4 3.4" stroke="${skD}" stroke-width=".8" fill="none"/></g>`;
   return `<svg viewBox="0 0 120 170" role="img" aria-label="${esc(p.id)}">
-    ${bgIt?bgIt.svg:""}<ellipse cx="60" cy="163" rx="${p.child?22:30}" ry="4" fill="#0e0c1f" opacity=".6"/><g ${sc}>
-    <rect x="48" y="108" width="10" height="50" fill="#3b3548"/><rect x="62" y="108" width="10" height="50" fill="#3b3548"/>
-    <ellipse cx="52" cy="159" rx="7" ry="3.5" fill="#2a2433"/><ellipse cx="68" cy="159" rx="7" ry="3.5" fill="#2a2433"/>
-    <path d="M45 58 L34 104 M75 58 L86 104" stroke="#cfc6b4" stroke-width="9" stroke-linecap="round"/>
-    <path d="M44 54 L76 54 L80 112 L40 112Z" fill="#cfc6b4"/>
-    ${p.blades?"":`<circle cx="34" cy="106" r="5" fill="${p.skin}"/><circle cx="86" cy="106" r="5" fill="${p.skin}"/>`}
-    <rect x="55" y="45" width="10" height="11" fill="${p.skin}"/>
-    <circle cx="60" cy="36" r="14" fill="${p.skin}"/>
-    <circle cx="55" cy="37" r="1.6" fill="#1a1410"/><circle cx="65" cy="37" r="1.6" fill="#1a1410"/>
-    <path d="M56 42 Q60 45 64 42" stroke="#1a1410" stroke-width="1.3" fill="none"/>
+    ${bgIt?bgIt.svg:""}<ellipse cx="60" cy="161" rx="${p.child?22:30}" ry="4.4" fill="#0e0c1f" opacity=".5"/><g ${sc}>
+    <path d="M48.4 110 L50 155 Q50 157.6 52.4 157.6 H56 Q57.6 157.4 57.6 155 L58.6 110Z" fill="${PA}"/><path d="M55.6 112 L55.2 156" stroke="${PAD}" stroke-width="2.4"/>
+    <path d="M61.4 110 L62.4 155 Q62.4 157.6 64.6 157.6 H68 Q70 157.4 70 155 L71.6 110Z" fill="${PA}"/><path d="M64.6 112 L65 156" stroke="${PAD}" stroke-width="2.4"/>
+    <path d="M46.6 158.6 Q46.4 154.6 51.6 154.4 L57.8 155 Q59.4 159 56.4 160.6 H48.4 Q46.8 160.2 46.6 158.6Z" fill="#2a2433"/><path d="M73.4 158.6 Q73.6 154.6 68.4 154.4 L62.2 155 Q60.6 159 63.6 160.6 H71.6 Q73.2 160.2 73.4 158.6Z" fill="#2a2433"/>
+    <path d="M49 156.4 h7 M71 156.4 h-7" stroke="#4a4258" stroke-width=".8"/>
+    <path d="M46.4 55.6 Q38.6 61 36.4 79 L32 101.6 L38.6 103.6 L42.4 82 Q44.6 70.4 49 64Z" fill="${SH}"/><path d="M40 72 Q37.6 86 35 101.8" stroke="${SHD}" stroke-width="2" fill="none"/>
+    <path d="M73.6 55.6 Q81.4 61 83.6 79 L88 101.6 L81.4 103.6 L77.6 82 Q75.4 70.4 71 64Z" fill="${SH}"/><path d="M80.6 70 Q83.6 86 86.6 101.6" stroke="#ece5d4" stroke-width="1.2" fill="none" opacity=".8"/>
+    <path d="M43 55 Q60 49.4 77 55 Q80 82 80.6 112.4 Q60 115 39.4 112.4 Q40 82 43 55Z" fill="${SH}"/>
+    <path d="M43 55 Q40 82 39.4 112.4 Q44 113.6 48.6 113.8 Q46.4 84 48.6 56.6Z" fill="${SHD}" opacity=".75"/>
+    <path d="M73 60 Q75.6 84 76 110" stroke="#ece5d4" stroke-width="1.4" fill="none" opacity=".7"/>
+    <path d="M55 52.6 L60 59.4 L65 52.6" stroke="${SHD}" stroke-width="1.2" fill="none"/>
+    ${p.blades?"":hand(34.4,1)+hand(85.6,-1)}
+    <path d="M55 44 H65 V54.4 Q60 57 55 54.4Z" fill="${sk}"/><path d="M55 47 Q60 52 65 47 V49.6 Q60 53.4 55 49.6Z" fill="${skD}" opacity=".6"/>
+    <circle cx="46.2" cy="37.4" r="3.2" fill="${sk}"/><circle cx="73.8" cy="37.4" r="3.2" fill="${sk}"/><path d="M45.4 36 q1.4 1.4 .4 3 M74.6 36 q-1.4 1.4 -.4 3" stroke="${skD}" stroke-width=".7" fill="none"/>
+    <circle cx="60" cy="36" r="14" fill="${sk}"/>
+    <path d="M47 39 Q48.6 48.6 58 50 Q50.6 47 47 39Z" fill="${skD}" opacity=".55"/><ellipse cx="66.4" cy="29" rx="4.4" ry="2.6" fill="${skL}" opacity=".45"/>
+    <path d="M51.6 32.6 q3.2 -1.8 6.2 -.2 M62.2 32.4 q3 -1.6 6.2 .2" stroke="${shd(hr,0)}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="55" cy="37" rx="2.1" ry="1.5" fill="#f4efe6"/><ellipse cx="65" cy="37" rx="2.1" ry="1.5" fill="#f4efe6"/>
+    <circle cx="55.3" cy="37.1" r="1.25" fill="#1a1410"/><circle cx="65.3" cy="37.1" r="1.25" fill="#1a1410"/><circle cx="55.7" cy="36.6" r=".42" fill="#fff"/><circle cx="65.7" cy="36.6" r=".42" fill="#fff"/>
+    <path d="M60.4 38 q-1.8 3.4 0 4.2 q1.2 .4 1.8 -.2" stroke="${skD}" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <circle cx="52.6" cy="42.2" r="2.2" fill="#d9715a" opacity=".22"/><circle cx="67.4" cy="42.2" r="2.2" fill="#d9715a" opacity=".22"/>
+    <path d="M56.4 44.6 Q60 46.8 63.6 44.6" stroke="#5a2e22" stroke-width="1.2" fill="none" stroke-linecap="round"/>
     ${hair}${elder}${layers}${p.blades?`<g><rect x="29" y="101" width="10" height="7" rx="1.5" fill="#6e5a4a"/><path d="M29.5 103.5 H38.5 M29.5 106 H38.5" stroke="#3a2e2a" stroke-width=".8"/>
-           <path d="M31 108 L37 108 L35.5 132 L34 135 L32.5 132Z" fill="#d7dbe2" stroke="#9aa1ad" stroke-width=".6"/>
+           <path d="M31 108 L37 108 L35.5 132 L34 135 L32.5 132Z" fill="#d7dbe2" stroke="#9aa1ad" stroke-width=".6"/><path d="M35.6 109 L34.6 130" stroke="#f4f6f9" stroke-width=".8"/>
            <rect x="81" y="101" width="10" height="7" rx="1.5" fill="#6e5a4a"/><path d="M81.5 103.5 H90.5 M81.5 106 H90.5" stroke="#3a2e2a" stroke-width=".8"/>
-           <path d="M83 108 L89 108 L87.5 132 L86 135 L84.5 132Z" fill="#d7dbe2" stroke="#9aa1ad" stroke-width=".6"/></g>`:""}</g>${petIt?petIt.svg:""}</svg>`;
+           <path d="M83 108 L89 108 L87.5 132 L86 135 L84.5 132Z" fill="#d7dbe2" stroke="#9aa1ad" stroke-width=".6"/><path d="M87.6 109 L86.6 130" stroke="#f4f6f9" stroke-width=".8"/></g>`:""}</g>${petIt?petIt.svg:""}</svg>`;
 }
 
 // a figure wearing a single item, cropped to where the item sits
@@ -1870,7 +1886,7 @@ function figPic(id){
   const vb=FIG_CROP[it.slot]||"0 0 120 170";
   const [,,w,h]=vb.split(" ").map(Number);
   return figureSVG(who,{[it.slot]:id}).replace('viewBox="0 0 120 170"',`viewBox="${vb}" width="${(1.6*w/Math.max(w,h)).toFixed(2)}em" height="${(1.6*h/Math.max(w,h)).toFixed(2)}em"`)
-    .replace('<ellipse cx="60" cy="163"','<ellipse visibility="hidden" cx="60" cy="163"');
+    .replace('<ellipse cx="60" cy="161"','<ellipse visibility="hidden" cx="60" cy="161"');
 }
 
 // ===== Coaches =====
@@ -2945,6 +2961,178 @@ function lof(sel,msg){
     if(nuts<x.price) return lof(sel,t().need(x.price-nuts));
     nuts-=x.price; lofOwned.push(x.id); save("nuts",nuts); save("lof",lofOwned); lof(x.id,t().bought(x.m)); });
 }
+
+/* ===== Vestuario art: shaded redraws of every item, drawn pets and painted backgrounds (overrides the flat versions above) ===== */
+const W_SIL=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#c3c8d1"/><circle cx="${x}" cy="${y}" r="${(r*.62).toFixed(2)}" fill="#e6e9ee"/><circle cx="${x-r*.3}" cy="${y-r*.3}" r="${(r*.25).toFixed(2)}" fill="#fff"/>`;
+const W_DIA=(x,y,s,c,ci)=>`<path d="M${x} ${y-s} L${x+s} ${y} L${x} ${y+s} L${x-s} ${y}Z" fill="${c}"/>${ci?`<path d="M${x} ${y-s*.45} L${x+s*.45} ${y} L${x} ${y+s*.45} L${x-s*.45} ${y}Z" fill="${ci}"/>`:""}`;
+const wPoncho=(c,bands)=>{ const d=shd(c,-.32), l=shd(c,.18), arc=(y,x)=>y+4.4*(1-((x-60)/38)**2);
+  const shape="M33 56 Q60 50 87 56 Q93.6 84 99 114 Q60 119.6 21 114 Q26.4 84 33 56Z";
+  return `<path d="${shape}" fill="${c}"/><path d="M33 56 Q26.4 84 21 114 Q30 116.4 40 117.4 Q36 86 42 58Z" fill="${d}" opacity=".55"/>
+   <path d="M49 60 Q44 88 41 116 M71 60 Q76 88 79 116" stroke="${d}" stroke-width="1.4" fill="none" opacity=".7"/><path d="M80 62 Q86 86 90 114" stroke="${l}" stroke-width="1.4" fill="none" opacity=".6"/>
+   ${bands.map(([y,bc,w,mc,ms,step])=>`<path d="M${23} ${y} Q60 ${y+8.8} ${97} ${y}" stroke="${bc}" stroke-width="${w}" fill="none"/>${mc?Array.from({length:Math.floor(64/step)+1},(_,i)=>{const x=28+i*step;return W_DIA(x,arc(y,x).toFixed(1)*1,ms,mc)}).join(""):""}`).join("")}
+   <path d="M53 54.4 Q60 58.6 67 54.4" stroke="${d}" stroke-width="1.6" fill="none"/>
+   <g stroke="${c}" stroke-width="1.1">${Array.from({length:27},(_,i)=>{const x=22.6+i*2.9, y=114+4.6*(1-((x-60)/38)**2);return `<path d="M${x.toFixed(1)} ${(y-.6).toFixed(1)} v3.4"/>`}).join("")}</g>`; };
+const wShawl=(c,e1,e2)=>{ const d=shd(c,-.3), l=shd(c,.2);
+  return `<path d="M41 54 Q60 67 79 54 Q84.6 74 88.4 96 Q60 107 31.6 96 Q35.4 74 41 54Z" fill="${c}"/><path d="M41 54 Q35.4 74 31.6 96 Q38 99.6 45 101.4 Q42 78 47 58Z" fill="${d}" opacity=".55"/>
+   <path d="M52 62 Q50 82 49 103 M68 62 Q70 82 71 103" stroke="${d}" stroke-width="1.2" fill="none" opacity=".7"/><path d="M76 60 Q80 78 84 96" stroke="${l}" stroke-width="1.2" fill="none" opacity=".6"/>
+   <path d="M33 92 Q60 102.6 87 92" stroke="${e1}" stroke-width="2.6" fill="none"/>${e2?`<path d="M34.6 87 Q60 96.6 85.4 87" stroke="${e2}" stroke-width="1.3" fill="none"/>`:""}
+   <g stroke="${c}" stroke-width="1">${Array.from({length:20},(_,i)=>{const x=33+i*2.85, y=96+9.6*(1-((x-60)/28)**2)*.55+(Math.abs(x-60)>24?-2:0);return `<path d="M${x.toFixed(1)} ${y.toFixed(1)} v3"/>`}).join("")}</g>`; };
+const wSash=(c,mc,ec)=>`<path d="M39.4 97.6 Q60 99.8 80.6 97.6 V106.2 Q60 108.4 39.4 106.2Z" fill="${c}"/><path d="M39.4 98.8 Q60 101 80.6 98.8 M39.4 105 Q60 107.2 80.6 105" stroke="${ec}" stroke-width=".9" fill="none"/>
+  ${[44,50,56,62,68,74].map(x=>W_DIA(x,102.4,2.4,mc,c)).join("")}<path d="M39.4 106.2 Q60 108.4 80.6 106.2" stroke="${shd(c,-.35)}" stroke-width="1" fill="none"/>
+  <path d="M77 105 q1.6 6 .6 12 M79.4 105 q1.4 6 2.4 11.4" stroke="${c}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M77.4 117 l-.6 2.6 M78.4 117 l.2 2.8 M81.4 116.4 l.4 2.6 M82.4 116 l1 2.4" stroke="${mc}" stroke-width=".7"/>`;
+const wHeadband=(c,mc)=>`<path d="M45.6 27.4 Q60 24.6 74.4 27.4 L74.6 31.4 Q60 28.6 45.4 31.4Z" fill="${c}"/><path d="M45.6 28.2 Q60 25.4 74.4 28.2" stroke="${shd(c,.3)}" stroke-width=".7" fill="none"/>${[51,56.5,62,67.5].map((x,i)=>W_DIA(x,28.4+Math.abs(x-60)*.04,1.5,mc)).join("")}<path d="M45.6 30 q-3.4 2 -3.6 7 M46 30.6 q-1.8 3 -1.2 7.4" stroke="${c}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+const wBeads=(c,dc)=>[[46.6,51.4],[49.4,55],[52.8,57.8],[56.4,59.4],[60,60],[63.6,59.4],[67.2,57.8],[70.6,55],[73.4,51.4]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.1" fill="${c}"/><circle cx="${x}" cy="${y}" r="2.1" fill="none" stroke="${dc}" stroke-width=".5"/><circle cx="${x-.6}" cy="${y-.7}" r=".6" fill="#fff" opacity=".75"/>`).join("");
+/* pets: drawn on the 40x42 box at x 0-40, y 128-170, ground at y 163 */
+const wPet=(inner)=>`<ellipse cx="20" cy="163.4" rx="13" ry="2.4" fill="#0e0c1f" opacity=".4"/>${inner}`;
+const W_PETS={
+ "pet-trewa":wPet(`<g transform="translate(20 163)"><path d="M8 -6 Q15 -9 13 -15" stroke="#7a4a28" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M-6 0 Q-9 -10 -2 -15 Q6 -18 9 -10 Q11 -3 8 0Z" fill="#8a5a32"/><path d="M-2 -4 Q0 -12 6 -12 Q9 -6 7 0Z" fill="#a8723f"/><path d="M-5 0 V-6 M-1.6 0 V-6" stroke="#6b4426" stroke-width="2.4"/><path d="M-7.6 0 h4.2 M-3.4 0 h4" stroke="#4f3220" stroke-width="1.4" stroke-linecap="round"/><path d="M-6 -15 Q-6 -24 -1 -25 Q4 -25 4 -19 Q4 -14 -1 -13Z" fill="#8a5a32"/><path d="M-6 -20 q-5 -2 -6.6 1.6 q2.2 1.6 5.4 1Z" fill="#c49a6c"/><circle cx="-12.4" cy="-18.6" r="1.1" fill="#1a1410"/><path d="M-1 -25 Q4 -27 4.6 -19 Q2.6 -20 1 -23Z" fill="#4f3220"/><circle cx="-4.4" cy="-21" r=".9" fill="#1a1410"/><circle cx="-4.1" cy="-21.3" r=".3" fill="#fff"/></g>`),
+ "pet-narki":wPet(`<g transform="translate(20 163)"><path d="M6 -1 Q14 0 14 -8 Q14 -13 10 -14" stroke="#5a5450" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M-6 0 Q-9 -12 -1 -16 Q7 -17 8 -8 Q9 -2 6 0Z" fill="#6e6862"/><path d="M-1 -3 Q0 -12 5 -12 Q7 -6 5 0Z" fill="#8a847e"/><path d="M-4 0 V-5 M0 0 V-5" stroke="#5a5450" stroke-width="2.4"/><ellipse cx="-1" cy="-21" rx="6.4" ry="5.6" fill="#6e6862"/><path d="M-6.6 -24 L-6 -30.4 L-2.4 -25.8Z M4.6 -24 L4 -30.4 L.4 -25.8Z" fill="#6e6862"/><path d="M-5.6 -25.6 L-5.4 -28.6 L-3.6 -26.2Z M3.6 -25.6 L3.4 -28.6 L1.6 -26.2Z" fill="#d99a90"/><path d="M-5 -22 h2.6 M.6 -22 h2.6" stroke="#e8c84a" stroke-width="1.6" stroke-linecap="round"/><path d="M-3.4 -22.8 v1.6 M2 -22.8 v1.6" stroke="#1a1410" stroke-width=".8"/><path d="M-1.6 -19.4 l.6 .8 .6 -.8Z" fill="#d99a90"/><path d="M-5 -18.6 h-5 M-5 -17.6 l-4.6 1.2 M3 -18.6 h5 M3 -17.6 l4.6 1.2" stroke="#d6d0c8" stroke-width=".4"/><path d="M-3 -25.6 q2 1 4 0" stroke="#4a4440" stroke-width=".8" fill="none"/></g>`),
+ "pet-achawall":wPet(`<g transform="translate(20 163) scale(1.9)">${lfHen(0,0,"#b5652e","#7d3f1a",0)}</g>`),
+ "pet-ufisa":wPet(`<g transform="translate(19 163) scale(1.55)">${lfSheep(0,0,0,0)}</g>`),
+ "pet-kawellu":wPet(`<g transform="translate(18 163) scale(.74)">${LOF.find(x=>x.id==="kawellu").s}</g>`),
+ "pet-waka":wPet(`<g transform="translate(16 163) scale(.92)">${LOF.find(x=>x.id==="waka").s}</g>`),
+ "pet-unum":wPet(`<g transform="translate(20 163)"><path d="M-2 -1 L-3 0 M2 -1 L2.6 0" stroke="#c9a26a" stroke-width="1"/><path d="M-10 -9 L-4 -7 L-4 -4.6Z" fill="#5a4a3a"/><ellipse cx="0" cy="-7" rx="6.4" ry="5" fill="#8a7460"/><path d="M-5 -6 Q0 -2 5 -6 Q2 -3 -5 -6Z" fill="#e9dfc8"/><path d="M-5 -9 Q0 -6 4 -9" stroke="#5a4a3a" stroke-width="1.6" fill="none"/><circle cx="5" cy="-11.6" r="4.2" fill="#8a7460"/><path d="M2.6 -15.2 q2.6 -1.4 4.8 .6" stroke="#3a2e26" stroke-width="1.2" fill="none"/><path d="M8.8 -11.6 l3 .8 -3 .8Z" fill="#c9a26a"/><circle cx="6.2" cy="-12.4" r=".9" fill="#1a1410"/><circle cx="6.5" cy="-12.7" r=".3" fill="#fff"/><path d="M3 -10 q2 2 4.6 .6" stroke="#e9dfc8" stroke-width="1.2" fill="none"/></g>`),
+ "pet-chinge":wPet(`<g transform="translate(20 163)"><path d="M4 -4 Q16 -8 14 -20 Q12 -27 4 -24 Q10 -18 4 -10Z" fill="#1d1b22"/><path d="M6 -8 Q14 -12 12 -21" stroke="#f2efe8" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="-2" cy="-6" rx="9" ry="5.4" fill="#1d1b22"/><path d="M-11 -7 Q-2 -12.4 7 -7.6" stroke="#f2efe8" stroke-width="1.6" fill="none"/><path d="M-7 0 V-3 M-3 0 V-3 M2 0 V-3 M5 0 V-3" stroke="#1d1b22" stroke-width="2"/><path d="M-9 -9 Q-14 -10 -16 -6 Q-13 -4 -9 -4Z" fill="#1d1b22"/><path d="M-9 -9 Q-12.6 -9 -13.6 -7" stroke="#f2efe8" stroke-width="1.2" fill="none"/><circle cx="-12" cy="-7.4" r=".7" fill="#e9dfc8"/><circle cx="-16" cy="-6" r=".8" fill="#4a4250"/></g>`),
+ "pet-nguru":wPet(`<g transform="translate(20 163)"><path d="M5 -1 Q16 1 15 -9 Q14 -14 10 -12 Q12 -6 4 -4Z" fill="#9a8a78"/><path d="M14.6 -9 q-.4 -3 -3 -3.2" stroke="#2a2420" stroke-width="2" fill="none"/><path d="M-6 0 Q-9 -12 -2 -16 Q6 -17 7 -8 Q8 -2 5 0Z" fill="#b8763f"/><path d="M-3 -2 Q-3 -11 1 -12 Q3 -6 2 0Z" fill="#efe6d6"/><path d="M-4 0 V-5 M0 0 V-5" stroke="#8a5530" stroke-width="2.4"/><path d="M-4.4 0 v-1.4 M-.4 0 v-1.4" stroke="#2a2420" stroke-width="2.4"/><path d="M-6.6 -21 Q-7 -26 -1 -27 Q5 -26 5 -21 Q4 -17 -1 -16.4 Q-6 -17 -6.6 -21Z" fill="#c9843f"/><path d="M-6.4 -24 L-7.6 -31 L-3 -26.4Z M3.4 -26 L5.4 -31.6 L5.4 -24Z" fill="#b8763f"/><path d="M-6 -25.6 L-6.6 -29 L-4.4 -26.8Z" fill="#2a2420"/><path d="M-7 -20 Q-10.4 -19.4 -11.6 -17.6 Q-7 -15.6 -3 -17Z" fill="#efe6d6"/><circle cx="-11.6" cy="-17.8" r="1" fill="#1a1410"/><path d="M-5 -22.4 q1 -.8 2 0 M.6 -22.4 q1 -.8 2 0" stroke="#1a1410" stroke-width="1" fill="none"/></g>`),
+ "pet-wakag":wPet(`<g transform="translate(20 163)"><path d="M-9 0 Q-14 -1 -12 -5 L-7 -6 M9 0 Q14 -1 12 -5 L7 -6" stroke="#2f6f40" stroke-width="2.6" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-6" rx="9.6" ry="6.4" fill="#3d8a52"/><ellipse cx="1" cy="-8.4" rx="5.4" ry="2.4" fill="#5fae6a" opacity=".7"/><ellipse cx="0" cy="-3.4" rx="6.6" ry="2.6" fill="#b8d9a8"/><path d="M-4 0 q-3 0 -4 1.4 M4 0 q3 0 4 1.4" stroke="#2f6f40" stroke-width="1.6" fill="none"/><circle cx="-4.4" cy="-12" r="3.2" fill="#3d8a52"/><circle cx="4.4" cy="-12" r="3.2" fill="#3d8a52"/><circle cx="-4.4" cy="-12.4" r="1.9" fill="#f2efe8"/><circle cx="4.4" cy="-12.4" r="1.9" fill="#f2efe8"/><circle cx="-4.2" cy="-12.2" r="1.1" fill="#1a1410"/><circle cx="4.6" cy="-12.2" r="1.1" fill="#1a1410"/><path d="M-4 -6.6 Q0 -4.4 4 -6.6" stroke="#1d4a2a" stroke-width=".9" fill="none"/><circle cx="-6" cy="-6" r=".7" fill="#2f6f40"/><circle cx="5.4" cy="-8" r=".7" fill="#2f6f40"/></g>`)
+};
+/* backgrounds: 120x170, ground line about y 140 so the figure stands in the scene */
+const wSky=(id,a,b)=>`<defs><filter id="wDim"><feColorMatrix type="matrix" values=".72 0 0 0 .12  0 .72 0 0 .15  0 0 .72 0 .2  0 0 0 1 0"/></filter><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="120" height="170" fill="url(#${id})"/>`;
+const wGround=(a,b)=>`<path d="M0 132 Q60 126 120 132 V170 H0Z" fill="${a}"/><path d="M0 150 Q60 144 120 150 V170 H0Z" fill="${b}" opacity=".7"/>`;
+const wTufts=(c,pts)=>`<g stroke="${c}" stroke-width=".8" stroke-linecap="round">${pts.map(([x,y])=>`<path d="M${x} ${y} l-1.4 -3 M${x+.6} ${y} v-3.6 M${x+1.2} ${y} l1.4 -3"/>`).join("")}</g>`;
+const wPewen=(x,y,h,c,snow)=>`<g transform="translate(${x} ${y}) scale(${(h/110).toFixed(3)})"${c?` filter="url(#wDim)"`:""}>${LOF.find(q=>q.id==="pewen").s}${snow?`<path d="M-30 -86 Q-28 -104 0 -109 Q28 -104 30 -86" stroke="#f4f7fa" stroke-width="5" fill="none"/>`:""}</g>`;
+const W_BG={
+ "bg-ruka":wSky("wgR","#1f2a4a","#6a6a8a")+`<circle cx="22" cy="24" r="7" fill="#f3efe6"/><circle cx="22" cy="24" r="12" fill="#f3efe6" opacity=".12"/>${[[50,14],[80,30],[100,12],[40,40],[106,48]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".8" fill="#f3efe6"/>`).join("")}<path d="M0 112 Q30 98 60 108 Q90 96 120 106 V140 H0Z" fill="#2c3a40"/>`+wGround("#3d4a34","#2f3a28")+`<g transform="translate(96 134)"><path d="M-26 0 C-26 -20 -14 -33 0 -34 C14 -33 26 -20 26 0Z" fill="#8a6c40"/><path d="M-26 0 C-26 -20 -14 -33 0 -34 C-8 -30 -14 -20 -14 0Z" fill="#5e4a2c" opacity=".7"/><path d="M-23 -9 Q0 -16 23 -9 M-18 -19 Q0 -25 18 -19" stroke="#5e4a2c" stroke-width="1.2" fill="none"/><path d="M2 0 V-11 Q7 -15 12 -11 V0Z" fill="#e8a040"/><path d="M2 0 V-11 Q7 -15 12 -11 V0Z" fill="#ffd27a" opacity=".5"/><path d="M4 -33 q-3 -6 1 -10 q4 -5 0 -10" stroke="#9aa0b0" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/></g><ellipse cx="103" cy="137" rx="14" ry="3" fill="#e8a040" opacity=".18"/>`,
+ "bg-pewen":wSky("wgP","#3e6aa6","#b8cfe0")+`<path d="M0 98 L22 80 L40 92 L64 60 L76 54 L88 62 L120 92 V140 H0Z" fill="#8ea7c2"/><path d="M64 60 L76 54 L84 58 L80 62 L74 59 L69 63Z" fill="#f4f7fa"/><path d="M0 112 Q40 100 80 110 Q100 104 120 108 V140 H0Z" fill="#5d7a5a"/>${[[10,124,40,"#2f5a3a"],[30,118,30,"#3a6644"],[100,122,44,"#2f5a3a"],[84,116,26,"#3a6644"]].map(([x,y,h,c])=>wPewen(x,y,h,c)).join("")}`+wGround("#5d8a45","#4a7438")+wTufts("#3f6a2d",[[12,146],[34,140],[90,144],[108,152],[24,160]])+wPewen(112,146,70,""),
+ "bg-lafken":wSky("wgL","#4f86c6","#e9d6b4")+`<circle cx="94" cy="58" r="11" fill="#f6dc8a"/><circle cx="94" cy="58" r="20" fill="#f6dc8a" opacity=".2"/><path d="M0 92 L14 82 L22 92Z" fill="#5a5f6a"/><rect y="92" width="120" height="34" fill="#2f63a8"/><path d="M80 94 h28 M86 100 h20 M90 106 h12" stroke="#f6dc8a" stroke-width="1.2" opacity=".7"/>${[100,108,116].map((y,i)=>`<path d="M0 ${y} Q7.5 ${y-3} 15 ${y} T30 ${y} T45 ${y} T60 ${y} T75 ${y} T90 ${y} T105 ${y} T120 ${y}" stroke="#a9cdeb" stroke-width="1" fill="none" opacity="${.8-i*.2}"/>`).join("")}<path d="M0 126 Q30 120 60 124 Q90 118 120 124 V128 Q60 122 0 130Z" fill="#f2efe8" opacity=".8"/><path d="M0 128 Q60 120 120 126 V170 H0Z" fill="#d6bd88"/><path d="M0 146 Q60 140 120 148 V170 H0Z" fill="#c4a874"/>`,
+ "bg-mawida":wSky("wgM","#4a74aa","#bcd2e2")+`<path d="M0 100 Q30 76 60 96 Q90 70 120 92 V140 H0Z" fill="#3c653d"/>${Array.from({length:14},(_,i)=>{const x=4+i*8.6,y=94-Math.sin(i*.8)*8;return `<ellipse cx="${x}" cy="${y}" rx="5" ry="7" fill="#2b4f31"/><ellipse cx="${x+1.4}" cy="${y-1.4}" rx="2.6" ry="4.6" fill="#3f6e43"/>`}).join("")}<path d="M0 118 Q40 106 80 116 Q100 112 120 114 V140 H0Z" fill="#4f7a45"/>`+wGround("#5d8a45","#4a7438")+wTufts("#3f6a2d",[[14,144],[96,140],[106,156],[30,158]]),
+ "bg-wingkul":wSky("wgW","#5a8acb","#cfe1ec")+`<g fill="#fff" opacity=".85"><ellipse cx="26" cy="30" rx="14" ry="4"/><ellipse cx="32" cy="27" rx="7" ry="4.4"/></g><path d="M-10 140 Q24 46 62 120 Q86 84 130 130 V170 H-10Z" fill="#5d8a45"/><path d="M-10 140 Q24 46 40 82 Q20 100 10 140Z" fill="#4a7438"/><path d="M20 70 Q28 92 44 100 Q54 116 66 132" stroke="#c8ab78" stroke-width="2" fill="none" stroke-dasharray="3 2"/>${[[8,96],[14,84],[34,72],[94,110],[104,104]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="3.4" ry="4.4" fill="#2f5a3a"/>`).join("")}`+wGround("#6a9a4f","#4a7438")+wTufts("#3f6a2d",[[18,146],[90,142],[100,158]]),
+ "bg-tripantu":wSky("wgT","#3a3f78","#f2a066")+`<circle cx="60" cy="118" r="30" fill="#f6c25a" opacity=".25"/><circle cx="60" cy="118" r="16" fill="#f6d27a"/>${[[14,16],[36,28],[94,14],[108,34]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".9" fill="#f3efe6"/>`).join("")}<path d="M0 118 L26 96 L44 108 L64 90 L84 104 L100 94 L120 110 V140 H0Z" fill="#2c2a4a"/><path d="M0 128 Q60 118 120 128 V140 H0Z" fill="#3a3456"/>`+wGround("#2f4a33","#253a29"),
+ "bg-pukem":wSky("wgK","#6a7a96","#c9d3df")+`<path d="M0 112 L30 74 L52 98 L78 64 L120 104 V140 H0Z" fill="#dfe6ee"/><path d="M30 74 L52 98 L40 98 Z M78 64 L120 104 L100 104Z" fill="#b9c4d2"/>${[[14,124,34],[104,122,40]].map(([x,y,h])=>wPewen(x,y,h,"d",1)).join("")}<path d="M0 130 Q60 122 120 130 V170 H0Z" fill="#f3f5f8"/><path d="M0 150 Q60 144 120 152 V170 H0Z" fill="#e2e8ef"/>${[[14,20],[40,34],[70,14],[96,40],[24,60],[86,88],[108,18],[52,58],[8,92],[64,80],[110,70],[30,108]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.4" fill="#fff" opacity=".9"/>`).join("")}`,
+ "bg-rayen":wSky("wgY","#5f93cf","#d6e8ee")+`<circle cx="96" cy="26" r="9" fill="#fff3c4"/><circle cx="96" cy="26" r="17" fill="#f6d77a" opacity=".3"/><path d="M0 108 Q40 96 80 106 Q100 100 120 104 V140 H0Z" fill="#6a9a50"/>`+wGround("#5d9a45","#4a8438")+[[8,134,"#e8b53a"],[18,142,"#c8322f"],[30,132,"#f3efe6"],[92,134,"#e8b53a"],[104,142,"#c8322f"],[114,130,"#f3efe6"],[12,156,"#f3efe6"],[104,158,"#e8b53a"],[24,152,"#e8b53a"],[96,150,"#b48ad0"],[6,148,"#b48ad0"],[112,150,"#c8322f"],[36,160,"#c8322f"],[86,162,"#f3efe6"]].map(([x,y,c])=>`<path d="M${x} ${y} v4" stroke="#3f7a3a" stroke-width=".8"/><g fill="${c}"><circle cx="${x-1.4}" cy="${y}" r="1.4"/><circle cx="${x+1.4}" cy="${y}" r="1.4"/><circle cx="${x}" cy="${y-1.4}" r="1.4"/><circle cx="${x}" cy="${y+1.2}" r="1.3"/></g><circle cx="${x}" cy="${y}" r=".8" fill="#e8b53a"/>`).join(""),
+ "bg-palin":wSky("wgA","#6c9ed3","#cfe2ec")+`<path d="M0 98 L30 84 L54 92 L80 76 L120 90 V112 H0Z" fill="#8ea7c2"/><path d="M0 108 Q60 98 120 106 V118 H0Z" fill="#4f7a4b"/>${Array.from({length:13},(_,i)=>`<g transform="translate(${6+i*9.2} ${116+(i%2)})"><path d="M-2.4 0 Q-2.6 -5.6 0 -6 Q2.6 -5.6 2.4 0Z" fill="${["#c8322f","#e8b53a","#2f5fd0","#efe7d2","#4a3f5c"][i%5]}"/><circle cy="-7.6" r="1.7" fill="#8a5a3c"/></g>`).join("")}<path d="M0 118 H120 V170 H0Z" fill="#76a456"/><path d="M8 124 H112 L120 168 H0Z M60 124 V168" stroke="#f2ecd8" stroke-width="1" fill="none" opacity=".85"/><g stroke="#6b4a2e" stroke-width="1.4"><path d="M10 124 V116 M110 124 V116"/></g><path d="M10 116 l6 2 -6 2Z" fill="#c8322f"/><path d="M110 116 l-6 2 6 2Z" fill="#2f5fd0"/><circle cx="26" cy="150" r="2.4" fill="#f3efe6"/>`,
+ "bg-kuyen":wSky("wgN","#0d0e24","#2a2c56")+`<filter id="wNight"><feColorMatrix type="matrix" values=".2 0 0 0 .02  0 .22 0 0 .03  0 0 .3 0 .06  0 0 0 1 0"/></filter><circle cx="88" cy="30" r="20" fill="#e9e3cf" opacity=".12"/><circle cx="88" cy="30" r="11" fill="#ece6d2"/><circle cx="84" cy="27" r="2" fill="#d6cfb8"/><circle cx="91" cy="33" r="1.4" fill="#d6cfb8"/>${[[14,18],[36,40],[60,14],[108,60],[22,70],[50,76],[6,44],[70,50],[114,14]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i%3?.8:1.2}" fill="#f3efe6"/>`).join("")}<path d="M10 22 L14 30 M40 10 L46 22 M58 28 l14 4" stroke="#f3efe6" stroke-width=".4" opacity=".4"/><path d="M0 120 L30 96 L58 118 L92 92 L120 114 V140 H0Z" fill="#1e2040"/>`+wGround("#1d2a24","#152019")+`<g filter="url(#wNight)">`+wPewen(14,138,60,"")+`</g>`
+};
+const W_ART={
+ "kupam":`<path d="M43 53 Q60 57.4 77 53 L80 100 L85 150 Q60 155.4 35 150 L40 100Z" fill="#1d1a24"/><path d="M43 53 L40 100 L35 150 Q41 152 47.6 152.6 L47 100 Q46 76 49 55Z" fill="#0f0d14" opacity=".7"/><path d="M53 106 L51 151 M62 108 L63 153 M71 104 L74 150" stroke="#2e2a38" stroke-width="1.2"/><path d="M74 60 Q77 100 81 148" stroke="#3a3546" stroke-width="1.2" fill="none"/><path d="M36 142.6 Q60 148 84 142.6" stroke="#2f5fd0" stroke-width="3" fill="none"/><path d="M36.4 145.4 Q60 150.8 83.6 145.4" stroke="#e9e3cf" stroke-width=".8" fill="none"/>${W_SIL(72,58,2.6)}`,
+ "chiripa":`<path d="M40 104 Q60 101 80 104 L84 136 Q72 140 63 136 L60 127 L57 136 Q48 140 36 136Z" fill="#3a2e2a"/><path d="M40 104 L36 136 Q41 138 46 138 L46 106Z" fill="#241c19" opacity=".7"/><path d="M50 108 L48 136 M70 108 L72 136 M60 104 V126" stroke="#54443c" stroke-width="1.2"/><g stroke="#3a2e2a" stroke-width="1">${[38,41,44,47,50,53,56,64,67,70,73,76,79,82].map(x=>`<path d="M${x} ${136+(x<60?Math.abs(x-46)*.12:Math.abs(x-74)*.12)} v2.6"/>`).join("")}</g>`,
+ "chiripa-kelu":`<path d="M40 104 Q60 101 80 104 L84 136 Q72 140 63 136 L60 127 L57 136 Q48 140 36 136Z" fill="#8a2a26"/><path d="M40 104 L36 136 Q41 138 46 138 L46 106Z" fill="#5e1a18" opacity=".7"/><path d="M50 108 L48 136 M70 108 L72 136 M60 104 V126" stroke="#a8403a" stroke-width="1.2"/><g stroke="#8a2a26" stroke-width="1">${[38,41,44,47,50,53,56,64,67,70,73,76,79,82].map(x=>`<path d="M${x} ${136+(x<60?Math.abs(x-46)*.12:Math.abs(x-74)*.12)} v2.6"/>`).join("")}</g>`,
+ "trariwe":wSash("#c8322f","#f3efe6","#e8b53a"),
+ "trariwe-kallfu":wSash("#2f5fd0","#f3efe6","#e8b53a"),
+ "trariwe-karu":wSash("#2f8a4f","#e8b53a","#f3efe6"),
+ "chamallwe":`<path d="M39.4 98.6 Q60 100.6 80.6 98.6 V104.6 Q60 106.6 39.4 104.6Z" fill="#26242c"/><path d="M39.4 100.4 Q60 102.4 80.6 100.4" stroke="#c8322f" stroke-width="1" fill="none"/><path d="M39.4 102.6 Q60 104.6 80.6 102.6" stroke="#f3efe6" stroke-width=".7" fill="none"/><rect x="56.4" y="98.4" width="7.2" height="7.6" rx="1.2" fill="none" stroke="#c3c8d1" stroke-width="1.4"/><path d="M57.6 99.4 l1.6 1.6" stroke="#fff" stroke-width=".6"/>`,
+ "makun":wPoncho("#6b1e22",[[90,"#efe7d2",6,"#14122a",2.2,6]]),
+ "makun-kuru":wPoncho("#1d1b22",[[70,"#c8322f",2,null],[96,"#c8322f",6,"#f3efe6",2.2,6]]),
+ "makun-kallfu":wPoncho("#2f4a8a",[[86,"#efe7d2",3,null],[102,"#efe7d2",3,null],[94,"#2f4a8a",.1,"#14122a",2.4,8]]),
+ "makun-karu":wPoncho("#2f6b3f",[[82,"#e8b53a",5,"#2f6b3f",1.6,5],[100,"#efe7d2",3,null]]),
+ "ikulla":wShawl("#2f5fd0","#1f3b7a",null),
+ "ikulla-kelu":wShawl("#a0262a","#f3efe6",null),
+ "ikulla-kuru":wShawl("#26242c","#5a3a8a","#c8322f"),
+ "ikulla-lig":wShawl("#e9e3cf","#c8322f","#2f5fd0"),
+ "trapelakucha":`<path d="M53 49 Q60 55 67 49" stroke="#c3c8d1" stroke-width="1" fill="none"/><path d="M60 54 V60" stroke="#c3c8d1" stroke-width="1.6"/><path d="M49 60 h22 l-2 4 h-18Z" fill="#c3c8d1"/><path d="M50 61 h20" stroke="#fff" stroke-width=".8"/><g stroke="#c3c8d1" stroke-width="1.2">${[52,56,60,64,68].map(x=>`<path d="M${x} 64 V83"/>`).join("")}</g><g fill="#e6e9ee">${[52,56,60,64,68].flatMap(x=>[69,74,79].map(y=>`<circle cx="${x}" cy="${y}" r=".8"/>`)).join("")}</g><path d="M47 83 h26 l-2.4 4 h-21.2Z" fill="#c3c8d1"/><path d="M49 84 h22" stroke="#fff" stroke-width=".8"/>${[51,60,69].map(x=>W_SIL(x,91,2.4)).join("")}`,
+ "trarilonko":`<path d="M45.6 27.4 Q60 25 74.4 27.4 L74.4 30.6 Q60 28.2 45.6 30.6Z" fill="#c3c8d1"/><path d="M45.6 28 Q60 25.6 74.4 28" stroke="#fff" stroke-width=".7" fill="none"/>${[50,55,60,65,70].map(x=>`<path d="M${x} 30 v1.6" stroke="#c3c8d1" stroke-width=".6"/>`+W_SIL(x,33.2,1.6)).join("")}`,
+ "chaway":`${[45,75].map(x=>`<path d="M${x} 38.6 v3" stroke="#c3c8d1" stroke-width="1"/><path d="M${x-2} 41.6 h4 l2 6 h-8Z" fill="#c3c8d1"/><path d="M${x-1.4} 42.4 h2.4" stroke="#fff" stroke-width=".6"/>${[-3,0,3].map(d=>`<path d="M${x+d} 47.6 v2.4" stroke="#c3c8d1" stroke-width=".6"/><circle cx="${x+d}" cy="50.8" r=".9" fill="#e6e9ee"/>`).join("")}`).join("")}`,
+ "kultrun":`<path d="M84 104 Q96 122 108 104" fill="#8a6440"/><ellipse cx="96" cy="104" rx="13" ry="9.6" fill="#e8d6a0"/><ellipse cx="96" cy="104" rx="13" ry="9.6" fill="none" stroke="#7a5a3c" stroke-width="1.6"/><ellipse cx="98" cy="101" rx="7" ry="4" fill="#f4e6b8" opacity=".6"/><path d="M96 94.6 V113.4 M83.2 104 H108.8" stroke="#7a5a3c" stroke-width="1.2"/><g fill="#7a5a3c"><circle cx="90" cy="99" r="1.3"/><circle cx="102" cy="99" r="1.3"/><circle cx="90" cy="109" r="1.3"/><circle cx="102" cy="109" r="1.3"/></g>`,
+ "trutruka":`<path d="M88 104 L114 38" stroke="#b28a52" stroke-width="3.6" stroke-linecap="round"/><path d="M89 101 L113 41" stroke="#d9bb84" stroke-width="1" stroke-linecap="round"/>${[[96,84],[102,69],[108,54]].map(([x,y])=>`<path d="M${x-2.4} ${y-1} l4.8 2" stroke="#c8322f" stroke-width="2.4"/>`).join("")}<path d="M88 102 Q80 108 84 118 Q92 120 94 110Z" fill="#a8743a"/><path d="M84 117 Q88 120 93 114" stroke="#6e4a26" stroke-width="1" fill="none"/>`,
+ "wuno":`<path d="M87 104 L99 156 Q101 165 93 163" stroke="#7a5536" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M88.4 104 L99.6 152" stroke="#a87c52" stroke-width="1" fill="none"/>`,
+ "waiki":`<path d="M88 24 V166" stroke="#6e5a4a" stroke-width="2.6"/><path d="M88.8 26 V164" stroke="#94806c" stroke-width=".8"/><path d="M88 4 L92.4 20 Q88 23 83.6 20Z" fill="#c3c8d1"/><path d="M88 6 L90.6 19" stroke="#fff" stroke-width=".8"/><path d="M86 22 h4 M86 25 h4" stroke="#c8322f" stroke-width="1.6"/>`,
+ "chumpiru":`<ellipse cx="60" cy="23" rx="22.6" ry="4.4" fill="#1d1b22"/><path d="M46 23 Q47 7.4 60 7.4 Q73 7.4 74 23Z" fill="#26242c"/><path d="M46 23 Q47 7.4 60 7.4 Q52 10 51 23Z" fill="#141218"/><rect x="46.6" y="17.6" width="26.8" height="3.2" fill="#c8322f"/><path d="M64 10 Q70 12 71.4 18" stroke="#3a3842" stroke-width="1.2" fill="none"/><path d="M40 24.6 Q60 28.6 80 24.6" stroke="#3a3842" stroke-width="1" fill="none"/>`,
+ "trarilonko-lana":wHeadband("#c8322f","#f3efe6"),
+ "trarilonko-kallfu":wHeadband("#2f5fd0","#e8b53a"),
+ "llangka":wBeads("#2f8a63","#1d5a40"),
+ "llangka-kelu":wBeads("#c8322f","#7a1a18")+W_SIL(60,64.6,2.8),
+ "tupu":`<path d="M71 54 L64 74" stroke="#c3c8d1" stroke-width="1.6"/><path d="M71.4 55 L65 73" stroke="#fff" stroke-width=".5"/><circle cx="71" cy="50" r="5.4" fill="#c3c8d1"/><circle cx="71" cy="50" r="3.6" fill="none" stroke="#9aa1ad" stroke-width=".8"/><circle cx="71" cy="50" r="1.6" fill="#9aa1ad"/><circle cx="69.4" cy="48.2" r="1.1" fill="#fff"/>`,
+ "wada":`<path d="M96 106 L92 119" stroke="#7a5a3c" stroke-width="3" stroke-linecap="round"/><circle cx="97" cy="97" r="9.4" fill="#c9a25a"/><path d="M88 97 A9.4 9.4 0 0 0 103 104.6 Q92 104 88 97Z" fill="#9a7a3a" opacity=".6"/><ellipse cx="100" cy="93" rx="3.6" ry="2.2" fill="#e6c88a" opacity=".7"/><g fill="#8a6a2a"><circle cx="93" cy="94" r="1"/><circle cx="99" cy="98" r="1"/><circle cx="95" cy="101" r="1"/><circle cx="101" cy="102" r=".9"/></g>`,
+ "kullkull":`<path d="M86 106 Q92 88 108 86" stroke="#c9b484" stroke-width="4.6" fill="none" stroke-linecap="round"/><path d="M87 104 Q93 89 107 87" stroke="#ece0bc" stroke-width="1.2" fill="none"/>${[[92,95],[98,90],[103,87.6]].map(([x,y])=>`<path d="M${x-1.6} ${y-2} l3 4" stroke="#8a7650" stroke-width=".9"/>`).join("")}<path d="M105 82 q9 2 7 10 q-7 -1 -7 -10z" fill="#a8905e"/><path d="M84 106 l-2 2" stroke="#6e5a3a" stroke-width="2.4" stroke-linecap="round"/>`,
+ "challa-hand":`<path d="M86 102 Q84.6 118 96 119.4 Q107.4 118 106 102Z" fill="#9a5b2e"/><path d="M86 102 Q84.6 118 96 119.4 Q90 114 90 102Z" fill="#6e3a1a" opacity=".6"/><ellipse cx="96" cy="102" rx="10" ry="2.6" fill="#5e2f1b"/><path d="M85 104 Q81 104 82 108 M107 104 Q111 104 110 108" stroke="#7a4522" stroke-width="2" fill="none"/><path d="M103 104 Q105 112 100 117" stroke="#c07b52" stroke-width="1.2" fill="none"/>`,
+ "ngulliw-hand":`<path d="M86 104 Q96 86 106 104" stroke="#8a6a3a" stroke-width="2.2" fill="none"/>${[[89,101],[94,99],[99,100],[104,101],[92,103],[101,103],[96.5,102]].map(([x,y])=>`<path d="M${x} ${y-4}C${x+2.4} ${y-2} ${x+2.4} ${y+2} ${x} ${y+4}C${x-2.4} ${y+2} ${x-2.4} ${y-2} ${x} ${y-4}Z" fill="#9a5b2e"/><path d="M${x} ${y-4}C${x+1} ${y-3} ${x+1} ${y-2} ${x} ${y-1.4}" stroke="#e8d6a0" stroke-width=".8" fill="none"/>`).join("")}<path d="M84 104 L108 104 L104 120 L88 120Z" fill="#c9a25a"/><path d="M84 104 L88 120 L91 120 L88 104Z" fill="#9a7a3a"/><g stroke="#8a6a3a" stroke-width=".9"><path d="M85.2 108.6 H106.8 M86.4 113.4 H105.6"/>${[90,94,98,102].map(x=>`<path d="M${x} 104 L${x-.4} 120"/>`).join("")}</g>`,
+ "witral-hand":`<rect x="84" y="76" width="3.2" height="46" rx="1" fill="#6e4f30"/><rect x="110" y="76" width="3.2" height="46" rx="1" fill="#8a6a44"/><rect x="82" y="77.4" width="33" height="3.4" rx="1" fill="#8a6a44"/><rect x="82" y="115.6" width="33" height="3.4" rx="1" fill="#7a5a3c"/><g stroke="#e9e3cf" stroke-width=".6">${Array.from({length:10},(_,i)=>`<path d="M${89+i*2.2} 81 V94"/>`).join("")}</g><rect x="88" y="94" width="21" height="21.6" fill="#b7302c"/><path d="M88 96 H109 M88 113.6 H109" stroke="#14122a" stroke-width="1.6"/><path d="M98.5 97.6 l6.4 6.4 -6.4 6.4 -6.4 -6.4z" fill="#14122a"/><path d="M98.5 101 l3 3 -3 3 -3 -3z" fill="#efe7d2"/>`,
+ "pali-hand":`<circle cx="92" cy="106" r="5.6" fill="#ece6d6"/><path d="M86.6 107 A5.6 5.6 0 0 0 97 109 Q90 110 86.6 107Z" fill="#c9bfa8"/><path d="M87.6 103 Q92 106 96.4 103" stroke="#8a6a3a" stroke-width=".8" fill="none"/><circle cx="90" cy="103.6" r="1.2" fill="#fff" opacity=".8"/>`,
+ "panu":`<path d="M45 33 Q44 17 60 17 Q76 17 75 33 L78.4 48 L72 46.4 L71 31 Q60 25 49 31 L48 46.4 L41.6 48Z" fill="#c8322f"/><path d="M45 33 Q44 17 60 17 Q50 20 49 31 L48 46.4 L41.6 48Z" fill="#8a1e1c" opacity=".6"/><path d="M64 19 Q72 21 73.4 30" stroke="#e05a4a" stroke-width="1.2" fill="none"/><g fill="#f3efe6"><circle cx="52" cy="22" r="1.2"/><circle cx="60" cy="20" r="1.2"/><circle cx="68" cy="22" r="1.2"/><circle cx="45" cy="40" r="1.2"/><circle cx="75" cy="40" r="1.2"/><circle cx="56" cy="25" r=".9"/><circle cx="64" cy="25" r=".9"/></g>`,
+ ...W_PETS, ...W_BG
+};
+ITEMS.forEach(it=>{ if(W_ART[it.id]) it.svg=W_ART[it.id]; });
+
+/* ===== Coach characters: shaded redraws (80x80), each standing on a soft ground shadow ===== */
+const cSv=inner=>`<svg viewBox="0 0 80 80" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+const cGr=(rx=24)=>`<ellipse cx="40" cy="75" rx="${rx}" ry="3.4" fill="#0e0c1f" opacity=".35"/>`;
+const CHAR_ART={
+ pangi:cSv(cGr(28)+`<path d="M62 50 Q76 48 74 32 Q73 24 68 24" stroke="#b8894f" stroke-width="4.6" fill="none"/><path d="M68 24 Q65 22 67 19" stroke="#3a2a1a" stroke-width="4.6" fill="none"/>
+  <path d="M56 58 L58 74 M50 60 L49 74" stroke="#a87a44" stroke-width="5.6"/><path d="M56 73 h4 M47 73 h4" stroke="#8a6034" stroke-width="3"/>
+  <path d="M22 50 Q24 38 42 38 Q60 38 64 48 Q66 58 56 62 H30 Q22 60 22 50Z" fill="#c9a26a"/><path d="M26 58 Q36 62 56 61" stroke="#a87a44" stroke-width="3" fill="none" opacity=".7"/><path d="M34 40 Q48 38 60 44" stroke="#e2c08a" stroke-width="2" fill="none" opacity=".8"/>
+  <path d="M28 58 L27 74 M35 60 L36 74" stroke="#c9a26a" stroke-width="5.6"/><path d="M24 73 h5 M34 73 h5" stroke="#a87a44" stroke-width="3"/>
+  <circle cx="22" cy="36" r="11" fill="#c9a26a"/><path d="M12 40 Q14 47 22 47 Q16 44 15 38Z" fill="#a87a44" opacity=".6"/>
+  <path d="M14 27 Q14 21 19 23 L18 29Z M26 24 Q30 20 31 26 L27 29Z" fill="#c9a26a"/><path d="M15.6 25.6 l1.6 2 M27.6 24.6 l.8 2.4" stroke="#8a6034" stroke-width="1.4"/>
+  <ellipse cx="16" cy="41" rx="6" ry="4.2" fill="#f1e2c4"/><path d="M13 39.4 l2 1.6 2 -1.6Z" fill="#3a2a1a"/><path d="M15 41.6 v2 M12.4 44 q2.6 1.6 5.2 0" stroke="#3a2a1a" stroke-width=".8" fill="none"/>
+  <ellipse cx="19.4" cy="34" rx="2" ry="1.6" fill="#e8c84a"/><ellipse cx="26.4" cy="34" rx="2" ry="1.6" fill="#e8c84a"/><path d="M19.4 33 v2 M26.4 33 v2" stroke="#1a1410" stroke-width="1"/>
+  <path d="M10 42 h-6 M10 43.6 l-5.6 1.6" stroke="#f1e2c4" stroke-width=".5"/>`),
+ choyke:cSv(cGr(18)+`<path d="M32 56 L28 74 M28 74 h-6 M44 56 L48 74 M48 74 h6" stroke="#d9a640" stroke-width="2.6"/>
+  <path d="M18 46 Q18 32 38 30 Q58 30 60 44 Q60 58 40 59 Q22 58 18 46Z" fill="#8a8172"/><path d="M18 46 Q22 58 40 59 Q28 54 26 44Z" fill="#6a6254" opacity=".7"/>
+  <path d="M40 34 Q52 32 58 40 M36 40 Q48 38 56 46 M32 46 Q44 46 52 52" stroke="#a49a88" stroke-width="1.6" fill="none"/><path d="M56 42 Q64 44 64 52 Q60 50 58 48Z" fill="#7a7262"/>
+  <path d="M26 34 Q20 24 22 14 Q23 8 28 8" stroke="#8a8172" stroke-width="5.6" fill="none"/><path d="M24 30 Q20 22 22.4 14" stroke="#a49a88" stroke-width="1.4" fill="none"/>
+  <ellipse cx="30" cy="8.6" rx="5.4" ry="4.2" fill="#8a8172"/><path d="M34.6 8 L41 9.6 L34.6 11Z" fill="#c9a26a"/><circle cx="30.6" cy="7.6" r="1.4" fill="#111"/><circle cx="31" cy="7.2" r=".45" fill="#fff"/>`),
+ rere:cSv(`<rect x="46" y="0" width="17" height="80" fill="#7a5a3c"/><path d="M46 0 V80" stroke="#5a4330" stroke-width="3"/><path d="M51 8 Q55 28 51 48 M58 18 Q56 40 60 70" stroke="#5a4330" stroke-width="1.4" fill="none"/><path d="M60 2 V78" stroke="#9a7a58" stroke-width="1.4"/>
+  <ellipse cx="54" cy="58" rx="3" ry="2" fill="#5a4330"/>
+  <path d="M45 66 Q28 52 32 32 Q36 22 46 25 L46 62Z" fill="#1d1b22"/><path d="M36 34 Q34 48 42 60" stroke="#2c2a33" stroke-width="3" fill="none"/><path d="M38 38 Q42 48 40 58" stroke="#f3efe6" stroke-width="2" fill="none"/>
+  <path d="M44 64 L41 78 M44 64 L46 78" stroke="#1d1b22" stroke-width="3"/><path d="M45 60 l3 -1 M45 63 l3 -1" stroke="#6a6a6a" stroke-width="1.6"/>
+  <circle cx="40" cy="23" r="7.6" fill="#c8322f"/><path d="M35 16 Q39 6 45 15 Q42 13 40 15Z" fill="#c8322f"/><path d="M37 18 Q40 14 43 18" stroke="#e05a4a" stroke-width="1.2" fill="none"/>
+  <path d="M47 23 L56 22.4 L47 25Z" fill="#c9c4bc"/><circle cx="42" cy="21.6" r="1.6" fill="#f3efe6"/><circle cx="42.4" cy="21.6" r=".8" fill="#111"/>`),
+ wakag:cSv(cGr(22)+`<path d="M16 66 Q8 70 12 74 H26 M64 66 Q72 70 68 74 H54" stroke="#2f6f40" stroke-width="5" fill="none"/><path d="M10 74 l-2 2 M14 74 v2.4 M66 74 l2 2 M70 74 v2.4" stroke="#2f6f40" stroke-width="1.6"/>
+  <ellipse cx="40" cy="55" rx="22" ry="15" fill="#3d8a52"/><ellipse cx="44" cy="49" rx="12" ry="5" fill="#5fae6a" opacity=".6"/><ellipse cx="40" cy="62" rx="13" ry="6" fill="#b8d9a8"/>
+  <path d="M24 64 Q20 70 26 72 M56 64 Q60 70 54 72" stroke="#2f6f40" stroke-width="3" fill="none"/>
+  <circle cx="30" cy="38" r="8.4" fill="#3d8a52"/><circle cx="50" cy="38" r="8.4" fill="#3d8a52"/><circle cx="30" cy="37.4" r="4.6" fill="#f3efe6"/><circle cx="50" cy="37.4" r="4.6" fill="#f3efe6"/>
+  <circle cx="30.6" cy="37.6" r="2.4" fill="#111"/><circle cx="50.6" cy="37.6" r="2.4" fill="#111"/><circle cx="31.4" cy="36.6" r=".9" fill="#fff"/><circle cx="51.4" cy="36.6" r=".9" fill="#fff"/>
+  <path d="M28 52 Q40 58 52 52" stroke="#1d3a24" stroke-width="2" fill="none"/><circle cx="26" cy="50" r="1.2" fill="#2f6f40"/><circle cx="58" cy="48" r="1.4" fill="#2f6f40"/><circle cx="48" cy="44" r="1" fill="#2f6f40"/>`),
+ "Tren Tren":cSv(`<defs><linearGradient id="cTT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a8a52"/><stop offset="1" stop-color="#2f5a35"/></linearGradient></defs>
+  <path d="M0 78 Q40 12 80 78Z" fill="url(#cTT)"/><path d="M0 78 Q40 12 40 18 Q26 40 16 78Z" fill="#244a2c" opacity=".55"/><g stroke="#3f6a2d" stroke-width=".8"><path d="M24 60 l-1 -3 M25 60 v-3.4 M56 64 l1 -3 M58 64 v-3"/></g>
+  <path d="M14 74 Q26 58 40 64 Q54 70 57 54 Q59 40 48 36" stroke="#b8862a" stroke-width="8" fill="none"/><path d="M14 74 Q26 58 40 64 Q54 70 57 54 Q59 40 48 36" stroke="#e8b53a" stroke-width="6" fill="none"/>
+  <path d="M15 72 Q26 57 40 62.4 Q53 68 55.6 54" stroke="#f6d77a" stroke-width="1.6" fill="none"/><path d="M14 74 Q26 58 40 64 Q54 70 57 54 Q59 40 48 36" stroke="#8a5a2a" stroke-width="1.8" stroke-dasharray="1.6 5" fill="none"/>
+  <ellipse cx="45" cy="32" rx="8.6" ry="6" fill="#e8b53a"/><ellipse cx="46" cy="30.4" rx="4.4" ry="2.4" fill="#f6d77a" opacity=".8"/><circle cx="43" cy="30" r="1.6" fill="#111"/><circle cx="43.4" cy="29.6" r=".5" fill="#fff"/>
+  <path d="M37 34 l-6 1 m6 -1 l-5 3" stroke="#c8322f" stroke-width="1.3"/>`),
+ "Kay Kay":cSv(`<path d="M24 68 Q18 46 34 40 Q50 34 50 20" stroke="#3a7f92" stroke-width="8.4" fill="none"/><path d="M24 68 Q18 46 34 40 Q50 34 50 20" stroke="#5aa6b8" stroke-width="6.4" fill="none"/><path d="M22 60 Q20 46 33 41 Q47 36 48.4 22" stroke="#9fd2de" stroke-width="1.6" fill="none"/>
+  <path d="M30 52 l-5 -3 4 -2z M33 42 l-3 -5 5 0z M45 33 l1 -6 4 4z" fill="#2f5fd0"/>
+  <ellipse cx="53" cy="17" rx="8.6" ry="6" fill="#5aa6b8"/><ellipse cx="54" cy="15.4" rx="4.4" ry="2.4" fill="#9fd2de" opacity=".8"/><circle cx="55" cy="15" r="1.6" fill="#111"/><circle cx="55.4" cy="14.6" r=".5" fill="#fff"/>
+  <path d="M61 19 l6 1 m-6 -1 l5 3" stroke="#c8322f" stroke-width="1.3"/>
+  <path d="M0 62 Q10 55 20 62 T40 62 T60 62 T80 62 V80 H0Z" fill="#2f5fd0"/><path d="M0 70 Q10 64 20 70 T40 70 T60 70 T80 70 V80 H0Z" fill="#244a9e"/>
+  <path d="M2 63 Q12 57 22 63 T42 63 T62 63 T82 63" stroke="#cfe6f4" stroke-width="1.6" fill="none" opacity=".8"/><circle cx="16" cy="58" r="1.4" fill="#cfe6f4" opacity=".7"/><circle cx="66" cy="57" r="1.2" fill="#cfe6f4" opacity=".7"/>`),
+ "mañke":cSv(cGr(14)+`<path d="M2 46 Q18 26 40 36 Q62 26 78 46 L70 47 L64 43 L58 49 L50 44 L40 52 L30 44 L22 49 L16 43 L10 47Z" fill="#1d1d22"/><path d="M2 46 Q18 26 40 36 Q22 32 10 44Z" fill="#2c2c34"/>
+  <path d="M9 43 Q21 33 35 39 M71 43 Q59 33 45 39" stroke="#e8e8e8" stroke-width="2.4" fill="none"/>
+  <path d="M34 62 L32 74 M46 62 L48 74" stroke="#6a6a6a" stroke-width="2.6"/><path d="M28 74 h6 M46 74 h6" stroke="#6a6a6a" stroke-width="1.8"/>
+  <ellipse cx="40" cy="50" rx="9.4" ry="15" fill="#1d1d22"/><path d="M34 44 Q36 56 40 64" stroke="#2c2c34" stroke-width="2" fill="none"/>
+  <ellipse cx="40" cy="35" rx="9" ry="4.4" fill="#f3efe6"/><path d="M32 35 Q40 39 48 35" stroke="#d6d0c8" stroke-width="1.2" fill="none"/>
+  <circle cx="40" cy="27" r="6.8" fill="#c98a7a"/><path d="M34 26 Q36 21 42 21" stroke="#a86a5c" stroke-width="1.2" fill="none"/><path d="M44.6 24.6 L51 28.6 L44.4 31Z" fill="#e8d6a0"/><path d="M48 27.4 l3 1.2 -2.6 1.4" fill="#3a3030"/>
+  <circle cx="41.6" cy="25.4" r="1.4" fill="#111"/><circle cx="42" cy="25" r=".45" fill="#fff"/>`),
+ "ngürü":cSv(cGr(22)+`<path d="M56 64 Q78 62 72 42 Q70 56 52 58Z" fill="#9a8a78"/><path d="M72 42 Q75 48 71 51 Q72 46 70 44Z" fill="#2a2420"/>
+  <ellipse cx="44" cy="58" rx="16" ry="15" fill="#b8763f"/><path d="M28 58 Q30 72 44 73 Q34 66 34 56Z" fill="#8a5530" opacity=".6"/><ellipse cx="40" cy="60" rx="6.4" ry="9.6" fill="#efe6d6"/>
+  <path d="M34 70 V75 M44 70 V75" stroke="#2a2420" stroke-width="4"/>
+  <path d="M22 30 L23.4 12 L34 25Z M37 25 L44 11 L46.4 29Z" fill="#a85a28"/><path d="M24.6 16.6 L25.4 25 L30 25Z M42 16 L40 25 L44.6 26Z" fill="#2a2420"/>
+  <circle cx="34" cy="35" r="12.6" fill="#c9843f"/><path d="M22 36 Q24 46 34 47.6 Q26 44 24.6 36Z" fill="#9a5a2a" opacity=".5"/>
+  <ellipse cx="28.6" cy="41.4" rx="8.6" ry="5.6" fill="#efe6d6"/><circle cx="21.6" cy="40" r="2.2" fill="#111"/>
+  <path d="M28 33 q2 -1.4 3.6 0 M36 33 q2 -1.4 3.6 0" stroke="#1a1410" stroke-width="1.6" fill="none"/><path d="M25 44.6 q3 1.6 6 0" stroke="#5a3a2a" stroke-width=".9" fill="none"/>`),
+ achawall:cSv(cGr(18)+`<path d="M56 46 Q74 26 70 56 Q64 50 58 52Z" fill="#3a2a1e"/><path d="M60 40 Q70 34 68 50" stroke="#5a4232" stroke-width="2" fill="none"/>
+  <path d="M38 64 L36 74 M47 64 L49 74" stroke="#d9a640" stroke-width="2.6"/><path d="M33 74 h5 M47 74 h5" stroke="#d9a640" stroke-width="1.6"/>
+  <ellipse cx="43" cy="51" rx="19" ry="15" fill="#f3efe6"/><path d="M24 52 Q30 66 46 66 Q32 60 30 48Z" fill="#d9cfc0"/><path d="M36 49 Q46 41 56 51 Q46 58 36 49Z" fill="#d9cfc0"/><path d="M40 50 Q46 46 52 51" stroke="#c4b8a6" stroke-width="1" fill="none"/>
+  <path d="M20 27 q3 -7 6 -1 q3 -7 6 -1 q2 -5 4 1 l-1 3 h-14z" fill="#c8322f"/><path d="M22 27 q2 -4 4 0" stroke="#e05a4a" stroke-width="1" fill="none"/>
+  <circle cx="27" cy="35" r="9.2" fill="#f3efe6"/><path d="M18.6 37 Q20 44 27 44.2 Q22 41 21.6 36Z" fill="#d9cfc0"/>
+  <ellipse cx="22" cy="43.4" rx="2.6" ry="4.2" fill="#c8322f"/><path d="M19 33 L11.6 35.6 L19 38Z" fill="#e8b53a"/><path d="M19 35.6 H13" stroke="#b8862a" stroke-width=".6"/>
+  <circle cx="25" cy="33" r="1.7" fill="#111"/><circle cx="25.4" cy="32.6" r=".5" fill="#fff"/>`),
+ pewen:cSv(cGr(14)+`<g transform="translate(40 76) scale(.66)">${LOF.find(q=>q.id==="pewen").s}</g>`),
+ machi:cSv(cGr(20)+`<path d="M24 78 L30.6 42 Q40 39 49.4 42 L56 78Z" fill="#1d1a24"/><path d="M24 78 L30.6 42 Q34 41 36 41 L32 78Z" fill="#0f0d14" opacity=".7"/><path d="M44 46 L48 78" stroke="#2e2a38" stroke-width="1.2"/>
+  <path d="M29.6 44 Q40 55 50.4 44 L48.4 40.6 Q40 43 31.6 40.6Z" fill="#2f5fd0"/><path d="M31 43.6 Q40 52 49 43.6" stroke="#1f3b7a" stroke-width="1" fill="none"/>
+  <path d="M27 72 Q40 75.4 53 72" stroke="#2f5fd0" stroke-width="2.4" fill="none"/>
+  <g fill="#c3c8d1"><rect x="38.6" y="50" width="2.8" height="10"/><rect x="34" y="60" width="12" height="2.4"/><rect x="36" y="64" width="8" height="2"/></g><path d="M34.6 60.6 h10" stroke="#fff" stroke-width=".6"/>
+  <path d="M36 37.6 H44 V44 Q40 46 36 44Z" fill="#9a6848"/>
+  <circle cx="40" cy="31" r="9.2" fill="#b07a55"/><path d="M31 33 Q32 40 38 41 Q33 38 32.6 32Z" fill="#8a5a3c" opacity=".6"/>
+  <path d="M30 32 Q30 17.6 40 17.6 Q50 17.6 50 32 L48 29 Q40 22 32 29Z" fill="#1d1715"/><path d="M42 19 Q47 20.4 48.4 26" stroke="#4a3e38" stroke-width="1" fill="none"/>
+  <path d="M30.6 25.6 Q40 23.4 49.4 25.6 L49.4 28 Q40 25.8 30.6 28Z" fill="#c3c8d1"/>${[33,37,41,45].map(x=>`<circle cx="${x+1}" cy="29.6" r=".9" fill="#e6e9ee"/>`).join("")}
+  <path d="M34.6 31 q1.6 -1 3 0 M42.4 31 q1.6 -1 3 0" stroke="#1a1410" stroke-width=".9" fill="none"/><circle cx="36.4" cy="32.6" r="1.1" fill="#111"/><circle cx="43.6" cy="32.6" r="1.1" fill="#111"/>
+  <path d="M37 36.4 Q40 38.6 43 36.4" stroke="#5a2e22" stroke-width="1.1" fill="none"/>
+  <path d="M49 46 L58 52" stroke="#1d1a24" stroke-width="5"/><circle cx="58" cy="53" r="2.6" fill="#b07a55"/>
+  <path d="M50 56 Q62 70 74 56" fill="#8a6440"/><ellipse cx="62" cy="56" rx="12" ry="8.6" fill="#e8d6a0"/><ellipse cx="62" cy="56" rx="12" ry="8.6" fill="none" stroke="#7a5a3c" stroke-width="1.4"/>
+  <ellipse cx="64" cy="53.4" rx="6" ry="3.4" fill="#f4e6b8" opacity=".6"/><g stroke="#7a5a3c" stroke-width="1.2"><path d="M62 47.6 V64.4"/><path d="M50.2 56 H73.8"/></g>
+  <g fill="#7a5a3c"><circle cx="57" cy="52" r="1.3"/><circle cx="67" cy="52" r="1.3"/><circle cx="57" cy="60" r="1.3"/><circle cx="67" cy="60" r="1.3"/></g>`)
+};
+CHARS.forEach(c=>{ if(CHAR_ART[c.name]) c.svg=CHAR_ART[c.name]; });
 
 /* --- palin: a match is 10 questions on Experto/Kimche forms; the pali moves one step per answer --- */
 const TEAM_MAX=4, TEAM_PRICE=25;
