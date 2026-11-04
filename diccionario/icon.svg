@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#14122a"/>
+  <!-- open book -->
+  <path d="M256 150 C206 118 140 112 86 124 L86 380 C140 368 206 374 256 404 Z" fill="#f3efe6"/>
+  <path d="M256 150 C306 118 372 112 426 124 L426 380 C372 368 306 374 256 404 Z" fill="#e5dfd2"/>
+  <path d="M256 150 V404" stroke="#14122a" stroke-width="6"/>
+  <!-- stepped diamond (trarikan motif) on the left page -->
+  <g fill="#4fb3a9" shape-rendering="crispEdges" transform="translate(171 262)">
+    <rect x="-6" y="-60" width="12" height="12"/><rect x="-18" y="-48" width="36" height="12"/><rect x="-30" y="-36" width="24" height="12"/><rect x="6" y="-36" width="24" height="12"/>
+    <rect x="-42" y="-24" width="24" height="12"/><rect x="18" y="-24" width="24" height="12"/><rect x="-54" y="-12" width="24" height="24"/><rect x="30" y="-12" width="24" height="24"/>
+    <rect x="-42" y="12" width="24" height="12"/><rect x="18" y="12" width="24" height="12"/><rect x="-30" y="24" width="24" height="12"/><rect x="6" y="24" width="24" height="12"/>
+    <rect x="-18" y="36" width="36" height="12"/><rect x="-6" y="48" width="12" height="12"/>
+  </g>
+  <rect x="165" y="256" width="12" height="12" fill="#c8322f"/>
+  <!-- lines of text on the right page -->
+  <g stroke="#14122a" stroke-width="10" stroke-linecap="round" opacity=".55">
+    <path d="M296 196 H390"/><path d="M296 236 H372"/><path d="M296 276 H390"/><path d="M296 316 H360"/>
+  </g>
+  <!-- red bookmark -->
+  <path d="M352 112 V178 L366 166 L380 178 V112 Z" fill="#c8322f"/>
+</svg>

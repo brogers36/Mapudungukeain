@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#14122a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nemülkawe">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tañi Nemülkawe</title>
+<meta name="description" content="Diccionario interactivo mapudungun, español e inglés, con juegos de vocabulario. Compañero del juego Mapudungukeaiñ Fill Püle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Same wool-and-textile identity as the game, so the two read as one family. */
+:root{
+  --ground:#14122a; --panel:#1f1c3d; --panel-2:#2a2652; --ink:#f3efe6; --muted:#a9a3c8;
+  --red:#c8322f; --red-soft:#e05a4f; --good:#3fa86b; --gold:#e8b53a; --teal:#4fb3a9;
+  --display:"Alfa Slab One", Rockwell, "Roboto Slab", Georgia, serif;
+  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{height:22px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));background-color:var(--teal);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' shape-rendering='crispEdges'%3E%3Cg fill='%2314122a'%3E%3Crect x='20' y='2' width='4' height='2'/%3E%3Crect x='16' y='4' width='12' height='2'/%3E%3Crect x='12' y='6' width='8' height='2'/%3E%3Crect x='24' y='6' width='8' height='2'/%3E%3Crect x='8' y='8' width='8' height='2'/%3E%3Crect x='28' y='8' width='8' height='2'/%3E%3Crect x='4' y='10' width='8' height='2'/%3E%3Crect x='32' y='10' width='8' height='2'/%3E%3Crect x='8' y='12' width='8' height='2'/%3E%3Crect x='28' y='12' width='8' height='2'/%3E%3Crect x='12' y='14' width='8' height='2'/%3E%3Crect x='24' y='14' width='8' height='2'/%3E%3Crect x='16' y='16' width='12' height='2'/%3E%3Crect x='20' y='18' width='4' height='2'/%3E%3C/g%3E%3Cg fill='%23f3efe6'%3E%3Crect x='20' y='10' width='4' height='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:repeat-x;background-position:center}
+.wrap{max-width:620px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:clamp(1.9rem,8vw,2.6rem);line-height:1.05}
+h1 small{display:block;font-family:var(--body);font-weight:700;font-size:.95rem;color:var(--muted);letter-spacing:0;margin-top:6px}
+h2{font-size:1.5rem;line-height:1.1} h3{font-size:1.15rem}
+p{margin:0}
+a{color:var(--gold)}
+button{font-family:var(--body)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font-size:.76rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lang{display:flex;border:1.5px solid var(--panel-2);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--muted);font:700 .85rem var(--body);padding:6px 12px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.purse{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:2px solid var(--panel-2);border-radius:999px;padding:4px 12px 4px 8px;font-weight:700;font-variant-numeric:tabular-nums}
+.nut{width:18px;height:18px;flex:none;vertical-align:-3px}
+.btn{background:var(--red);color:var(--ink);border:0;border-radius:6px;padding:12px 18px;font:700 1rem var(--body);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn:hover{background:var(--red-soft)}
+.btn.ghost{background:transparent;border:2px solid var(--panel-2);color:var(--muted)}
+.btn.ghost:hover{border-color:var(--muted);color:var(--ink)}
+.btn.sm{padding:7px 12px;font-size:.88rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.back{all:unset;cursor:pointer;color:var(--muted);font-weight:700;font-size:.9rem}
+.back:hover{color:var(--ink)}
+/* search */
+.search{position:relative}
+.search input{width:100%;background:var(--panel);border:2px solid var(--panel-2);border-radius:10px;color:var(--ink);font:400 1.15rem var(--body);padding:14px 44px 14px 16px}
+.search input:focus{outline:none;border-color:var(--gold)}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.search .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:6px}
+.hint{font-size:.85rem;color:var(--muted)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;background:var(--panel);border:1.5px solid var(--panel-2);border-radius:999px;padding:5px 11px;font-size:.88rem}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+/* lists */
+.list{display:flex;flex-direction:column}
+.res{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;align-items:baseline;padding:10px 4px;border-bottom:1px solid var(--panel-2)}
+.res:hover{background:var(--panel)}
+.res .w{font-family:var(--display);font-size:1.12rem;line-height:1.15;flex:none;max-width:48%;overflow-wrap:anywhere}
+.res .g{color:var(--muted);font-size:.93rem;min-width:0}
+.res .tag{margin-left:auto;flex:none;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--panel-2);border-radius:4px;padding:1px 5px}
+.res .tag.core{color:var(--teal);border-color:var(--teal)}
+.sect{margin-top:6px}
+.empty{background:var(--panel);border-radius:8px;padding:14px;color:var(--muted)}
+/* analysis */
+.ana{background:var(--panel);border-left:4px solid var(--teal);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.seg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem}
+.seg span{display:inline-block;border-radius:4px;padding:1px 4px;margin:1px;background:var(--panel-2)}
+.seg span.root{background:var(--teal);color:var(--ground);font-weight:700}
+/* entry */
+.entry-h{display:flex;flex-direction:column;gap:6px}
+.entry-h h2{font-size:clamp(2rem,9vw,2.8rem);overflow-wrap:anywhere}
+.other-g{font-size:.88rem;color:var(--muted)}
+.pos{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.gl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;background:var(--panel);border-radius:8px;padding:14px}
+.gl dt{font-weight:700;color:var(--muted);font-size:.85rem;padding-top:2px}
+.gl dd{margin:0;font-size:1.08rem}
+.status{display:inline-block;font-size:.72rem;font-weight:700;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.status.draft{background:#3b2f14;color:var(--gold)}
+.status.ok{background:#173524;color:#8fe0ad}
+.box{background:var(--panel);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.box h3{font-size:1rem}
+.aug{font-size:.95rem;line-height:1.5}
+.aug .sense{display:block;margin-top:6px}
+.forms{display:flex;flex-wrap:wrap;gap:6px}
+.forms button{all:unset;cursor:pointer;background:var(--panel-2);border-radius:6px;padding:4px 9px;font-size:.92rem}
+.star{all:unset;cursor:pointer;font-size:1.5rem;line-height:1;color:var(--muted)}
+.star[aria-pressed="true"]{color:var(--gold)}
+.pic{font-size:3rem;line-height:1}
+/* hub */
+.hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:560px){.hub{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{all:unset;box-sizing:border-box;cursor:pointer;background:var(--panel);border:2px solid var(--panel-2);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:3px;min-height:76px;min-width:0}
+.card:hover:not([disabled]){border-color:var(--gold)}
+.card[disabled]{opacity:.45;cursor:default}
+.card b{font-family:var(--display);font-weight:400;font-size:1.08rem;line-height:1.15}
+.card small{color:var(--muted);font-size:.8rem}
+.card .ic{font-size:1.5rem;line-height:1}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+/* games */
+.hud{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.prog{height:8px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--gold);transition:width .25s}
+.prompt{background:var(--panel);border-radius:10px;padding:22px 16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}
+.prompt .big{font-family:var(--display);font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.1;overflow-wrap:anywhere}
+.prompt .sub{color:var(--muted)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.opts.long{grid-template-columns:1fr}}
+.opt{background:var(--panel-2);color:var(--ink);border:2px solid transparent;border-radius:8px;padding:12px 10px;min-height:64px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;font:400 1.05rem var(--body);overflow-wrap:anywhere}
+.opt.mapu{font-family:var(--display);font-size:1.2rem}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt.ok{background:var(--good);border-color:var(--good)}
+.opt.bad{background:var(--red);border-color:var(--red)}
+.opt.sel{border-color:var(--gold)}
+.opt.gone{visibility:hidden}
+.opt:disabled{cursor:default}
+.fb{min-height:1.6em;text-align:center;font-weight:700}
+.fb.ok{color:#8fe0ad} .fb.bad{color:var(--red-soft)}
+.flip{perspective:900px;cursor:pointer}
+.flip .face{background:var(--panel);border-radius:12px;min-height:200px;padding:22px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.typein{display:flex;gap:8px}
+.typein input{flex:1;min-width:0;background:var(--panel);border:2px solid var(--panel-2);border-radius:8px;color:var(--ink);font:400 1.2rem var(--body);padding:12px}
+.typein input:focus{outline:none;border-color:var(--gold)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:52px}
+.tile{background:var(--panel-2);color:var(--ink);border:2px solid transparent;border-radius:8px;padding:10px 14px;font:700 1.1rem ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+.tile.root{border-color:var(--teal)}
+.slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:56px;background:var(--panel);border-radius:10px;padding:10px;border:2px dashed var(--panel-2)}
+.gain{font-family:var(--display);font-size:1.5rem;color:var(--gold);display:inline-flex;align-items:center;gap:6px}
+.gain .nut{width:26px;height:26px}
+.note{font-size:.85rem;color:var(--muted);border-top:1px solid var(--panel-2);padding-top:12px}
+.seg-pick{display:flex;flex-direction:column;gap:6px}
+footer{font-size:.8rem;color:var(--muted);text-align:center;padding-top:10px}
+#pwaInstall{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--red);color:var(--ink);border:0;border-radius:999px;padding:12px 18px;font:700 1rem var(--body);box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<main class="wrap" id="app" aria-live="polite"><p class="muted">Cargando el diccionario…</p></main>
+<div class="band" aria-hidden="true"></div>
+<button id="pwaInstall" hidden>Instalar la app</button>
+<script src="datos.js"></script>
+<script>
+"use strict";
+/* ===== Storage: the game's keys (mpk_) are shared on purpose: language, grafemario and ngülliw carry over between
+   the two apps, which live on the same site. Dictionary-only state uses the mpd_ prefix. ===== */
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let lang=ld("mpk_lang","es")==="en"?"en":"es";
+let graf=["uni","azu","rag"].includes(ld("mpk_graf","uni"))?ld("mpk_graf","uni"):"uni";
+let saved=ld("mpd_saved",[]), srs=ld("mpd_srs",{}), stats=ld("mpd_stats",{});
+const nuts=()=>ld("mpk_nuts",0)||0;
+const addNuts=n=>{ if(n>0) sv("mpk_nuts",nuts()+n); };
+const L=(es,en)=>lang==="es"?es:en;
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const NUT=`<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
+const GAME_URL="../";
+
+/* ===== Grafemarios: words are stored in Unificado and shown in the reader's chosen grafemario (same rules as the game) ===== */
+const GRAF_NAME={uni:"Unificado",azu:"Azümchefe",rag:"Ragileo"};
+const GRAF_MAP={azu:{ng:"g",g:"q",d:"z",tr:"tx"},rag:{ng:"g",g:"q",d:"z",tr:"x",ch:"c",ll:"j","ü":"v",sh:"s"}};
+const inG=(k,s)=>{ if(s==null||k==="uni") return s; const m=GRAF_MAP[k];
+  return String(s).replace(/ng|tr|ch|ll|sh|[gdü]/gi,x=>{const lo=x.toLowerCase(),r=m[lo]; if(r==null) return x;
+    if(x!==lo&&x===x.toUpperCase()) return r.toUpperCase(); if(x[0]!==lo[0]) return r[0].toUpperCase()+r.slice(1); return r;});};
+const G=s=>inG(graf,s);
+/* Search key: every grafemario folds to the Ragileo spelling (one letter per sound), accents removed. */
+const fold=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u0302\u0304-\u0307\u0309-\u036f]/g,"").normalize("NFC")
+  .replace(/ḻ/g,"l").replace(/ṉ/g,"n").replace(/ṯ/g,"t").replace(/[’'`]/g,"");
+const keyUni=s=>inG("rag",fold(s));
+function guessSys(q){ q=fold(q);
+  if(/tx|z|q|lh|nh|th/.test(q)) return "azu";
+  if(/(^|[^n])g[aeiouü]/.test(q)) return "azu";   /* in Unificado g only ends a syllable; before a vowel it is the ng of Azümchefe or Ragileo */
+  if(/x|c(?!h)|j|v/.test(q)) return "rag";
+  return "uni"; }
+function keyQuery(q){ q=fold(q); const s=guessSys(q);
+  if(s==="rag") return q;
+  if(s==="azu") return q.replace(/tx/g,"x").replace(/lh/g,"l").replace(/nh/g,"n").replace(/th/g,"t").replace(/ch/g,"c").replace(/ll/g,"j").replace(/sh/g,"s").replace(/ü/g,"v");
+  return inG("rag",q); }
+const plain=s=>fold(s).replace(/ü/g,"u").replace(/ñ/g,"n");
+
+/* ===== Data ===== */
+const D=window.DICC||{core:[],aug:[],build:[]};
+const CORE=D.core, AUG=D.aug, BUILD=D.build;
+const BYID=new Map(); CORE.forEach(e=>BYID.set(e.id,e)); AUG.forEach(e=>BYID.set(e.id,e));
+const AUGBYH=new Map(AUG.map(e=>[e.h,e]));
+CORE.forEach(e=>{ e._k=keyUni(e.m); e._es=plain(e.es); e._en=plain(e.en); });
+AUG.forEach(e=>{ e._k=keyUni(e.h); e._r=keyUni(e.r); e._s=plain(e.s); e._d=null; e._en=plain(e.en); });
+const THEMES=[
+ ["saludos","Saludos","Greetings","👋"],["pron","Pronombres","Pronouns","🙋"],["fam","Familia y personas","Family and people","👪"],
+ ["cuerpo","El cuerpo","The body","✋"],["num","Números","Numbers","🔢"],["color","Colores","Colors","🎨"],["anim","Animales","Animals","🦊"],
+ ["nat","Tierra y cielo","Land and sky","🌄"],["plant","Plantas","Plants","🌿"],["comida","Comida","Food","🍲"],["casa","La casa","The home","🏠"],
+ ["ropa","La ropa","Clothing","🧣"],["verb","Acciones","Actions","🏃"],["desc","Cómo son","Descriptions","✨"],["tiempo","El tiempo","Time","🗓"],
+ ["lugar","Dónde","Place","📍"],["preg","Preguntas","Questions","❓"],["cult","Cultura","Culture","🪘"],["sent","Mente y sentir","Mind and feeling","💭"],
+ ["func","Palabras pequeñas","Little words","🔗"],["frases","Frases del juego","Phrases from the game","💬"]];
+const THEME=Object.fromEntries(THEMES.map(t=>[t[0],t]));
+const themeName=k=>THEME[k]?L(THEME[k][1],THEME[k][2]):k;
+const POSN={v:["verbo","verb"],s:["sustantivo","noun"],adj:["adjetivo","adjective"],adv:["adverbio","adverb"],pron:["pronombre","pronoun"],
+  det:["determinante","determiner"],part:["partícula","particle"],posp:["posposición","postposition"],interj:["interjección","interjection"],
+  num:["numeral","numeral"],suf:["sufijo","suffix"],conj:["conjunción","conjunction"]};
+const posName=p=>POSN[p]?L(POSN[p][0],POSN[p][1]):"";
+const head=e=>e.m||e.h;
+const gloss=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:e.s);
+const statusChip=e=>e.st===1?`<span class="status ok">${L("Revisado","Reviewed")}</span>`:`<span class="status draft">${L("Sin revisar","Not yet reviewed")}</span>`;
+
+/* Learner-facing names for the parser's morpheme glosses */
+const GLAB={NEG:["negación","negation"],NRLD:["futuro","future"],"SUBJ.FIN":["persona","person"],SUBJ:["persona","person"],NUM:["número","number"],
+  DIR:["objeto (3.ª persona)","object (3rd person)"],OBJ:["objeto","object"],INV:["inverso (alguien a mí/ti)","inverse (someone to me/you)"],CF:["habitual","habitual"],
+  IPD:["pasado interrumpido","interrupted past"],STAT:["estado, en curso","state, ongoing"],REST:["de nuevo","again"],RET:["regreso","return"],PERSIST:["persistencia (ya no, todavía)","persistive (no longer, still)"],
+  PASS:["pasiva","passive"],HITHER:["hacia acá","hither"],THITHER:["hacia allá","thither"],TRANS:["transitivizador","transitivizer"],VBLZ:["verbalizador","verbalizer"],
+  REFL:["reflexivo, recíproco","reflexive, reciprocal"],CAUS:["causativo","causative"],REPORT:["dicen que","reportative"],PROX:["recién","just now"],
+  "PROG.PERS":["continuativo","continuative"],FORCE:["obligación","obligation"],AFF:["de veras","really"],EXP:["experimentante","experiencer"],
+  "MOOD/NMLZ":["forma no finita","non-finite form"],POSS:["posesivo","possessive"],PL:["plural","plural"],ROOT:["raíz","root"]};
+const lab=g=>GLAB[g]?L(GLAB[g][0],GLAB[g][1]):g;
+
+/* ===== Parser in a Web Worker, loaded only when a search needs it (the engine is about 2 MB) ===== */
+let worker=null, wseq=0; const wwait=new Map();
+function analyse(word,sys){ return new Promise(res=>{
+  try{ if(!worker){ worker=new Worker("worker.js"); worker.onmessage=ev=>{const f=wwait.get(ev.data.id); if(f){wwait.delete(ev.data.id); f(ev.data.r);}}; worker.onerror=()=>{ wwait.forEach(f=>f(null)); wwait.clear(); }; }
+    const id=++wseq; wwait.set(id,res); worker.postMessage({id,word,sys}); setTimeout(()=>{ if(wwait.has(id)){wwait.delete(id);res(null);} },20000);
+  }catch(e){ res(null); } }); }
+
+/* ===== Router ===== */
+const app=document.getElementById("app");
+function go(h){ if(location.hash===h) route(); else location.hash=h; }
+window.addEventListener("hashchange",route);
+function route(){
+  const h=decodeURIComponent(location.hash.slice(1)||"/"), p=h.split("/").filter(Boolean);
+  window.scrollTo(0,0);
+  if(!p.length) return home();
+  if(p[0]==="e") return entry(p.slice(1).join("/"));
+  if(p[0]==="temas") return p[1]?themeList(p[1]):themes();
+  if(p[0]==="guardadas") return savedList();
+  if(p[0]==="juegos") return games();
+  if(p[0]==="jugar") return play(p[1],p[2]||"all",p[3]||"m");
+  if(p[0]==="acerca") return about();
+  return home();
+}
+function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
+function topBar(){ return `<div class="ctl"><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
+function bindCommon(){
+  app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{ lang=b.dataset.l; sv("mpk_lang",lang); document.documentElement.lang=lang; route(); });
+  app.querySelectorAll("[data-go]").forEach(b=>b.onclick=ev=>{ ev.preventDefault(); go(b.dataset.go); });
+  app.querySelectorAll("[data-graf]").forEach(b=>b.onclick=()=>{ graf=b.dataset.graf; sv("mpk_graf",graf); route(); });
+}
+const grafPicker=()=>`<div class="chips" role="group" aria-label="${L("Grafemario","Grafemario")}">${Object.entries(GRAF_NAME).map(([k,n])=>`<button class="chip" data-graf="${k}" aria-pressed="${graf===k}">${n}</button>`).join("")}</div>`;
+
+/* ===== Home and search ===== */
+let lastQ="";
+function home(){
+  const nSaved=saved.length, due=dueCards(CORE.filter(e=>!e.ph)).length;
+  app.innerHTML=`
+    <div class="top"><div><p class="eyebrow">${L("Diccionario mapudungun · español · inglés","Mapudungun · Spanish · English dictionary")}</p>
+      <h1>Tañi Nemülkawe<small>Yeniekeafiel ñi Kewün Fill Püle</small></h1></div>${topBar()}</div>
+    <div class="search" role="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="${L("Busca en mapudungun, español o inglés","Search in Mapudungun, Spanish or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
+      <button class="clr" id="clr" aria-label="${L("Borrar","Clear")}" ${lastQ?"":"hidden"}>×</button></div>
+    <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work.")}</p>
+    <div id="out"></div>
+    <div id="hubwrap">
+      <nav class="hub" aria-label="${L("Secciones","Sections")}">
+        <button class="card" data-go="#/juegos"><span class="ic">🎲</span><b>${L("Juegos","Games")}</b><small>${L("Practica el vocabulario y gana ngülliw","Practise vocabulary and earn ngülliw")}</small></button>
+        <button class="card" data-go="#/temas"><span class="ic">🗂</span><b>${L("Temas","Topics")}</b><small>${L(`${CORE.length} palabras y frases`,`${CORE.length} words and phrases`)}</small></button>
+        <button class="card" data-go="#/guardadas"><span class="ic">⭐</span><b>${L("Mis palabras","My words")}</b><small>${nSaved?L(`${nSaved} guardadas · ${due} para repasar`,`${nSaved} saved · ${due} to review`):L("Guarda palabras con ☆","Save words with ☆")}</small></button>
+        <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>Mapudungukeaiñ Fill Püle</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
+        <button class="card" data-go="#/acerca"><span class="ic">📖</span><b>${L("Acerca","About")}</b><small>${L("Fuentes y cómo usarlo","Sources and how to use it")}</small></button>
+      </nav>
+      <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
+        <p class="hint">${L("Elige cómo ver las palabras. Es el mismo ajuste del juego.","Choose how words are shown. It is the same setting as the game.")}</p></div>
+    </div>
+    <footer>${L(`${CORE.length} entradas del núcleo · ${AUG.length.toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${AUG.length.toLocaleString("en")} Augusta entries`)}</footer>`;
+  bindCommon();
+  const q=document.getElementById("q"), clr=document.getElementById("clr");
+  let t=null; q.oninput=()=>{ clr.hidden=!q.value; clearTimeout(t); t=setTimeout(()=>{ lastQ=q.value; search(q.value); },140); };
+  clr.onclick=()=>{ q.value=""; lastQ=""; clr.hidden=true; search(""); q.focus(); };
+  if(lastQ) search(lastQ);
+}
+let searchSeq=0;
+function search(q){
+  const out=document.getElementById("out"), hub=document.getElementById("hubwrap"); const my=++searchSeq;
+  q=q.trim(); if(!q){ out.innerHTML=""; hub.hidden=false; return; }
+  hub.hidden=true;
+  const k=keyQuery(q), pq=plain(q), score=[];
+  const wordRe=new RegExp("(^|[^a-z])"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
+  for(const e of CORE){ let s=0;
+    if(e._k===k) s=100; else if(e._k.startsWith(k)) s=70-Math.min(20,e._k.length-k.length);
+    if(pq.length>1){ if(wordRe.test(e._es)||wordRe.test(e._en)) s=Math.max(s,60); else if(pq.length>3&&(e._es.includes(pq)||e._en.includes(pq))) s=Math.max(s,40); }
+    if(s) score.push([s+5,e]); }
+  for(const e of AUG){ let s=0;
+    if(e._k===k||e._r===k) s=95; else if(e._k.startsWith(k)) s=55-Math.min(20,e._k.length-k.length);
+    if(pq.length>2&&!s){ const lead=new RegExp("^(el |la |los |las |un |una )?"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b");
+      if(lead.test(e._s)||(e.en&&lead.test(e._en))) s=50; else if(wordRe.test(e._s)) s=35; else if(e.en&&wordRe.test(e._en)) s=35; }
+    if(s) score.push([s+Math.min(4,Math.log10(1+(e.f||0))),e]); }
+  score.sort((a,b)=>b[0]-a[0]);
+  const exact=score.some(([s,e])=>s>=95);
+  const top=score.slice(0,60).map(x=>x[1]);
+  const coreR=top.filter(e=>e.m!=null), augR=top.filter(e=>e.m==null);
+  let html=`<div id="ana"></div>`;
+  if(coreR.length) html+=`<p class="eyebrow sect">${L("Núcleo","Core")}</p><div class="list">${coreR.map(resRow).join("")}</div>`;
+  if(augR.length) html+=`<p class="eyebrow sect">${L("Diccionario de Augusta (1916)","Augusta's dictionary (1916)")}</p><div class="list">${augR.map(resRow).join("")}</div>`;
+  const none=`<div class="empty">${L("No hay entradas que coincidan.","No matching entries.")}</div>`;
+  const oneWord=/^[^\s\d]{3,}$/.test(q)&&!/[áéíóú]/.test(q);
+  if(!top.length&&!oneWord) html+=none;
+  out.innerHTML=html; bindRes(out);
+  if(oneWord&&!exact){
+    /* the analysis is shown only when it leads to a root that is in the dictionary, so Spanish or English words typed
+       into the box don't produce a spurious Mapudungun parse */
+    const ana=document.getElementById("ana"); ana.innerHTML=`<p class="hint">${L("Analizando la palabra…","Analysing the word…")}</p>`;
+    analyse(q.toLowerCase(),guessSys(q)).then(r=>{ if(my!==searchSeq) return; const h=anaHTML(r,q); ana.innerHTML=h||(top.length?"":none); bindRes(ana); });
+  }
+}
+function resRow(e){ const core=e.m!=null;
+  return `<button class="res" data-id="${esc(e.id)}"><span class="w">${esc(G(head(e)))}</span><span class="g">${esc(gloss(e))}</span>${core?`<span class="tag core">${L("núcleo","core")}</span>`:""}</button>`; }
+function bindRes(root){ root.querySelectorAll(".res,[data-id]").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id))); }
+function entriesForRoot(root){
+  const k=keyUni(root), out=[];
+  CORE.forEach(e=>{ if(!e.ph&&(e._k===k||e._k===k+"n"||e._k===k+"vn")) out.push(e); });
+  AUG.forEach(e=>{ if(e._r===k||e._k===k) out.push(e); });
+  return out.slice(0,8); }
+function anaHTML(r,q){
+  if(!r||!r.root) return "";
+  const parts=[r.root].concat(r.morphs||[]);
+  if(parts.length<2&&!r.mean) return "";
+  const hits=entriesForRoot(r.root);
+  if(!hits.length) return "";
+  const segH=`<span class="root">${esc(G(r.root))}</span>`+(r.morphs||[]).map((m,i)=>`<span title="${esc(lab(r.gl[i]||""))}">${esc(G(m))}</span>`).join("");
+  const labels=(r.gl||[]).filter(Boolean).map(lab).join(" · ");
+  return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
+    <div class="seg">${segH}</div>
+    ${labels?`<p class="hint">${esc(labels)}</p>`:""}
+    ${r.mean?`<p>${L("Significado aproximado: ","Approximate meaning (Spanish): ")}«${esc(r.mean)}»</p>`:""}
+    ${hits.length?`<p class="hint">${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:</p><div class="list">${hits.map(resRow).join("")}</div>`
+      :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
+    <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
+
+/* ===== Entry ===== */
+function augHTML(e){ return esc(e.d).split(" | ").map((s,i)=>`<span class="sense">${i?"• ":""}${s}</span>`).join(""); }
+function entry(id){
+  const e=BYID.get(id); if(!e){ app.innerHTML=`<p class="empty">${L("No se encontró la entrada.","Entry not found.")}</p><button class="btn ghost" data-go="#/">${L("Inicio","Home")}</button>`; return bindCommon(); }
+  const core=e.m!=null, hw=head(e), isSaved=saved.includes(e.id);
+  const others=Object.keys(GRAF_NAME).filter(k=>k!==graf).map(k=>`${GRAF_NAME[k]}: <b>${esc(inG(k,hw))}</b>`).join(" · ");
+  const a=core&&e.a?AUGBYH.get(e.a):(!core?e:null);
+  const linkedCore=!core?CORE.filter(c=>c.a===e.h):[];
+  const rootK=keyUni(core?(e.p==="v"?hw.replace(/(?<=[aeiou])n$|ün$/,""):hw):e.r);
+  const forms=BUILD.filter(b=>keyUni(b.m[0])===rootK).slice(0,12);
+  app.innerHTML=`
+    <div class="top"><button class="back" data-go="#/">← ${L("Buscar","Search")}</button>${topBar()}</div>
+    <div class="entry-h">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap">
+        <div><p class="pos">${esc([posName(e.p),core&&e.t?themeName(e.t):""].filter(Boolean).join(" · "))||"&nbsp;"}</p><h2>${esc(G(hw))}</h2></div>
+        <div class="row" style="flex-wrap:nowrap">${e.pic?`<span class="pic" aria-hidden="true">${esc(e.pic)}</span>`:""}
+          <button class="star" id="star" aria-pressed="${isSaved}" aria-label="${L("Guardar en Mis palabras","Save to My words")}">${isSaved?"★":"☆"}</button></div>
+      </div>
+      <p class="other-g">${others}</p>
+    </div>
+    ${core?`<dl class="gl"><dt>ES</dt><dd>${esc(e.es)}</dd><dt>EN</dt><dd>${esc(e.en||"—")}</dd></dl>
+      <p class="hint">${statusChip(e)} ${e.o==="juego"?L(`En el juego: ${esc(e.src)}`,`In the game: ${esc(e.src)}`):L("Palabra frecuente en el habla (corpus AVENUE)","Frequent word in speech (AVENUE corpus)")}</p>`
+      :`<dl class="gl"><dt>ES</dt><dd>${esc(e.s)}</dd><dt>EN</dt><dd>${e.en?esc(e.en):`<span class="muted">${L("Traducción al inglés pendiente","English translation pending")}</span>`}</dd></dl>`}
+    ${linkedCore.length?`<div class="box"><h3>${L("En el núcleo","In the core")}</h3><div class="list">${linkedCore.map(resRow).join("")}</div></div>`:""}
+    ${a?`<div class="box"><h3>${L("Augusta (1916)","Augusta (1916)")} · <span class="muted" style="font-family:var(--body);font-size:.85rem">${esc(G(a.h))}</span>${core?"":" "+statusChip(e)}</h3>
+      <div class="aug">${augHTML(a)}</div>
+      <p class="hint">${L("Texto de Augusta en la edición digital en Unificado. El español es de 1916 y algunos usos han cambiado.","Augusta's text from the digital edition in Unificado. The Spanish dates from 1916 and some usages have changed.")}</p></div>`:""}
+    ${forms.length?`<div class="box"><h3>${L("Formas para armar","Forms to build")}</h3><div class="forms">${forms.map((b,i)=>`<button data-f="${i}">${esc(G(b.w))}</button>`).join("")}</div><div id="fout"></div></div>`:""}
+    <div class="row"><button class="btn" id="prac">${L("Practicar esta palabra","Practise this word")}</button></div>`;
+  bindCommon(); bindRes(app.querySelector(".box")||document.createElement("div"));
+  app.querySelectorAll(".box .res").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id)));
+  document.getElementById("star").onclick=()=>{ toggleSave(e.id); entry(id); };
+  app.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ const f=forms[+b.dataset.f];
+    document.getElementById("fout").innerHTML=`<p class="seg" style="margin-top:8px">${f.m.map((m,i)=>`<span class="${i?"":"root"}" title="${esc(lab(f.g[i]))}">${esc(G(m))}</span>`).join("")}</p>
+      <p class="hint">${esc(f.g.slice(1).map(lab).join(" · "))}</p><p>«${esc(lang==="es"?f.es:f.en)}» <span class="muted">(${L("traducción aproximada","approximate translation")})</span></p>`; });
+  document.getElementById("prac").onclick=()=>{ if(!saved.includes(e.id)) toggleSave(e.id); go("#/jugar/tarjetas/guardadas/m"); };
+}
+function toggleSave(id){ const i=saved.indexOf(id); if(i>=0) saved.splice(i,1); else saved.push(id); sv("mpd_saved",saved); }
+
+/* ===== Topics, saved words ===== */
+function themes(){
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
+    <h2>${L("Temas","Topics")}</h2>
+    <div class="themes">${THEMES.map(([k,es,en,ic])=>{ const n=CORE.filter(e=>e.t===k).length; return n?`<button class="card" data-go="#/temas/${k}"><span class="ic">${ic}</span><b>${esc(L(es,en))}</b><small>${n} ${L("entradas","entries")}</small></button>`:""; }).join("")}</div>`;
+  bindCommon(); }
+function themeList(k){
+  const list=CORE.filter(e=>e.t===k);
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/temas">← ${L("Temas","Topics")}</button>${topBar()}</div>
+    <h2>${esc(themeName(k))}</h2>
+    ${k!=="frases"?`<div class="row"><button class="btn sm" data-go="#/jugar/elige/${k}/m">${L("Jugar con este tema","Play with this topic")}</button></div>`:""}
+    <div class="list">${list.map(resRow).join("")}</div>`;
+  bindCommon(); bindRes(app.querySelector(".list")); }
+function savedList(){
+  const list=saved.map(id=>BYID.get(id)).filter(Boolean);
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
+    <h2>${L("Mis palabras","My words")}</h2>
+    ${list.length?`<div class="row"><button class="btn sm" data-go="#/jugar/tarjetas/guardadas/m">${L("Repasar con tarjetas","Review with flashcards")}</button>
+      ${list.length>=4?`<button class="btn sm ghost" data-go="#/jugar/elige/guardadas/m">${L("Elige","Pick")}</button>`:""}</div>
+      <div class="list">${list.map(resRow).join("")}</div>`
+      :`<div class="empty">${L("Todavía no guardas palabras. Abre una entrada y toca ☆.","You haven't saved any words yet. Open an entry and tap ☆.")}</div>`}`;
+  bindCommon(); const l=app.querySelector(".list"); if(l) bindRes(l); }
+
+/* ===== Spaced repetition (Leitner boxes) ===== */
+const DAY=86400000, IVL=[0,DAY,3*DAY,7*DAY,16*DAY,35*DAY];
+const dueCards=list=>list.filter(e=>{ const s=srs[e.id]; return saved.includes(e.id)&&(!s||s.due<=Date.now()); });
+function grade(id,ok){ const s=srs[id]||{b:0,due:0}; s.b=ok?Math.min(5,s.b+1):1; s.due=Date.now()+IVL[s.b]; srs[id]=s; sv("mpd_srs",srs); }
+
+/* ===== Games ===== */
+const GAMES=[
+ ["tarjetas","🃏","Tarjetas","Flashcards","Repaso espaciado de tus palabras","Spaced review of your words"],
+ ["elige","🎯","Elige","Pick","Diez preguntas de opción múltiple","Ten multiple-choice questions"],
+ ["parejas","🧩","Parejas","Pairs","Une cada palabra con su significado","Match each word to its meaning"],
+ ["escribe","⌨️","Escribe","Spell it","Escribe la palabra en mapudungun","Type the word in Mapudungun"],
+ ["grafemarios","🔤","Grafemarios","Grafemarios","La misma palabra en otro grafemario","The same word in another grafemario"],
+ ["arma","🧱","Arma la palabra","Build the word","Ordena raíz y sufijos","Put root and suffixes in order"]];
+function pool(set){
+  let p=CORE.filter(e=>!e.ph);
+  if(set==="guardadas") p=saved.map(id=>BYID.get(id)).filter(e=>e&&(e.m!=null?!e.ph:true));
+  else if(set==="frases") p=CORE.filter(e=>e.t==="frases");
+  else if(set!=="all") p=p.filter(e=>e.t===set);
+  return p; }
+let gSet="all", gDir="m";
+function games(){
+  const sets=[["all",L("Todo el núcleo","Whole core")],["guardadas",L("Mis palabras","My words")]].concat(THEMES.filter(t=>CORE.some(e=>e.t===t[0])).map(t=>[t[0],L(t[1],t[2])]));
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
+    <h2>${L("Juegos","Games")}</h2>
+    <p>${L("Cada respuesta correcta vale 1 ngülliw. Los ngülliw se suman a los del juego, así que puedes gastarlos en el vestuario.","Each correct answer is worth 1 ngülliw. They are added to the game's, so you can spend them in the wardrobe.")}</p>
+    <div class="box"><p class="eyebrow">${L("Palabras","Words")}</p>
+      <label class="hint" for="gset">${L("Elige un tema o tus palabras guardadas","Choose a topic or your saved words")}</label>
+      <select id="gset" style="background:var(--panel-2);color:var(--ink);border:0;border-radius:6px;padding:10px;font:inherit">${sets.map(([k,n])=>`<option value="${k}" ${gSet===k?"selected":""}>${esc(n)} (${pool(k).length})</option>`).join("")}</select>
+      <p class="eyebrow" style="margin-top:6px">${L("Dirección","Direction")}</p>
+      <div class="chips"><button class="chip" data-dir="m" aria-pressed="${gDir==="m"}">${L("Mapudungun → español","Mapudungun → English")}</button><button class="chip" data-dir="g" aria-pressed="${gDir==="g"}">${L("Español → mapudungun","English → Mapudungun")}</button></div></div>
+    <div class="hub">${GAMES.map(([k,ic,es,en,des,den])=>`<button class="card" data-game="${k}"><span class="ic">${ic}</span><b>${esc(L(es,en))}</b><small>${esc(L(des,den))}</small></button>`).join("")}</div>`;
+  bindCommon();
+  document.getElementById("gset").onchange=ev=>{ gSet=ev.target.value; };
+  app.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{ gDir=b.dataset.dir; games(); });
+  app.querySelectorAll("[data-game]").forEach(b=>b.onclick=()=>go(`#/jugar/${b.dataset.game}/${gSet}/${gDir}`));
+}
+const mw=e=>G(head(e)), gw=e=>gloss(e);
+function hud(i,n,back){ return `<div class="top"><button class="back" data-go="${back||"#/juegos"}">← ${L("Juegos","Games")}</button>${topBar()}</div>
+  <div class="prog" aria-hidden="true"><i style="width:${Math.round(100*i/n)}%"></i></div>`; }
+function finish(right,total,game,set,dir){
+  addNuts(right); stats[game]=(stats[game]||0)+1; sv("mpd_stats",stats);
+  app.innerHTML=`${hud(1,1)}<div class="prompt"><p class="eyebrow">${right>=total/2?(Math.random()<.5?"Kümey!":"Tuteley!"):L("¡Sigue practicando!","Keep practising!")}</p>
+    <p class="big">${right} / ${total}</p><span class="gain">+${right} ${NUT}</span><p class="sub">${L("ngülliw para el juego","ngülliw for the game")}</p></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="again">${L("Otra vez","Again")}</button><button class="btn ghost" data-go="#/juegos">${L("Otro juego","Another game")}</button></div>`;
+  bindCommon(); document.getElementById("again").onclick=()=>play(game,set,dir); }
+const PRAISE=()=>Math.random()<.5?"Kümey!":"Tuteley!";
+function tooFew(n){ app.innerHTML=`${hud(0,1)}<div class="empty">${L(`Este conjunto tiene muy pocas palabras (se necesitan ${n}). Elige otro tema o guarda más palabras.`,`This set has too few words (${n} needed). Choose another topic or save more words.`)}</div>`; bindCommon(); }
+function play(game,set,dir){
+  gSet=set; gDir=dir;
+  if(game==="tarjetas") return cards(set,dir);
+  if(game==="elige") return choose(set,dir);
+  if(game==="parejas") return pairs(set,dir);
+  if(game==="escribe") return spell(set);
+  if(game==="grafemarios") return grafGame(set);
+  if(game==="arma") return build();
+  go("#/juegos"); }
+
+/* Tarjetas: saved words due for review first, then new words from the set */
+function cards(set,dir){
+  let p=pool(set); if(set!=="guardadas"){ p.forEach(e=>{ if(!saved.includes(e.id)&&!srs[e.id]) {} }); }
+  let deck=set==="guardadas"?dueCards(p):shuffle(p).slice(0,12);
+  if(set==="guardadas"&&!deck.length){ app.innerHTML=`${hud(1,1)}<div class="prompt"><p class="big">✓</p><p>${L("No tienes tarjetas pendientes hoy. ¡Vuelve mañana!","No cards due today. Come back tomorrow!")}</p></div><div class="row"><button class="btn ghost" data-go="#/guardadas">${L("Mis palabras","My words")}</button></div>`; return bindCommon(); }
+  if(!deck.length) return tooFew(1);
+  deck=deck.slice(0,20); let i=0, right=0;
+  const show=()=>{ if(i>=deck.length) return finish(right,deck.length,"tarjetas",set,dir);
+    const e=deck[i]; const front=dir==="m"?mw(e):gw(e), backS=dir==="m"?gw(e):mw(e);
+    app.innerHTML=`${hud(i,deck.length)}
+      <div class="flip" id="card" role="button" tabindex="0" aria-label="${L("Voltear la tarjeta","Flip the card")}"><div class="face">
+        ${e.pic?`<span class="pic">${esc(e.pic)}</span>`:""}<p class="prompt" style="padding:0;background:none"><span class="big">${esc(front)}</span></p>
+        <p class="muted" id="backS">${L("Toca para ver","Tap to reveal")}</p></div></div>
+      <div class="row" id="gr" style="justify-content:center" hidden><button class="btn ghost" id="no">${L("Otra vez","Again")}</button><button class="btn" id="yes">${L("Lo sabía","I knew it")}</button></div>`;
+    bindCommon();
+    const c=document.getElementById("card"); const rev=()=>{ document.getElementById("backS").innerHTML=`<span style="font-size:1.25rem;color:var(--ink)">${esc(backS)}</span>`; document.getElementById("gr").hidden=false; };
+    c.onclick=rev; c.onkeydown=ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); rev(); } };
+    document.getElementById("yes").onclick=()=>{ if(!saved.includes(e.id)) toggleSave(e.id); grade(e.id,true); right++; i++; show(); };
+    document.getElementById("no").onclick=()=>{ if(!saved.includes(e.id)) toggleSave(e.id); grade(e.id,false); i++; show(); };
+  }; show(); }
+
+/* Elige: ten multiple-choice questions, distractors from the same topic when possible */
+function choose(set,dir){
+  const p=pool(set); if(p.length<4) return tooFew(4);
+  const all=CORE.filter(e=>!e.ph); const qs=pick(p,Math.min(10,p.length)); let i=0, right=0;
+  const show=()=>{ if(i>=qs.length) return finish(right,qs.length,"elige",set,dir);
+    const e=qs[i]; const same=p.length>=4?p:all;
+    const ds=pick(same.filter(x=>x.id!==e.id&&gw(x)!==gw(e)&&mw(x)!==mw(e)),3); const opts=shuffle([e,...ds]);
+    const q=dir==="m"?mw(e):gw(e), lab=x=>dir==="m"?gw(x):mw(x);
+    app.innerHTML=`${hud(i,qs.length)}
+      <div class="prompt">${e.pic&&dir!=="m"?`<span class="pic">${esc(e.pic)}</span>`:""}<span class="big">${esc(q)}</span><span class="sub">${dir==="m"?L("¿Qué significa?","What does it mean?"):L("¿Cómo se dice en mapudungun?","How do you say it in Mapudungun?")}</span></div>
+      <div class="opts${dir==="m"?" long":""}">${opts.map((o,j)=>`<button class="opt${dir==="g"?" mapu":""}" data-j="${j}">${esc(lab(o))}</button>`).join("")}</div>
+      <p class="fb" id="fb"></p>`;
+    bindCommon();
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const o=opts[+b.dataset.j], ok=o===e;
+      app.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(opts[+x.dataset.j]===e) x.classList.add("ok"); }); if(!ok) b.classList.add("bad");
+      const fb=document.getElementById("fb"); fb.className="fb "+(ok?"ok":"bad"); fb.textContent=ok?PRAISE():`${mw(e)} = ${gw(e)}`;
+      if(ok) right++; if(saved.includes(e.id)) grade(e.id,ok); i++; setTimeout(show,ok?800:1700); });
+  }; show(); }
+
+/* Parejas: five pairs at a time, three rounds */
+function pairs(set,dir){
+  const p=pool(set); if(p.length<5) return tooFew(5);
+  const rounds=Math.min(3,Math.floor(p.length/5)); const used=pick(p,rounds*5); let r=0, right=0, tries=0;
+  const show=()=>{ if(r>=rounds) return finish(right,rounds*5,"parejas",set,dir);
+    const ws=used.slice(r*5,r*5+5); const left=shuffle(ws), rightCol=shuffle(ws); let sel=null, done=0;
+    app.innerHTML=`${hud(r,rounds)}<p class="hint" style="text-align:center">${L("Toca una palabra y luego su significado.","Tap a word, then its meaning.")}</p>
+      <div class="opts">${left.map((e,j)=>`<button class="opt mapu" data-s="L" data-j="${j}">${esc(mw(e))}</button><button class="opt" data-s="R" data-j="${j}">${esc(gw(rightCol[j]))}</button>`).join("")}</div>
+      <p class="fb" id="fb"></p>`;
+    bindCommon();
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+      const e=b.dataset.s==="L"?left[+b.dataset.j]:rightCol[+b.dataset.j];
+      if(!sel||sel.dataset.s===b.dataset.s){ app.querySelectorAll(".opt.sel").forEach(x=>x.classList.remove("sel")); sel=b; b.classList.add("sel"); return; }
+      const e0=sel.dataset.s==="L"?left[+sel.dataset.j]:rightCol[+sel.dataset.j]; tries++;
+      if(e0===e){ [sel,b].forEach(x=>{ x.classList.remove("sel"); x.classList.add("ok"); x.disabled=true; }); right++; done++;
+        document.getElementById("fb").className="fb ok"; document.getElementById("fb").textContent=PRAISE();
+        const s=sel; setTimeout(()=>{ s.classList.add("gone"); b.classList.add("gone"); },500);
+        if(done===5){ r++; setTimeout(show,800); } }
+      else { const s=sel; [s,b].forEach(x=>x.classList.add("bad")); setTimeout(()=>[s,b].forEach(x=>x.classList.remove("bad","sel")),600); }
+      sel=null; });
+  }; show(); }
+
+/* Escribe: type the Mapudungun word; any grafemario is accepted */
+function spell(set){
+  const p=pool(set).filter(e=>e.m!=null&&!/\s/.test(e.m)); if(p.length<1) return tooFew(1);
+  const qs=pick(p,Math.min(8,p.length)); let i=0, right=0;
+  const show=()=>{ if(i>=qs.length) return finish(right,qs.length,"escribe",set,"g");
+    const e=qs[i]; let hintN=0;
+    app.innerHTML=`${hud(i,qs.length)}
+      <div class="prompt">${e.pic?`<span class="pic">${esc(e.pic)}</span>`:""}<span class="big" style="font-size:1.5rem">${esc(gw(e))}</span><span class="sub">${L("Escríbelo en mapudungun","Write it in Mapudungun")}</span></div>
+      <form class="typein" id="f"><input id="a" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${L("Respuesta","Answer")}"><button class="btn">OK</button></form>
+      <div class="row" style="justify-content:center"><button class="btn ghost sm" id="hint">${L("Pista","Hint")}</button><button class="btn ghost sm" id="skip">${L("No sé","Skip")}</button></div>
+      <p class="fb" id="fb"></p>`;
+    bindCommon(); const a=document.getElementById("a"); a.focus();
+    const target=mw(e);
+    document.getElementById("hint").onclick=()=>{ hintN=Math.min(target.length,hintN+1); a.value=target.slice(0,hintN); a.focus(); };
+    document.getElementById("skip").onclick=()=>{ const fb=document.getElementById("fb"); fb.className="fb bad"; fb.textContent=target; i++; setTimeout(show,1600); };
+    document.getElementById("f").onsubmit=ev=>{ ev.preventDefault(); const ok=keyQuery(a.value.trim())===e._k;
+      const fb=document.getElementById("fb"); fb.className="fb "+(ok?"ok":"bad"); fb.textContent=ok?PRAISE():`${target}`;
+      if(ok){ right+=hintN?0:1; } if(saved.includes(e.id)) grade(e.id,ok); i++; setTimeout(show,ok?800:1700); };
+  }; show(); }
+
+/* Grafemarios: a word in one grafemario, pick the same word in another */
+function grafGame(set){
+  const p=pool(set).filter(e=>e.m!=null&&inG("rag",e.m)!==e.m); if(p.length<4) return tooFew(4);
+  const qs=pick(p,Math.min(10,p.length)); let i=0, right=0;
+  const show=()=>{ if(i>=qs.length) return finish(right,qs.length,"grafemarios",set,"m");
+    const e=qs[i]; const [from,to]=shuffle(["uni","azu","rag"]).slice(0,2);
+    const ds=pick(p.filter(x=>x.id!==e.id),2).map(x=>inG(to,x.m));
+    /* a near miss: the right word written in the wrong grafemario, when that spelling differs */
+    const third=Object.keys(GRAF_NAME).find(k=>k!==from&&k!==to); const near=inG(third,e.m);
+    const prompt=inG(from,e.m), target=inG(to,e.m);
+    let cand=[near,...ds,...pick(p,4).map(x=>inG(to,x.m))].filter(v=>v!==target&&v!==prompt);
+    cand=cand.filter((v,j,a)=>a.indexOf(v)===j).slice(0,3);
+    const opts=shuffle([target,...cand]);
+    app.innerHTML=`${hud(i,qs.length)}
+      <div class="prompt"><span class="sub">${GRAF_NAME[from]}</span><span class="big">${esc(inG(from,e.m))}</span><span class="sub">${L(`¿Cómo se escribe en ${GRAF_NAME[to]}?`,`How is it written in ${GRAF_NAME[to]}?`)}</span></div>
+      <div class="opts">${opts.map((o,j)=>`<button class="opt mapu" data-j="${j}">${esc(o)}</button>`).join("")}</div><p class="fb" id="fb"></p>`;
+    bindCommon();
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const ok=opts[+b.dataset.j]===inG(to,e.m);
+      app.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(opts[+x.dataset.j]===inG(to,e.m)) x.classList.add("ok"); }); if(!ok) b.classList.add("bad");
+      const fb=document.getElementById("fb"); fb.className="fb "+(ok?"ok":"bad"); fb.textContent=ok?PRAISE():`${GRAF_NAME[to]}: ${inG(to,e.m)} · ${gw(e)}`;
+      if(ok) right++; i++; setTimeout(show,ok?800:1900); });
+  }; show(); }
+
+/* Arma la palabra: tap root and suffixes into order; items come from hand-checked segmentations */
+function build(){
+  if(!BUILD.length) return tooFew(1);
+  const qs=pick(BUILD,8); let i=0, right=0;
+  const show=()=>{ if(i>=qs.length) return finish(right,qs.length,"arma","all","m");
+    const b=qs[i]; const tiles=shuffle(b.m.map((m,j)=>({m,j}))); const placed=[];
+    const render=()=>{
+      app.innerHTML=`${hud(i,qs.length)}
+        <div class="prompt"><span class="sub">${L("Arma la palabra que significa","Build the word that means")}</span><span class="big" style="font-size:1.35rem">«${esc(lang==="es"?b.es:b.en)}»</span>
+          <span class="sub" style="font-size:.8rem">${L("traducción aproximada","approximate translation")}</span></div>
+        <div class="slots" aria-label="${L("Tu palabra","Your word")}">${placed.map((t,k)=>`<button class="tile${t.j===0?" root":""}" data-p="${k}">${esc(G(t.m))}</button>`).join("")}</div>
+        <div class="tiles">${tiles.map((t,k)=>placed.includes(t)?"":`<button class="tile${t.j===0?" root":""}" data-t="${k}">${esc(G(t.m))}</button>`).join("")}</div>
+        <p class="hint" style="text-align:center">${L("La raíz tiene borde verde. Toca una pieza puesta para quitarla.","The root has a green border. Tap a placed piece to remove it.")}</p>
+        <p class="fb" id="fb"></p>`;
+      bindCommon();
+      app.querySelectorAll("[data-t]").forEach(x=>x.onclick=()=>{ placed.push(tiles[+x.dataset.t]); if(placed.length===b.m.length) check(); else render(); });
+      app.querySelectorAll("[data-p]").forEach(x=>x.onclick=()=>{ placed.splice(+x.dataset.p,1); render(); });
+    };
+    const check=()=>{ render(); const ok=placed.every((t,k)=>t.m===b.m[k]);
+      const fb=document.getElementById("fb"); fb.className="fb "+(ok?"ok":"bad");
+      fb.innerHTML=ok?PRAISE():`${esc(b.m.map(G).join("-"))}`;
+      app.querySelectorAll(".tiles .tile,.slots .tile").forEach(x=>x.disabled=true);
+      fb.insertAdjacentHTML("afterend",`<p class="hint" style="text-align:center">${esc(b.m.map(G).join("-"))} · ${esc(b.g.slice(1).map(lab).join(" · "))}</p>`);
+      if(ok) right++; i++; setTimeout(show,ok?1400:2600); };
+    render();
+  }; show(); }
+
+/* ===== About ===== */
+function about(){
+  const n=D.n||{};
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
+    <h2>${L("Acerca del diccionario","About the dictionary")}</h2>
+    <p>${L("<b>Tañi Nemülkawe</b> es un diccionario en mapudungun, español e inglés, compañero del juego <b>Mapudungukeaiñ Fill Püle</b>. Se hizo con herramientas de investigación entrenadas en el corpus AVENUE y con recursos gramaticales y léxicos establecidos.","<b>Tañi Nemülkawe</b> is a Mapudungun, Spanish and English dictionary, a companion to the game <b>Mapudungukeaiñ Fill Püle</b>. It was built with research tools trained on the AVENUE corpus and with established grammatical and lexical resources.")}</p>
+    <div class="box"><h3>${L("Dos partes","Two parts")}</h3>
+      <p>${L(`<b>El núcleo</b> (${n.core||CORE.length} entradas): las palabras y frases del juego y las palabras más frecuentes en el habla del corpus AVENUE, con español e inglés. Es la base de los juegos.`,`<b>The core</b> (${n.core||CORE.length} entries): the game's words and phrases plus the most frequent words in the speech of the AVENUE corpus, with Spanish and English. The games use it.`)}</p>
+      <p>${L(`<b>Augusta</b> (${(n.aug||AUG.length).toLocaleString("es")} entradas): el diccionario de Félix José de Augusta (1916), en la edición digital en grafemario Unificado. Su español es de hace un siglo; el inglés de estas entradas todavía no está.`,`<b>Augusta</b> (${(n.aug||AUG.length).toLocaleString("en")} entries): Félix José de Augusta's dictionary (1916), from the digital edition in the Unificado grafemario. Its Spanish is a century old; the English for these entries is not available yet.`)}</p>
+      <p>${L("Las marcas <b>Revisado</b> y <b>Sin revisar</b> dicen si una entrada ya fue revisada por un hablante o lingüista. Las que no, son borradores.","The <b>Reviewed</b> and <b>Not yet reviewed</b> labels say whether an entry has been checked by a speaker or linguist. Those that haven't are drafts.")}</p></div>
+    <div class="box"><h3>${L("El analizador","The analyser")}</h3>
+      <p>${L("Si buscas una forma conjugada, un analizador morfológico la divide en raíz y sufijos y busca la raíz. Funciona sin conexión una vez cargado, pero puede equivocarse; los significados que propone son aproximados.","If you search for an inflected form, a morphological analyser splits it into root and suffixes and looks up the root. It works offline once loaded, but it can be wrong; the meanings it proposes are approximate.")}</p></div>
+    <div class="box"><h3>${L("Fuentes","Sources")}</h3>
+      <p class="hint">Augusta, F. J. de. (1916). <i>Diccionario araucano-español y español-araucano</i>. Imprenta Universitaria.</p>
+      <p class="hint">Augusta, F. J. de, Painemilla Ñamcucheu, P. S., Colüñ, J. F., &amp; Huenuñamco, D. S. (2019). <i>Diccionario mapudungun–español / español–mapudungun</i> [${L("edición digital, adaptada del Corpus Lexicográfico del Mapudungun (CORLEXIM)","digital edition, adapted from the Corpus Lexicográfico del Mapudungun (CORLEXIM)")}].</p>
+      <p class="hint">Duan, M., Fasola, C., Rallabandi, S. K., Vega, R., Anastasopoulos, A., Levin, L., &amp; Black, A. W. (2020). A resource for computational experiments on Mapudungun. <i>Proceedings of LREC 2020</i>, 2872–2877.</p>
+      <p class="hint">Smeets, I. (2008). <i>A grammar of Mapuche</i>. Mouton de Gruyter.</p></div>
+    <div class="box"><h3>${L("Instalar","Install")}</h3>
+      <p>${L("Android: en Chrome, toca <b>Instalar la app</b> o el menú ⋮ → <b>Instalar app</b>. iPhone/iPad: en Safari, <b>Compartir</b> → <b>Añadir a pantalla de inicio</b>. Funciona sin conexión.","Android: in Chrome, tap <b>Install the app</b> or the ⋮ menu → <b>Install app</b>. iPhone/iPad: in Safari, <b>Share</b> → <b>Add to Home Screen</b>. It works offline.")}</p></div>`;
+  bindCommon(); }
+
+document.documentElement.lang=lang;
+route();
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+(function(){ let ev=null; const b=document.getElementById('pwaInstall');
+  try{ if((localStorage.getItem('mpk_lang')||'').indexOf('en')>=0) b.textContent='Install the app'; }catch(e){}
+  window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); ev=e; b.hidden=false; });
+  b.addEventListener('click',async()=>{ if(!ev) return; ev.prompt(); try{ await ev.userChoice; }catch(e){} ev=null; b.hidden=true; });
+  window.addEventListener('appinstalled',()=>{ b.hidden=true; });
+})();
+</script>
+<script>
+/* Anonymous visit counts on the public site only (same GoatCounter setup as the game: no cookies, no personal data). */
+(function(){ if(location.protocol!=='https:'||location.hostname!=='brogers36.github.io') return;
+  try{ var u='https://brogers36.goatcounter.com/count?p='+encodeURIComponent(location.pathname)+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer||'')+'&rnd='+Math.random().toString(36).slice(2); new Image().src=u; }catch(e){} })();
+</script>
+</body>
+</html>

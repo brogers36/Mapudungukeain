@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tañi Nemülkawe · copia maestra (revisión)</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d1b2e;--mut:#6b6880;--line:#dcd8cc;--teal:#2c8a80;--gold:#9a6a00;--red:#b3261e;--good:#1f7a45}
+@media (prefers-color-scheme:dark){:root{--bg:#14122a;--card:#1f1c3d;--ink:#f3efe6;--mut:#a9a3c8;--line:#2f2a58;--teal:#4fb3a9;--gold:#e8b53a;--red:#e05a4f;--good:#5fd08e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (max-width:700px){header{position:static!important}}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+h1{font-size:1.15rem;margin:0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea,button{font:inherit;color:inherit}
+input[type=search],select{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
+input[type=search]{flex:1;min-width:180px}
+button{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:7px 11px;cursor:pointer}
+button.pri{background:var(--teal);border-color:var(--teal);color:#fff}
+.stats{font-size:.85rem;color:var(--mut)}
+main{padding:12px 16px 80px;max-width:1100px;margin:0 auto}
+.e{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px;display:grid;grid-template-columns:1fr;gap:6px}
+.e.ok{border-left-color:var(--good)} .e.flag{border-left-color:var(--red)} .e.chg{box-shadow:inset 0 0 0 1px var(--gold)}
+.e .h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.e .h b{font-size:1.15rem}
+.meta{font-size:.78rem;color:var(--mut)}
+.f{display:grid;grid-template-columns:70px 1fr;gap:4px 8px;align-items:start}
+.f label{font-size:.78rem;color:var(--mut);padding-top:6px}
+.f input,.f textarea{width:100%;background:transparent;border:1px solid var(--line);border-radius:5px;padding:5px 7px}
+.f textarea{min-height:34px;resize:vertical}
+.aug{font-size:.85rem;color:var(--mut);max-height:7.5em;overflow:auto;border-top:1px dashed var(--line);padding-top:6px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.acts button[aria-pressed=true].ok{background:var(--good);border-color:var(--good);color:#fff}
+.acts button[aria-pressed=true].flag{background:var(--red);border-color:var(--red);color:#fff}
+.pager{display:flex;gap:8px;align-items:center;justify-content:center;margin:14px 0}
+.help{font-size:.85rem;color:var(--mut);max-width:80ch}
+</style>
+</head>
+<body>
+<header>
+  <h1>Tañi Nemülkawe · copia maestra para revisar</h1>
+  <p class="help">Tus cambios se guardan en este navegador mientras trabajas. Para publicarlos, toca <b>Exportar revisiones</b> y guarda el archivo <code>revisiones.json</code>; luego súbelo al repositorio en <code>tools/dicc/revisiones.json</code> (o envíalo para que se integre). <b>Importar</b> carga un archivo de revisiones anterior, por ejemplo desde otro computador.</p>
+  <div class="bar">
+    <input type="search" id="q" placeholder="Buscar (mapudungun, español, inglés)">
+    <select id="part"><option value="core">Núcleo</option><option value="aug">Augusta</option></select>
+    <select id="st"><option value="all">Todas</option><option value="0">Sin revisar</option><option value="1">Revisadas</option><option value="2">Marcadas para discutir</option><option value="chg">Con cambios</option><option value="noen">Sin inglés</option></select>
+    <select id="th"><option value="">Todos los temas</option></select>
+    <select id="sort"><option value="f">Por frecuencia (AVENUE)</option><option value="az">A–Z</option></select>
+  </div>
+  <div class="bar">
+    <button class="pri" id="exp">Exportar revisiones</button>
+    <button id="imp">Importar revisiones</button><input type="file" id="file" accept=".json,application/json" hidden>
+    <span class="stats" id="stats"></span>
+  </div>
+</header>
+<main id="list"></main>
+<script>
+const DATA=/*DATA*/null;
+const KEY="mpd_master_rev";
+let REV={}; try{ REV=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){}
+const saveRev=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(REV)); }catch(e){} stats(); };
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fold=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const CORE=DATA.core, AUG=DATA.aug;
+const THEMES=[...new Set(CORE.map(e=>e.t))].sort();
+document.getElementById("th").innerHTML+=THEMES.map(t=>`<option value="${t}">${t}</option>`).join("");
+const cur=(e,k)=>{ const r=REV[e.id]; return r&&r[k]!=null?r[k]:e[k]; };  /* e already carries published revisions (merged at build) */
+const status=e=>{ const r=REV[e.id]; return r&&r.st!=null?r.st:(e.st||0); };
+const changed=e=>{ const r=REV[e.id]; return !!r&&["m","es","en","t","s","note"].some(k=>r[k]!=null&&r[k]!==(e[k]||"")); };
+function setField(e,k,v){ const r=REV[e.id]||(REV[e.id]={}); if(v===(e[k]||"")) delete r[k]; else r[k]=v; r.when=new Date().toISOString(); if(Object.keys(r).filter(x=>x!=="when").length===0) delete REV[e.id]; saveRev(); }
+function setStatus(e,v){ const r=REV[e.id]||(REV[e.id]={}); r.st=v; r.when=new Date().toISOString(); saveRev(); }
+let page=0; const PER=40;
+function filtered(){
+  const part=document.getElementById("part").value, st=document.getElementById("st").value, th=document.getElementById("th").value, q=fold(document.getElementById("q").value.trim());
+  let L=part==="core"?CORE:AUG;
+  if(th&&part==="core") L=L.filter(e=>e.t===th);
+  if(st==="chg") L=L.filter(changed); else if(st==="noen") L=L.filter(e=>!cur(e,"en")); else if(st!=="all") L=L.filter(e=>String(status(e))===st);
+  if(q) L=L.filter(e=>[cur(e,"m")||e.h,cur(e,"es")||cur(e,"s"),cur(e,"en"),e.d].some(x=>fold(x).includes(q)));
+  const so=document.getElementById("sort").value;
+  L=L.slice().sort(so==="az"?((a,b)=>(a.m||a.h).localeCompare(b.m||b.h,"es")):((a,b)=>(b.f||0)-(a.f||0)));
+  return L; }
+function render(){
+  const L=filtered(); const n=L.length, pages=Math.max(1,Math.ceil(n/PER)); page=Math.min(page,pages-1);
+  const part=document.getElementById("part").value;
+  const rows=L.slice(page*PER,page*PER+PER).map((e,i)=>{ const s=status(e);
+    const core=part==="core";
+    return `<article class="e${s===1?" ok":s===2?" flag":""}${changed(e)?" chg":""}" data-i="${esc(e.id)}">
+      <div class="h"><b>${esc(core?e.m:e.h)}</b><span class="meta">${core?`${esc(e.t)} · ${e.o==="juego"?"juego: "+esc(e.src):"frecuente"}`:`${esc(e.p||"")} · raíz ${esc(e.r)}`} · AVENUE ${e.f||0}</span></div>
+      <div class="f">
+        ${core?`<label>mapu</label><input data-k="m" value="${esc(cur(e,"m"))}">
+        <label>español</label><input data-k="es" value="${esc(cur(e,"es"))}">`
+        :`<label>español</label><input data-k="s" value="${esc(cur(e,"s"))}">`}
+        <label>inglés</label><input data-k="en" value="${esc(cur(e,"en"))}" placeholder="(falta)">
+        ${core?`<label>tema</label><input data-k="t" value="${esc(cur(e,"t"))}" list="themes">`:""}
+        <label>nota</label><textarea data-k="note" placeholder="Comentario para la próxima versión">${esc(cur(e,"note")||"")}</textarea>
+      </div>
+      ${(!core||e.a)?`<div class="aug">${esc(core?(DATA.augd[e.a]||""):e.d)}</div>`:""}
+      <div class="acts"><button class="ok" data-st="1" aria-pressed="${s===1}">✓ Revisada</button><button class="flag" data-st="2" aria-pressed="${s===2}">⚑ Discutir</button><button data-st="0" aria-pressed="${s===0}">Sin revisar</button></div>
+    </article>`; }).join("");
+  document.getElementById("list").innerHTML=`<datalist id="themes">${THEMES.map(t=>`<option value="${t}">`).join("")}</datalist>
+    <div class="pager"><button id="pv" ${page?"":"disabled"}>←</button><span>${n.toLocaleString("es")} entradas · página ${page+1} de ${pages}</span><button id="nx" ${page<pages-1?"":"disabled"}>→</button></div>
+    ${rows||"<p>No hay entradas con estos filtros.</p>"}
+    <div class="pager"><button id="pv2" ${page?"":"disabled"}>←</button><span>página ${page+1} de ${pages}</span><button id="nx2" ${page<pages-1?"":"disabled"}>→</button></div>`;
+  const BY=new Map((part==="core"?CORE:AUG).map(e=>[e.id,e]));
+  document.querySelectorAll(".e").forEach(a=>{ const e=BY.get(a.dataset.i);
+    a.querySelectorAll("[data-k]").forEach(inp=>inp.onchange=()=>{ setField(e,inp.dataset.k,inp.value.trim()); a.classList.toggle("chg",changed(e)); });
+    a.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ setStatus(e,+b.dataset.st); render(); }); });
+  ["pv","pv2"].forEach(id=>{ const b=document.getElementById(id); if(b) b.onclick=()=>{ page--; render(); scrollTo(0,0); }; });
+  ["nx","nx2"].forEach(id=>{ const b=document.getElementById(id); if(b) b.onclick=()=>{ page++; render(); scrollTo(0,0); }; });
+  stats(); }
+function stats(){
+  const c=CORE.filter(e=>status(e)===1).length, a=AUG.filter(e=>status(e)===1).length, f=Object.values(REV).filter(r=>r.st===2).length, ch=Object.keys(REV).length;
+  document.getElementById("stats").textContent=`Núcleo revisado: ${c}/${CORE.length} · Augusta revisado: ${a}/${AUG.length} · Para discutir: ${f} · Entradas con cambios o marca: ${ch}`; }
+["q","part","st","th","sort"].forEach(id=>document.getElementById(id).addEventListener(id==="q"?"input":"change",()=>{ page=0; render(); }));
+document.getElementById("exp").onclick=()=>{
+  /* the export is cumulative: decisions already published (DATA.rev) plus this browser's, newest wins per entry */
+  const out=Object.assign({},DATA.rev||{}); Object.entries(REV).forEach(([id,r])=>{ const o=out[id]; if(!o||!o.when||!r.when||r.when>=o.when) out[id]=Object.assign({},o||{},r); });
+  const blob=new Blob([JSON.stringify(out,null,1)],{type:"application/json"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="revisiones.json"; document.body.appendChild(a); a.click(); a.remove(); };
+document.getElementById("imp").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=ev=>{ const f=ev.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ try{ const x=JSON.parse(rd.result); let n=0; Object.entries(x).forEach(([id,r])=>{ const old=REV[id];
+      if(!old||!old.when||(r.when&&r.when>old.when)){ REV[id]=r; n++; } }); saveRev(); render(); alert(`Importadas ${n} revisiones (se conserva la más reciente de cada entrada).`); }
+    catch(e){ alert("El archivo no es un archivo de revisiones válido."); } }; rd.readAsText(f); ev.target.value=""; };
+render();
+</script>
+</body>
+</html>
