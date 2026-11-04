@@ -785,6 +785,34 @@ const gramForm=(k,m)=>({m,es:GRAM[k].G[m][0],en:GRAM[k].G[m][1]});
 function genGram(k,n){ return shuffle(GRAM[k].L).slice(0,n).map(([m,d])=>({...gramForm(k,m),dist:d.map(x=>gramForm(k,x))})); }
 const gramExamples=k=>GRAM[k].L.map(([m])=>gramForm(k,m));
 
+// ===== Two Kimche lessons on root formation: V+V compounding (compu) and reduplication (redup) =====
+// Sources: AVENUE (types.json counts) and Augusta (gloss.json). Forms marked * are built by rule.
+Object.assign(GRAM,{
+ compu:{G:{
+   "lefün":["correr","to run"],"konün":["entrar","to go in"],"tripan":["salir","to go out"],"trekan":["caminar","to walk"],
+   "lefkonün":["entrar corriendo","to run in"],"leftripan":["salir corriendo, huir","to run out, flee"],"lefamun":["irse corriendo*","to run off*"],
+   "trekatripan":["salir caminando","to walk out"],
+   "anün":["sentarse","to sit"],"anünagün":["sentarse (el que está de pie)","to sit down (from standing)"],"anüpüran":["incorporarse (el que está acostado)","to sit up (from lying down)"],
+   "witran":["ponerse de pie","to stand up"],"witrapüran":["levantarse","to get up"],
+   "kintun":["buscar, mirar","to look for, look"],"pürakintun":["mirar hacia arriba","to look up"],"inakintun":["seguir con la vista, observar","to follow with the eyes, observe"],
+   "dungun":["hablar","to speak"],"llowdungun":["contestar","to answer"],"elkünun":["dejar (algo en un lugar)","to leave (something somewhere)"]},
+  L:[["lefkonün",["leftripan","lefün","konün"]],["leftripan",["lefkonün","trekatripan","tripan"]],["trekatripan",["leftripan","trekan","tripan"]],
+     ["lefamun",["lefkonün","leftripan","trekan"]],["anünagün",["anüpüran","anün","witrapüran"]],["anüpüran",["anünagün","witrapüran","anün"]],
+     ["witrapüran",["witran","anüpüran","anünagün"]],["pürakintun",["inakintun","kintun","witrapüran"]],["inakintun",["pürakintun","kintun","trekatripan"]],
+     ["llowdungun",["dungun","elkünun","inakintun"]],["elkünun",["llowdungun","anünagün","lefkonün"]]]},
+ redup:{G:{
+   "ngümay":["lloró","she/he cried"],"ngümakefuy":["lloraba (de costumbre)","she/he used to cry"],"ngümangümangi":["lloraba y lloraba","she/he cried and cried"],
+   "tripay":["salió","it came out"],"tripatripangi":["sale y sale, a cada rato","it keeps coming out"],
+   "amuy":["fue","she/he went"],"amukey":["va (de costumbre)","she/he goes (habitually)"],"amuamungi":["sigue yendo","she/he keeps going"],
+   "piy":["dijo","she/he said"],"pipiyefiñ":["le estuve diciendo y diciendo","I kept telling her/him"],
+   "dunguy":["habló","she/he spoke"],"dungudunguy":["es hablador (habla y habla)","she/he is a chatterbox (talks and talks)"],
+   "trüntrüni":["tirita","she/he shivers"],"poypoyi":["se hinchó","it swelled up"],"wedwedngi":["es loco, imprudente","she/he is reckless, crazy"]},
+  L:[["ngümangümangi",["ngümay","ngümakefuy","tripatripangi"]],["ngümay",["ngümangümangi","ngümakefuy","amuy"]],["ngümakefuy",["ngümangümangi","ngümay","amukey"]],
+     ["tripatripangi",["tripay","amuamungi","ngümangümangi"]],["amuamungi",["amuy","amukey","tripatripangi"]],["amukey",["amuamungi","amuy","ngümakefuy"]],
+     ["pipiyefiñ",["piy","dungudunguy","amuamungi"]],["dungudunguy",["dunguy","pipiyefiñ","ngümangümangi"]],
+     ["trüntrüni",["poypoyi","wedwedngi","tripatripangi"]],["poypoyi",["trüntrüni","wedwedngi","tripay"]],["wedwedngi",["dungudunguy","trüntrüni","poypoyi"]]]}
+});
+
 // ===== Causatives (citation forms attested in Augusta) =====
 const CAUS=[
   {v:"amu",vg:{es:"ir",en:"go"},m:"amulün",es:"hacer andar, poner en movimiento",en:"to make go, set in motion"},
@@ -1574,6 +1602,14 @@ const STAGES = [
     gen:()=>genGram("kantu",7), examples:()=>gramExamples("kantu"),
     rule:{es:"<b>-kantu-</b> dice que algo se hace de juego o en broma, sin que sea en serio: <b>feypi-kantu-y</b> “lo dijo en broma”, <b>kütral-kantu-y</b> “juega a hacer fuego”; <b>awkantun</b> “jugar” ya lo lleva. <b>-faluw-</b> dice que se finge para que otros lo crean: <b>kutran-faluw-i</b> “se hace el enfermo”, <b>kim-faluw-i</b> “se hace el que sabe”. La diferencia: con <b>-kantu-</b> todos saben que es juego; con <b>-faluw-</b> se quiere engañar. (* = forma formada por regla.)",
           en:"<b>-kantu-</b> says something is done in play or in jest, not seriously: <b>feypi-kantu-y</b> “she/he said it as a joke”, <b>kütral-kantu-y</b> “she/he plays at making a fire”; <b>awkantun</b> “to play” already contains it. <b>-faluw-</b> says someone pretends so that others will believe it: <b>kutran-faluw-i</b> “she/he pretends to be sick”, <b>kim-faluw-i</b> “she/he pretends to know”. The difference: with <b>-kantu-</b> everyone knows it is play; with <b>-faluw-</b> the aim is to deceive. (* = form built by rule.)"}},
+  { id:"compu", mt:"Lef + kon → lefkonün", es:"Dos verbos en uno: la composición", en:"Two verbs in one: compounding", kind:"verb",
+    gen:()=>genGram("compu",8), examples:()=>gramExamples("compu"),
+    rule:{es:"Dos raíces verbales pueden unirse en una sola palabra, y las terminaciones van solo al final. Muchas veces la primera raíz dice <b>cómo</b> y la segunda <b>hacia dónde</b> o con qué resultado: <b>lef</b> “correr” + <b>kon</b> “entrar” → <b>lefkonün</b> “entrar corriendo”; <b>leftripan</b> “salir corriendo, huir”; <b>trekatripan</b> “salir caminando”. Con <b>nag</b> “bajar” y <b>püra</b> “subir”: <b>anünagün</b> “sentarse” (el que está de pie) y <b>anüpüran</b> “incorporarse” (el que está acostado); <b>witrapüran</b> “levantarse” (42 veces en AVENUE). Con <b>kintu</b> “mirar, buscar”: <b>pürakintun</b> “mirar hacia arriba”, <b>inakintun</b> “seguir con la vista”. A veces el resultado es una palabra nueva: <b>llow</b> “recibir” + <b>dungu</b> “hablar” → <b>llowdungun</b> “contestar”; <b>el</b> “dejar” + <b>künu</b> “poner, dejar” → <b>elkünun</b> “dejar en un lugar” (96 veces). (* = forma formada por regla.)",
+          en:"Two verb roots can join into one word, and the endings go only at the end. Often the first root says <b>how</b> and the second says <b>where to</b> or with what result: <b>lef</b> “run” + <b>kon</b> “enter” → <b>lefkonün</b> “to run in”; <b>leftripan</b> “to run out, flee”; <b>trekatripan</b> “to walk out”. With <b>nag</b> “go down” and <b>püra</b> “go up”: <b>anünagün</b> “to sit down” (from standing) and <b>anüpüran</b> “to sit up” (from lying down); <b>witrapüran</b> “to get up” (42 times in AVENUE). With <b>kintu</b> “look, search”: <b>pürakintun</b> “to look up”, <b>inakintun</b> “to follow with the eyes”. Sometimes the result is a new word: <b>llow</b> “receive” + <b>dungu</b> “speak” → <b>llowdungun</b> “to answer”; <b>el</b> “leave” + <b>künu</b> “put, leave” → <b>elkünun</b> “to leave somewhere” (96 times). (* = form built by rule.)"}},
+  { id:"redup", mt:"Ngüma → ngümangüma", es:"Raíz doble: la reduplicación", en:"Doubled roots: reduplication", kind:"verb",
+    gen:()=>genGram("redup",8), examples:()=>gramExamples("redup"),
+    rule:{es:"Repetir la raíz del verbo dice que la acción se repite o sigue y sigue: <b>ngüma</b> “llorar” → <b>ngümangümangi</b> “lloraba y lloraba”; <b>tripa</b> “salir” → <b>tripatripangi</b> “sale y sale”; <b>amu</b> “ir” → <b>amuamungi</b> “sigue yendo”; <b>pi</b> “decir” → <b>pipiyefiñ</b> “le estuve diciendo y diciendo”; <b>dungudunguy</b> “es hablador”. En AVENUE la raíz doble a menudo lleva <b>-nge-</b> antes de la persona (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), y a veces se escribe separada: <b>ngüma ngümangi</b>. No es lo mismo que <b>-ke-</b>, que dice que algo se hace de costumbre: <b>ngümakefuy</b> “lloraba (de costumbre)”, <b>amukey</b> “va (siempre)”. Algunos verbos solo se usan con la raíz doble: <b>trüntrünün</b> “tiritar”, <b>poypoyün</b> “hincharse”, <b>wedwedün</b> “ser travieso, loco”.",
+          en:"Repeating the verb root says the action repeats or goes on and on: <b>ngüma</b> “cry” → <b>ngümangümangi</b> “she/he cried and cried”; <b>tripa</b> “go out” → <b>tripatripangi</b> “it keeps coming out”; <b>amu</b> “go” → <b>amuamungi</b> “she/he keeps going”; <b>pi</b> “say” → <b>pipiyefiñ</b> “I kept telling her/him”; <b>dungudunguy</b> “she/he is a chatterbox”. In AVENUE the doubled root often takes <b>-nge-</b> before the person ending (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), and is sometimes written as two words: <b>ngüma ngümangi</b>. This is not the same as <b>-ke-</b>, which says something is done habitually: <b>ngümakefuy</b> “she/he used to cry”, <b>amukey</b> “she/he goes (always)”. Some verbs are used only with the doubled root: <b>trüntrünün</b> “to shiver”, <b>poypoyün</b> “to swell up”, <b>wedwedün</b> “to be mischievous, crazy”."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
