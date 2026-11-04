@@ -2125,8 +2125,11 @@ function menu(){
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
       ["help",t().howBtn,L2("Instrucciones","Instructions")],
+      ["dicc",L2("Diccionario","Dictionary"),L2("Tañi Nemülkawe: busca y juega","Tañi Nemülkawe: look up and play")],
       ["about",L2("Acerca del juego","About the game"),L2("Qué es y cómo se hizo","What it is and how it was made")]
-    ].map(([id,n,d])=>id==="about"
+    ].map(([id,n,d])=>id==="dicc"
+      ?`<a class="tcard" id="dicc" href="diccionario/"><b>${esc(n)}</b><small>${esc(d)} ↗</small></a>`
+      :id==="about"
       ?`<a class="tcard" id="about" href="https://brogers36.github.io/Mapudungukeain/acerca/" target="_blank" rel="noopener"><b>${esc(n)}</b><small>${esc(d)} ↗</small></a>`
       :`<button class="tcard" id="${id}"><b>${esc(n)}</b><small>${esc(d)}</small></button>`).join("")}</nav>
     ${STAGES.map(st=>{
