@@ -330,7 +330,13 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .xcard:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .lofwrap,.palinsvg{border-radius:8px;overflow:hidden;border:3px solid var(--red)}
 .lofsvg,.palinsvg{display:block;width:100%;height:auto}
-.lp{cursor:pointer;transform-box:fill-box;transform-origin:center} .lp.on{filter:drop-shadow(0 0 4px #fff)}
+.lp{cursor:pointer;outline:none} .lp.on{filter:drop-shadow(0 0 1.5px #fff8dc) drop-shadow(0 0 4px #e8b53a)} .lp:focus-visible{filter:drop-shadow(0 0 2px #fff)}
+.lf-cloud{animation:lfdrift 70s ease-in-out infinite alternate} @keyframes lfdrift{to{transform:translateX(46px)}}
+.lf-smk{transform-box:fill-box;transform-origin:50% 100%;animation:lfsmk 4.5s ease-in-out infinite} @keyframes lfsmk{0%{opacity:0;transform:translateY(3px) scaleX(.8)}35%{opacity:.6}100%{opacity:0;transform:translateY(-7px) scaleX(1.4)}}
+.lf-flame{transform-box:fill-box;transform-origin:50% 100%;animation:lfflick .55s ease-in-out infinite alternate} @keyframes lfflick{to{transform:scale(.93,1.13)}}
+.lf-glide{animation:lfglide 22s ease-in-out infinite alternate} @keyframes lfglide{50%{transform:translate(-40px,6px)}100%{transform:translate(-80px,-2px)}}
+.lf-shim{stroke-dasharray:4 6;animation:lfshim 3s linear infinite} @keyframes lfshim{to{stroke-dashoffset:-20}}
+@media (prefers-reduced-motion:reduce){.lofsvg *,.item .th *{animation:none!important}}
 .lofcard{background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px}
 .lofcard b{font-family:var(--display);font-weight:400;font-size:1.3rem}
 .lofsent{font-family:var(--display);font-size:1.2rem}
@@ -2790,42 +2796,125 @@ const needOf=id=>STAGES.find(s=>s.id===id).need;
 let lofOwned=load("lof")||[], team=load("team")||1, palinWins=load("palinWins")||0, epewOwned=load("epew")||[], epewDone=load("epewDone")||{};
 
 /* --- lof: buildings, crops and animals placed on one scene; each piece unlocks a sentence --- */
+/* Drawing helpers: every piece is drawn standing on y=0 (its ground line), centred on x=0, lit from the upper right. */
+const lfSh=(rx)=>`<ellipse cx="0" cy="0" rx="${rx}" ry="${(rx*.22).toFixed(1)}" fill="#1c3315" opacity=".4" filter="url(#lfblur)"/>`;
+const lfHen=(x,y,c,d,f)=>`<g transform="translate(${x} ${y}) scale(${f?-1:1} 1)"><path d="M-1 -1 L-1.5 1.5 M2 -1 L2.5 1.5" stroke="#d9a640" stroke-width=".9"/><path d="M-6 -7 Q-11 -14 -9 -5 Z" fill="#2e2216"/><ellipse cx="0" cy="-5" rx="6.2" ry="4.4" fill="${c}"/><path d="M-4 -5 Q0 -2 3 -5" stroke="${d}" stroke-width="1.2" fill="none"/><circle cx="5" cy="-10" r="2.6" fill="${c}"/><path d="M3.8 -12.2 q.8 -2 1.8 -.4 q1 -1.8 1.9 .2" fill="#c8322f"/><path d="M7.4 -10.3 l2.2 .8 -2.2 .8z" fill="#e0a83a"/><circle cx="5.8" cy="-10.6" r=".55" fill="#14122a"/><ellipse cx="2" cy="-7.6" rx="3" ry="1.2" fill="#fff" opacity=".18"/></g>`;
+const lfSheep=(x,y,f,graze)=>`<g transform="translate(${x} ${y}) scale(${f?-1:1} 1)"><path d="M-7 -6 V0 M-3 -6 V0 M4 -6 V0 M7.5 -6 V0" stroke="#3a3230" stroke-width="1.6"/><g fill="#efe9db"><circle cx="-6" cy="-9" r="4.4"/><circle cx="-1" cy="-11" r="4.8"/><circle cx="4" cy="-10" r="4.6"/><circle cx="7" cy="-8" r="3.6"/><circle cx="-2" cy="-7" r="4.6"/><circle cx="3.5" cy="-6.6" r="4"/></g><path d="M-10 -8 Q-4 -3 9 -5 Q4 -2 -2 -2.6 Q-8 -3 -10 -8Z" fill="#cfc6b1"/><g transform="${graze?"translate(10 -4) rotate(35)":"translate(10.5 -10)"}"><ellipse cx="0" cy="0" rx="2.8" ry="3.8" fill="#3a3230"/><path d="M-2.4 -2 L-5 -3.2 L-2.6 -.6Z" fill="#3a3230"/><circle cx="1" cy="-.8" r=".5" fill="#eee"/></g><circle cx="1" cy="-13" r="2" fill="#fff" opacity=".35"/></g>`;
+const lfPig=(x,y,c,d,f)=>`<g transform="translate(${x} ${y}) scale(${f?-1:1} 1)"><path d="M-6 -4 V0 M-3 -4 V0 M4 -4 V0 M7 -4 V0" stroke="${d}" stroke-width="2"/><path d="M-11 -8 q-3 -1 -2 -3 q1 -1 2 .5" stroke="${d}" stroke-width="1" fill="none"/><ellipse cx="0" cy="-7.5" rx="10.5" ry="5.6" fill="${c}"/><ellipse cx="-1" cy="-4.6" rx="8" ry="2.4" fill="${d}" opacity=".45"/><path d="M8 -11 L10.5 -15 L11.5 -10Z" fill="${d}"/><ellipse cx="11.6" cy="-7" rx="2.3" ry="2.8" fill="${c}"/><ellipse cx="13.6" cy="-6.4" rx="1.1" ry="1.6" fill="${d}"/><circle cx="10.6" cy="-8.6" r=".55" fill="#14122a"/><ellipse cx="1" cy="-10.6" rx="6" ry="1.6" fill="#fff" opacity=".16"/></g>`;
+const lfBird=(x,y,f,peck)=>`<g transform="translate(${x} ${y}) scale(${f?-1:1} 1)"><path d="M-.5 -3 L-1 0 M1.2 -3 L1.6 0" stroke="#c8322f" stroke-width=".8"/><path d="M-6 -5.4 L-2 -4.6 L-2 -3.4Z" fill="#26262a"/><ellipse cx="0" cy="-4.6" rx="4.2" ry="2.5" fill="#8d8f93"/><path d="M-3 -3.4 Q0 -1.8 3.4 -3.6 Q1 -2.6 -3 -3.4Z" fill="#f2f2ee"/><g transform="${peck?"translate(3.4 -4.2) rotate(40)":"translate(3.6 -7.2)"}"><path d="M-1.8 1.2 Q0 3 1.8 1.4 L1.6 -.4 Q0 .6 -1.6 -.2Z" fill="#26262a"/><circle cx="0" cy="-1" r="1.9" fill="#8d8f93"/><path d="M-.6 -2.6 Q-3 -4.6 -4.6 -4" stroke="#26262a" stroke-width=".7" fill="none"/><circle cx=".6" cy="-1.2" r=".5" fill="#c8322f"/><path d="M1.8 -1 l1.8 .4 -1.8 .4z" fill="#26262a"/></g></g>`;
+const lfOx=(x,y,c,d)=>`<g transform="translate(${x} ${y})"><path d="M-12 -9 V0 M-8 -9 V0 M8 -9 V0 M12 -9 V0" stroke="${d}" stroke-width="2.6"/><path d="M-15 -14 Q-19 -8 -17 -2" stroke="${d}" stroke-width="1.2" fill="none"/><path d="M-15 -17 Q-15 -22 -8 -22 H10 Q15 -22 15 -16 V-10 Q15 -7 10 -7 H-10 Q-15 -7 -15 -12Z" fill="${c}"/><path d="M-15 -12 Q-15 -7 -10 -7 H10 Q14 -7 15 -10" stroke="${d}" stroke-width="2.4" fill="none" opacity=".6"/><path d="M14 -20 L21 -18 L22 -11 Q22 -9 20 -9 L16 -10Z" fill="${c}"/><path d="M19 -10 Q22 -10 22 -12" stroke="${d}" stroke-width="1.4" fill="none"/><path d="M15 -20 Q12 -23 13.6 -25 M19 -19 Q21.6 -22 20.4 -24.6" stroke="#e9dfc4" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="18.6" cy="-15.6" r=".6" fill="#14122a"/><path d="M-10 -21 H8" stroke="#fff" stroke-width="1.2" opacity=".18"/></g>`;
+
 const LOF=[
- {id:"ruka",m:"ruka",es:"casa",en:"house",price:30,x:150,y:92,s:`<g><path d="M-30 34 Q-29 -4 0 -8 Q29 -4 30 34Z" fill="#c9a25a"/><path d="M-22 10 Q0 1 22 10 M-26 22 Q0 13 26 22" stroke="#8a6a3a" stroke-width="1.5" fill="none"/><rect x="-6" y="18" width="12" height="16" fill="#2a2018"/></g>`,
-  ma:"Tüfa ñi ruka.",ses:"Esta es mi casa.",sen:"This is my house."},
- {id:"pewen",m:"pewen",es:"araucaria",en:"monkey-puzzle tree",price:25,x:52,y:40,s:`<g><rect x="-2.5" y="-6" width="5" height="68" fill="#5a4330"/><g stroke="#2f6b3f" stroke-width="4.5" fill="none" stroke-linecap="round"><path d="M0 -4 Q-14 2 -26 -8"/><path d="M0 -4 Q14 2 26 -8"/><path d="M0 4 Q-12 10 -22 0"/><path d="M0 4 Q12 10 22 0"/><path d="M0 -10 Q-8 -8 -14 -16"/><path d="M0 -10 Q8 -8 14 -16"/></g><g fill="#3d8a52"><circle cx="-26" cy="-9" r="3"/><circle cx="26" cy="-9" r="3"/><circle cx="-22" cy="-1" r="3"/><circle cx="22" cy="-1" r="3"/><circle cx="-14" cy="-17" r="3"/><circle cx="14" cy="-17" r="3"/></g></g>`,
-  ma:"Pewen mew müley ngülliw.",ses:"En el pewen hay piñones.",sen:"There are pine nuts in the pewen."},
- {id:"mawida",m:"mawida",es:"monte",en:"wooded hills",price:20,x:318,y:58,s:`<text font-size="26" text-anchor="middle">🌲🌲</text>`,
+ {id:"mawida",m:"mawida",es:"monte",en:"wooded hills",price:20,x:316,y:116,k:1,z:1,vb:"-50 -34 100 38",
+  s:`<path d="M-50 2 Q-30 -16 -6 -14 Q20 -22 50 2Z" fill="#3c653d"/>${[[-38,-4,7],[-28,-9,8],[-17,-12,9],[-6,-13,8],[5,-15,10],[16,-15,9],[27,-12,8],[37,-7,7],[-22,-4,7],[0,-6,8],[22,-5,7]].map(([a,b,r])=>`<ellipse cx="${a}" cy="${b-r*.6}" rx="${r*.75}" ry="${r}" fill="#2b4f31"/><ellipse cx="${a+r*.25}" cy="${b-r*.75}" rx="${r*.42}" ry="${r*.7}" fill="#3f6e43"/>`).join("")}`,
   ma:"Mawida mew umawtuy ngürü.",ses:"En el monte duerme el zorro.",sen:"The fox sleeps in the woods."},
- {id:"ko",m:"ko",es:"agua, estero",en:"water, stream",price:20,x:0,y:0,s:`<path d="M-10 178 Q40 168 70 186 T150 206 L150 220 L-10 220Z" fill="#2f5fd0" opacity=".85"/>`,
+ {id:"lafken",m:"lafken",es:"lago, mar",en:"lake, sea",price:35,x:0,y:0,abs:1,z:2,vb:"30 110 140 30",
+  s:`<ellipse cx="100" cy="125" rx="68" ry="10.5" fill="#9fb27a"/><ellipse cx="100" cy="124.6" rx="64" ry="8.6" fill="url(#lfLake)"/><g stroke="#e6f1fb" stroke-linecap="round" opacity=".55" class="lf-shim"><path d="M62 122 h14 M90 125 h22 M124 121 h10 M78 128 h12"/></g><g stroke="#56743a" stroke-width="1" stroke-linecap="round"><path d="M38 125 l-1 -6 M40 125 l1 -7 M42 126 l0 -5 M160 124 l1 -6 M162 125 l-1 -5"/></g>`,
+  ma:"Lafken mew müley challwa.",ses:"En el lago hay peces.",sen:"There are fish in the lake."},
+ {id:"wampo",m:"wampo",es:"bote, canoa",en:"canoe",price:25,x:82,y:125.5,z:3,req:"lafken",vb:"-16 -6 32 9",
+  s:`<path d="M-15 -2 Q-13 2 0 2 Q13 2 15 -2 L13.5 -3 H-13.5Z" fill="#6b4a2e"/><path d="M-12.5 -3 Q0 -1.4 12.5 -3" stroke="#3b2717" stroke-width="1" fill="none"/><path d="M-11 -2.6 L9 -2.6" stroke="#9a7048" stroke-width=".6"/><path d="M-12 3 Q0 5 12 3" stroke="#e6f1fb" stroke-width=".6" opacity=".6" fill="none"/>`,
+  ma:"Wampo mew miawkefuiñ.",ses:"Andábamos en bote.",sen:"We used to go about by canoe."},
+ {id:"pewen",m:"pewen",es:"araucaria",en:"monkey-puzzle tree",price:25,x:30,y:142,sh:10,hz:0,vb:"-36 -114 72 118",
+  s:`<path d="M-3.6 0 L-1.8 -96 H1.8 L3.6 0Z" fill="#5b4331"/><path d="M1.2 -94 L2.8 0" stroke="#86664a" stroke-width="1.1"/><path d="M-2 -30 h-2 M2 -46 h2 M-2 -60 h-2 M2 -70 h2" stroke="#4a3626" stroke-width="1.2"/><path d="M-33 -78 Q-34 -98 0 -110 Q34 -98 33 -78 Q16 -84 0 -82 Q-16 -84 -33 -78Z" fill="#1f4029"/><path d="M0 -84 Q-15.0 -87 -30 -80 q-2 -4 -1 -8" stroke="#244a30" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -84 Q-15.0 -87 -30 -80" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -84 Q15.0 -87 30 -80 q2 -4 1 -8" stroke="#244a30" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -84 Q15.0 -87 30 -80" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -90 Q-16.0 -93 -32 -86 q-2 -4 -1 -8" stroke="#2b5838" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -90 Q-16.0 -93 -32 -86" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -90 Q16.0 -93 32 -86 q2 -4 1 -8" stroke="#2b5838" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -90 Q16.0 -93 32 -86" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -96 Q-15.0 -99 -30 -92 q-2 -4 -1 -8" stroke="#336543" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -96 Q-15.0 -99 -30 -92" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -96 Q15.0 -99 30 -92 q2 -4 1 -8" stroke="#336543" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -96 Q15.0 -99 30 -92" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -102 Q-12.0 -105 -24 -98 q-2 -4 -1 -8" stroke="#3c7249" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -102 Q-12.0 -105 -24 -98" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -102 Q12.0 -105 24 -98 q2 -4 1 -8" stroke="#3c7249" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -102 Q12.0 -105 24 -98" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -107 Q-7.5 -110 -15 -103 q-2 -4 -1 -8" stroke="#4a8456" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -107 Q-7.5 -110 -15 -103" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -107 Q7.5 -110 15 -103 q2 -4 1 -8" stroke="#4a8456" stroke-width="4.4" fill="none" stroke-linecap="round"/><path d="M0 -107 Q7.5 -110 15 -103" stroke="#7fb27f" stroke-width=".7" stroke-dasharray="1.2 1.6" fill="none" opacity=".5"/><path d="M0 -80 Q-8 -78 -12 -72 q-1 -3 1 -5 M0 -76 Q7 -75 11 -70 q1 -3 -1 -5" stroke="#2b5838" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  ma:"Pewen mew müley ngülliw.",ses:"En el pewen hay piñones.",sen:"There are pine nuts in the pewen."},
+ {id:"ko",m:"ko",es:"agua, estero",en:"water, stream",price:20,x:0,y:0,abs:1,z:4,vb:"10 118 140 122",
+  s:`<path d="M134 124 Q120 132 106 139 Q84 150 70 160 Q50 175 42 190 Q30 212 18 240 L64 240 Q66 214 72 190 Q80 174 92 162 Q106 150 118 142 Q130 134 140 126Z" fill="#5f7f3a" opacity=".55" transform="translate(-1.5 1.5)"/><path d="M134 124 Q120 132 106 139 Q84 150 70 160 Q50 175 42 190 Q30 212 18 240 L64 240 Q66 214 72 190 Q80 174 92 162 Q106 150 118 142 Q130 134 140 126Z" fill="url(#lfRiver)"/><g stroke="#e6f1fb" stroke-linecap="round" opacity=".6" class="lf-shim"><path d="M108 143 l-6 3 M84 158 l-8 5 M62 180 l-6 6 M48 206 l-5 9 M40 226 l-3 8"/></g><g stroke="#56743a" stroke-width="1.1" stroke-linecap="round"><path d="M16 236 l-2 -8 M19 237 l1 -9 M38 196 l-3 -7 M41 194 l0 -7 M66 214 l2 -8 M69 213 l-1 -7 M96 162 l2 -6"/></g>`,
   ma:"Ñi kawellu pütokoy ko.",ses:"Mi caballo tomó agua.",sen:"My horse drank water."},
- {id:"poñü",m:"poñü",es:"papas",en:"potatoes",price:20,x:236,y:168,s:`<g><rect x="-26" y="-8" width="52" height="22" rx="3" fill="#5a3f28"/><text y="10" font-size="13" text-anchor="middle">🥔🥔🥔</text></g>`,
-  ma:"Fentren poñü müley.",ses:"Hay muchas papas.",sen:"There are many potatoes."},
- {id:"wa",m:"wa",es:"maíz",en:"maize",price:20,x:96,y:150,s:`<text font-size="20" text-anchor="middle">🌽🌽🌽</text>`,
-  ma:"Ñi chaw küdawi wa mew.",ses:"Mi padre trabajó en el maizal.",sen:"My father worked in the maize field."},
- {id:"kütral",m:"kütral",es:"fuego",en:"fire",price:15,x:200,y:150,s:`<g><ellipse cx="0" cy="8" rx="12" ry="4" fill="#5a4330"/><path d="M-7 8 Q-4 -10 0 -2 Q4 -14 7 8Z" fill="#e8b53a"/><path d="M-3 8 Q0 -4 3 8Z" fill="#c8322f"/></g>`,
-  ma:"Kütral mew inaltuleiñ.",ses:"Estamos a la orilla del fuego.",sen:"We are beside the fire."},
- {id:"achawall",m:"achawall",es:"gallinas",en:"chickens",price:15,x:118,y:132,s:`<text font-size="18" text-anchor="middle">🐔🐔</text>`,
-  ma:"Küla achawall müley ruka mew.",ses:"Hay tres gallinas en la casa.",sen:"There are three chickens at the house."},
- {id:"ufisa",m:"ufisa",es:"ovejas",en:"sheep",price:20,x:286,y:128,s:`<text font-size="20" text-anchor="middle">🐑🐑</text>`,
-  ma:"Epu lig ufisa müley.",ses:"Hay dos ovejas blancas.",sen:"There are two white sheep."},
- {id:"kawellu",m:"kawellu",es:"caballo",en:"horse",price:30,x:36,y:130,s:`<text font-size="26" text-anchor="middle">🐎</text>`,
-  ma:"Ñi chaw niey kiñe kawellu.",ses:"Mi padre tiene un caballo.",sen:"My father has a horse."},
- {id:"waka",m:"waka",es:"vaca",en:"cow",price:25,x:330,y:170,s:`<text font-size="24" text-anchor="middle">🐄</text>`,
-  ma:"Kiñe waka müley.",ses:"Hay una vaca.",sen:"There is a cow."},
- {id:"trewa",m:"trewa",es:"perro",en:"dog",price:15,x:178,y:178,s:`<text font-size="18" text-anchor="middle">🐕</text>`,
-  ma:"Ñi trewa umawtukey kütral mew.",ses:"Mi perro suele dormir junto al fuego.",sen:"My dog usually sleeps by the fire."},
- {id:"witral",m:"witral",es:"telar",en:"loom",price:35,x:228,y:96,s:`<g><path d="M-18 -10 H18" stroke="#7a5a3c" stroke-width="3"/><rect x="-16" y="-10" width="3" height="34" fill="#7a5a3c"/><rect x="13" y="-10" width="3" height="34" fill="#7a5a3c"/><rect x="-11" y="2" width="22" height="16" fill="#c8322f"/><path d="M0 4 l6 6 -6 6 -6 -6z" fill="#14122a"/></g>`,
+ {id:"kachilla",m:"kachilla",es:"trigo",en:"wheat",price:25,x:262,y:131,vb:"-50 -18 100 22",
+  s:`<path d="M-48 0 Q-44 -12 -30 -14 H32 Q46 -12 48 0Z" fill="#c9a24c"/><path d="M-44 -3 Q-40 -11 -28 -12 H30 Q42 -11 44 -3Z" fill="#dcb95f"/><g stroke="#a98235" stroke-width=".8" opacity=".8">${Array.from({length:22},(_,i)=>`<path d="M${-42+i*4} ${-2-(i%3)} l${(i%2)?.8:-.8} -5"/>`).join("")}</g><g fill="#efd486">${Array.from({length:14},(_,i)=>`<ellipse cx="${-36+i*5.4}" cy="${-12+(i%2)}" rx=".9" ry="1.8"/>`).join("")}</g>`,
+  ma:"Kachilla mew dewmakeiñ kofke.",ses:"Con el trigo hacemos pan.",sen:"We make bread from the wheat."},
+ {id:"palin",m:"palin",es:"cancha de palin",en:"palin field",price:40,x:322,y:146,vb:"-48 -20 96 24",
+  s:`<path d="M-46 0 L-34 -16 H34 L46 0Z" fill="#79a85a"/><path d="M-46 0 L-34 -16 H34 L46 0Z M0 -16 V0" stroke="#f2ecd8" stroke-width="1" fill="none" opacity=".9"/><path d="M-40 -8 H40" stroke="#f2ecd8" stroke-width=".6" stroke-dasharray="2 2" opacity=".7"/><g stroke="#6b4a2e" stroke-width="1.6"><path d="M-44 0 V-8 M-36 -16 V-23 M44 0 V-8 M36 -16 V-23"/></g><circle cx="5" cy="-7" r="1.6" fill="#f2ecd8"/>`,
+  ma:"Wüle palin müleay.",ses:"Mañana habrá palin.",sen:"Tomorrow there will be palin."},
+ {id:"mamüll",m:"mamüll",es:"leña",en:"firewood",price:15,x:132,y:152,sh:16,vb:"-18 -20 36 22",
+  s:`<path d="M-15 -1 L-9 -6 H15 L15 -1Z M-12 -9 L-7 -13 H13 V-8Z M-8 -16 L-4 -19 H10 V-15Z" fill="#6e4f30"/>${[[-12,-3.4],[-6,-3.4],[0,-3.4],[6,-3.4],[-9,-9.6],[-3,-9.6],[3,-9.6],[-6,-15.6],[0,-15.6]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="3.2" fill="#c49762"/><circle cx="${a}" cy="${b}" r="1.6" fill="none" stroke="#8a6638" stroke-width=".6"/>`).join("")}<path d="M-15 -.4 H9" stroke="#3b2a1a" stroke-width=".8" opacity=".5"/>`,
+  ma:"Ñi chaw yey mamüll.",ses:"Mi padre trajo leña.",sen:"My father brought firewood."},
+ {id:"ruka",m:"ruka",es:"casa",en:"house",price:30,x:180,y:154,sh:44,vb:"-46 -78 92 82",
+  s:`<path d="M6 -55 q-5 -9 2 -16 q6 -7 -1 -15" stroke="#eef0f2" stroke-width="3.4" fill="none" stroke-linecap="round" class="lf-smk"/><path d="M-44 0 C-44 -32 -25 -54 0 -56 C25 -54 44 -32 44 0Z" fill="#b8904f"/><path d="M-44 0 C-44 -32 -25 -54 0 -56 C-14 -50 -24 -34 -24 0Z" fill="#8f6c38" opacity=".6"/><g fill="none" stroke-linecap="round"><path d="M-40 -15 Q0 -27 40 -15 M-34 -30 Q0 -41 34 -30 M-22 -45 Q0 -52 22 -45" stroke="#7d5c2e" stroke-width="1.6" opacity=".7"/><path d="M-40 -13 Q0 -25 40 -13 M-34 -28 Q0 -39 34 -28 M-22 -43 Q0 -50 22 -43" stroke="#dcb873" stroke-width="1" stroke-dasharray="1.5 2.5" opacity=".8"/></g><path d="M26 -46 C36 -36 42 -22 43 -5" stroke="#e6c483" stroke-width="2" fill="none" opacity=".6"/><ellipse cx="6" cy="-54" rx="4.5" ry="1.6" fill="#3a2a18"/><path d="M4 0 V-17 Q12 -24 20 -17 V0Z" fill="#2a1d12"/><path d="M4 0 V-17 Q12 -24 20 -17 V0" stroke="#6b4b26" stroke-width="1.4" fill="none"/><path d="M-44 0 Q0 4 44 0" stroke="#5a4228" stroke-width="2.4" fill="none"/>`,
+  ma:"Tüfa ñi ruka.",ses:"Esta es mi casa.",sen:"This is my house."},
+ {id:"witral",m:"witral",es:"telar",en:"loom",price:35,x:228,y:150,sh:15,vb:"-18 -40 36 44",
+  s:`<rect x="-15" y="-38" width="3.4" height="38" rx="1" fill="#7a5a3c"/><rect x="11.6" y="-38" width="3.4" height="38" rx="1" fill="#8e6c4a"/><path d="M-17 -35 H17 M-14 -6 H14" stroke="#6b4b2e" stroke-width="2.6" stroke-linecap="round"/><g stroke="#e9e1cc" stroke-width=".5" opacity=".9">${Array.from({length:11},(_,i)=>`<path d="M${-10+i*2} -34 V-22"/>`).join("")}</g><rect x="-11" y="-23" width="22" height="16" fill="#b7302c"/><path d="M-11 -21 H11 M-11 -9 H11" stroke="#14122a" stroke-width="1.6"/><path d="M0 -20 L6 -15 L0 -10 L-6 -15Z" fill="#14122a"/><path d="M0 -17.6 L2.6 -15 L0 -12.4 L-2.6 -15Z" fill="#efe7d2"/><path d="M-9 -15 h2 M7 -15 h2" stroke="#efe7d2" stroke-width="1.4"/>`,
   ma:"Ñi ñuke küdawi witral mew.",ses:"Mi madre trabajó en el telar.",sen:"My mother worked at the loom."},
- {id:"palin",m:"palin",es:"cancha de palin",en:"palin field",price:40,x:300,y:96,s:`<g><rect x="-34" y="-8" width="68" height="20" fill="#5a8d4a"/><path d="M-34 -8 H34 V12 H-34Z M0 -8 V12" stroke="#e9e3cf" stroke-width="1" fill="none"/><circle cx="6" cy="2" r="2" fill="#e9e3cf"/></g>`,
-  ma:"Wüle palin müleay.",ses:"Mañana habrá palin.",sen:"Tomorrow there will be palin."}
+ {id:"wa",m:"wa",es:"maíz",en:"maize",price:20,x:276,y:166,vb:"-42 -34 84 38",
+  s:`<path d="M-40 0 Q-36 -10 -24 -11 H26 Q38 -10 40 0Z" fill="#6b4a30"/><g stroke="#4f3622" stroke-width=".8" opacity=".7"><path d="M-34 -3 H34 M-30 -7 H30"/></g>${[-9,-5,-1].flatMap((r,ri)=>Array.from({length:7},(_,i)=>{const s=.7+ri*.15,x=-27+i*9+(ri%2)*4,y=r;return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 V-24" stroke="#6f9a3a" stroke-width="1.4"/><path d="M0 -8 Q-7 -10 -9 -5 M0 -13 Q7 -15 9 -10 M0 -18 Q-6 -21 -8 -17" stroke="#7fae45" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="1.6" cy="-12" rx="1.3" ry="3" fill="#e2c35a"/><path d="M0 -24 l-2 -4 M0 -24 l2 -4 M0 -24 v-5" stroke="#d8b45a" stroke-width=".8"/></g>`})).join("")}`,
+  ma:"Ñi chaw küdawi wa mew.",ses:"Mi padre trabajó en el maizal.",sen:"My father worked in the maize field."},
+ {id:"kudi",m:"kudi",es:"piedra de moler",en:"grinding stone",price:20,x:150,y:172,sh:15,vb:"-18 -14 36 16",
+  s:`<path d="M-16 0 Q-17 -6 -11 -8 L13 -9 Q17 -6 16 0Z" fill="#7d7a73"/><path d="M-14 -6 Q-10 -9 0 -9.4 L13 -9 Q15 -8 14 -6.5 Q0 -5 -14 -6Z" fill="#a8a49b"/><ellipse cx="2" cy="-10.6" rx="5" ry="2.4" fill="#8c8880"/><ellipse cx="3.4" cy="-11.4" rx="2.6" ry="1" fill="#b7b3aa"/><g fill="#d6b25a"><circle cx="-8" cy="-7" r=".7"/><circle cx="-5" cy="-7.4" r=".7"/><circle cx="9" cy="-7.6" r=".7"/><circle cx="-10" cy="-6.6" r=".6"/></g>`,
+  ma:"Kudi mew ñi ñuke kudituy kachilla.",ses:"Mi madre molió trigo en la piedra.",sen:"My mother ground wheat on the stone."},
+ {id:"kawellu",m:"kawellu",es:"caballo",en:"horse",price:30,x:96,y:174,sh:16,vb:"-24 -40 50 44",
+  s:`<g stroke-linecap="round"><path d="M-10 -14 L-11 0 M-6 -14 L-5 0" stroke="#4f2e1b" stroke-width="2.6"/><path d="M8 -14 L9 0 M12 -14 L13 0" stroke="#6b3e24" stroke-width="2.6"/></g><path d="M-11 0 h2.4 M-5 0 h2.4 M9 0 h2.4 M13 0 h2.4" stroke="#1d1410" stroke-width="1.6"/><path d="M-15 -22 Q-22 -16 -19 -5" stroke="#2e1d14" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M-15 -22 Q-15 -27 -8 -27 H8 Q14 -27 16 -23 L22 -36 Q24 -40 28 -37 L33 -31 Q34 -28 31 -28 L25 -30 L20 -18 Q18 -13 12 -13 H-10 Q-15 -13 -15 -18Z" fill="#7a4a2b"/><path d="M-12 -15 Q0 -12 12 -14" stroke="#5a341e" stroke-width="2.4" fill="none" opacity=".6"/><path d="M15 -24 L22 -37 Q24 -40 27 -38" stroke="#2e1d14" stroke-width="2.2" fill="none"/><path d="M-10 -26 Q2 -28 12 -25" stroke="#a6704a" stroke-width="1.6" fill="none" opacity=".7"/><circle cx="27.4" cy="-34" r=".7" fill="#14122a"/><path d="M26 -39 l1 -3 1.6 3" fill="#5a341e"/>`,
+  ma:"Ñi chaw niey kiñe kawellu.",ses:"Mi padre tiene un caballo.",sen:"My father has a horse."},
+ {id:"kütral",m:"kütral",es:"fuego",en:"fire",price:15,x:214,y:178,sh:0,vb:"-22 -34 44 38",
+  s:`<ellipse cx="0" cy="-1" rx="24" ry="7" fill="url(#lfGlow)"/><path d="M2 -24 q-5 -8 1 -14 q5 -6 -1 -12" stroke="#d9dde0" stroke-width="2.6" fill="none" stroke-linecap="round" class="lf-smk"/>${[[-11,0],[-7,2],[-1,3],[5,2.6],[10,.6],[11,-2],[-11,-2.4]].map(([a,b])=>`<ellipse cx="${a}" cy="${b-1}" rx="3.4" ry="2.2" fill="#7f7d78"/><ellipse cx="${a+.6}" cy="${b-1.8}" rx="2" ry="1" fill="#a3a09a"/>`).join("")}<path d="M-9 -1 L8 -4 M-8 -4 L9 -1" stroke="#5a3a22" stroke-width="2.6" stroke-linecap="round"/><g class="lf-flame"><path d="M-7 -2 C-8 -9 -3 -11 -2.4 -18 C0 -13 3 -15 2.4 -22 C7 -15 8.6 -9 7 -2Z" fill="#e8952a"/><path d="M-4 -2 C-4 -7 -1 -8 -.6 -13 C1.4 -9 4 -9 4 -2Z" fill="#f2c03c"/><path d="M-1.6 -2 C-1.6 -5 0 -6 .4 -8 C1.4 -6 2 -5 2 -2Z" fill="#fff2b0"/></g>`,
+  ma:"Kütral mew inaltuleiñ.",ses:"Estamos a la orilla del fuego.",sen:"We are beside the fire."},
+ {id:"challa",m:"challa",es:"olla",en:"clay pot",price:15,x:236,y:182,sh:11,vb:"-15 -18 30 20",
+  s:`<g transform="translate(-4 0)"><path d="M-8 0 Q-12.5 -6 -9 -12 L-6 -14 H6 L9 -12 Q12.5 -6 8 0Z" fill="#8c4a2b"/><ellipse cx="0" cy="-14" rx="6.2" ry="1.6" fill="#5e2f1b"/><path d="M6 -11 Q10 -6 6.6 -1.6" stroke="#b9714a" stroke-width="1.4" fill="none"/><path d="M-8 -7 H8" stroke="#6e3820" stroke-width=".8"/></g><g transform="translate(8 1)"><path d="M-5 0 Q-7.6 -4 -5.4 -7.6 L-3.6 -8.6 H3.6 L5.4 -7.6 Q7.6 -4 5 0Z" fill="#9b5634"/><ellipse cx="0" cy="-8.6" rx="3.8" ry="1" fill="#5e2f1b"/><path d="M3.8 -7 Q6 -4 4 -1" stroke="#c07b52" stroke-width="1" fill="none"/></g>`,
+  ma:"Challa mew afümkeiñ poñü.",ses:"En la olla cocemos papas.",sen:"We cook potatoes in the pot."},
+ {id:"lawen",m:"lawen",es:"plantas medicinales",en:"medicinal plants",price:25,x:122,y:188,sh:0,vb:"-24 -18 48 20",
+  s:`<ellipse cx="0" cy="-1" rx="22" ry="4.6" fill="#5a3f27"/><g stroke="#8a6a44" stroke-width="1"><path d="M-21 -1 V-8 M-14 2 V-6 M-7 3 V-5 M0 3.4 V-4.6 M7 3 V-5 M14 2 V-6 M21 -1 V-8"/><path d="M-21 -6 Q0 0 21 -6" fill="none"/></g>${[[-14,-3,"#4d8a3e","#f2f2ee"],[-6,-2,"#5d9a48","#e8c440"],[2,-2.6,"#3f7a3a","#b48ad0"],[10,-2.4,"#5d9a48","#f2f2ee"],[17,-3.4,"#4d8a3e","#e8c440"],[-17,-6,"#3f7a3a","#b48ad0"]].map(([a,b,c,f])=>`<g transform="translate(${a} ${b})"><circle cx="-2" cy="-3" r="3" fill="${c}"/><circle cx="2" cy="-4" r="3.2" fill="${c}"/><circle cx="0" cy="-6" r="2.6" fill="${c}"/><circle cx="1" cy="-5.6" r="1.2" fill="#fff" opacity=".2"/><circle cx="-1.6" cy="-6.6" r=".8" fill="${f}"/><circle cx="2.4" cy="-6" r=".8" fill="${f}"/><circle cx="0" cy="-8" r=".8" fill="${f}"/></g>`).join("")}`,
+  ma:"Ñi ñuke kimi lawen.",ses:"Mi madre conoce las plantas medicinales.",sen:"My mother knows the medicinal plants."},
+ {id:"ufisa",m:"ufisa",es:"ovejas",en:"sheep",price:20,x:304,y:190,sh:20,vb:"-26 -22 52 24",
+  s:`${lfSheep(-10,0,0,1)}${lfSheep(11,2,1,0)}`,
+  ma:"Epu lig ufisa müley.",ses:"Hay dos ovejas blancas.",sen:"There are two white sheep."},
+ {id:"trewa",m:"trewa",es:"perro",en:"dog",price:15,x:194,y:194,sh:11,vb:"-14 -12 30 14",
+  s:`<path d="M-9 -3 Q-15 -2 -13 -7" stroke="#6b4426" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-4" rx="9.5" ry="4.2" fill="#8a5a32"/><ellipse cx="0" cy="-2" rx="7" ry="2" fill="#c49a6c"/><path d="M5 -1 h7 M-4 -.6 h5" stroke="#6b4426" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="-6.4" r="3.6" fill="#8a5a32"/><path d="M11.6 -6 l3 1 -2.8 1.4Z" fill="#c49a6c"/><path d="M7 -9 L6.2 -5 L8.6 -6.6Z" fill="#4f3220"/><path d="M9.6 -6.8 q.8 .5 1.4 0" stroke="#14122a" stroke-width=".6" fill="none"/><ellipse cx="2" cy="-7" rx="5" ry="1.2" fill="#fff" opacity=".15"/>`,
+  ma:"Ñi trewa umawtukey kütral mew.",ses:"Mi perro suele dormir junto al fuego.",sen:"My dog usually sleeps by the fire."},
+ {id:"mansun",m:"mansun",es:"bueyes",en:"oxen",price:35,x:104,y:226,sh:24,vb:"-24 -30 52 34",
+  s:`<g transform="translate(-6 -2) scale(.92)">${lfOx(0,0,"#9a5a32","#5e3218")}</g>${lfOx(-2,3,"#b9875a","#6b4426")}<path d="M12 -19 L20 -24" stroke="#6b4a2e" stroke-width="2.4" stroke-linecap="round"/>`,
+  ma:"Ñi chaw niey epu mansun.",ses:"Mi padre tiene dos bueyes.",sen:"My father has two oxen."},
+ {id:"achawall",m:"achawall",es:"gallinas",en:"chickens",price:15,x:160,y:208,sh:14,vb:"-18 -16 36 18",
+  s:`${lfHen(-7,0,"#b5652e","#7d3f1a",0)}${lfHen(8,1.6,"#efe8da","#c8bfae",1)}`,
+  ma:"Küla achawall müley ruka mew.",ses:"Hay tres gallinas en la casa.",sen:"There are three chickens at the house."},
+ {id:"sañwe",m:"sañwe",es:"chanchos",en:"pigs",price:20,x:246,y:210,sh:20,vb:"-24 -16 50 18",
+  s:`${lfPig(-9,0,"#3e3431","#211a18",0)}${lfPig(10,2,"#d9a094","#9a6157",1)}`,
+  ma:"Küla sañwe müley.",ses:"Hay tres chanchos.",sen:"There are three pigs."},
+ {id:"waka",m:"waka",es:"vaca",en:"cow",price:25,x:330,y:214,sh:18,vb:"-22 -32 50 36",
+  s:`${lfOx(0,0,"#f2eee6","#8f8a80")}<path d="M-8 -21 q6 -2 8 4 q-4 4 -9 1Z M4 -14 q4 -6 8 -2 q-1 5 -7 4Z M17 -19 l4 1 l-1 4 l-3 -1Z" fill="#6e4126"/><ellipse cx="6" cy="-6.6" rx="3" ry="1.6" fill="#e4a7a0"/>`,
+  ma:"Kiñe waka müley.",ses:"Hay una vaca.",sen:"There is a cow."},
+ {id:"tregül",m:"tregül",es:"queltehues",en:"southern lapwings",price:15,x:200,y:224,sh:12,vb:"-14 -14 30 16",
+  s:`${lfBird(-6,0,0,0)}${lfBird(7,1.4,1,1)}`,
+  ma:"Epu tregül müley lelfün mew.",ses:"Hay dos queltehues en el campo.",sen:"There are two lapwings in the field."},
+ {id:"poñü",m:"poñü",es:"papas",en:"potatoes",price:20,x:288,y:236,vb:"-50 -22 100 26",
+  s:`<path d="M-48 0 Q-44 -16 -30 -18 H32 Q46 -16 48 0Z" fill="#6b4a30"/><g stroke="#4f3622" stroke-width="1.1" opacity=".75"><path d="M-44 -4 H44 M-40 -10 H40 M-34 -15 H34"/></g>${[[-15,.6],[-9.4,.75],[-2.8,.9]].flatMap(([y,s],ri)=>Array.from({length:8},(_,i)=>`<g transform="translate(${-36+i*10+(ri%2)*5} ${y}) scale(${s})"><circle cx="-2.6" cy="-2" r="3" fill="#3f7a3a"/><circle cx="2.6" cy="-2.4" r="3.2" fill="#4f8a3e"/><circle cx="0" cy="-4.4" r="2.8" fill="#5d9a48"/><circle cx=".6" cy="-6" r=".9" fill="#ece6f2"/><circle cx="-1.6" cy="-5" r=".8" fill="#c8b0dc"/></g>`)).join("")}`,
+  ma:"Fentren poñü müley.",ses:"Hay muchas papas.",sen:"There are many potatoes."},
+ {id:"mañke",m:"mañke",es:"cóndor",en:"condor",price:30,x:250,y:42,k:1,z:0,sh:0,vb:"-36 -6 72 16",
+  s:`<g class="lf-glide"><path d="M0 0 C-8 -2 -18 -1 -30 2 L-35 4 L-30 4.4 L-33.6 6.4 L-28.4 5.6 L-30.4 8.6 L-24 5.6 C-14 4.4 -6 4.2 0 3.4 C6 4.2 14 4.4 24 5.6 L30.4 8.6 L28.4 5.6 L33.6 6.4 L30 4.4 L35 4 L30 2 C18 -1 8 -2 0 0Z" fill="#1d1d22"/><path d="M-27 3.2 C-17 1.4 -9 1.2 -3 1.6 M27 3.2 C17 1.4 9 1.2 3 1.6" stroke="#dcdcdc" stroke-width="1.4" fill="none" opacity=".85"/><ellipse cx="0" cy=".8" rx="2.2" ry="1.4" fill="#f2f2f2"/><circle cx="0" cy="-1.4" r="1.3" fill="#b5675b"/><path d="M-3 3.4 L0 7 L3 3.4" fill="#1d1d22"/></g>`,
+  ma:"Kiñe mañke müley wenu mew.",ses:"Hay un cóndor arriba.",sen:"There is a condor up above."}
 ];
+const lfK=p=>p.k||Math.min(1.12,.56+.52*(p.y-118)/112);
+const lfPiece=(p,sel)=>`<g transform="translate(${p.x} ${p.y})${p.abs?"":` scale(${lfK(p).toFixed(3)})`}"${!p.abs&&p.y<146&&!p.k&&p.hz!==0?` filter="url(#lfHaze)"`:""}><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(G(p.m))}">${p.sh?lfSh(p.sh):""}${p.s}</g></g>`;
+const lfThumb=p=>`<svg viewBox="${p.vb}" aria-hidden="true">${p.s}</svg>`;
 function lofScene(sel){
   const has=id=>lofOwned.includes(id);
-  return `<svg viewBox="0 0 360 220" class="lofsvg" role="img" aria-label="lof">
-    <rect width="360" height="220" fill="#6a9ad0"/><circle cx="312" cy="26" r="13" fill="#e8b53a"/>
-    <path d="M0 96 Q70 62 140 88 Q220 56 360 86 V220 H0Z" fill="#4f7d45"/><path d="M0 120 Q120 104 240 120 T360 118 V220 H0Z" fill="#5a8d4a"/>
-    ${LOF.filter(p=>has(p.id)).map(p=>`<g transform="translate(${p.x} ${p.y})"><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(G(p.m))}">${p.s}</g></g>`).join("")}
+  const tufts=[[30,150],[150,140],[248,150],[320,170],[110,200],[176,226],[236,196],[26,214],[340,232],[270,186],[90,232],[200,134],[300,140],[140,232]];
+  return `<svg viewBox="0 0 360 240" class="lofsvg" role="img" aria-label="lof">
+    <defs>
+      <linearGradient id="lfSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f93cf"/><stop offset=".75" stop-color="#a9cbe6"/><stop offset="1" stop-color="#d9e8ee"/></linearGradient>
+      <linearGradient id="lfMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa35a"/><stop offset=".35" stop-color="#679448"/><stop offset="1" stop-color="#4c7a36"/></linearGradient>
+      <linearGradient id="lfRiver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8db6dc"/><stop offset="1" stop-color="#3d72b0"/></linearGradient>
+      <linearGradient id="lfLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ec3e4"/><stop offset="1" stop-color="#4b80bd"/></linearGradient>
+      <radialGradient id="lfSun"><stop offset="0" stop-color="#fff6d0"/><stop offset=".35" stop-color="#f6d77a" stop-opacity=".9"/><stop offset="1" stop-color="#f6d77a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="lfGlow"><stop offset="0" stop-color="#ffc35a" stop-opacity=".75"/><stop offset="1" stop-color="#ffc35a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="lfVig" cx=".5" cy=".45" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0b0a18" stop-opacity=".35"/></radialGradient>
+      <linearGradient id="lfHazeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfeaf0" stop-opacity="0"/><stop offset=".5" stop-color="#dfeaf0" stop-opacity=".55"/><stop offset="1" stop-color="#dfeaf0" stop-opacity="0"/></linearGradient>
+      <filter id="lfblur" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="1.3"/></filter>
+      <filter id="lfHaze"><feColorMatrix type="matrix" values=".82 0 0 0 .14  0 .82 0 0 .15  0 0 .82 0 .17  0 0 0 1 0"/></filter>
+    </defs>
+    <rect width="360" height="240" fill="url(#lfSky)"/>
+    <circle cx="300" cy="34" r="34" fill="url(#lfSun)"/><circle cx="300" cy="34" r="10" fill="#fff3c4"/>
+    <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="62" cy="34" rx="22" ry="6"/><ellipse cx="74" cy="29" rx="12" ry="7"/><ellipse cx="54" cy="30" rx="9" ry="5"/></g><g opacity=".7"><ellipse cx="186" cy="22" rx="16" ry="4"/><ellipse cx="194" cy="18" rx="8" ry="5"/></g></g>
+    <path d="M0 96 L28 82 L52 90 L80 72 L108 86 L140 76 L170 88 L196 80 L232 62 L246 56 L258 58 L276 74 L300 82 L330 70 L360 80 V120 H0Z" fill="#8ea7c2"/>
+    <path d="M232 62 L246 56 L258 58 L268 66 L262 68 L256 64 L250 68 L244 64 L238 68Z" fill="#f4f7fa"/>
+    <path d="M246 56 L258 58 L276 74 L300 82 L280 86 L262 78Z" fill="#7a94b2" opacity=".6"/>
+    <path d="M0 106 Q40 92 84 100 Q130 88 178 100 Q228 90 276 98 Q320 90 360 98 V124 H0Z" fill="#5d8a5a"/>
+    <g fill="#486f47">${Array.from({length:30},(_,i)=>`<ellipse cx="${6+i*12.2}" cy="${100+Math.sin(i*1.7)*3.4}" rx="5.4" ry="${4+(i%3)}"/>`).join("")}</g>
+    <rect y="96" width="360" height="22" fill="url(#lfHazeG)"/>
+    <path d="M0 116 Q90 106 180 114 T360 112 V240 H0Z" fill="url(#lfMeadow)"/>
+    <g fill="#5c8a42" opacity=".55"><ellipse cx="60" cy="168" rx="46" ry="8"/><ellipse cx="250" cy="200" rx="60" ry="9"/></g>
+    <path d="M168 240 Q172 210 176 190 Q178 172 184 158 L192 158 Q190 176 192 192 Q196 214 212 240Z" fill="#b59a6a" opacity=".55"/>
+    <g stroke="#3f6a2d" stroke-width=".9" stroke-linecap="round">${tufts.map(([a,b])=>`<path d="M${a} ${b} l-2 -4 M${a+1} ${b} l0 -5 M${a+2} ${b} l2 -4"/>`).join("")}</g>
+    ${LOF.filter(p=>has(p.id)).sort((a,b)=>(a.z??a.y)-(b.z??b.y)).map(p=>lfPiece(p,sel)).join("")}
+    <rect width="360" height="240" fill="url(#lfVig)" pointer-events="none"/>
   </svg>`;
 }
 function lof(sel,msg){
@@ -2840,15 +2929,17 @@ function lof(sel,msg){
     ${p?`<div class="lofcard"><b>${esc(G(p.m))}</b> <span class="muted">${esc(gl(p))}</span><p class="lofsent">${esc(G(p.ma))}</p><p class="muted">${esc(L2(p.ses,p.sen))}</p></div>`
        :`<p class="muted">${lofOwned.length?L2("Toca algo de tu lof para leer su frase.","Tap something in your lof to read its sentence."):L2("Compra la primera pieza para empezar tu lof.","Buy the first piece to start your lof.")}</p>`}
     <div class="items">${LOF.map(x=>{ const own=lofOwned.includes(x.id);
-      return `<div class="item${own?" on":""}"><span class="nm">${esc(G(x.m))}</span><span class="gl">${esc(gl(x))}</span>
+      const lock=x.req&&!lofOwned.includes(x.req);
+      return `<div class="item${own?" on":""}"><div class="th">${lfThumb(x)}</div><span class="nm">${esc(G(x.m))}</span><span class="gl">${esc(gl(x))}</span>${lock&&!own?`<span class="gl">🔒 ${L2("Primero","First")}: ${esc(G(x.req))}</span>`:""}
         ${own?`<button class="btn ghost" data-see="${x.id}">${L2("Ver","View")}</button>`
-             :`<button class="btn" data-lbuy="${x.id}" ${!open||nuts<x.price?"disabled":""}>${NUT}${x.price} · ${t().buy}</button>`}</div>`}).join("")}</div>
+             :`<button class="btn" data-lbuy="${x.id}" ${!open||lock||nuts<x.price?"disabled":""}>${NUT}${x.price} · ${t().buy}</button>`}</div>`}).join("")}</div>
     ${lofOwned.length===LOF.length?`<div class="rule">${L2("¡Tu lof está completo! Kümey.","Your lof is complete! Kümey.")}</div>`:""}`;
   bindLang(()=>lof(sel));
   document.getElementById("bk").onclick=menu;
   app.querySelectorAll(".lp").forEach(g=>{ g.onclick=()=>lof(g.dataset.id); g.onkeydown=e=>{ if(e.key==="Enter") lof(g.dataset.id); }; });
   app.querySelectorAll("[data-see]").forEach(b=>b.onclick=()=>lof(b.dataset.see));
   app.querySelectorAll("[data-lbuy]").forEach(b=>b.onclick=()=>{ const x=LOF.find(i=>i.id===b.dataset.lbuy);
+    if(x.req&&!lofOwned.includes(x.req)) return;
     if(nuts<x.price) return lof(sel,t().need(x.price-nuts));
     nuts-=x.price; lofOwned.push(x.id); save("nuts",nuts); save("lof",lofOwned); lof(x.id,t().bought(x.m)); });
 }
