@@ -4,9 +4,7 @@ Un juego para aprender mapudungun (grafemario Unificado), con niveles desde Prin
 
 Juega en: https://brogers36.github.io/Mapudungukeain/
 
-Diccionario compañero, **Tañi Nemülkawe: Yeniekeafiel ñi Kewün Fill Püle** (mapudungun, español e inglés, con juegos de vocabulario): https://brogers36.github.io/Mapudungukeain/diccionario/ · cómo se arma: `tools/dicc/README.md`.
-
-Sitio de las dos apps (qué son y cómo instalarlas): https://brogers36.github.io/Mapudungukeain/apps/
+Diccionario compañero, **Tañi Nemülkawe: Yeniekeafiel ñi Kewün Fill Püle** (mapudungun, español e inglés, con juegos de vocabulario): https://brogers36.github.io/Mapudungukeain/diccionario/ (página: https://brogers36.github.io/Mapudungukeain/diccionario/acerca/) · cómo se arma: `tools/dicc/README.md`.
 
 Todo el juego está en un solo archivo, `index.html`. El progreso se guarda en el navegador de cada jugador.
 
