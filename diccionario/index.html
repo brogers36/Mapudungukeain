@@ -471,7 +471,8 @@ function entriesForRoot(root,morphs){
   return out.slice(0,8); }
 /* short meaning of a root for the gloss line, in the reader's language */
 function rootMeaning(root,hop){
-  const hs=entriesForRoot(root,[]); if(!hs.length) return "";
+  /* the dictionary's own core glosses come before Augusta's text, which is OCR and can pair a sense with the wrong headword */
+  const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
   const pickTxt=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:(e.s||""));
   for(const e of hs){ let t=pickTxt(e); if(!t) continue;
     if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1):""; if(r) return r; continue; }

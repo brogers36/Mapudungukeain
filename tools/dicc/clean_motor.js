@@ -8,7 +8,11 @@
    no display text. The display code is pointed at "t".
    Usage: node clean_motor.js motor.js augusta1916_entries.json OUT_motor.js */
 const fs = require('fs'), vm = require('vm'), path = require('path');
-const [inp, augf, out] = process.argv.slice(2);
+const [inp, augf, out, datosf] = process.argv.slice(2);
+// meanings for the composer: the dictionary's own core glosses first, then 1916 text of confirmed headwords only
+const CORE = {}, VER = new Set(JSON.parse(fs.readFileSync(path.join(path.dirname(augf), 'augusta1916_verified.json'), 'utf8')));
+if (datosf) { const D = JSON.parse(fs.readFileSync(datosf, 'utf8').replace(/^window\.DICC=/, '').replace(/;\s*$/, ''));
+  for (const c of D.core) if (!c.ph && c.es) { const k = c.m.toLowerCase(); if (!CORE[k]) { const es = c.es.replace(/\s*\([^)]*\)/g, ''); CORE[k] = (/^¿/.test(es) || c.t === 'preg') ? 'interrog. ' + es[0].toUpperCase() + es.slice(1) + '.' : es[0].toUpperCase() + es.slice(1) + '.'; } } }
 let src = fs.readFileSync(inp, 'utf8');
 const AUG = JSON.parse(fs.readFileSync(augf, 'utf8'));
 const ctx = { console, atob, btoa }; ctx.globalThis = ctx; ctx.self = ctx; vm.createContext(ctx);
@@ -45,6 +49,19 @@ function stub(d) {
   return d;
 }
 const t16 = k => { const x = AUG[k]; return x && x.length ? x.join(' ‖ ') : null; };
+/* the meaning composer expects labels like "intr. Saber, conocer.": Augusta writes "n., saber, conocer" (n. = neutro,
+   intransitive; r. = reflexive; a. = active, transitive). The first 1916 text whose label fits the key is used. */
+const LABMAP = [[/^s\.\s*c\.,?\s*/, 's. '], [/^n\.\s*y\s*tr\.,?\s*/, 'intr. '], [/^tr\.\s*y\s*n\.,?\s*/, 'tr. '], [/^n\.,?\s*/, 'intr. '], [/^r\.,?\s*/, 'refl. '], [/^rec\.,?\s*/, 'refl. '],
+  [/^a\.,?\s*/, 'tr. '], [/^tr\.,?\s*/, 'tr. '], [/^s\.,?\s*/, 's. '], [/^adj\.(?:\s*v\.)?,?\s*/, 'adj. '], [/^adv\.,?\s*/, 'adv. '], [/^partíc\.,?\s*/, 'part. '], [/^interj\.,?\s*/, 'interj. ']];
+function m16(k) {
+  const x = AUG[k]; if (!x) return null;
+  const norm = t => { t = t.replace(/^\((?:Panguipulli|Huapi)[^)]*\)\s*/, '').replace(/^[^,]{0,40}?\*,\s*/, '');
+    for (const [re, lab] of LABMAP) if (re.test(t)) { t = t.replace(re, lab); break; }
+    return t.replace(/^((?:intr|tr|refl|s|adj|adv|part|interj)\.\s)([a-zñáéíóú])/, (m, a, b) => a + b.toUpperCase()); };
+  const xs = x.map(norm);
+  const verbal = /(?:n|ün)$/.test(k);
+  return (verbal && xs.find(t => /^(?:intr|tr|refl)\./.test(t))) || xs[0];
+}
 let nA = 0, nK = 0, nT = 0, nLong = 0;
 function cleanTable(tbl) {
   const o = {};
@@ -55,6 +72,7 @@ function cleanTable(tbl) {
       e.d = stub(g.d); delete e.ed;
       if (e.d.split(/\s+/).length > 3) nLong++;
       if (g.src === 'A') { nA++; const t = t16(k); if (t) { e.t = t; nT++; } } else nK++;
+      if (CORE[k]) e.m = CORE[k]; else if (g.src === 'A' && VER.has(k) && AUG[k]) e.m = m16(k);
     }
     o[k] = e;
   }
@@ -73,6 +91,6 @@ for (const [a, b] of edits) { if (src.split(a).length !== 2) throw new Error('di
 const sa = "function senseOf(entry, GLOSS, depth){     if(!entry) return null;     var d=String(entry.d||'');";
 const sa2 = src.indexOf("function senseOf(entry, GLOSS, depth){");
 if (sa2 < 0) throw new Error('senseOf not found');
-src = src.replace(/(function senseOf\(entry, GLOSS, depth\)\{\s*if\(!entry\) return null;\s*var d=String\()entry\.d(\|\|''\);)/, '$1entry.t||entry.d$2');
+src = src.replace(/(function senseOf\(entry, GLOSS, depth\)\{\s*if\(!entry\) return null;\s*var d=String\()entry\.d(\|\|''\);)/, '$1entry.m||entry.d$2');
 fs.writeFileSync(out, src);
 console.log({ A: nA, K: nK, with1916text: nT, stubsOver3words: nLong, bytes: src.length });
