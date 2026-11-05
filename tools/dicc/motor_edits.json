@@ -1,0 +1,7 @@
+[
+ {
+  "why": "chillka-tu- means 'leer', not 'usar libro' (analyst ruling 2026-11-04)",
+  "old": "                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};",
+  "new": "                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chillka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- 'leer, estudiar' (analyst ruling 2026-11-04) */\n                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};"
+ }
+]

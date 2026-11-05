@@ -2796,6 +2796,7 @@ var MEANING = (function(){
         /* verbaliser on a non-verbal root */
         var ntext=predicate(sense, p.root);
         if(!lex){ if(/^(nge|ngi|ng|ge)$/.test(e.vblz)) lex={inf:'ser', comp:ntext};
+                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chillka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- 'leer, estudiar' (analyst ruling 2026-11-04) */
                   else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};
                   else if(/^(ye|yi)$/.test(e.vblz)) lex={inf:'tener', comp:ntext};
                   else lex={inf:'hacer', comp:ntext}; }
@@ -3160,5 +3161,9 @@ function renderSentence(){
 }
 document.getElementById('sentgo').addEventListener('click',renderSentence);
 document.getElementById('sent').addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); renderSentence(); } });
+
+/* Analyst rulings applied to the dictionary's copy of the parser engine (appended by extract.js).
+   2026-11-04: chillka is a root and is never split (chillka-tu-n 'leer', not chi-l-l-ka-tu-n). */
+RULED_ROOTS.push('chillka');
 
 ;globalThis.MOTOR={parse43,inferCat,GX,ORTHO:(typeof ORTHO!=="undefined"?ORTHO:null),MEANING:(typeof MEANING!=="undefined"?MEANING:null)};

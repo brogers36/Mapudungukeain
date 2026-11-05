@@ -12,8 +12,11 @@ D.STAGES.forEach(st=>st.levels.forEach(l=>(l.words||[]).forEach(w=>add(w.m,w.es,
 D.READINGS.forEach(r=>(r.gloss||[]).forEach(([m,es,en])=>add(m,es,en,'Lectura: '+(r.title&&r.title.es||r.title||''),'frase')));
 D.EPEW.forEach(c=>(c.gloss||[]).forEach(([m,es,en])=>add(m,es,en,'Epew: '+c.t,'frase')));
 fs.writeFileSync(path.join(out,'game_vocab.json'),JSON.stringify(vocab));
-const p=fs.readFileSync(parser,'utf8'); const ps=[...p.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]).sort((a,b)=>b.length-a.length)[0];
+const p=fs.readFileSync(parser,'utf8'); let ps=[...p.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]).sort((a,b)=>b.length-a.length)[0];
+/* analyst rulings that change engine code, applied as exact text edits (motor_edits.json) */
+for(const ed of JSON.parse(fs.readFileSync(path.join(__dirname,'motor_edits.json'),'utf8'))){ if(ps.split(ed.old).length!==2) throw new Error('motor edit no longer applies: '+ed.why); ps=ps.replace(ed.old,ed.new); }
 fs.writeFileSync(path.join(out,'motor.js'),'/* Mapudungun morphological parser engine (from the verb parser page), run inside a Web Worker. */\n'+ps.replace(/require\('\/home\/[^']*\/ortho\.js'\)/g,"require('./ortho.js')")+
+  '\n'+fs.readFileSync(path.join(__dirname,'motor_patches.js'),'utf8')+
   '\n;globalThis.MOTOR={parse43,inferCat,GX,ORTHO:(typeof ORTHO!=="undefined"?ORTHO:null),MEANING:(typeof MEANING!=="undefined"?MEANING:null)};\n');
 (0,eval)(ps+'\n;globalThis.MOTOR={parse43,inferCat,GX,MEANING};');
 const M=globalThis.MOTOR, rows=fs.readFileSync(gold,'utf8').trim().split('\n').slice(1);
