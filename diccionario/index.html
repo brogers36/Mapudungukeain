@@ -146,7 +146,6 @@ button{font-family:var(--body)}
 .note{font-size:.85rem;color:var(--muted);border-top:1px solid var(--panel-2);padding-top:12px}
 .seg-pick{display:flex;flex-direction:column;gap:6px}
 footer{font-size:.8rem;color:var(--muted);text-align:center;padding-top:10px}
-#pwaInstall{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--red);color:var(--ink);border:0;border-radius:999px;padding:12px 18px;font:700 1rem var(--body);box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -154,7 +153,6 @@ footer{font-size:.8rem;color:var(--muted);text-align:center;padding-top:10px}
 <div class="band" aria-hidden="true"></div>
 <main class="wrap" id="app" aria-live="polite"><p class="muted">Cargando el diccionario…</p></main>
 <div class="band" aria-hidden="true"></div>
-<button id="pwaInstall" hidden>Instalar la app</button>
 <script src="datos.js"></script>
 <script>
 "use strict";
@@ -172,7 +170,23 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const pick=(a,n)=>shuffle(a).slice(0,n);
 const NUT=`<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
-const GAME_URL="../";
+const GAME_URL="../index.html";
+/* ===== Installing: Android/desktop Chrome hand us an install prompt; iPhone/iPad need Safari's Share menu ===== */
+let installEv=null;
+const standalone=()=>{ try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } };
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEv=e; const b=document.getElementById("instbox"); if(b) b.outerHTML=installBox(); bindInstall(); });
+window.addEventListener("appinstalled",()=>{ installEv=null; const b=document.getElementById("instbox"); if(b) b.outerHTML=installBox(); });
+function installBox(){
+  if(standalone()) return "";
+  const body=installEv
+    ?`<button class="btn" id="instbtn">📲 ${L("Instalar la app","Install the app")}</button>`
+    :isIOS
+    ?`<p>${L("En <b>Safari</b>, toca <b>Compartir</b> (el cuadrado con la flecha) y luego <b>Añadir a pantalla de inicio</b>.","In <b>Safari</b>, tap <b>Share</b> (the square with the arrow), then <b>Add to Home Screen</b>.")}</p>`
+    :`<p>${L("En <b>Chrome</b>, abre el menú <b>⋮</b> y toca <b>Instalar app</b> (o <b>Añadir a pantalla de inicio</b>). Si no aparece, es posible que ya esté instalada: búscala en tu pantalla de inicio.","In <b>Chrome</b>, open the <b>⋮</b> menu and tap <b>Install app</b> (or <b>Add to Home screen</b>). If it isn't there, it may already be installed: look for it on your home screen.")}</p>`;
+  return `<div class="box" id="instbox"><p class="eyebrow">${L("Instalar en el teléfono","Install on your phone")}</p>${body}
+    <p class="hint">${L("Se instala aparte del juego, con su propio ícono, y funciona sin conexión.","It installs separately from the game, with its own icon, and works offline.")}</p></div>`; }
+function bindInstall(){ const b=document.getElementById("instbtn"); if(b) b.onclick=async()=>{ if(!installEv) return; installEv.prompt(); try{ await installEv.userChoice; }catch(e){} installEv=null; const x=document.getElementById("instbox"); if(x) x.outerHTML=installBox(); }; }
 
 /* ===== Grafemarios: words are stored in Unificado and shown in the reader's chosen grafemario (same rules as the game) ===== */
 const GRAF_NAME={uni:"Unificado",azu:"Azümchefe",rag:"Ragileo"};
@@ -275,6 +289,7 @@ function home(){
     <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios. Para buscar en inglés, cambia a <b>EN</b> arriba.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work. To search in Spanish, switch to <b>ES</b> above.")}</p>
     <div id="out"></div>
     <div id="hubwrap">
+      ${installBox()}
       <nav class="hub" aria-label="${L("Secciones","Sections")}">
         <button class="card" data-go="#/juegos"><span class="ic">🎲</span><b>${L("Juegos","Games")}</b><small>${L("Practica el vocabulario y gana ngülliw","Practise vocabulary and earn ngülliw")}</small></button>
         <button class="card" data-go="#/temas"><span class="ic">🗂</span><b>${L("Temas","Topics")}</b><small>${L(`${CORE.length} palabras y frases`,`${CORE.length} words and phrases`)}</small></button>
@@ -286,7 +301,8 @@ function home(){
         <p class="hint">${L("Elige cómo ver las palabras. Es el mismo ajuste del juego.","Choose how words are shown. It is the same setting as the game.")}</p></div>
     </div>
     <footer>${L(`${CORE.length} entradas del núcleo · ${AUG.length.toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${AUG.length.toLocaleString("en")} Augusta entries`)}</footer>`;
-  bindCommon();
+  bindCommon(); bindInstall();
+  if(/[?&]instalar/.test(location.search)){ const b=document.getElementById("instbox"); if(b) b.scrollIntoView({block:"center"}); }
   const q=document.getElementById("q"), clr=document.getElementById("clr");
   let t=null; q.oninput=()=>{ clr.hidden=!q.value; clearTimeout(t); t=setTimeout(()=>{ lastQ=q.value; search(q.value); },140); };
   clr.onclick=()=>{ q.value=""; lastQ=""; clr.hidden=true; search(""); q.focus(); };
@@ -630,12 +646,7 @@ route();
 </script>
 <script>
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
-(function(){ let ev=null; const b=document.getElementById('pwaInstall');
-  try{ if((localStorage.getItem('mpk_lang')||'').indexOf('en')>=0) b.textContent='Install the app'; }catch(e){}
-  window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); ev=e; b.hidden=false; });
-  b.addEventListener('click',async()=>{ if(!ev) return; ev.prompt(); try{ await ev.userChoice; }catch(e){} ev=null; b.hidden=true; });
-  window.addEventListener('appinstalled',()=>{ b.hidden=true; });
-})();
+
 </script>
 <script>
 /* Anonymous visit counts on the public site only (same GoatCounter setup as the game: no cookies, no personal data). */
