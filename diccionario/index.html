@@ -83,6 +83,13 @@ button{font-family:var(--body)}
 .seg{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem}
 .seg span{display:inline-block;border-radius:4px;padding:1px 4px;margin:1px;background:var(--panel-2)}
 .seg span.root{background:var(--teal);color:var(--ground);font-weight:700}
+/* interlinear: each morpheme over its gloss, the root over its meaning */
+.igl{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start}
+.igl .mc{display:flex;flex-direction:column;align-items:stretch;gap:2px;min-width:0}
+.igl .mf{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.05rem;border-radius:4px;padding:1px 6px;background:var(--panel-2);text-align:center}
+.igl .mc.root .mf{background:var(--teal);color:var(--ground);font-weight:700}
+.igl .mg{font-size:.78rem;color:var(--muted);line-height:1.2;max-width:12em;text-align:center}
+.igl .mc.root .mg{color:var(--ink)}
 /* entry */
 .entry-h{display:flex;flex-direction:column;gap:6px}
 .entry-h h2{font-size:clamp(2rem,9vw,2.8rem);overflow-wrap:anywhere}
@@ -411,17 +418,26 @@ function entriesForRoot(root,morphs){
   let out=look(false); if(!out.length&&root.length>=3) out=look(true);
   out.sort((x,y)=>(y.m!=null)-(x.m!=null));
   return out.slice(0,8); }
+/* short meaning of a root for the gloss line, in the reader's language */
+function rootMeaning(root,hop){
+  const hs=entriesForRoot(root,[]); if(!hs.length) return "";
+  const pickTxt=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:(e.s||""));
+  for(const e of hs){ let t=pickTxt(e); if(!t) continue;
+    if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1):""; if(r) return r; continue; }
+    t=t.replace(/\s*\([^)]*\)/g,"").split(/[;:]/)[0].trim(); if(t.length>32) t=t.split(",")[0].trim(); if(t.length>32) t=t.slice(0,30).trim()+"…";
+    return t; }
+  return ""; }
+function interlinear(root,morphs,gl,rm){
+  const cell=(f,g,cls)=>`<span class="mc${cls||""}"><span class="mf">${esc(G(f))}</span><span class="mg">${esc(g||"")}</span></span>`;
+  return `<div class="igl">${cell(root,rm===undefined?rootMeaning(root):rm," root")}${(morphs||[]).map((m,i)=>cell(m,lab(gl[i]||""))).join("")}</div>`; }
 function anaHTML(r,q){
   if(!r||!r.root) return "";
   const parts=[r.root].concat(r.morphs||[]);
   if(parts.length<2&&!r.mean) return "";
   const hits=entriesForRoot(r.root,r.morphs);
   if(!hits.length) return "";
-  const segH=`<span class="root">${esc(G(r.root))}</span>`+(r.morphs||[]).map((m,i)=>`<span title="${esc(lab(r.gl[i]||""))}">${esc(G(m))}</span>`).join("");
-  const labels=(r.gl||[]).filter(Boolean).map(lab).join(" · ");
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
-    <div class="seg">${segH}</div>
-    ${labels?`<p class="hint">${esc(labels)}</p>`:""}
+    ${interlinear(r.root,r.morphs,r.gl)}
     ${r.mean?`<p>${L("Significado aproximado: ","Approximate meaning (Spanish): ")}«${esc(r.mean)}»</p>`:""}
     ${hits.length?`<p class="hint">${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
@@ -474,8 +490,7 @@ function entry(id){
   app.querySelectorAll(".box .res").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id)));
   document.getElementById("star").onclick=()=>{ toggleSave(e.id); entry(id); };
   app.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ const f=forms[+b.dataset.f];
-    document.getElementById("fout").innerHTML=`<p class="seg" style="margin-top:8px">${f.m.map((m,i)=>`<span class="${i?"":"root"}" title="${esc(lab(f.g[i]))}">${esc(G(m))}</span>`).join("")}</p>
-      <p class="hint">${esc(f.g.slice(1).map(lab).join(" · "))}</p><p>«${esc(lang==="es"?f.es:f.en)}» <span class="muted">(${L("traducción aproximada","approximate translation")})</span></p>`; });
+    document.getElementById("fout").innerHTML=`<div style="margin-top:8px">${interlinear(f.m[0],f.m.slice(1),f.g.slice(1))}</div><p>«${esc(lang==="es"?f.es:f.en)}» <span class="muted">(${L("traducción aproximada","approximate translation")})</span></p>`; });
   document.getElementById("prac").onclick=()=>{ if(!saved.includes(e.id)) toggleSave(e.id); go("#/jugar/tarjetas/guardadas/m"); };
 }
 function toggleSave(id){ const i=saved.indexOf(id); if(i>=0) saved.splice(i,1); else saved.push(id); sv("mpd_saved",saved); }
@@ -687,7 +702,7 @@ function build(){
       const fb=document.getElementById("fb"); fb.className="fb "+(ok?"ok":"bad");
       fb.innerHTML=ok?PRAISE():`${esc(b.m.map(G).join("-"))}`;
       app.querySelectorAll(".tiles .tile,.slots .tile").forEach(x=>x.disabled=true);
-      fb.insertAdjacentHTML("afterend",`<p class="hint" style="text-align:center">${esc(b.m.map(G).join("-"))} · ${esc(b.g.slice(1).map(lab).join(" · "))}</p>`);
+      fb.insertAdjacentHTML("afterend",`<div style="display:flex;justify-content:center">${interlinear(b.m[0],b.m.slice(1),b.g.slice(1))}</div>`);
       if(ok) right++; i++; setTimeout(show,ok?1400:2600); };
     render();
   }; show(); }
