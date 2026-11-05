@@ -23,6 +23,9 @@ function scan(vol, hw, text) {
   for (const raw of text.match(/[A-Za-zÁÉÍÓÚÑÜáéíóúñüḻṉṯ]+/g) || []) {
     const w = raw.toLowerCase();
     if (w.length < 3 || ES.has(w) || SPANISHY.test(w) || !MAPU.test(w)) continue;
+    // Spanish with an accent the OCR dropped (tratandose = tratándose)
+    if ([...w].some((ch, i) => 'aeiou'.includes(ch) && ES.has(w.slice(0, i) + 'áéíóú'['aeiou'.indexOf(ch)] + w.slice(i + 1)))) continue;
+    if (/(se|lo|la|le|los|las|les|me|nos)$/.test(w) && [...w.replace(/(se|lo|la|le|los|las|les|me|nos)$/, '')].some((ch, i, arr) => { const b = arr.join(''); return 'aeiou'.includes(ch) && ES.has(b.slice(0, i) + 'áéíóú'['aeiou'.indexOf(ch)] + b.slice(i + 1)); })) continue;
     let s = seen.get(w); if (!s) { s = { n: 0, where: [] }; seen.set(w, s); }
     s.n++; if (s.where.length < 5 && !s.where.some(x => x[1] === hw)) s.where.push([vol, hw]);
   }

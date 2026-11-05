@@ -44,6 +44,7 @@ def snap(c):
     if r: return r
     best = None
     for a, b in CONF2:
+        if a == 'f' and c.startswith('wef'): continue     # wefa- 'aparecer': wefakelu 'cosa' is not wedakelu
         for m in re.finditer(re.escape(a), c):
             v = c[:m.start()] + b + c[m.end():]
             f = V.get(v, 0)
