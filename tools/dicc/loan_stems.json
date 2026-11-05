@@ -1,0 +1,1363 @@
+{
+"valer": {
+"h": "fali",
+"v": [
+"falil",
+"falin"
+]
+},
+"faltar": {
+"h": "falta",
+"v": []
+},
+"correr": {
+"h": "kore",
+"v": [
+"corre",
+"korre",
+"korie"
+]
+},
+"fuerte": {
+"h": "fuerte",
+"v": []
+},
+"joven": {
+"h": "joven",
+"v": [
+"ofen"
+]
+},
+"libre": {
+"h": "libre",
+"v": [
+"lifre",
+"lifrey"
+]
+},
+"parar": {
+"h": "para",
+"v": []
+},
+"pobre": {
+"h": "pobre",
+"v": [
+"pofre",
+"pofres"
+]
+},
+"tranquilo": {
+"h": "trankilu",
+"v": []
+},
+"afectar": {
+"h": "afecta",
+"v": [
+"afekta"
+]
+},
+"aguantar": {
+"h": "aguanta",
+"v": []
+},
+"alcanzar": {
+"h": "alkansa",
+"v": [
+"alcanza",
+"alkansaa"
+]
+},
+"alimentar": {
+"h": "alimenta",
+"v": []
+},
+"apurar": {
+"h": "apura",
+"v": [
+"apurag",
+"apuray"
+]
+},
+"atender": {
+"h": "atende",
+"v": [
+"tende",
+"atendi",
+"atendey"
+]
+},
+"avisar": {
+"h": "avisa",
+"v": [
+"afisa"
+]
+},
+"ayudar": {
+"h": "ayuda",
+"v": [
+"ayuday"
+]
+},
+"calmar": {
+"h": "kalma",
+"v": [
+"calma"
+]
+},
+"cansar": {
+"h": "kansa",
+"v": [
+"cansa",
+"kansaf"
+]
+},
+"cantar": {
+"h": "kanta",
+"v": [
+"canta",
+"kantay",
+"kantar"
+]
+},
+"cerrar": {
+"h": "sera",
+"v": [
+"cerra",
+"serra"
+]
+},
+"cobrar": {
+"h": "kofra",
+"v": [
+"cobra",
+"kofray"
+]
+},
+"confianza": {
+"h": "confianza",
+"v": [
+"konfiansa",
+"konfiansaf"
+]
+},
+"contento": {
+"h": "kontentu",
+"v": []
+},
+"controlar": {
+"h": "kontrola",
+"v": [
+"controla"
+]
+},
+"creer": {
+"h": "kree",
+"v": [
+"cree"
+]
+},
+"criar": {
+"h": "cria",
+"v": [
+"kria"
+]
+},
+"dañar": {
+"h": "daña",
+"v": []
+},
+"deber": {
+"h": "debe",
+"v": [
+"defe",
+"defi"
+]
+},
+"dejar": {
+"h": "deja",
+"v": [
+"dea"
+]
+},
+"durar": {
+"h": "dura",
+"v": [
+"duray"
+]
+},
+"echar": {
+"h": "echa",
+"v": []
+},
+"enfermar": {
+"h": "enferma",
+"v": []
+},
+"enseñar": {
+"h": "enseña",
+"v": [
+"enseñal",
+"enseñay"
+]
+},
+"entender": {
+"h": "entende",
+"v": [
+"antende",
+"entendey",
+"entenden"
+]
+},
+"entregar": {
+"h": "entrega",
+"v": [
+"entregap"
+]
+},
+"esperar": {
+"h": "espera",
+"v": []
+},
+"estudiar": {
+"h": "estudia",
+"v": [
+"estudiay"
+]
+},
+"firma": {
+"h": "firma",
+"v": [
+"firmay"
+]
+},
+"formar": {
+"h": "forma",
+"v": []
+},
+"ganar": {
+"h": "gana",
+"v": []
+},
+"gastar": {
+"h": "gasta",
+"v": []
+},
+"golpear": {
+"h": "golpea",
+"v": []
+},
+"grabar": {
+"h": "graba",
+"v": [
+"grafa",
+"grafay"
+]
+},
+"guardar": {
+"h": "guarda",
+"v": [
+"guarday"
+]
+},
+"interesar": {
+"h": "interesa",
+"v": []
+},
+"lavar": {
+"h": "lava",
+"v": [
+"lafa"
+]
+},
+"levantar": {
+"h": "levanta",
+"v": [
+"lefanta",
+"lefantay"
+]
+},
+"limpiar": {
+"h": "limpia",
+"v": []
+},
+"listo": {
+"h": "listu",
+"v": []
+},
+"llamar": {
+"h": "llama",
+"v": [
+"yama",
+"yamaf"
+]
+},
+"llegar": {
+"h": "llega",
+"v": [
+"yega"
+]
+},
+"llenar": {
+"h": "llena",
+"v": [
+"yena"
+]
+},
+"madurar": {
+"h": "madura",
+"v": []
+},
+"malo": {
+"h": "malu",
+"v": []
+},
+"mandar": {
+"h": "manda",
+"v": [
+"manday"
+]
+},
+"mate": {
+"h": "mate",
+"v": []
+},
+"mejorar": {
+"h": "mejora",
+"v": [
+"meora",
+"meoray"
+]
+},
+"molestar": {
+"h": "molesta",
+"v": []
+},
+"mostrar": {
+"h": "mostra",
+"v": []
+},
+"mover": {
+"h": "move",
+"v": [
+"mofe"
+]
+},
+"nacer": {
+"h": "nase",
+"v": [
+"nace",
+"nasi",
+"naseñ"
+]
+},
+"necesitar": {
+"h": "necesita",
+"v": [
+"nesesita"
+]
+},
+"negar": {
+"h": "nega",
+"v": [
+"negay"
+]
+},
+"notar": {
+"h": "nota",
+"v": [
+"notaf"
+]
+},
+"obligar": {
+"h": "obliga",
+"v": [
+"ofliga"
+]
+},
+"ofrecer": {
+"h": "ofrece",
+"v": [
+"ofrese"
+]
+},
+"olvidar": {
+"h": "olvida",
+"v": [
+"olfida",
+"olfiday"
+]
+},
+"operar": {
+"h": "opera",
+"v": [
+"operay",
+"operaw",
+"operaa"
+]
+},
+"pasar": {
+"h": "pasa",
+"v": [
+"pasaf"
+]
+},
+"pasear": {
+"h": "pasea",
+"v": [
+"paseay"
+]
+},
+"pedir": {
+"h": "pedi",
+"v": [
+"pedia",
+"pedif"
+]
+},
+"pegar": {
+"h": "pega",
+"v": []
+},
+"pensar": {
+"h": "pensa",
+"v": [
+"pensan",
+"pensay"
+]
+},
+"perder": {
+"h": "perde",
+"v": [
+"perdi",
+"perdey",
+"perder"
+]
+},
+"permitir": {
+"h": "permiti",
+"v": []
+},
+"pesar": {
+"h": "pesa",
+"v": [
+"pesap"
+]
+},
+"plantar": {
+"h": "planta",
+"v": []
+},
+"preparar": {
+"h": "prepara",
+"v": [
+"pürepara",
+"aprepara",
+"preparay"
+]
+},
+"presentar": {
+"h": "presenta",
+"v": [
+"presentay"
+]
+},
+"repartir": {
+"h": "reparti",
+"v": []
+},
+"rico": {
+"h": "riku",
+"v": []
+},
+"salvar": {
+"h": "salva",
+"v": [
+"salfa"
+]
+},
+"sano": {
+"h": "sanu",
+"v": []
+},
+"sentir": {
+"h": "senti",
+"v": [
+"sentik"
+]
+},
+"servir": {
+"h": "servi",
+"v": [
+"serfi"
+]
+},
+"sobrar": {
+"h": "sobra",
+"v": [
+"sofra"
+]
+},
+"sufrir": {
+"h": "sufri",
+"v": [
+"sufr",
+"sufria"
+]
+},
+"surgir": {
+"h": "surgi",
+"v": []
+},
+"tapar": {
+"h": "tapa",
+"v": [
+"tapan",
+"tapat"
+]
+},
+"tirar": {
+"h": "tira",
+"v": []
+},
+"topar": {
+"h": "topa",
+"v": [
+"topay",
+"topak",
+"topan"
+]
+},
+"ultimo": {
+"h": "ultimu",
+"v": []
+},
+"vender": {
+"h": "vende",
+"v": [
+"fende",
+"fendi",
+"fendes"
+]
+},
+"aceptar": {
+"h": "acepta",
+"v": [
+"asepta",
+"aseptay"
+]
+},
+"acordar": {
+"h": "akorda",
+"v": [
+"acorda",
+"akorday",
+"akordar"
+]
+},
+"afirmar": {
+"h": "afirma",
+"v": []
+},
+"agarrar": {
+"h": "agarra",
+"v": []
+},
+"apoyar": {
+"h": "apoya",
+"v": []
+},
+"apretar": {
+"h": "apreta",
+"v": []
+},
+"arreglar": {
+"h": "arregla",
+"v": [
+"aregla"
+]
+},
+"catolico": {
+"h": "katoliku",
+"v": []
+},
+"invitar": {
+"h": "invita",
+"v": [
+"infita"
+]
+},
+"mudar": {
+"h": "muda",
+"v": []
+},
+"nombrar": {
+"h": "nombra",
+"v": [
+"nomfra"
+]
+},
+"ordenar": {
+"h": "ordena",
+"v": []
+},
+"perdonar": {
+"h": "perdona",
+"v": [
+"perdonay",
+"perdonag"
+]
+},
+"recibir": {
+"h": "recibi",
+"v": [
+"resifi"
+]
+},
+"saludar": {
+"h": "saluda",
+"v": []
+},
+"tomar": {
+"h": "toma",
+"v": [
+"tomay"
+]
+},
+"tratar": {
+"h": "trata",
+"v": []
+},
+"acabar": {
+"h": "acaba",
+"v": [
+"akafa"
+]
+},
+"acompañar": {
+"h": "acompaña",
+"v": [
+"kompaña"
+]
+},
+"aconsejar": {
+"h": "aconseja",
+"v": [
+"konsea"
+]
+},
+"acostar": {
+"h": "acosta",
+"v": []
+},
+"admirar": {
+"h": "admira",
+"v": []
+},
+"agradecer": {
+"h": "agradece",
+"v": [
+"agradese",
+"gradese"
+]
+},
+"almorzar": {
+"h": "almorza",
+"v": [
+"almorsa"
+]
+},
+"andar": {
+"h": "anda",
+"v": []
+},
+"anotar": {
+"h": "anota",
+"v": []
+},
+"aprender": {
+"h": "aprende",
+"v": []
+},
+"aprovechar": {
+"h": "aprovecha",
+"v": []
+},
+"arreglado": {
+"h": "arreglado",
+"v": []
+},
+"arrendar": {
+"h": "arrenda",
+"v": []
+},
+"arrepentir": {
+"h": "arrepenti",
+"v": []
+},
+"atrasar": {
+"h": "atrasa",
+"v": []
+},
+"atravesar": {
+"h": "atravesa",
+"v": [
+"atrafesa"
+]
+},
+"aumentar": {
+"h": "aumenta",
+"v": []
+},
+"avanzar": {
+"h": "avanza",
+"v": [
+"afansa"
+]
+},
+"bailar": {
+"h": "baila",
+"v": [
+"fayla"
+]
+},
+"bajar": {
+"h": "baja",
+"v": []
+},
+"barrer": {
+"h": "barre",
+"v": []
+},
+"bautizar": {
+"h": "bautiza",
+"v": [
+"fautisa"
+]
+},
+"beber": {
+"h": "bebe",
+"v": []
+},
+"buscar": {
+"h": "busca",
+"v": [
+"fuska"
+]
+},
+"cafe": {
+"h": "kafe",
+"v": [
+"cafe"
+]
+},
+"cambiar": {
+"h": "cambia",
+"v": [
+"kamfia",
+"kamfiay"
+]
+},
+"caminar": {
+"h": "camina",
+"v": [
+"kamina"
+]
+},
+"cargar": {
+"h": "karga",
+"v": [
+"carga",
+"kargay"
+]
+},
+"casar": {
+"h": "casa",
+"v": [
+"kasa",
+"kasay"
+]
+},
+"castigar": {
+"h": "castiga",
+"v": [
+"kastiga",
+"kastigaf"
+]
+},
+"celebrar": {
+"h": "celebra",
+"v": [
+"selefra"
+]
+},
+"cocinar": {
+"h": "cocina",
+"v": [
+"kosina"
+]
+},
+"colocar": {
+"h": "koloka",
+"v": [
+"coloca",
+"kolokaf"
+]
+},
+"comer": {
+"h": "come",
+"v": [
+"kome"
+]
+},
+"componer": {
+"h": "compone",
+"v": [
+"kompone",
+"komponey",
+"komponie"
+]
+},
+"confesar": {
+"h": "confesa",
+"v": [
+"konfesa"
+]
+},
+"confiar": {
+"h": "confia",
+"v": [
+"konfia"
+]
+},
+"conocer": {
+"h": "conoce",
+"v": [
+"konosi"
+]
+},
+"conseguir": {
+"h": "consegui",
+"v": []
+},
+"contar": {
+"h": "conta",
+"v": [
+"konta",
+"kontak"
+]
+},
+"continuar": {
+"h": "continua",
+"v": [
+"kontinua"
+]
+},
+"conversar": {
+"h": "conversa",
+"v": [
+"konfersa"
+]
+},
+"cruzar": {
+"h": "cruza",
+"v": [
+"krusa"
+]
+},
+"cuidar": {
+"h": "kuyda",
+"v": [
+"kuida",
+"cuida",
+"kuiday"
+]
+},
+"cumplir": {
+"h": "cumpli",
+"v": [
+"kumpli",
+"kumplik"
+]
+},
+"curar": {
+"h": "cura",
+"v": []
+},
+"defender": {
+"h": "defende",
+"v": [
+"defendey"
+]
+},
+"desayunar": {
+"h": "desayuna",
+"v": []
+},
+"descansar": {
+"h": "descansa",
+"v": [
+"deskansa"
+]
+},
+"desear": {
+"h": "desea",
+"v": []
+},
+"despreciar": {
+"h": "desprecia",
+"v": [
+"despresia"
+]
+},
+"detener": {
+"h": "detene",
+"v": [
+"deteni"
+]
+},
+"disculpar": {
+"h": "disculpa",
+"v": [
+"diskulpa",
+"diskulpay"
+]
+},
+"doblar": {
+"h": "dobla",
+"v": [
+"dofla"
+]
+},
+"dormir": {
+"h": "dormi",
+"v": []
+},
+"educar": {
+"h": "eduka",
+"v": [
+"educa"
+]
+},
+"empezar": {
+"h": "empesa",
+"v": [
+"empeza",
+"empesay",
+"empesaf"
+]
+},
+"emplear": {
+"h": "emplea",
+"v": [
+"empleaw"
+]
+},
+"encargar": {
+"h": "encarga",
+"v": [
+"enkarga"
+]
+},
+"enterrar": {
+"h": "enterra",
+"v": []
+},
+"entrar": {
+"h": "entra",
+"v": []
+},
+"entretener": {
+"h": "entretene",
+"v": [
+"entreteni"
+]
+},
+"entusiasmar": {
+"h": "entusiasma",
+"v": []
+},
+"enviar": {
+"h": "envia",
+"v": [
+"enfia"
+]
+},
+"escuchar": {
+"h": "escucha",
+"v": []
+},
+"estudio": {
+"h": "estudio",
+"v": []
+},
+"evitar": {
+"h": "evita",
+"v": [
+"efita"
+]
+},
+"examinar": {
+"h": "examina",
+"v": [
+"xamina"
+]
+},
+"existir": {
+"h": "existi",
+"v": []
+},
+"explicar": {
+"h": "explica",
+"v": [
+"explika"
+]
+},
+"felicitar": {
+"h": "felicita",
+"v": [
+"felisita"
+]
+},
+"fregar": {
+"h": "frega",
+"v": []
+},
+"fumar": {
+"h": "fuma",
+"v": []
+},
+"gozar": {
+"h": "goza",
+"v": [
+"gosa"
+]
+},
+"guiar": {
+"h": "guia",
+"v": []
+},
+"hallar": {
+"h": "halla",
+"v": []
+},
+"herir": {
+"h": "heri",
+"v": []
+},
+"jubilar": {
+"h": "jubila",
+"v": [
+"ufila"
+]
+},
+"llevar": {
+"h": "lleva",
+"v": [
+"yefa"
+]
+},
+"luchar": {
+"h": "lucha",
+"v": [
+"lukat",
+"lukay"
+]
+},
+"manejar": {
+"h": "maneja",
+"v": [
+"manea"
+]
+},
+"mantener": {
+"h": "mantene",
+"v": [
+"mantenie"
+]
+},
+"matar": {
+"h": "mata",
+"v": []
+},
+"pagar": {
+"h": "paga",
+"v": []
+},
+"parecer": {
+"h": "parece",
+"v": [
+"parese",
+"paresi"
+]
+},
+"participar": {
+"h": "participa",
+"v": [
+"partisipa"
+]
+},
+"pelar": {
+"h": "pela",
+"v": []
+},
+"pertenecer": {
+"h": "pertenece",
+"v": [
+"pertenese"
+]
+},
+"picar": {
+"h": "pica",
+"v": [
+"pika"
+]
+},
+"pintar": {
+"h": "pinta",
+"v": []
+},
+"poder": {
+"h": "pode",
+"v": []
+},
+"poner": {
+"h": "pone",
+"v": []
+},
+"preguntar": {
+"h": "pregunta",
+"v": []
+},
+"preocupar": {
+"h": "preocupa",
+"v": []
+},
+"probar": {
+"h": "proba",
+"v": [
+"profa"
+]
+},
+"quebrar": {
+"h": "quebra",
+"v": [
+"kefra",
+"kefrad"
+]
+},
+"quedar": {
+"h": "queda",
+"v": [
+"keda"
+]
+},
+"quejar": {
+"h": "queja",
+"v": []
+},
+"quitar": {
+"h": "kita",
+"v": [
+"quita"
+]
+},
+"recoger": {
+"h": "recoge",
+"v": [
+"rekoge"
+]
+},
+"recomendar": {
+"h": "recomenda",
+"v": [
+"rekomenda"
+]
+},
+"reconocer": {
+"h": "reconoce",
+"v": [
+"rekonose"
+]
+},
+"recorrer": {
+"h": "recorre",
+"v": [
+"rekore"
+]
+},
+"recuperar": {
+"h": "recupera",
+"v": [
+"rekupera"
+]
+},
+"regar": {
+"h": "rega",
+"v": [
+"regak",
+"regañ"
+]
+},
+"responder": {
+"h": "responde",
+"v": []
+},
+"resultar": {
+"h": "resulta",
+"v": []
+},
+"reunir": {
+"h": "reuni",
+"v": []
+},
+"revisar": {
+"h": "revisa",
+"v": [
+"refisa"
+]
+},
+"rezar": {
+"h": "reza",
+"v": [
+"resa",
+"resay"
+]
+},
+"rogar": {
+"h": "roga",
+"v": []
+},
+"romper": {
+"h": "rompe",
+"v": [
+"rompi"
+]
+},
+"saber": {
+"h": "sabe",
+"v": [
+"safe"
+]
+},
+"saltar": {
+"h": "salta",
+"v": []
+},
+"sanar": {
+"h": "sana",
+"v": []
+},
+"secar": {
+"h": "seca",
+"v": [
+"seka"
+]
+},
+"seguir": {
+"h": "segui",
+"v": []
+},
+"seguro": {
+"h": "seguru",
+"v": []
+},
+"sembrar": {
+"h": "sembra",
+"v": [
+"semfra",
+"semfray"
+]
+},
+"sentar": {
+"h": "senta",
+"v": []
+},
+"soltar": {
+"h": "solta",
+"v": [
+"soltaw"
+]
+},
+"subir": {
+"h": "subi",
+"v": [
+"sufi"
+]
+},
+"suceder": {
+"h": "sucede",
+"v": [
+"susede"
+]
+},
+"terminar": {
+"h": "termina",
+"v": []
+},
+"tocar": {
+"h": "toka",
+"v": [
+"toca",
+"tokañ",
+"tokay"
+]
+},
+"tomate": {
+"h": "tomate",
+"v": [
+"tomati"
+]
+},
+"tragar": {
+"h": "traga",
+"v": []
+},
+"tranquilizar": {
+"h": "tranquiliza",
+"v": [
+"trankilisa"
+]
+},
+"vacunar": {
+"h": "fakuna",
+"v": [
+"vacuna",
+"fakunay",
+"fakunan"
+]
+},
+"vencer": {
+"h": "vence",
+"v": [
+"fense"
+]
+},
+"viajar": {
+"h": "viaja",
+"v": []
+},
+"visitar": {
+"h": "visita",
+"v": [
+"fisita",
+"fisitao"
+]
+},
+"vivir": {
+"h": "vivi",
+"v": []
+},
+"votar": {
+"h": "fota",
+"v": [
+"vota",
+"fotaf"
+]
+},
+"zapato": {
+"h": "sapatu",
+"v": [
+"zapato"
+]
+}
+}
