@@ -36,7 +36,8 @@ pm = {k: statistics.median(v) for k, v in par.items() if v}
 for pg, lines in PAGES:
     left = MARG.get(pg, pm[pg % 2])
     # a page made only of one-line entries has its "margin" at the indent: compare with pages of the same parity
-    if left - pm[pg % 2] > 45: left = pm[pg % 2]
+    # (only when the gap is about one indent: a page from another scan has its own margin)
+    if 45 < left - pm[pg % 2] < 140: left = pm[pg % 2]
     H = max(l[1] for l in lines) or 1
     foot = False
     for x, y, t in lines:
