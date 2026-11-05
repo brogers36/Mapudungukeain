@@ -127,6 +127,9 @@ for e in A:
 OCRFIX = {k[4:]: v['fix'] for k, v in rev.items() if k.startswith('ocr:') and v.get('fix')}
 ESHFIX = {k[4:]: v['fix'] for k, v in rev.items() if k.startswith('esh:') and v.get('fix')}
 def ocrfix(t):
+    # Augusta's label tr. is often read "ir." (he never uses "ir." as a label); "2.ª" read "2.2"
+    t = re.sub(r'(?:(?<=\()|(?<=, )|(?<=\| )|(?<=\by )|^)ir\.(?=[\s,);:]|$)', 'tr.', t)
+    t = re.sub(r'\b((?:tr|n|r)\. [12]\.)2(?=[\s,);])', r'\1ª', t)
     if not OCRFIX: return t
     return re.sub(r'[A-Za-zÁÉÍÓÚÑÜáéíóúñüḻṉṯ]+', lambda m: OCRFIX.get(m.group(0).lower(), m.group(0)) if m.group(0).lower() in OCRFIX else m.group(0), t)
 for e in A:

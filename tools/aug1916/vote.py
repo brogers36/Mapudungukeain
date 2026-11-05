@@ -27,6 +27,8 @@ def conv(w):
 CORE = re.compile(r"[A-Za-zÁÉÍÓÚÑÜáéíóúñü]+")
 SPLIT = re.compile(r"^([^A-Za-zÁÉÍÓÚÑÜáéíóúñü]*)([A-Za-zÁÉÍÓÚÑÜáéíóúñü]+)([^A-Za-zÁÉÍÓÚÑÜáéíóúñü]*)$")
 def known(tok):
+    # a word read with Augusta's own letters (trained model) is never replaced by a reading without them
+    if re.search(r'[ŋəʃŊƏ]', tok): return True
     m = SPLIT.match(tok)
     if not m or len(m.group(2)) < 2: return False
     w = m.group(2)

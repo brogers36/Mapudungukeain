@@ -49,7 +49,9 @@ además el **Suplemento al tomo I** (13 páginas), que el del Internet Archive n
 - `flag_mapu.js`: palabras mapuches de los dos tomos que no están en AVENUE ni son titulares y que el analizador no
   puede analizar; `revision_ocr_mapu.json`, ordenada por frecuencia. Las dos listas aparecen en la copia maestra, y
   sus correcciones se aplican al publicar (`build_dict.py`).
-- `ocrtrain/`: líneas para corregir y entrenar Tesseract con el alfabeto de Augusta.
+- `ocrtrain/`: modelo de Tesseract entrenado con el alfabeto de Augusta (`aug.traineddata`), sus líneas y su
+  transcripción. Desde noviembre de 2026 los dos ejemplares se leen con ese modelo y no con `spa`; `rebuild.sh` corre
+  todos los pasos (las dos votaciones, el Suplemento, `split.py` … `build_es16.py`) en una carpeta aparte.
 
 ## Límites conocidos
 
