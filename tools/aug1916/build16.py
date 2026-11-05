@@ -34,7 +34,8 @@ def conv(w):
     # infinitive -ün written without its vowel: dollown -> dollowün, kulann -> kulanün
     w = re.sub(r'([^aeiouüy])n$', r'\1ün', w)
     return w
-CONF = [('i', 'ü'), ('u', 'ü'), ('ü', 'i'), ('ü', 'u'), ('ü', 'iw'), ('e', 'ü'), ('a', 'ü'), ('o', 'ü'), ('y', 'ng'), ('g', 'ng'), ('n', 'ng'), ('l', 'll'), ('ll', 'l'), ('d', 'z')]
+# Augusta's ʃ (Unificado sh) is read as f, like a long s: wəʃákelu -> wefakelu = weshakelu
+CONF = [('f', 'sh'), ('i', 'ü'), ('u', 'ü'), ('ü', 'i'), ('ü', 'u'), ('ü', 'iw'), ('e', 'ü'), ('a', 'ü'), ('o', 'ü'), ('y', 'ng'), ('g', 'ng'), ('n', 'ng'), ('l', 'll'), ('ll', 'l'), ('d', 'z')]
 # systematic italic misreads mined from the review list (flag_mapu.js): applied only when the OCR form is unattested
 # and the result is well attested, since some (f for d) also occur in real words (wefakelu)
 CONF2 = [('f', 'd'), ('t', 'i'), ('s', 'y'), ('s', 'n'), ('m', 'k'), ('a', 'u'), ('pr', 'pür'), ('pl', 'pül'), ('kr', 'kür'), ('tr', 'tür')]
@@ -44,7 +45,6 @@ def snap(c):
     if r: return r
     best = None
     for a, b in CONF2:
-        if a == 'f' and c.startswith('wef'): continue     # wefa- 'aparecer': wefakelu 'cosa' is not wedakelu
         for m in re.finditer(re.escape(a), c):
             v = c[:m.start()] + b + c[m.end():]
             f = V.get(v, 0)
