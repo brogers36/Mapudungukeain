@@ -3183,5 +3183,9 @@ for(const s of ['trekatu','nentutu','kintutu']) LEX_STEMS.delete(s);   /* analys
    cross-reference, which the meaning panel otherwise prints as '▹ entu') */
 GLOSS['yow']={d:'Recibir, aceptar',src:'R'};
 GLOSS['nentu']={d:'Sacar',src:'R'}; GLOSS['nentun']={d:'Sacar',src:'R'}; if(typeof GLOSS_VIEW!=='undefined' && GLOSS_VIEW['nentun']) GLOSS_VIEW['nentun']={d:'Sacar',src:'R'};
+/* 2026-11-05: emür is not a root. It is a truncated token holding pieces of two morphemes, (f/ch)em- + -(ü)rke-
+   (femürkey = fem-ürke-y, chemürke = chem-ürke); the only evidence for it was the gold token emürkechi. */
+{ const i=ADD_ROOTS.indexOf('emür'); if(i>=0) ADD_ROOTS.splice(i,1); }
+PROTECT.delete('emür');
 
 ;globalThis.MOTOR={parse43,inferCat,GX,ORTHO:(typeof ORTHO!=="undefined"?ORTHO:null),MEANING:(typeof MEANING!=="undefined"?MEANING:null)};
