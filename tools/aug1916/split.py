@@ -17,6 +17,8 @@ for f in sorted(x for x in os.listdir(d) if x.endswith('.tsv')):
     for ws in L.values():
         lines.append((min(int(w['left']) for w in ws), min(int(w['top']) for w in ws), ' '.join(w['text'] for w in ws)))
     lines.sort(key=lambda x: x[1])
+    # library and scanner notes (HathiTrust / Google copies): not part of the book
+    lines = [l for l in lines if not re.search(r'Google|Digitized|Original from|UNIVERSITY OF|Generated at|hathitrust|Public Domain|handle\.net', l[2], re.I)]
     if not lines: continue
     # header: first line, all-caps words or a page number, within the top margin
     top = lines[0]
