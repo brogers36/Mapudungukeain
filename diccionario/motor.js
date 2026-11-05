@@ -2788,6 +2788,11 @@ var MEANING = (function(){
     if(/^(küme|kume)$/.test(p.root) && ms[0] && ms[0].f==='l' && ms[0].slot===36 && ms[1] && ms[1].f==='ka'){
       lex={inf:'estar', comp:'bien'}; i0=(ms[2] && ms[2].slot===28)?3:2; hadVblz=true;   /* a stative -le- adds nothing to estar */
       steps.push('-l-ka- con küme-: tema lexicalizado küme-l-ka- \u00abestar bien\u00bb (decisión del analista)'); }
+    /* chillka-tu- 'leer, estudiar'; chilka- is read as a spelling of chillka- only when -tu- follows (analyst ruling 2026-11-04),
+       so chilka-n keeps Augusta's 'marcar los animales' */
+    if(/^chill?ka$/.test(p.root) && ms[0] && /^n?tu$/.test(ms[0].f)){
+      lex={inf:'leer', comp:''}; i0=1; hadVblz=true;
+      steps.push('-tu- con chillka- (o chilka-): tema lexicalizado chillka-tu- \u00ableer\u00bb (decisión del analista)'); }
     /* walk suffixes root-outward (innermost first) so periphrases nest correctly */
     for(var i=i0;i<ms.length;i++){
       var x=ms[i], e=suffixEffect(x, ms[i+1], ms[i-1]);
@@ -2798,7 +2803,6 @@ var MEANING = (function(){
         /* verbaliser on a non-verbal root */
         var ntext=predicate(sense, p.root);
         if(!lex){ if(/^(nge|ngi|ng|ge)$/.test(e.vblz)) lex={inf:'ser', comp:ntext};
-                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chill?ka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- (also spelled chilka-tu-) 'leer, estudiar' (analyst ruling 2026-11-04) */
                   else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};
                   else if(/^(ye|yi)$/.test(e.vblz)) lex={inf:'tener', comp:ntext};
                   else lex={inf:'hacer', comp:ntext}; }

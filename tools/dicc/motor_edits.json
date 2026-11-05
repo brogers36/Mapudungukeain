@@ -1,8 +1,8 @@
 [
  {
-  "why": "chillka-tu- (also spelled chilka-tu-) means 'leer', not 'usar libro' (analyst ruling 2026-11-04)",
-  "old": "                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};",
-  "new": "                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chill?ka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- (also spelled chilka-tu-) 'leer, estudiar' (analyst ruling 2026-11-04) */\n                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};"
+  "why": "chillka-tu-, and chilka-tu- as its spelling, mean 'leer'; chilka- without -tu- keeps 'marcar animales' (analyst ruling 2026-11-04)",
+  "old": "      steps.push('-l-ka- con küme-: tema lexicalizado küme-l-ka- \\u00abestar bien\\u00bb (decisión del analista)'); }",
+  "new": "      steps.push('-l-ka- con küme-: tema lexicalizado küme-l-ka- \\u00abestar bien\\u00bb (decisión del analista)'); }\n    /* chillka-tu- 'leer, estudiar'; chilka- is read as a spelling of chillka- only when -tu- follows (analyst ruling 2026-11-04),\n       so chilka-n keeps Augusta's 'marcar los animales' */\n    if(/^chill?ka$/.test(p.root) && ms[0] && /^n?tu$/.test(ms[0].f)){\n      lex={inf:'leer', comp:''}; i0=1; hadVblz=true;\n      steps.push('-tu- con chillka- (o chilka-): tema lexicalizado chillka-tu- \\u00ableer\\u00bb (decisión del analista)'); }"
  },
  {
   "why": "Underlying cause of chillka/chilla/chilka being split as chi-…: the AVENUE frequency bucket counts the bare wordform, so a frequent free word (chi, 8,801 tokens) that is attested only weakly (through the spelling fold) outranked the dictionary root. Weakly attested roots now get at most bucket 1. Gold v38 +1 (0 broken), blind set 3 +1, blind set 1 unchanged; 24 of the top 20,000 AVENUE types change (2026-11-04).",
