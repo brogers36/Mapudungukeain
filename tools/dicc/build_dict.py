@@ -84,6 +84,21 @@ for hw, texts in aug.items():
     text = ' | '.join(t.strip() for t in texts if t.strip())
     p = pos_of(text); s = short(texts[0])
     A.append({'id': 'a:' + hw, 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p))})
+# drafted English for Augusta (en/*.tsv: headword, English, optional corrected Spanish short gloss)
+import glob
+ENX = {}
+for fp in sorted(glob.glob(P('en/*.tsv'))):
+    for line in open(fp, encoding='utf-8'):
+        c = line.rstrip('\n').split('\t')
+        if len(c) >= 2 and c[0]: ENX[c[0]] = c[1:]
+nen = 0
+for e in A:
+    x = ENX.get(e['h'])
+    if x:
+        e['en'] = x[0]; nen += 1
+        if len(x) > 1 and x[1]: e['s'] = x[1]
+    elif e['s'].startswith('Véase '):
+        e['en'] = 'See ' + e['s'][6:]
 # reviewer decisions
 nrev = 0
 for e in core + A:
@@ -98,6 +113,6 @@ SUBS = [('poseemos','tenemos'),('poseen','tienen'),('posees','tienes'),('posee',
 for b in B:
     for x, y in SUBS: b['es'] = re.sub(r'\b' + x + r'\b', y, b['es'])
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,
-        'n': {'core': len(core), 'aug': len(A), 'skipped': skipped, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
+        'n': {'core': len(core), 'aug': len(A), 'skipped': skipped, 'aug_en': sum(1 for e in A if e['en']), 'aug_en_drafted': nen, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
 open(sys.argv[1], 'w', encoding='utf-8').write('window.DICC=' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n')
 print(data['n'], os.path.getsize(sys.argv[1]))
