@@ -14,6 +14,8 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   const scope = new URL(self.registration.scope);
   const inScope = url.origin === location.origin && url.pathname.startsWith(scope.pathname);
+  /* the dictionary's web page (acerca/) is a separate page: never cache it as the app page */
+  if (url.origin === location.origin && url.pathname.startsWith(scope.pathname + 'acerca/')) return;
   if (req.mode === 'navigate' && inScope) {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); return r; })
       .catch(() => caches.match('./index.html')));

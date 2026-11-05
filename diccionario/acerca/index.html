@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14122a">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:title" content="Tañi Nemülkawe">
+<meta property="og:description" content="Diccionario gratuito mapudungun, español e inglés, con juegos de vocabulario. Funciona sin conexión.">
+<meta property="og:image" content="https://brogers36.github.io/Mapudungukeain/diccionario/acerca/img/d-home.jpg">
+<title>Tañi Nemülkawe: Yeniekeafiel ñi Kewün Fill Püle</title>
+<meta name="description" content="Diccionario gratuito mapudungun, español e inglés, con un analizador de formas conjugadas y seis juegos de vocabulario. Funciona sin conexión.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one long night-sky scroll, cut by the game's woven red band between sections; phone screenshots sit beside short copy. */
+:root{
+  --night:#14122a; --panel:#1f1c3d; --panel2:#2a2652;
+  --ink:#f3efe6; --muted:#b9b3d6; --gold:#e8b53a; --red:#c8322f; --green:#5fae6a;
+  --display:"Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.band{height:22px;background-color:#4fb3a9;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22'%3E%3Cpath d='M22 2 L34 11 L22 20 L10 11Z' fill='%2314122a'/%3E%3Cpath d='M22 7 L28 11 L22 15 L16 11Z' fill='%23f3efe6'/%3E%3Cpath d='M0 11 h6 M38 11 h6' stroke='%2314122a' stroke-width='2'/%3E%3C/svg%3E");background-repeat:repeat-x;background-position:center}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(1.7rem,4vw,2.4rem)}
+h3{font-size:1.2rem;letter-spacing:.01em}
+p{margin:0}
+a{color:var(--gold)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.eyebrow{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.lead{font-size:1.15rem;color:var(--ink);max-width:60ch}
+.muted{color:var(--muted)}
+section{padding-block:clamp(48px,8vw,88px)}
+/* language toggle */
+.lang{display:inline-flex;border:1.5px solid var(--panel2);border-radius:999px;overflow:hidden}
+.lang button{all:unset;cursor:pointer;padding:6px 14px;font-weight:700;font-size:.85rem;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--night)}
+html[data-l="en"] .es, html:not([data-l="en"]) .en{display:none}
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:18px}
+.brand{font-family:var(--display);font-size:1.05rem}
+/* hero */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,64px);align-items:center;padding-block:clamp(28px,6vw,64px) clamp(40px,7vw,80px)}
+.hero h1{font-size:clamp(2.6rem,7.4vw,4.9rem);letter-spacing:-.01em}
+.hero h1 span{display:block;color:var(--gold)}
+.hero .copy{display:flex;flex-direction:column;gap:20px;min-width:0}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-block;text-decoration:none;font-weight:700;padding:13px 22px;border-radius:999px;background:#4fb3a9;color:#14122a}
+.btn.ghost{background:transparent;border:2px solid var(--panel2);color:var(--ink)}
+.btn:hover{filter:brightness(1.08)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.95rem;color:var(--muted)}
+.facts b{font-family:var(--display);font-weight:400;color:var(--ink);font-size:1.3rem;margin-right:4px;font-variant-numeric:tabular-nums}
+.phone{justify-self:center;width:min(300px,100%);aspect-ratio:390/760;border-radius:34px;border:8px solid #0b0a18;box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 2px var(--panel2);overflow:hidden;background:var(--panel);max-width:100%}
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.hero .phone{transform:rotate(2deg)}
+@media (prefers-reduced-motion:no-preference){.hero .phone{animation:settle .9s ease-out both}@keyframes settle{from{transform:rotate(6deg) translateY(18px)}to{transform:rotate(2deg)}}}
+/* features: alternating screenshot + copy */
+.feat{display:grid;grid-template-columns:240px 1fr;gap:clamp(20px,4vw,48px);align-items:center}
+.feat + .feat{margin-top:clamp(40px,6vw,64px)}
+.feat:nth-child(even){grid-template-columns:1fr 240px}
+.feat:nth-child(even) .phone{order:2}
+.feat .phone{width:240px;border-width:6px;border-radius:28px}
+.feat .copy{display:flex;flex-direction:column;gap:12px;min-width:0}
+.feat ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.feat ul b{color:var(--ink)}
+.mapu{font-style:italic;color:var(--gold)}
+/* path of stages */
+.path{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:22px}
+.stage{background:var(--panel);border:1.5px solid var(--panel2);border-radius:8px;padding:12px 10px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.stage b{font-size:.95rem}
+.stage span{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage:last-child{border-color:var(--gold)}
+/* how built */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);margin-top:24px}
+.split > div{display:flex;flex-direction:column;gap:14px;min-width:0}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--muted)}
+.checks li::before{content:"";width:12px;height:12px;margin-top:7px;background:var(--gold);transform:rotate(45deg)}
+.checks b{color:var(--ink)}
+/* uses */
+.uses{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}
+.use{background:var(--panel);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.use h3{color:var(--gold)}
+.use p{color:var(--muted);font-size:.95rem}
+/* install */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.step{border:1.5px solid var(--panel2);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;overflow-wrap:anywhere}
+.step ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.step ol b{color:var(--ink)}
+.note{background:var(--panel);border-left:4px solid var(--gold);border-radius:6px;padding:14px 16px;color:var(--muted);max-width:70ch}
+.note b{color:var(--ink)}
+/* sources */
+.refs{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.93rem;max-width:80ch}
+.refs i{color:var(--ink)}
+footer{padding-block:28px 40px;color:var(--muted);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .hero .phone{width:min(260px,80%)}
+  .path{grid-template-columns:repeat(4,1fr)}
+  .uses{grid-template-columns:1fr 1fr}
+  .split,.steps{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .feat,.feat:nth-child(even){grid-template-columns:1fr}
+  .feat:nth-child(even) .phone{order:0}
+  .feat .phone{justify-self:center;width:min(230px,70%)}
+  .path{grid-template-columns:1fr 1fr}
+  .uses{grid-template-columns:1fr}
+}
+.phones,.split > .phones{display:flex;flex-direction:row;gap:14px;justify-content:center;align-items:flex-start}
+.phones .phone{width:min(210px,31%);border-width:6px;border-radius:26px;transform:none!important;animation:none!important}
+.phones .phone:nth-child(2){margin-top:28px}.phones .phone:nth-child(3){margin-top:56px}
+.sub{color:var(--gold);font-style:italic;font-size:1.05rem}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">Tañi Nemülkawe</span>
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button id="l-es" type="button" aria-pressed="true">ES</button><button id="l-en" type="button" aria-pressed="false">EN</button>
+    </div>
+  </header>
+  <main>
+  <section class="hero" aria-labelledby="t">
+    <div class="copy">
+      <p class="eyebrow"><span class="es">Diccionario mapudungun · español · inglés</span><span class="en">Mapudungun · Spanish · English dictionary</span></p>
+      <h1 id="t">Tañi Nemülkawe <span>Yeniekeafiel ñi Kewün Fill Püle</span></h1>
+      <p class="sub"><span class="es">«Mi diccionario: para llevar mi lengua a todas partes»</span><span class="en">“My dictionary: to carry my language everywhere”</span></p>
+      <p class="lead"><span class="es">Un diccionario gratuito para buscar palabras en mapudungun, español e inglés, en cualquiera de los tres grafemarios. Si escribes una forma conjugada, como <span class="mapu">amulayay</span> o <span class="mapu">kimlafiñ</span>, un analizador la divide en raíz y sufijos y te lleva a la raíz. Funciona en el teléfono y sin conexión.</span><span class="en">A free dictionary for looking up words in Mapudungun, Spanish and English, in any of the three grafemarios. Type an inflected form such as <span class="mapu">amulayay</span> or <span class="mapu">kimlafiñ</span> and a parser splits it into root and suffixes and takes you to the root. It runs on your phone and works offline.</span></p>
+      <div class="cta">
+        <a class="btn" href="../"><span class="es">Abrir el diccionario</span><span class="en">Open the dictionary</span></a>
+        <a class="btn ghost" href="#instalar"><span class="es">Instalar la app</span><span class="en">Install the app</span></a>
+      </div>
+      <div class="facts" aria-label="En cifras">
+        <span><b>479</b><span class="es">entradas del núcleo</span><span class="en">core entries</span></span>
+        <span><b>9.855</b><span class="es">entradas de Augusta</span><span class="en">Augusta entries</span></span>
+        <span><b>6</b><span class="es">juegos</span><span class="en">games</span></span>
+        <span><b>3</b>grafemarios</span>
+      </div>
+    </div>
+    <div class="phone"><img src="img/d-home.jpg" alt=""></div>
+  </section>
+  </main>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-trae">
+    <p class="eyebrow"><span class="es">Qué trae</span><span class="en">What's inside</span></p>
+    <h2 id="h-trae"><span class="es">Buscar, entender y practicar</span><span class="en">Look up, understand and practise</span></h2>
+    <div class="split">
+      <div>
+        <ul class="checks">
+          <li><span><span class="es"><b>Búsqueda en tu idioma.</b> Busca en mapudungun y en español, o cambia a inglés con un toque.</span><span class="en"><b>Search in your language.</b> Search in Mapudungun and English, or switch to Spanish with one tap.</span></span></li>
+          <li><span><span class="es"><b>El núcleo:</b> las palabras y frases del juego <i>Mapudungukeaiñ Fill Püle</i> y las más frecuentes en el habla, con español e inglés, ordenadas por temas.</span><span class="en"><b>The core:</b> the words and phrases of the game <i>Mapudungukeaiñ Fill Püle</i> and the most frequent words in speech, with Spanish and English, by topic.</span></span></li>
+          <li><span><span class="es"><b>El diccionario de Augusta (1916),</b> en la edición digital en Unificado, para las palabras que el núcleo todavía no tiene. El inglés de estas entradas se está agregando por etapas.</span><span class="en"><b>Augusta's dictionary (1916),</b> from the digital edition in Unificado, for words the core doesn't have yet. English for these entries is being added in stages.</span></span></li>
+          <li><span><span class="es"><b>Seis juegos:</b> tarjetas con repaso espaciado, opción múltiple, parejas, escribir la palabra, grafemarios y armar palabras con raíz y sufijos. Los ngülliw que ganas se suman a los del juego.</span><span class="en"><b>Six games:</b> spaced-repetition flashcards, multiple choice, pairs, spelling, grafemarios and building words from root and suffixes. The ngülliw you earn are added to the game's.</span></span></li>
+          <li><span><span class="es"><b>Cada entrada dice si ya fue revisada.</b> Las que no, son borradores.</span><span class="en"><b>Every entry says whether it has been reviewed.</b> Those that haven't are drafts.</span></span></li>
+        </ul>
+      </div>
+      <div class="phones">
+        <div class="phone"><img src="img/d-search.jpg" alt="" loading="lazy"></div>
+        <div class="phone"><img src="img/d-entry.jpg" alt="" loading="lazy"></div>
+        <div class="phone"><img src="img/d-build.jpg" alt="" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section id="instalar" aria-labelledby="h-inst">
+    <p class="eyebrow"><span class="es">Instalar la app</span><span class="en">Install the app</span></p>
+    <h2 id="h-inst"><span class="es">Llévalo en el teléfono</span><span class="en">Put it on your phone</span></h2>
+    <div class="steps">
+      <div class="step"><h3>Android</h3>
+        <ol><li><span class="es">Abre <b>brogers36.github.io/Mapudungukeain/diccionario</b> en Chrome.</span><span class="en">Open <b>brogers36.github.io/Mapudungukeain/diccionario</b> in Chrome.</span></li>
+            <li><span class="es">Toca <b>Instalar la app</b>, debajo del buscador (o el menú ⋮ → <b>Instalar app</b>).</span><span class="en">Tap <b>Install the app</b>, below the search box (or the ⋮ menu → <b>Install app</b>).</span></li>
+            <li><span class="es">Ábrelo desde la pantalla de inicio. Funciona sin conexión.</span><span class="en">Open it from your home screen. It works offline.</span></li></ol></div>
+      <div class="step"><h3>iPhone / iPad</h3>
+        <ol><li><span class="es">Abre <b>brogers36.github.io/Mapudungukeain/diccionario</b> en Safari.</span><span class="en">Open <b>brogers36.github.io/Mapudungukeain/diccionario</b> in Safari.</span></li>
+            <li><span class="es">Toca <b>Compartir</b> → <b>Añadir a pantalla de inicio</b>.</span><span class="en">Tap <b>Share</b> → <b>Add to Home Screen</b>.</span></li>
+            <li><span class="es">Ábrelo desde el ícono. Funciona sin conexión.</span><span class="en">Open it from the icon. It works offline.</span></li></ol></div>
+    </div>
+    <p class="muted" style="margin-top:18px;max-width:70ch"><span class="es">Se instala aparte del juego, con su propio ícono. Cuando el diccionario se actualiza, la app instalada recibe la versión nueva la próxima vez que se abre con internet.</span><span class="en">It installs separately from the game, with its own icon. When the dictionary is updated, the installed app gets the new version the next time it opens online.</span></p>
+    <div class="cta" style="margin-top:22px"><a class="btn" href="../?instalar"><span class="es">Instalar la app</span><span class="en">Install the app</span></a></div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <section aria-labelledby="h-fuentes" style="padding-block:clamp(36px,6vw,56px)">
+    <h2 id="h-fuentes" style="font-size:1.5rem"><span class="es">Cómo se hizo y fuentes</span><span class="en">How it was made and sources</span></h2>
+    <p class="muted" style="margin-top:12px;max-width:72ch"><span class="es">Se hizo con herramientas de investigación entrenadas en el corpus AVENUE de mapudungun y con recursos gramaticales y léxicos establecidos. Es gratuito, para la comunidad, y no reemplaza a quienes enseñan: el mapudungun se aprende de verdad con su gente.</span><span class="en">It was built with research tools trained on the AVENUE Mapudungun corpus and with established grammatical and lexical resources. It is free, for the community, and it doesn't replace the people who teach: Mapudungun is really learned from its people.</span></p>
+    <ul class="refs" style="margin-top:16px">
+      <li>Augusta, F. J. de. (1916). <i>Diccionario araucano-español y español-araucano</i>. Imprenta Universitaria.</li>
+      <li>Augusta, F. J. de, Painemilla Ñamcucheu, P. S., Colüñ, J. F., &amp; Huenuñamco, D. S. (2019). <i>Diccionario mapudungun–español / español–mapudungun</i> [<span class="es">edición digital, adaptada del Corpus Lexicográfico del Mapudungun (CORLEXIM)</span><span class="en">digital edition, adapted from the Corpus Lexicográfico del Mapudungun (CORLEXIM)</span>].</li>
+      <li>Duan, M., Fasola, C., Rallabandi, S. K., Vega, R., Anastasopoulos, A., Levin, L., &amp; Black, A. W. (2020). A resource for computational experiments on Mapudungun. In <i>Proceedings of the Twelfth Language Resources and Evaluation Conference</i> (pp. 2872–2877). European Language Resources Association.</li>
+    </ul>
+    <footer><span>Tañi Nemülkawe</span><span><a href="../"><span class="es">Abrir el diccionario</span><span class="en">Open the dictionary</span></a></span></footer>
+  </section>
+</div>
+<div class="band" aria-hidden="true"></div>
+<script>
+(function(){
+  var root=document.documentElement;
+  function set(l){ root.setAttribute("data-l",l); root.lang=l;
+    document.getElementById("l-es").setAttribute("aria-pressed",l==="es");
+    document.getElementById("l-en").setAttribute("aria-pressed",l==="en");
+    try{ localStorage.setItem("mpk_promo_lang",l); }catch(e){} }
+  var saved=null; try{ saved=localStorage.getItem("mpk_promo_lang"); }catch(e){}
+  set(saved==="en"?"en":"es");
+  document.getElementById("l-es").onclick=function(){ set("es"); };
+  document.getElementById("l-en").onclick=function(){ set("en"); };
+})();
+</script>
+<script>
+(function(){ if(location.protocol!=='https:'||location.hostname!=='brogers36.github.io') return;
+  try{ new Image().src='https://brogers36.goatcounter.com/count?p='+encodeURIComponent(location.pathname)+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer||'')+'&rnd='+Math.random().toString(36).slice(2); }catch(e){} })();
+</script>
+</body>
+</html>
