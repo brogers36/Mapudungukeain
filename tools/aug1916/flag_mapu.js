@@ -14,7 +14,8 @@ const AV = JSON.parse(fs.readFileSync(avf, 'utf8'));
 // Spanish words: every word form in the LibreOffice .dic stems plus the Spanish headwords of volume II
 const ES = new Set(Object.keys(V2));
 for (const r of ['ES', 'CL']) for (const l of fs.readFileSync(path.join(lodir, 'es_' + r + '.dic'), 'utf8').split('\n').slice(1)) ES.add(l.split('/')[0].toLowerCase());
-const HW = new Set(); for (const k of Object.keys(V1)) for (const w of k.split(/\s+/)) HW.add(w);
+const VER = new Set(JSON.parse(fs.readFileSync(path.join(path.dirname(v1f), 'augusta1916_verified.json'), 'utf8')));
+const HW = new Set(); for (const k of Object.keys(V1)) if (VER.has(k)) for (const w of k.split(/\s+/)) HW.add(w);
 const known = r => !!(GX[r] || GX[r + 'n'] || GX[r + 'ün'] || HW.has(r) || HW.has(r + 'n') || HW.has(r + 'ün'));
 const SPANISHY = /[jvzxbh]|c(?!h)|qu|gu[eiéí]|[áéíóú]/;
 const MAPU = /k|w|ü|tr|ng/;

@@ -15,8 +15,12 @@ exec(src.split('\nout = []')[0])
 sys.argv = argv
 SC = SpellChecker(language='es', distance=1)
 CONF[:0] = [('iw', 'ü'), ('iu', 'ü'), ('iwy', 'üy'), ('o', 'ü'), ('s', 'ü')]   # volume II italics: ü read as iu, ə as o or s
+# confirmed volume I headwords help recognise Mapudungun words (unconfirmed ones are OCR forms and would
+# reinforce the misreads: mufay, manfana)
+_ver = set(json.load(open(os.path.join(os.path.dirname(os.path.abspath(sys.argv[4])), 'augusta1916_verified.json'), encoding='utf-8')))
 for k in aug1:
-    for w in k.split(): V[w] += 3          # the volume I headwords help recognise Mapudungun words
+    if k in _ver:
+        for w in k.split(): V[w] += 3
 # LibreOffice's Spanish dictionary (RLA-ES, hunspell; Spain and Chile), path in LO_ES_DIR
 from spylls.hunspell import Dictionary
 _LO = os.environ.get('LO_ES_DIR')
