@@ -6,7 +6,9 @@ del diccionario de 1916.
 1. **Corregir líneas.** La página «Líneas de Augusta» (artefacto privado) muestra 450 líneas impresas de los dos tomos
    (`lines/`, 270 del tomo I y 180 del II, elegidas entre las que tienen más mapudungun) con la lectura actual del OCR.
    Se corrigen copiando la ortografía de Augusta tal como está impresa.
-2. **Exportar.** Leer la base de datos de la página (colección `lineas`) y correr `export_gt.py`.
+2. **Exportar.** Leer la base de datos de la página (colección `lineas`) y correr `export_gt.py`. Las 450 líneas ya
+   están transcritas en `gt.json` (437 útiles; `#SKIP` = recorte ilegible o sin texto). `held.txt` son las 24 que no se
+   usan para entrenar y sirven para medir el error con `cer.py`.
 3. **Entrenar.** `./train.sh TRAIN_DIR tessdata_best/spa.traineddata langdata_lstm/radical-stroke.txt OUT 3000`
    ajusta el modelo `spa` de tessdata_best (el «fast» instalado no se puede entrenar), agrega las letras nuevas y deja
    `OUT/aug.traineddata`. 10 % de las líneas quedan aparte para medir el error.
