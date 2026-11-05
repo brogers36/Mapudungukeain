@@ -503,7 +503,7 @@ function entryES(e){
     <div class="entry-h"><p class="pos">${L("Español → mapudungun","Spanish → Mapudungun")}</p><h2 style="font-family:var(--body);font-weight:700">${esc(e.h)}</h2></div>
     <div class="box"><h3>Augusta (1916) <span class="status draft">${L("Sin revisar","Not yet reviewed")}</span></h3>
       <div class="aug">${senses.map((t,i)=>`<span class="sense">${i?"• ":""}${linkMapu(t)}</span>`).join("")}</div>
-      <p class="hint">${L("Texto de Augusta (1916, tomo II), leído por reconocimiento óptico del original impreso; las palabras mapuches pasaron a Unificado y puede haber errores de lectura. Las palabras subrayadas tienen su propia entrada.","Augusta's text (1916, volume II), read by OCR from the printed original; the Mapudungun words were converted to Unificado and there may be reading errors. Underlined words have their own entry.")}</p></div>`;
+      <p class="hint">${L("Texto de Augusta (1916, tomo II), leído por reconocimiento óptico del original impreso; las palabras mapuches pasaron a Unificado y puede haber errores de lectura. Las palabras subrayadas tienen su propia entrada.","Augusta's text (1916, volume II), read by OCR from the printed original; the Mapudungun words were converted to Unificado and there may be reading errors. Underlined words have their own entry.")}${e.u?" "+L("Este titular no se pudo confirmar en el escaneo.","This headword could not be confirmed in the scan."):""}</p></div>`;
   bindCommon(); }
 function entry(id){
   if(id.startsWith("e:")&&!BYID.has(id)){ loadES().then(()=>{ if(BYID.has(id)) entry(id); else entry("__none__"); }); app.innerHTML=`<p class="muted">${L("Cargando…","Loading…")}</p>`; return; }
