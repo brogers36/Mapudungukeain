@@ -1,5 +1,5 @@
 /* Runs the morphological parser off the main thread. Message in: {id, word, sys:'uni'|'azu'|'rag'};
-   message out: {id, r:{root, morphs, gl, wclass, mean}} or r:null. */
+   message out: {id, r:{root, morphs, gl, wclass, mean, who}} or r:null. */
 importScripts('stub.js', 'motor.js');
 const SYS = {uni: 'unificado', azu: 'azumchefe', rag: 'ragileo'};
 onmessage = ev => {
@@ -10,10 +10,10 @@ onmessage = ev => {
     let p = M.parse43(w, '', 3, false);
     if (p && !p.nvRule) { const c = M.inferCat(p.root); if (c) { const p2 = M.parse43(w, c, 3, false); if (p2 && !p2.nvRule) p = p2; } }
     if (p && p.root) {
-      let mean = null;
-      if (p.wclass === 'verb' && M.MEANING) { try { const X = M.MEANING.compose(p, M.GX()); if (X && X.ok) mean = X.sentence; } catch (e) {} }
+      let mean = null, who = null;
+      if (p.wclass === 'verb' && M.MEANING) { try { const X = M.MEANING.compose(p, M.GX()); if (X && X.ok) { mean = X.sentence; who = {person: X.person || null, obj: X.obj || null}; } } catch (e) {} }
       const ms = (p.m || []).filter(x => x && x.f);
-      r = {root: p.root, morphs: ms.map(x => x.f), gl: ms.map(x => x.gloss || ''), wclass: p.wclass || '', mean};
+      r = {root: p.root, morphs: ms.map(x => x.f), gl: ms.map(x => x.gloss || ''), wclass: p.wclass || '', mean, who};
     }
   } catch (e) { r = null; }
   postMessage({id, r});
