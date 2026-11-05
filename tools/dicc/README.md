@@ -42,7 +42,7 @@ español, sin nombres propios, de 3 a 12 palabras) y escribe `diccionario/ejempl
 
 ```
 node extract.js ../../index.html "Mapudungun Verb Parser 136.html" GOLD.csv .   # game_vocab.json, builder.json, motor.js
-node clean_motor.js motor.js ../aug1916/augusta1916_entries.json ../../diccionario/motor.js   # sin texto con derechos
+python3 build_dict.py ../../diccionario/datos.js && node clean_motor.js motor.js ../aug1916/augusta1916_entries.json ../../diccionario/motor.js ../../diccionario/datos.js   # sin texto con derechos
 python3 builder_en.py builder.json builder_en.json
 python3 build_dict.py ../../diccionario/datos.js            # también escribe datos_es.js (vacío por ahora)
 node build_examples.js CORPUS_DIR ../../diccionario/motor.js ../../diccionario/datos.js ../../diccionario/ejemplos.js
