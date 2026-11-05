@@ -1,8 +1,9 @@
 # Augusta (1916) desde el original impreso
 
 El diccionario publica el texto de Félix José de Augusta, *Diccionario araucano-español y español-araucano*, tomo I
-(1916, dominio público), leído del escaneo del Internet Archive (`diccionarioarauc01fluoft`) con OCR propio. No usa el
-texto de la edición digital de 2019 ni el de CORLEXIM; los tomos I y II salen del escaneo: esa capa tiene derechos vigentes.
+(1916, dominio público), leído del escaneo del Internet Archive (`diccionarioarauc01fluoft`) con OCR propio. El tomo II
+(`diccionarioarauc02fluoft`) se lee igual. No usa el texto de la edición digital de 2019 ni el de CORLEXIM: esa capa
+tiene derechos vigentes.
 
 ## Pasos
 
