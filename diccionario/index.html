@@ -472,7 +472,7 @@ function entriesForRoot(root,morphs){
 /* short meaning of a root for the gloss line, in the reader's language */
 function rootMeaning(root,hop){
   /* the dictionary's own core glosses come before Augusta's text, which is OCR and can pair a sense with the wrong headword */
-  const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
+  const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(lang==="en"?(!!y.en)-(!!x.en):0)||(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
   const pickTxt=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:(e.s||""));
   for(const e of hs){ let t=pickTxt(e); if(!t) continue;
     if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1):""; if(r) return r; continue; }
@@ -482,6 +482,73 @@ function rootMeaning(root,hop){
 function interlinear(root,morphs,gl,rm){
   const cell=(f,g,cls)=>`<span class="mc${cls||""}"><span class="mf">${esc(G(f))}</span><span class="mg">${esc(g||"")}</span></span>`;
   return `<div class="igl">${cell(root,rm===undefined?rootMeaning(root):rm," root")}${(morphs||[]).map((m,i)=>cell(m,lab(gl[i]||""))).join("")}</div>`; }
+/* English rendering of a parsed verb: subject, tense/aspect from the suffix glosses, the root's English gloss.
+   Returns "" when the root has no English gloss (then the Spanish rendering is shown, marked as Spanish). */
+const EN_IRR={be:["was","been"],have:["had","had"],do:["did","done"],go:["went","gone"],come:["came","come"],see:["saw","seen"],
+  know:["knew","known"],say:["said","said"],give:["gave","given"],eat:["ate","eaten"],make:["made","made"],take:["took","taken"],
+  get:["got","gotten"],find:["found","found"],tell:["told","told"],hear:["heard","heard"],leave:["left","left"],put:["put","put"],
+  bring:["brought","brought"],think:["thought","thought"],buy:["bought","bought"],sell:["sold","sold"],sit:["sat","sat"],
+  stand:["stood","stood"],run:["ran","run"],speak:["spoke","spoken"],write:["wrote","written"],drink:["drank","drunk"],
+  sing:["sang","sung"],sleep:["slept","slept"],fall:["fell","fallen"],feel:["felt","felt"],keep:["kept","kept"],lose:["lost","lost"],
+  send:["sent","sent"],spend:["spent","spent"],build:["built","built"],catch:["caught","caught"],teach:["taught","taught"],
+  fight:["fought","fought"],hold:["held","held"],grow:["grew","grown"],throw:["threw","thrown"],break:["broke","broken"],
+  choose:["chose","chosen"],forget:["forgot","forgotten"],begin:["began","begun"],become:["became","become"],bite:["bit","bitten"],
+  hide:["hid","hidden"],ride:["rode","ridden"],rise:["rose","risen"],shake:["shook","shaken"],steal:["stole","stolen"],
+  swim:["swam","swum"],wear:["wore","worn"],weave:["wove","woven"],win:["won","won"],meet:["met","met"],lie:["lay","lain"],
+  lay:["laid","laid"],pay:["paid","paid"],cut:["cut","cut"],hit:["hit","hit"],let:["let","let"],shut:["shut","shut"],
+  burn:["burned","burned"],dig:["dug","dug"],feed:["fed","fed"],hang:["hung","hung"],lead:["led","led"],light:["lit","lit"],
+  read:["read","read"],seek:["sought","sought"],shoot:["shot","shot"],sweep:["swept","swept"],tear:["tore","torn"],
+  understand:["understood","understood"],wake:["woke","woken"],blow:["blew","blown"],draw:["drew","drawn"],fly:["flew","flown"],
+  freeze:["froze","frozen"],drive:["drove","driven"],bear:["bore","born"],bend:["bent","bent"],bleed:["bled","bled"],
+  dream:["dreamed","dreamed"],kneel:["knelt","knelt"],lend:["lent","lent"],spin:["spun","spun"],spit:["spat","spat"],
+  split:["split","split"],spread:["spread","spread"],stick:["stuck","stuck"],sting:["stung","stung"],strike:["struck","struck"],
+  swear:["swore","sworn"],swell:["swelled","swollen"],wind:["wound","wound"],grind:["ground","ground"],shine:["shone","shone"]};
+const EN_DBL=/^(?:stop|run|sit|get|put|cut|hit|let|shut|dig|swim|spin|spit|plan|drop|step|beg|hug|rub|nod|chop|skip|trap|wrap|grab|knit|trim|tap|rot|pat|sob|hop|shop|ship|slip|drip|grip|chat|pet|wed|win|begin|forget|admit|prefer|occur)$/;
+function enForm(v,f){ const w=v.split(" "), h=w[0], r=w.slice(1).join(" "), add=x=>x+(r?" "+r:"");
+  if(h==="be") return add({p3:"is",past:"was",pp:"been",ing:"being"}[f]);
+  if(f==="p3"){ if(h==="have") return add("has"); if(/(s|sh|ch|x|z|o)$/.test(h)) return add(h+"es"); if(/[^aeiou]y$/.test(h)) return add(h.slice(0,-1)+"ies"); return add(h+"s"); }
+  if(f==="ing"){ if(h==="die"||h==="lie"||h==="tie") return add(h.slice(0,-2)+"ying"); if(/[^aeiou]e$/.test(h)&&h!=="be") return add(h.slice(0,-1)+"ing"); if(EN_DBL.test(h)) return add(h+h.slice(-1)+"ing"); return add(h+"ing"); }
+  const irr=EN_IRR[h]; if(irr) return add(f==="past"?irr[0]:irr[1]);
+  if(/e$/.test(h)) return add(h+"d"); if(/[^aeiou]y$/.test(h)) return add(h.slice(0,-1)+"ied"); if(EN_DBL.test(h)) return add(h+h.slice(-1)+"ed"); return add(h+"ed"); }
+function enVerbGloss(root){
+  const hs=entriesForRoot(root,[]).filter(e=>e.en&&(e.m==null||e.t==="verb"||/^to /.test(e.en)));
+  hs.sort((x,y)=>(y.m!=null)-(x.m!=null));
+  for(const e of hs){ let t=String(e.en).replace(/\s*\[[^\]]*\]/g,"").replace(/\s*\([^)]*\)/g,"").split(/[;,]/)[0].trim();
+    if(!/^to [a-z]/.test(t)) continue; t=t.slice(3).replace(/\bsomething\b|\bsomeone\b/g,"").replace(/\s+/g," ").trim();
+    if(t&&t.split(" ").length<=4) return t; }
+  return ""; }
+const EN_SUBJ={"1sg":"I","2sg":"you","3":"he/she","1du":"we two","2du":"you two","3du":"they two","1pl":"we","2pl":"you all","3pl":"they"};
+const EN_OBJ={"1sg":"me","2sg":"you","3":"him/her","1du":"us two","2du":"you two","3du":"them two","1pl":"us","2pl":"you all","3pl":"them"};
+const EN_REFL={"1sg":"myself","2sg":"yourself","3":"himself/herself","1du":"ourselves","2du":"yourselves","3du":"themselves","1pl":"ourselves","2pl":"yourselves","3pl":"themselves"};
+function enMeaning(r){
+  if(!r||!r.who||!r.who.person) return ""; const pn=r.who.person, sub=EN_SUBJ[pn]; if(!sub) return "";
+  const sp=String(r.mean||""); if(/^¿/.test(sp)) return "";   /* questions: the Spanish rendering is shown */
+  const base=enVerbGloss(r.root); if(!base) return "";
+  const f=new Set(r.gl||[]), neg=f.has("NEG"), fut=f.has("NRLD"), past=f.has("IPD")||f.has("PLUPERF"), hab=f.has("CF"),
+    prog=f.has("STAT")||f.has("PROG.PERS"), pass=f.has("PASS"), caus=f.has("CAUS")||f.has("TRANS"), refl=f.has("REFL"),
+    again=f.has("REST"), back=f.has("RET"), prox=f.has("PROX"), still=f.has("PERSIST"), must=f.has("FORCE"), really=f.has("AFF"),
+    imp=/^¡/.test(sp)||f.has("IMP.3"), cond=/^si /.test(sp), report=/^dicen que /.test(sp);
+  const obj=r.who.obj&&EN_OBJ[r.who.obj]?EN_OBJ[r.who.obj]:"";
+  const tail=(caus||pass?"":(obj?" "+obj:""))+(refl?" "+EN_REFL[pn]:"")+(back?" back":"")+(again?" again":"")+(really?", really":"");
+  let v=(base==="say"&&obj&&!pass&&!caus)?"tell":base;   /* pi- with a person object: "tell" */
+  if(pass) v="be "+enForm(v,"pp");
+  if(caus) v="make "+(obj||"someone")+" "+v;
+  if(prog) v="be "+enForm(v,"ing");
+  const third=pn==="3", plural=!/^(1sg|3)$/.test(pn), isBe=/^be\b/.test(v), rest=isBe?v.slice(2).trim():"";
+  const adv=still?(neg?"no longer":"still"):hab?(past?"":"usually"):prox?"just":"";
+  const N=neg&&!still;   /* "no longer" carries the negation */
+  let vp;
+  if(imp){ const head=(N?"do not ":"")+v; return (/^2/.test(pn)?head[0].toUpperCase()+head.slice(1):"Let "+(EN_OBJ[pn]||"him/her")+" "+head)+tail+"!"; }
+  if(must) vp=(fut?"will have to":past?"had to":third?"has to":"have to").replace(/^(will|had|has|have)/,x=>N?(fut?"will not":past?"did not":third?"does not":"do not")+" have":x)+" "+v;
+  else if(fut) vp="will "+(N?"not ":"")+(adv?adv+" ":"")+v;
+  else if(hab&&past) vp=(N?"did not use to ":"used to ")+v;
+  else if(isBe){ const be=past?(plural?"were":"was"):(pn==="1sg"?"am":third?"is":"are"); vp=be+(N?" not":"")+(adv?" "+adv:"")+(rest?" "+rest:""); }
+  else if(prox&&!N) vp=(past?"had":third?"has":"have")+" just "+enForm(v,"pp");
+  else if(N) vp=(past?"did":third?"does":"do")+" not "+(adv?adv+" ":"")+v;
+  else vp=(adv?adv+" ":"")+(past?enForm(v,"past"):third?enForm(v,"p3"):v);
+  let out=sub+" "+vp+tail;
+  if(cond) out="if "+out; if(report) out="they say "+out;
+  return out[0].toUpperCase()+out.slice(1); }
 function anaHTML(r,q){
   if(!r||!r.root) return "";
   const parts=[r.root].concat(r.morphs||[]);
@@ -490,7 +557,7 @@ function anaHTML(r,q){
   if(!hits.length){ cp=compoundParts(r.root); if(!cp) return ""; hits=cp.ha.slice(0,3).concat(cp.hb.slice(0,2)); }
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
     ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a),rootMeaning(cp.b)].filter(Boolean).join(" + "):undefined)}
-    ${r.mean?`<p>${L("Significado aproximado: ","Approximate meaning (Spanish): ")}«${esc(r.mean)}»</p>`:""}
+    ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
     ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`,`Compound root <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
     <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
