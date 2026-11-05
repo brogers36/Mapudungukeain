@@ -173,34 +173,32 @@ const NUT=`<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 
 const GAME_URL="../index.html";
 /* ===== Installing: Android/desktop Chrome hand us an install prompt; iPhone/iPad need Safari's Share menu ===== */
 let installEv=null;
-/* The dictionary's manifest starts at ./?app, so a launch from its own icon is recognisable; "standalone" alone is also
-   true inside the installed game, where the dictionary must still offer to install itself. */
-try{ if(/[?&]app\b/.test(location.search)) sessionStorage.setItem("mpd_app","1"); }catch(e){}
-const displayStandalone=()=>{ try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } };
-const asOwnApp=()=>{ try{ return displayStandalone()&&(isIOS||sessionStorage.getItem("mpd_app")==="1"); }catch(e){ return false; } };   /* iOS never opens one home-screen app inside another */
+/* The box hides once the dictionary runs as an installed app (any app-like display mode), after the browser reports
+   the install, after a launch from the icon (start_url ./?app), or when the reader says it is installed. */
+const markInstalled=()=>{ try{ localStorage.setItem("mpd_installed","1"); }catch(e){} };
+if(/[?&]app\b/.test(location.search)) markInstalled();
+const displayStandalone=()=>{ try{ return ["standalone","minimal-ui","fullscreen","window-controls-overlay"].some(m=>matchMedia("(display-mode: "+m+")").matches)||navigator.standalone===true; }catch(e){ return false; } };
+const asOwnApp=()=>{ if(displayStandalone()) return true; try{ return localStorage.getItem("mpd_installed")==="1"; }catch(e){ return false; } };
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 let instOpen=false;
 window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEv=e; refreshInstall(); });
-window.addEventListener("appinstalled",()=>{ installEv=null; refreshInstall(); });
-function refreshInstall(){ const b=document.getElementById("instbox"); if(b){ b.outerHTML=installBox(); bindInstall(); } }
+window.addEventListener("appinstalled",()=>{ installEv=null; markInstalled(); refreshInstall(); });
+function refreshInstall(){ const b=document.getElementById("instbox"); if(b){ b.outerHTML=installBox()||""; bindInstall(); } }
 const SITE_URL="https://brogers36.github.io/Mapudungukeain/diccionario/";
 function installBox(){
   if(asOwnApp()) return "";
-  const inGame=displayStandalone()&&!isIOS;
-  const steps=inGame
-    ?`<p>${L("Estás dentro de la app del juego. Para instalar el diccionario aparte, ábrelo en el navegador (Chrome o Safari) con esta dirección y toca otra vez <b>Instalar la app</b>:","You are inside the game app. To install the dictionary separately, open it in the browser (Chrome or Safari) at this address and tap <b>Install the app</b> again:")}</p>
-       <p><b>${SITE_URL.replace("https://","")}</b></p><button class="btn ghost sm" id="instcopy">${L("Copiar la dirección","Copy the address")}</button>`
-    :isIOS
+  const steps=isIOS
     ?`<p>${L("En <b>Safari</b>, toca <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y luego <b>Añadir a pantalla de inicio</b>.","In <b>Safari</b>, tap <b>Share</b> (the square with the up arrow), then <b>Add to Home Screen</b>.")}</p>`
     :`<p>${L("En <b>Chrome</b>, abre el menú <b>⋮</b> (arriba a la derecha) y toca <b>Instalar app</b> o <b>Añadir a la pantalla de inicio</b>. Si no aparece, puede que ya esté instalada: búscala en tu pantalla de inicio.","In <b>Chrome</b>, open the <b>⋮</b> menu (top right) and tap <b>Install app</b> or <b>Add to Home screen</b>. If it isn't there, it may already be installed: look for it on your home screen.")}</p>`;
   return `<div class="box" id="instbox"><p class="eyebrow">${L("Instalar en el teléfono","Install on your phone")}</p>
     <button class="btn" id="instbtn">📲 ${L("Instalar la app","Install the app")}</button>
     <div id="inststeps" ${instOpen?"":"hidden"}>${steps}</div>
-    <p class="hint">${L("Se instala aparte del juego, con su propio ícono, y funciona sin conexión.","It installs separately from the game, with its own icon, and works offline.")}</p></div>`; }
+    <p class="hint">${L("Se instala aparte del juego, con su propio ícono, y funciona sin conexión.","It installs separately from the game, with its own icon, and works offline.")} <button class="back" id="instdone" style="text-decoration:underline">${L("Ya la instalé","I've installed it")}</button></p></div>`; }
 function bindInstall(){
   const b=document.getElementById("instbtn"); if(b) b.onclick=async()=>{
     if(installEv&&!displayStandalone()){ installEv.prompt(); try{ await installEv.userChoice; }catch(e){} installEv=null; refreshInstall(); return; }
     instOpen=true; const st=document.getElementById("inststeps"); if(st){ st.hidden=false; st.scrollIntoView({block:"nearest"}); } };
+  const d=document.getElementById("instdone"); if(d) d.onclick=()=>{ markInstalled(); refreshInstall(); };
   const c=document.getElementById("instcopy"); if(c) c.onclick=async()=>{ try{ await navigator.clipboard.writeText(SITE_URL); c.textContent=L("Copiada ✓","Copied ✓"); }catch(e){ c.textContent=SITE_URL; } };
 }
 
