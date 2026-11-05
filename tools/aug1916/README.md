@@ -32,6 +32,17 @@ usa únicamente para comparar definiciones. Los dos viven fuera del repositorio.
   (i/u semivocales → y/w, q → g, ŋ → ng, ə → ü, -n tras consonante → -ün) y se comparan con las formas del corpus
   AVENUE. El español, los nombres botánicos y lo que no se reconoce quedan como están impresos.
 
+## Revisión
+
+- `vote.py`: segunda lectura palabra por palabra (otro escaneo o la capa de texto del PDF); se aplica antes de `split.py`.
+- `build_es16.py` comprueba los titulares en español con el diccionario de LibreOffice (RLA-ES; `LO_ES_DIR` apunta a
+  la carpeta `es` de github.com/LibreOffice/dictionaries) y con el orden alfabético; los dudosos van a
+  `augusta1916_es_flags.json`.
+- `flag_mapu.js`: palabras mapuches de los dos tomos que no están en AVENUE ni son titulares y que el analizador no
+  puede analizar; `revision_ocr_mapu.json`, ordenada por frecuencia. Las dos listas aparecen en la copia maestra, y
+  sus correcciones se aplican al publicar (`build_dict.py`).
+- `ocrtrain/`: líneas para corregir y entrenar Tesseract con el alfabeto de Augusta.
+
 ## Límites conocidos
 
 - Ocho páginas del PDF del Internet Archive están en blanco (58, 166, 176, 182, 184, 228, 234, 302). Sus entradas

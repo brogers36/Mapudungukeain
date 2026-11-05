@@ -1,0 +1,17 @@
+# Entrenar el OCR con el alfabeto de Augusta
+
+Tesseract no trae ŋ ni ə y confunde la ü y la cursiva. Estas herramientas ajustan su modelo de español a la tipografía
+del diccionario de 1916.
+
+1. **Corregir líneas.** La página «Líneas de Augusta» (artefacto privado) muestra 450 líneas impresas de los dos tomos
+   (`lines/`, 270 del tomo I y 180 del II, elegidas entre las que tienen más mapudungun) con la lectura actual del OCR.
+   Se corrigen copiando la ortografía de Augusta tal como está impresa.
+2. **Exportar.** Leer la base de datos de la página (colección `lineas`) y correr `export_gt.py`.
+3. **Entrenar.** `./train.sh TRAIN_DIR tessdata_best/spa.traineddata langdata_lstm/radical-stroke.txt OUT 3000`
+   ajusta el modelo `spa` de tessdata_best (el «fast» instalado no se puede entrenar), agrega las letras nuevas y deja
+   `OUT/aug.traineddata`. 10 % de las líneas quedan aparte para medir el error.
+4. **Volver a leer.** Repetir el OCR de los dos tomos con `-l aug` y correr de nuevo `split.py` … `build_es16.py`.
+
+`vote.py` (en la carpeta de arriba) combina dos lecturas del mismo tomo palabra por palabra: la de Tesseract y otra
+(un segundo escaneo, o la capa de texto que trae el PDF). Con la capa del PDF del Internet Archive cambió 845 palabras
+del tomo I y 2.933 del tomo II.
