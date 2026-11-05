@@ -1,7 +1,9 @@
 """Assemble diccionario/datos.js from:
   game_vocab.json            every word and phrase the game teaches (extract.js)
   core_extra.tsv             hand-written core entries for frequent words not in the game
-  augusta_digital_entries.json  Augusta's dictionary, digital edition in Unificado
+  ../aug1916/augusta1916_entries.json  Augusta's dictionary (1916), OCR of the printed original, spelling
+                             converted to Unificado (tools/aug1916); ../aug1916/augusta1916_verified.json lists
+                             the headwords confirmed against their definitions
   builder_en.json            word-building items (extract.js + builder_en.py)
   rootfreq.json (optional)   AVENUE root frequencies (rootagg from the parser over the corpus)
   revisiones.json (optional) the reviewer's decisions exported from the master copy
@@ -9,7 +11,8 @@ Usage: python3 build_dict.py OUT_datos.js"""
 import json, re, sys, os, time
 H = os.path.dirname(os.path.abspath(__file__)); P = lambda f: os.path.join(H, f)
 game = json.load(open(P('game_vocab.json')))
-aug = json.load(open(P('augusta_digital_entries.json')))
+aug = json.load(open(P('../aug1916/augusta1916_entries.json'), encoding='utf-8'))
+VER = set(json.load(open(P('../aug1916/augusta1916_verified.json'), encoding='utf-8')))
 builder = json.load(open(P('builder_en.json')))
 freq = json.load(open(P('rootfreq.json'))) if os.path.exists(P('rootfreq.json')) else {}
 rev = json.load(open(P('revisiones.json'))) if os.path.exists(P('revisiones.json')) else {}
@@ -20,19 +23,23 @@ THEME = {  # game level title -> theme key
  'El cuerpo':'cuerpo','Más del cuerpo':'cuerpo','Colores':'color','Colores II':'color','La familia':'fam','La familia II':'fam',
  'Lo que hacemos':'verb','Acciones':'verb','Más acciones':'verb','Más trabajos':'verb','La ropa':'ropa','Comida':'comida','Más comida':'comida',
  'La casa':'casa','Cómo son las cosas':'desc','El año y el tiempo':'tiempo','Palabras para preguntar':'preg','Más preguntas':'preg','Dónde: en, junto a':'lugar'}
-LABS = re.compile(r"^(?:(?:s|tr|intr|unitr|refl|rec|expr|adj|adv|part|partíc|comp|interj|pron|pers|conj|prep|posp|num|pl|dem|interr|interrog|v|n|loc|neg|fig|indet|t|exp|impers|poses|suf|pref|apóc|contracc|Pangui|Huapi|Imp|Tranc|Bot|Zool|Med|Anat|y)\.\s*|/?unitr\.\s*|y\s+(?=[a-z]+\.))+")
-POS = [('tr.','v'),('intr.','v'),('unitr.','v'),('rec.','v'),('refl.','v'),('s.','s'),('adj.','adj'),('adv.','adv'),('pron.','pron'),('partíc.','part'),('part.','part'),('interj.','interj'),('num.','num'),('posp.','posp'),('suf.','suf'),('conj.','conj')]
+LABS = re.compile(r"^(?:(?:r|a|c|ant|ger|s|tr|intr|unitr|refl|rec|expr|adj|adv|part|partíc|comp|interj|pron|pers|conj|prep|posp|num|pl|dem|interr|interrog|v|n|loc|neg|fig|indet|t|exp|impers|poses|suf|pref|apóc|contracc|Pangui|Huapi|Imp|Tranc|Bot|Zool|Med|Anat|y)\.\s*|/?unitr\.\s*|y\s+(?=[a-z]+\.))+")
+POS = [('tr.','v'),('intr.','v'),('unitr.','v'),('rec.','v'),('refl.','v'),('n.','v'),('r.','v'),('s.','s'),('adj.','adj'),('adv.','adv'),('pron.','pron'),('partíc.','part'),('part.','part'),('interj.','interj'),('num.','num'),('posp.','posp'),('suf.','suf'),('conj.','conj')]
 def pos_of(t):
     for k, v in POS:
         if re.search(r'(^|\s|/)' + re.escape(k), t[:40]): return v
     return ''
 def short(t):
+    t = re.sub(r'^\((?:Panguipulli|Huapi)[^)]*\)\s*', '', t.strip())
+    t = re.sub(r'^((?:(?:s|n|tr|r|a|adj|adv|partíc|interj|rec|ger|num|pron|conj|c|v|ant|t)\.\s*,?\s*(?:y\s+)?)+)', lambda m: m.group(1).replace(',', ' '), t)
+    t = re.sub(r'^=\s*([^\s.,;]+)[.,]?\s*$', r'▹ \1', t)
     t = re.sub(r'^\((?:del esp\.|de |ger\. de|rz\.|probabl\.|lit\.|pl\.)[^)]*\)\s*', '', t.strip())
     m = re.match(r'^▹\s*([^.;]+)', LABS.sub('', t))
     if m and len(LABS.sub('', t)) < 60: return 'Véase ' + m.group(1).strip()
     t = LABS.sub('', t).strip()
     m = re.match(r"(.+?(?<!\bp)(?<!\bej)(?<!\betc)(?<!\bprobabl)(?<!\blit)[.;])(?:\s|$)", t)
     s = (m.group(1) if m else t).rstrip('.;').strip()
+    s = s.rstrip(' ,;:')
     return s if len(s) <= 140 else s[:137].rsplit(' ', 1)[0] + '…'
 def root_of(hw, p):
     if p != 'v': return hw
@@ -80,16 +87,17 @@ def junk(h, texts):
 linked = {c['a'] for c in core if c['a']}
 A = []; skipped = 0
 for hw, texts in aug.items():
-    if junk(hw, texts) and hw not in linked: skipped += 1; continue
-    text = ' | '.join(t.strip() for t in texts if t.strip())
+    if hw not in VER and junk(hw, texts) and hw not in linked: skipped += 1; continue
+    text = ' ‖ '.join(t.strip() for t in texts if t.strip())
     p = pos_of(text); s = short(texts[0])
-    A.append({'id': 'a:' + hw, 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p))})
+    A.append({'id': 'a:' + hw, 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p)), 'u': 0 if hw in VER else 1})
 # entries from the parser's lexicon (parser_extra.tsv) and the Spanish loan roots it knows (loan_stems.json + loan_en.tsv)
 have = {e['h'] for e in A}
 for line in open(P('parser_extra.tsv'), encoding='utf-8'):
     if not line.strip() or line.startswith('#'): continue
     h, r, p, es, en, src, d = line.rstrip('\n').split('\t')
     if h in have: continue
+    if src == 'A': d = es[:1].upper() + es[1:] + '.'   # the parser's quotation of the digital edition is not republished
     A.append({'id': 'a:' + h, 'h': h, 'r': r, 'p': p, 's': es, 'd': d, 'en': en, 'f': fq(r), 'o': src}); have.add(h)
 LEN = dict(l.rstrip('\n').split('\t') for l in open(P('loan_en.tsv'), encoding='utf-8') if l.strip())
 NOUNISH = {'cafe','catolico','confianza','contento','estudio','firma','fuerte','joven','libre','listo','malo','mate','pobre','rico','sano','seguro','tomate','tranquilo','ultimo','zapato','arreglado'}
@@ -112,7 +120,6 @@ for e in A:
     x = ENX.get(e['h'])
     if x and e.get('o') is None:
         e['en'] = x[0]; nen += 1
-        if len(x) > 1 and x[1]: e['s'] = x[1]
     elif e['s'].startswith('Véase '):
         e['en'] = 'See ' + e['s'][6:]
 # reviewer decisions
@@ -130,10 +137,7 @@ for b in B:
     for x, y in SUBS: b['es'] = re.sub(r'\b' + x + r'\b', y, b['es'])
 # Spanish -> Mapudungun half of Augusta (extract_es.py), plus the few the parser has and the digital edition lacks.
 # Written to a separate file that the app loads only when someone searches in Spanish.
-ES = [{'id': 'e:' + h, 'h': h, 'd': ' | '.join(t), 'o': None} for h, t in json.load(open(P('es_entries.json'), encoding='utf-8')).items()]
-have_es = {e['h'] for e in ES}
-for h, t in json.load(open(P('es_parser_extra.json'), encoding='utf-8')).items():
-    if h not in have_es: ES.append({'id': 'e:' + h, 'h': h, 'd': t, 'o': 'A'})
+ES = []   # vol. II (español-araucano) of the 1916 original has not been OCR'd yet
 open(os.path.join(os.path.dirname(sys.argv[1]), 'datos_es.js'), 'w', encoding='utf-8').write(
     'window.DICC_ES=' + json.dumps(ES, ensure_ascii=False, separators=(',', ':')) + ';\n')
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,
