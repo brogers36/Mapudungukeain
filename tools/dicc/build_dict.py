@@ -128,7 +128,15 @@ B = [{'w': b['w'], 'm': b['m'], 'g': b['g'], 's': b['s'], 'es': b['es'], 'en': b
 SUBS = [('poseemos','tenemos'),('poseen','tienen'),('posees','tienes'),('posee','tiene'),('poseo','tengo'),('poseía','tenía'),('poseías','tenías'),('poseían','tenían'),('poseer','tener')]
 for b in B:
     for x, y in SUBS: b['es'] = re.sub(r'\b' + x + r'\b', y, b['es'])
+# Spanish -> Mapudungun half of Augusta (extract_es.py), plus the few the parser has and the digital edition lacks.
+# Written to a separate file that the app loads only when someone searches in Spanish.
+ES = [{'id': 'e:' + h, 'h': h, 'd': ' | '.join(t), 'o': None} for h, t in json.load(open(P('es_entries.json'), encoding='utf-8')).items()]
+have_es = {e['h'] for e in ES}
+for h, t in json.load(open(P('es_parser_extra.json'), encoding='utf-8')).items():
+    if h not in have_es: ES.append({'id': 'e:' + h, 'h': h, 'd': t, 'o': 'A'})
+open(os.path.join(os.path.dirname(sys.argv[1]), 'datos_es.js'), 'w', encoding='utf-8').write(
+    'window.DICC_ES=' + json.dumps(ES, ensure_ascii=False, separators=(',', ':')) + ';\n')
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,
-        'n': {'core': len(core), 'aug': sum(1 for e in A if e.get('o') is None), 'parser': sum(1 for e in A if e.get('o') in ('A','R')), 'loans': sum(1 for e in A if e.get('o') == 'L'), 'skipped': skipped, 'aug_en': sum(1 for e in A if e['en']), 'aug_en_drafted': nen, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
+        'n': {'es': len(ES), 'core': len(core), 'aug': sum(1 for e in A if e.get('o') is None), 'parser': sum(1 for e in A if e.get('o') in ('A','R')), 'loans': sum(1 for e in A if e.get('o') == 'L'), 'skipped': skipped, 'aug_en': sum(1 for e in A if e['en']), 'aug_en_drafted': nen, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
 open(sys.argv[1], 'w', encoding='utf-8').write('window.DICC=' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n')
 print(data['n'], os.path.getsize(sys.argv[1]))

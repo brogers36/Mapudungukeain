@@ -21,7 +21,7 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match('./index.html')));
     return;
   }
-  if (inScope && /\/(datos|worker|stub)\.js$/.test(url.pathname)) {
+  if (inScope && /\/(datos|datos_es|worker|stub)\.js$/.test(url.pathname)) {
     e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; })
       .catch(() => caches.match(req)));
     return;
