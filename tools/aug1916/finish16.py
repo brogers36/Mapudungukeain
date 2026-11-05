@@ -33,6 +33,7 @@ for e in E:
         continue
     d = re.sub(r'^ir\.', 'tr.', d)
     if e['reg']: d = '(' + ', '.join(e['reg']) + ') ' + d
+    if e.get('pg', 0) >= 900: d = '[Suplemento al tomo I] ' + d   # pages 901+ = the Supplement (HathiTrust copy)
     out.setdefault(h, [])
     if d not in out[h]: out[h].append(d)
     if e['ok']: ver.add(h)

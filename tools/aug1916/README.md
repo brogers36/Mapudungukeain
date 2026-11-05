@@ -32,6 +32,14 @@ usa únicamente para comparar definiciones. Los dos viven fuera del repositorio.
   (i/u semivocales → y/w, q → g, ŋ → ng, ə → ü, -n tras consonante → -ün) y se comparan con las formas del corpus
   AVENUE. El español, los nombres botánicos y lo que no se reconoce quedan como están impresos.
 
+## Segundo ejemplar (HathiTrust)
+
+El ejemplar de la Universidad de Texas digitalizado por Google (HathiTrust `txu.059172017840807`, los dos tomos en un
+PDF de 765 páginas, 600 ppp) se leyó con el mismo OCR. `map_pages.py` empareja sus páginas con las del Internet Archive
+(tomo I: +3, tomo II: +329), y `vote.py` combina las dos lecturas y después la capa de texto del PDF. El ejemplar trae
+además el **Suplemento al tomo I** (13 páginas), que el del Internet Archive no tiene; sus entradas llevan la marca
+«[Suplemento al tomo I]».
+
 ## Revisión
 
 - `vote.py`: segunda lectura palabra por palabra (otro escaneo o la capa de texto del PDF); se aplica antes de `split.py`.
@@ -45,9 +53,9 @@ usa únicamente para comparar definiciones. Los dos viven fuera del repositorio.
 
 ## Límites conocidos
 
-- Ocho páginas del PDF del Internet Archive están en blanco (58, 166, 176, 182, 184, 228, 234, 302). Sus entradas
-  faltan hasta conseguir otra copia de esas páginas (Memoria Chilena tiene el libro).
+- Las páginas en blanco de los PDF (tomo I: 58, 166, 176, 182, 184, 228, 234, 302; tomo II: 54, 64, 108, 230, 234,
+  266, 276, 348, 404, 424) están en blanco también en el libro: son el reverso de la última página de una letra, y la
+  letra siguiente empieza en página impar. No falta texto.
 - El texto es OCR sin revisar: hay errores de lectura, sobre todo en los ejemplos en mapudungun.
 - Tomo II (español-araucano, `diccionarioarauc02fluoft`, págs. 13 a 426): `python3 build_es16.py raw2.json
-  avenue_words.json keys2019.json augusta1916_entries.json augusta1916_es.json` (7.969 titulares en español). Diez
-  páginas de ese PDF están en blanco (54, 64, 108, 230, 234, 266, 276, 348, 404, 424).
+  avenue_words.json keys2019.json augusta1916_entries.json augusta1916_es.json` (7.969 titulares en español). 
