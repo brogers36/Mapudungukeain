@@ -2107,7 +2107,7 @@ function menu(){
   app.innerHTML=`
     <div class="top"><div><p class="eyebrow">Mapudungun</p><h1>Mapudungukeaiñ Fill Püle</h1></div>${langToggle()}</div>
     <p>${t().sub}</p>
-    <div class="bar-top start">${purse()}<span class="purse"><span class="stars">★</span>${ts}</span></div>
+    <div class="bar-top start">${purse()}<span class="purse"><span class="stars">★</span>${ts}</span><a class="purse" id="dicc-top" href="diccionario/" style="text-decoration:none;color:inherit">📖 ${L2("Diccionario","Dictionary")}</a></div>
     <p class="eyebrow hub-h">${L2("Gasta tus ngülliw","Spend your ngülliw")}</p>
     <nav class="hub" aria-label="${L2("Gasta tus ngülliw","Spend your ngülliw")}">${[
       ["ward",t().wardrobe,L2("Viste a los personajes","Dress the characters"),null],
