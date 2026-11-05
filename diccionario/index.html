@@ -342,10 +342,12 @@ function search(q){
   score.sort((a,b)=>b[0]-a[0]);
   const exact=score.some(([s,e])=>s>=95);
   const top=score.slice(0,60).map(x=>x[1]);
-  const coreR=top.filter(e=>e.m!=null), augR=top.filter(e=>e.m==null);
+  const coreR=top.filter(e=>e.m!=null), augR=top.filter(e=>e.m==null&&e.o!=="L"&&e.o!=="R"), parR=top.filter(e=>e.o==="R"), loanR=top.filter(e=>e.o==="L");
   let html=`<div id="ana"></div>`;
   if(coreR.length) html+=`<p class="eyebrow sect">${L("Núcleo","Core")}</p><div class="list">${coreR.map(resRow).join("")}</div>`;
   if(augR.length) html+=`<p class="eyebrow sect">${L("Diccionario de Augusta (1916)","Augusta's dictionary (1916)")}</p><div class="list">${augR.map(resRow).join("")}</div>`;
+  if(parR.length) html+=`<p class="eyebrow sect">${L("Del analizador","From the parser")}</p><div class="list">${parR.map(resRow).join("")}</div>`;
+  if(loanR.length) html+=`<p class="eyebrow sect">${L("Préstamos del español (corpus AVENUE)","Loans from Spanish (AVENUE corpus)")}</p><div class="list">${loanR.map(resRow).join("")}</div>`;
   const none=`<div class="empty">${L("No hay entradas que coincidan.","No matching entries.")}</div>`;
   const oneWord=/^[^\s\d]{3,}$/.test(q)&&!/[áéíóú]/.test(q);
   if(!top.length&&!oneWord) html+=none;
@@ -360,16 +362,36 @@ function search(q){
 function resRow(e){ const core=e.m!=null;
   return `<button class="res" data-id="${esc(e.id)}"><span class="w">${esc(G(head(e)))}</span><span class="g">${esc(gloss(e))}</span>${core?`<span class="tag core">${L("núcleo","core")}</span>`:""}</button>`; }
 function bindRes(root){ root.querySelectorAll(".res,[data-id]").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id))); }
-function entriesForRoot(root){
-  const k=keyUni(root), out=[];
-  CORE.forEach(e=>{ if(!e.ph&&(e._k===k||e._k===k+"n"||e._k===k+"vn")) out.push(e); });
-  AUG.forEach(e=>{ if(e._r===k||e._k===k) out.push(e); });
+/* Root lookup for the automatic analysis. Tries, most specific first, the root plus its first suffixes as a derived stem
+   (perkü-ñma -> perküñman), then the root itself; each with and without a final ü and with the citation endings -n/-ün,
+   plus the spelling variants the parser's meaning panel uses (u~w after a vowel, u or i for ü). */
+let KIDX=null;
+function kindex(){ if(KIDX) return KIDX; KIDX=new Map(); const add=(k,e)=>{ if(!k) return; let a=KIDX.get(k); if(!a) KIDX.set(k,a=[]); if(!a.includes(e)) a.push(e); };
+  CORE.forEach(e=>{ if(!e.ph) add(e._k,e); }); AUG.forEach(e=>{ add(e._k,e); add(e._r,e); }); return KIDX; }
+function rootVariants(r,wide){ const v=[r]; const push=x=>{ if(!v.includes(x)) v.push(x); };
+  push(r.replace(/([aeiouü])u(?=[^aeiouü]|$)/g,"$1w")); push(r.replace(/([aeiouü])w/g,"$1u")); push(r.replace(/([aeou])i(?=[^aeiouü]|$)/g,"$1y"));
+  if(wide) for(let i=0,n=0;i<r.length&&n<4;i++) if(r[i]==="u"||r[i]==="i"){ n++; push(r.slice(0,i)+"ü"+r.slice(i+1)); }
+  return v; }
+function entriesForRoot(root,morphs){
+  const idx=kindex(), stems=[]; root=String(root).replace(/[()]/g,"").replace(/v/g,"f");   /* AVENUE writes v for f */
+  let st=root; (morphs||[]).slice(0,3).forEach(m=>{ st+=String(m).replace(/[()]/g,"").replace(/v/g,"f"); stems.unshift(st); });
+  stems.push(root);
+  const look=wide=>{ const out=[];
+    for(const s0 of stems){ const isRoot=s0===root;
+      for(const s of rootVariants(s0,wide)){
+        const bases=[s]; if(/ü$/.test(s)) bases.push(s.slice(0,-1));
+        for(const b of bases){ const k=keyUni(b);
+          for(const kk of isRoot?[k,k+"n",k+"vn"]:[k+"n",k+"vn",k]) (idx.get(kk)||[]).forEach(e=>{ if(!out.includes(e)) out.push(e); }); } } }
+    return out; };
+  /* the u/i -> ü spellings are tried only when nothing else matched, and never on roots shorter than three letters */
+  let out=look(false); if(!out.length&&root.length>=3) out=look(true);
+  out.sort((x,y)=>(y.m!=null)-(x.m!=null));
   return out.slice(0,8); }
 function anaHTML(r,q){
   if(!r||!r.root) return "";
   const parts=[r.root].concat(r.morphs||[]);
   if(parts.length<2&&!r.mean) return "";
-  const hits=entriesForRoot(r.root);
+  const hits=entriesForRoot(r.root,r.morphs);
   if(!hits.length) return "";
   const segH=`<span class="root">${esc(G(r.root))}</span>`+(r.morphs||[]).map((m,i)=>`<span title="${esc(lab(r.gl[i]||""))}">${esc(G(m))}</span>`).join("");
   const labels=(r.gl||[]).filter(Boolean).map(lab).join(" · ");
@@ -405,9 +427,12 @@ function entry(id){
       <p class="hint">${statusChip(e)} ${e.o==="juego"?L(`En el juego: ${esc(e.src)}`,`In the game: ${esc(e.src)}`):L("Palabra frecuente en el habla (corpus AVENUE)","Frequent word in speech (AVENUE corpus)")}</p>`
       :`<dl class="gl"><dt>ES</dt><dd>${esc(e.s)}</dd><dt>EN</dt><dd>${e.en?esc(e.en):`<span class="muted">${L("Traducción al inglés pendiente","English translation pending")}</span>`}</dd></dl>`}
     ${linkedCore.length?`<div class="box"><h3>${L("En el núcleo","In the core")}</h3><div class="list">${linkedCore.map(resRow).join("")}</div></div>`:""}
-    ${a?`<div class="box"><h3>${L("Augusta (1916)","Augusta (1916)")} · <span class="muted" style="font-family:var(--body);font-size:.85rem">${esc(G(a.h))}</span>${core?"":" "+statusChip(e)}</h3>
+    ${a?`<div class="box"><h3>${a.o==="L"?L("Préstamo del español","Loan from Spanish"):a.o==="R"?L("Del analizador","From the parser"):L("Augusta (1916)","Augusta (1916)")} · <span class="muted" style="font-family:var(--body);font-size:.85rem">${esc(G(a.h))}</span>${core?"":" "+statusChip(e)}</h3>
       <div class="aug">${augHTML(a)}</div>
-      <p class="hint">${L("Texto de Augusta en la edición digital en Unificado. El español es de 1916 y algunos usos han cambiado.","Augusta's text from the digital edition in Unificado. The Spanish dates from 1916 and some usages have changed.")}</p></div>`:""}
+      <p class="hint">${a.o==="L"?L("Raíz tomada del español, tal como aparece en el habla del corpus AVENUE.","A root borrowed from Spanish, as it appears in the speech of the AVENUE corpus.")
+        :a.o==="R"?L("Raíz que el analizador reconoce por un dictamen sobre los datos del corpus AVENUE.","A root the parser recognizes by a ruling on the AVENUE corpus data.")
+        :a.o==="A"?L("Entrada de Augusta (1916) que falta en la edición digital; el texto llega cortado.","An Augusta (1916) entry missing from the digital edition; the text is cut short.")
+        :L("Texto de Augusta en la edición digital en Unificado. El español es de 1916 y algunos usos han cambiado.","Augusta's text from the digital edition in Unificado. The Spanish dates from 1916 and some usages have changed.")}</p></div>`:""}
     ${forms.length?`<div class="box"><h3>${L("Formas para armar","Forms to build")}</h3><div class="forms">${forms.map((b,i)=>`<button data-f="${i}">${esc(G(b.w))}</button>`).join("")}</div><div id="fout"></div></div>`:""}
     <div class="row"><button class="btn" id="prac">${L("Practicar esta palabra","Practise this word")}</button></div>`;
   bindCommon(); bindRes(app.querySelector(".box")||document.createElement("div"));
@@ -638,9 +663,10 @@ function about(){
   app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
     <h2>${L("Acerca del diccionario","About the dictionary")}</h2>
     <p>${L("<b>Tañi Nemülkawe</b> es un diccionario en mapudungun, español e inglés, compañero del juego <b>Mapudungukeaiñ Fill Püle</b>. Se hizo con herramientas de investigación entrenadas en el corpus AVENUE y con recursos gramaticales y léxicos establecidos.","<b>Tañi Nemülkawe</b> is a Mapudungun, Spanish and English dictionary, a companion to the game <b>Mapudungukeaiñ Fill Püle</b>. It was built with research tools trained on the AVENUE corpus and with established grammatical and lexical resources.")}</p>
-    <div class="box"><h3>${L("Dos partes","Two parts")}</h3>
+    <div class="box"><h3>${L("De dónde vienen las entradas","Where the entries come from")}</h3>
       <p>${L(`<b>El núcleo</b> (${n.core||CORE.length} entradas): las palabras y frases del juego y las palabras más frecuentes en el habla del corpus AVENUE, con español e inglés. Es la base de los juegos.`,`<b>The core</b> (${n.core||CORE.length} entries): the game's words and phrases plus the most frequent words in the speech of the AVENUE corpus, with Spanish and English. The games use it.`)}</p>
       <p>${L(`<b>Augusta</b> (${(n.aug||AUG.length).toLocaleString("es")} entradas): el diccionario de Félix José de Augusta (1916), en la edición digital en grafemario Unificado. Su español es de hace un siglo. El inglés se está agregando por etapas: ya tienen un borrador las entradas cuyas raíces aparecen en el corpus AVENUE, y las demás llegarán después.`,`<b>Augusta</b> (${(n.aug||AUG.length).toLocaleString("en")} entries): Félix José de Augusta's dictionary (1916), from the digital edition in the Unificado grafemario. Its Spanish is a century old. English is being added in stages: entries whose roots occur in the AVENUE corpus already have a draft, and the rest will follow.`)}</p>
+      <p>${L(`<b>Del analizador</b> (${n.parser||0} entradas y ${n.loans||0} préstamos del español): entradas de Augusta que faltan en la edición digital, raíces que el analizador reconoce por dictamen, y las raíces tomadas del español que aparecen en el corpus AVENUE.`,`<b>From the parser</b> (${n.parser||0} entries and ${n.loans||0} loans from Spanish): Augusta entries missing from the digital edition, roots the parser recognizes by ruling, and the Spanish-borrowed roots that occur in the AVENUE corpus.`)}</p>
       <p>${L("Las marcas <b>Revisado</b> y <b>Sin revisar</b> dicen si una entrada ya fue revisada por un hablante o lingüista. Las que no, son borradores.","The <b>Reviewed</b> and <b>Not yet reviewed</b> labels say whether an entry has been checked by a speaker or linguist. Those that haven't are drafts.")}</p></div>
     <div class="box"><h3>${L("El analizador","The analyser")}</h3>
       <p>${L("Si buscas una forma conjugada, un analizador morfológico la divide en raíz y sufijos y busca la raíz. Funciona sin conexión una vez cargado, pero puede equivocarse; los significados que propone son aproximados.","If you search for an inflected form, a morphological analyser splits it into root and suffixes and looks up the root. It works offline once loaded, but it can be wrong; the meanings it proposes are approximate.")}</p></div>

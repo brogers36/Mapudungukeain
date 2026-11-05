@@ -11,6 +11,9 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 | `core_extra.tsv` | entradas del núcleo escritas a mano: palabra, clave de Augusta (`-` = ninguna), clase, español, inglés, tema |
 | `augusta_digital_entries.json` | el diccionario de Augusta (1916), edición digital en Unificado |
 | `builder.json`, `builder_en.json` | formas para «Arma la palabra»: segmentaciones del corpus de oro que el analizador reproduce, con español (del analizador) e inglés (`builder_en.py`) |
+| `parser_extra.tsv` | entradas tomadas del léxico del analizador: headwords de Augusta (1916) que faltan en la edición digital y raíces por dictamen |
+| `loan_stems.json`, `loan_en.tsv` | las 246 raíces tomadas del español que conoce el analizador, con su forma principal, variantes e inglés |
+| `motor_patches.js`, `motor_edits.json` | dictámenes aplicados a la copia del analizador que usa el diccionario |
 | `rootfreq.json` | frecuencia en el corpus AVENUE sumada por raíz |
 | `revisiones.json` | (opcional) las decisiones exportadas desde la copia maestra |
 

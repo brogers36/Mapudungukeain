@@ -84,6 +84,22 @@ for hw, texts in aug.items():
     text = ' | '.join(t.strip() for t in texts if t.strip())
     p = pos_of(text); s = short(texts[0])
     A.append({'id': 'a:' + hw, 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p))})
+# entries from the parser's lexicon (parser_extra.tsv) and the Spanish loan roots it knows (loan_stems.json + loan_en.tsv)
+have = {e['h'] for e in A}
+for line in open(P('parser_extra.tsv'), encoding='utf-8'):
+    if not line.strip() or line.startswith('#'): continue
+    h, r, p, es, en, src, d = line.rstrip('\n').split('\t')
+    if h in have: continue
+    A.append({'id': 'a:' + h, 'h': h, 'r': r, 'p': p, 's': es, 'd': d, 'en': en, 'f': fq(r), 'o': src}); have.add(h)
+LEN = dict(l.rstrip('\n').split('\t') for l in open(P('loan_en.tsv'), encoding='utf-8') if l.strip())
+NOUNISH = {'cafe','catolico','confianza','contento','estudio','firma','fuerte','joven','libre','listo','malo','mate','pobre','rico','sano','seguro','tomate','tranquilo','ultimo','zapato','arreglado'}
+for lemma, x in sorted(json.load(open(P('loan_stems.json'), encoding='utf-8')).items()):
+    h = x['h']; var = [v for v in x['v'] if not v.startswith(h) and not h.startswith(v)]
+    hw = h if lemma in NOUNISH else h + ('n' if h[-1] in 'aeiouü' else 'ün')
+    also = (' También: ' + ', '.join(v + '-' for v in var) + '.') if var else ''
+    A.append({'id': 'p:' + lemma, 'h': hw, 'r': h, 'p': 's' if lemma in NOUNISH else 'v',
+              's': f'«{lemma}» (préstamo del español)', 'en': f"{LEN.get(lemma, lemma)} (loan from Spanish {lemma})",
+              'd': f'Préstamo del español «{lemma}». Raíz en el corpus AVENUE: {h}-.' + also, 'f': fq(h), 'o': 'L'})
 # drafted English for Augusta (en/*.tsv: headword, English, optional corrected Spanish short gloss)
 import glob
 ENX = {}
@@ -94,7 +110,7 @@ for fp in sorted(glob.glob(P('en/*.tsv'))):
 nen = 0
 for e in A:
     x = ENX.get(e['h'])
-    if x:
+    if x and e.get('o') is None:
         e['en'] = x[0]; nen += 1
         if len(x) > 1 and x[1]: e['s'] = x[1]
     elif e['s'].startswith('Véase '):
@@ -113,6 +129,6 @@ SUBS = [('poseemos','tenemos'),('poseen','tienen'),('posees','tienes'),('posee',
 for b in B:
     for x, y in SUBS: b['es'] = re.sub(r'\b' + x + r'\b', y, b['es'])
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,
-        'n': {'core': len(core), 'aug': len(A), 'skipped': skipped, 'aug_en': sum(1 for e in A if e['en']), 'aug_en_drafted': nen, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
+        'n': {'core': len(core), 'aug': sum(1 for e in A if e.get('o') is None), 'parser': sum(1 for e in A if e.get('o') in ('A','R')), 'loans': sum(1 for e in A if e.get('o') == 'L'), 'skipped': skipped, 'aug_en': sum(1 for e in A if e['en']), 'aug_en_drafted': nen, 'build': len(B), 'rev': nrev, 'linked': len(linked)}}
 open(sys.argv[1], 'w', encoding='utf-8').write('window.DICC=' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n')
 print(data['n'], os.path.getsize(sys.argv[1]))
