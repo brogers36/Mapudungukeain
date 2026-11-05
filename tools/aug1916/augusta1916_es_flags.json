@@ -1,12 +1,18 @@
 {
-"abair": {
+"aboar": {
 "pg": 14,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"aboar": {
-"pg": 14,
+"ab": {
+"pg": 15,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"abo": {
+"pg": 15,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -17,10 +23,10 @@
 "fuera de orden alfabético"
 ]
 },
-"acineriar": {
+"aciberar": {
 "pg": 19,
 "why": [
-"no está en el diccionario de LibreOffice"
+"fuera de orden alfabético"
 ]
 },
 "acreedor": {
@@ -29,26 +35,44 @@
 "fuera de orden alfabético"
 ]
 },
+"acumuar": {
+"pg": 22,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"adúlteraar": {
+"pg": 24,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"adúlteraino": {
+"pg": 24,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"adúlteraio": {
+"pg": 24,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"adúlterao": {
+"pg": 24,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
 "afarse": {
 "pg": 25,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"aguaitar": {
-"pg": 28,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"agro": {
-"pg": 28,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"águilaaño": {
-"pg": 28,
+"agot": {
+"pg": 27,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -59,19 +83,7 @@
 "fuera de orden alfabético"
 ]
 },
-"alarido": {
-"pg": 30,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"alarante": {
-"pg": 30,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"alararse": {
+"ajusar": {
 "pg": 30,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -83,14 +95,14 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"aloamiento": {
-"pg": 33,
+"aliviar": {
+"pg": 32,
 "why": [
-"no está en el diccionario de LibreOffice"
+"fuera de orden alfabético"
 ]
 },
-"aloar": {
-"pg": 33,
+"alifio": {
+"pg": 32,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -113,6 +125,12 @@
 "fuera de orden alfabético"
 ]
 },
+"osamenteoso": {
+"pg": 37,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
 "ánimocer": {
 "pg": 37,
 "why": [
@@ -125,13 +143,14 @@
 "fuera de orden alfabético"
 ]
 },
-"antermente": {
-"pg": 38,
+"apluejable": {
+"pg": 40,
 "why": [
-"no está en el diccionario de LibreOffice"
+"no está en el diccionario de LibreOffice",
+"fuera de orden alfabético"
 ]
 },
-"aplincjablear": {
+"apluejar": {
 "pg": 40,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -143,40 +162,10 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"arraigado": {
-"pg": 43,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"arelar": {
-"pg": 44,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"arroyar": {
-"pg": 45,
-"why": [
-"fuera de orden alfabético"
-]
-},
 "ar": {
 "pg": 93,
 "why": [
 "fuera de orden alfabético"
-]
-},
-"aserríno": {
-"pg": 46,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"atribuciónir": {
-"pg": 50,
-"why": [
-"no está en el diccionario de LibreOffice"
 ]
 },
 "avellanillo": {
@@ -185,40 +174,64 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
+"avisso": {
+"pg": 52,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"bar": {
+"pg": 55,
+"why": [
+"fuera de orden alfabético"
+]
+},
 "mu": {
 "pg": 55,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"ren": {
+"baraja": {
 "pg": 56,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"bequear": {
+"beedor": {
 "pg": 57,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"brazada": {
+"beer": {
+"pg": 57,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"beible": {
+"pg": 57,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"beida": {
+"pg": 57,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"beido": {
+"pg": 57,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"braco": {
 "pg": 62,
 "why": [
 "fuera de orden alfabético"
-]
-},
-"brueria": {
-"pg": 62,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"bruo": {
-"pg": 62,
-"why": [
-"no está en el diccionario de LibreOffice"
 ]
 },
 "buenaventurado": {
@@ -227,8 +240,26 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"cabeceaar": {
-"pg": 65,
+"calla": {
+"pg": 68,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"calmlar": {
+"pg": 68,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"canoaancio": {
+"pg": 71,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"canoaar": {
+"pg": 71,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -239,28 +270,34 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"carnivor": {
-"pg": 73,
+"carbónk": {
+"pg": 72,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"cautivo": {
+"cari": {
+"pg": 73,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"cauto": {
 "pg": 74,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"celar": {
-"pg": 78,
+"céntuploidor": {
+"pg": 76,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
-"cija": {
-"pg": 79,
+"céntuploir": {
+"pg": 76,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
 "corlador": {
@@ -281,61 +318,19 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"leona": {
-"pg": 81,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"leonimiento": {
-"pg": 81,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"leoninera": {
-"pg": 81,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"coigúe": {
-"pg": 82,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"conclulído": {
-"pg": 87,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"conclulir": {
-"pg": 87,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"con": {
-"pg": 89,
-"why": [
-"fuera de orden alfabético"
-]
-},
 "no": {
 "pg": 262,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"conquillijar": {
+"cosquillar": {
 "pg": 89,
 "why": [
-"no está en el diccionario de LibreOffice"
+"fuera de orden alfabético"
 ]
 },
-"consegujibleir": {
+"conquillo": {
 "pg": 89,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -353,37 +348,31 @@
 "fuera de orden alfabético"
 ]
 },
+"conteno": {
+"pg": 91,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
 "cortina": {
 "pg": 94,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"cuchichejadorar": {
-"pg": 101,
+"costefio": {
+"pg": 97,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"cuchilliazo": {
+"acuchilladizo": {
 "pg": 101,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"cuchillio": {
-"pg": 101,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"otro": {
-"pg": 103,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"cutio": {
+"otro": {
 "pg": 103,
 "why": [
 "fuera de orden alfabético"
@@ -401,10 +390,28 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"depravlado": {
-"pg": 114,
+"dafñar": {
+"pg": 109,
 "why": [
 "no está en el diccionario de LibreOffice"
+]
+},
+"dafñino": {
+"pg": 109,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"dafño": {
+"pg": 109,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"alemán": {
+"pg": 188,
+"why": [
+"fuera de orden alfabético"
 ]
 },
 "lélfiñ": {
@@ -414,27 +421,14 @@
 "fuera de orden alfabético"
 ]
 },
-"adhiuniial": {
-"pg": 122,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
-"destre": {
-"pg": 126,
+"espulgar": {
+"pg": 125,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"detale": {
-"pg": 126,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"discursivoo": {
-"pg": 130,
+"distraídoer": {
+"pg": 133,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -445,40 +439,46 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"ecuánimio": {
-"pg": 139,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"empajar": {
+"empalar": {
 "pg": 143,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"entejo": {
-"pg": 153,
+"empuj'e": {
+"pg": 145,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"adó": {
+"pg": 145,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"entolido": {
-"pg": 153,
+"encalado": {
+"pg": 145,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"enriada": {
-"pg": 153,
+"enmarafiado": {
+"pg": 150,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
-"enriar": {
-"pg": 153,
+"enmarafiar": {
+"pg": 150,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
+]
+},
+"enojón": {
+"pg": 151,
+"why": [
+"no está en el diccionario de LibreOffice"
 ]
 },
 "envarill": {
@@ -487,56 +487,20 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"épocaio": {
-"pg": 155,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"escoada": {
-"pg": 157,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"escoilla": {
-"pg": 157,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"espejo": {
-"pg": 160,
-"why": [
-"fuera de orden alfabético"
-]
-},
 "eumolpo": {
 "pg": 164,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"excluirsivamente": {
-"pg": 165,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"filo": {
-"pg": 175,
+"extraviar": {
+"pg": 168,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"forzaroso": {
-"pg": 176,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"forzarudo": {
-"pg": 176,
+"extremlo": {
+"pg": 168,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -547,51 +511,26 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"guiíal": {
-"pg": 185,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
-"haba": {
+"hablador": {
 "pg": 187,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"armónica": {
+"haraposo": {
 "pg": 190,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"heido": {
+"hermosara": {
 "pg": 192,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"heir": {
-"pg": 192,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"hermoseura": {
-"pg": 192,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"hiastra": {
-"pg": 193,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"hiastro": {
-"pg": 193,
+"holgn": {
+"pg": 194,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -614,14 +553,8 @@
 "fuera de orden alfabético"
 ]
 },
-"imperiar": {
-"pg": 199,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"incultivad": {
-"pg": 202,
+"ilusionario": {
+"pg": 198,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -650,6 +583,12 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
+"maduro": {
+"pg": 207,
+"why": [
+"fuera de orden alfabético"
+]
+},
 "inmergiir": {
 "pg": 207,
 "why": [
@@ -668,38 +607,14 @@
 "fuera de orden alfabético"
 ]
 },
-"ínter": {
-"pg": 210,
-"why": [
-"fuera de orden alfabético"
-]
-},
 "irrespetuoso": {
 "pg": 214,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"junquilljar": {
+"junquillar": {
 "pg": 216,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"labador": {
-"pg": 219,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"labandera": {
-"pg": 219,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"labar": {
-"pg": 219,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -710,13 +625,13 @@
 "fuera de orden alfabético"
 ]
 },
-"languidez": {
-"pg": 221,
+"legumbreido": {
+"pg": 223,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
-"leja": {
+"leila": {
 "pg": 224,
 "why": [
 "fuera de orden alfabético"
@@ -734,19 +649,19 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"libra": {
-"pg": 225,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"libr": {
-"pg": 225,
+"limpiaplata": {
+"pg": 226,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"limpiaplata": {
+"limpiaplataeza": {
+"pg": 226,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"limpiaplatao": {
 "pg": 226,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -758,58 +673,8 @@
 "fuera de orden alfabético"
 ]
 },
-"lisonjear": {
-"pg": 226,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"lucia": {
-"pg": 228,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"lucar": {
-"pg": 228,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"luoso": {
-"pg": 228,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"maga": {
-"pg": 231,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"chañíu": {
-"pg": 232,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
-"lmovier": {
-"pg": 233,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
 "malacostumbrar": {
 "pg": 236,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"malicios": {
-"pg": 237,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -826,28 +691,10 @@
 "fuera de orden alfabético"
 ]
 },
-"mancebía": {
+"manceba": {
 "pg": 238,
 "why": [
 "fuera de orden alfabético"
-]
-},
-"mancebío": {
-"pg": 238,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"machía": {
-"pg": 238,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"maar": {
-"pg": 238,
-"why": [
-"no está en el diccionario de LibreOffice"
 ]
 },
 "maquial": {
@@ -856,8 +703,14 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"madroño": {
+"mardofño": {
 "pg": 242,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"me": {
+"pg": 244,
 "why": [
 "fuera de orden alfabético"
 ]
@@ -868,76 +721,52 @@
 "fuera de orden alfabético"
 ]
 },
-"moar": {
-"pg": 253,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"moidad": {
+"mofñudo": {
 "pg": 255,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"momente": {
+"mortaidad": {
 "pg": 255,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"muchisimlo": {
-"pg": 257,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"mujo": {
-"pg": 257,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"mujer": {
-"pg": 257,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"murmurilla": {
+"murtillar": {
 "pg": 258,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"murmurillar": {
-"pg": 258,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"naufragi": {
-"pg": 260,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"necróticio": {
+"neurótico": {
 "pg": 261,
 "why": [
-"no está en el diccionario de LibreOffice"
+"fuera de orden alfabético"
 ]
 },
-"nortinio": {
-"pg": 263,
+"niñja": {
+"pg": 262,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"nostalgiaar": {
-"pg": 263,
+"niñjez": {
+"pg": 262,
 "why": [
 "no está en el diccionario de LibreOffice"
+]
+},
+"niñjo": {
+"pg": 262,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"encortino": {
+"pg": 263,
+"why": [
+"fuera de orden alfabético"
 ]
 },
 "núcleo": {
@@ -958,22 +787,28 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"omnipotentepresente": {
-"pg": 272,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"omnipotentesciente": {
-"pg": 272,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
 "opinión": {
 "pg": 272,
 "why": [
 "fuera de orden alfabético"
+]
+},
+"defiar": {
+"pg": 273,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"ordinaro": {
+"pg": 273,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"orificiodel": {
+"pg": 274,
+"why": [
+"no está en el diccionario de LibreOffice"
 ]
 },
 "asar": {
@@ -988,7 +823,7 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"palabrosjo": {
+"palabroso": {
 "pg": 279,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1000,13 +835,7 @@
 "fuera de orden alfabético"
 ]
 },
-"pantorriudo": {
-"pg": 280,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"panucjar": {
+"panucar": {
 "pg": 280,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1018,58 +847,14 @@
 "fuera de orden alfabético"
 ]
 },
-"parlamentjo": {
-"pg": 283,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"pallar": {
-"pg": 283,
+"paree": {
+"pg": 282,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"pajar": {
-"pg": 285,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"fiñull": {
-"pg": 285,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
-"atol": {
-"pg": 287,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"rapúmeica": {
+"pear": {
 "pg": 290,
-"why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
-]
-},
-"pens'amiento": {
-"pg": 291,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"pens'ar": {
-"pg": 291,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"pens'ativo": {
-"pg": 291,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -1078,12 +863,6 @@
 "pg": 293,
 "why": [
 "fuera de orden alfabético"
-]
-},
-"perniabiert": {
-"pg": 294,
-"why": [
-"no está en el diccionario de LibreOffice"
 ]
 },
 "pésame": {
@@ -1104,6 +883,12 @@
 "fuera de orden alfabético"
 ]
 },
+"domo": {
+"pg": 297,
+"why": [
+"fuera de orden alfabético"
+]
+},
 "plancha": {
 "pg": 299,
 "why": [
@@ -1117,13 +902,13 @@
 "fuera de orden alfabético"
 ]
 },
-"plumipedio": {
+"plumipedo": {
 "pg": 300,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"plumar": {
+"plumipedar": {
 "pg": 300,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1141,22 +926,22 @@
 "fuera de orden alfabético"
 ]
 },
-"posada": {
+"perfilado": {
 "pg": 303,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"presencar": {
-"pg": 307,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"de": {
-"pg": 308,
+"que": {
+"pg": 304,
 "why": [
 "fuera de orden alfabético"
+]
+},
+"aueo": {
+"pg": 304,
+"why": [
+"no está en el diccionario de LibreOffice"
 ]
 },
 "progresión": {
@@ -1165,17 +950,16 @@
 "fuera de orden alfabético"
 ]
 },
-"puad": {
+"puñado": {
 "pg": 318,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"lichituyeaqel": {
-"pg": 319,
+"quero": {
+"pg": 321,
 "why": [
-"no está en el diccionario de LibreOffice",
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
 "quilaanto": {
@@ -1196,32 +980,14 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"raar": {
-"pg": 323,
+"rasgufiar": {
+"pg": 325,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"realidad": {
-"pg": 326,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"rebaar": {
-"pg": 326,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"redil": {
-"pg": 330,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"refugión": {
-"pg": 332,
+"refinaro": {
+"pg": 331,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
@@ -1232,16 +998,34 @@
 "fuera de orden alfabético"
 ]
 },
-"repenteinamente": {
+"remo": {
+"pg": 334,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"reponer": {
 "pg": 336,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"retener": {
+"pg": 340,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"retefilir": {
+"pg": 340,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"reacio": {
-"pg": 340,
+"retofiar": {
+"pg": 341,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
 "reverberar": {
@@ -1250,13 +1034,13 @@
 "fuera de orden alfabético"
 ]
 },
-"rijo": {
+"riera": {
 "pg": 343,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"riera": {
+"ripioso": {
 "pg": 343,
 "why": [
 "fuera de orden alfabético"
@@ -1268,20 +1052,8 @@
 "fuera de orden alfabético"
 ]
 },
-"roncador": {
+"rollo": {
 "pg": 345,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"rojo": {
-"pg": 346,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"ap": {
-"pg": 347,
 "why": [
 "fuera de orden alfabético"
 ]
@@ -1298,25 +1070,31 @@
 "fuera de orden alfabético"
 ]
 },
-"seguidmente": {
+"san'ar": {
+"pg": 353,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"san'ativo": {
+"pg": 353,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"seguidmiente": {
 "pg": 356,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"semillaero": {
+"semiopaco": {
 "pg": 358,
 "why": [
 "no está en el diccionario de LibreOffice"
 ]
 },
-"semiopacio": {
-"pg": 358,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"semioscurlidad": {
+"semioscuridad": {
 "pg": 358,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1334,7 +1112,7 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"sepultijación": {
+"sepultación": {
 "pg": 360,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1358,6 +1136,24 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
+"simpemente": {
+"pg": 363,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"simpificar": {
+"pg": 363,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"sol": {
+"pg": 367,
+"why": [
+"fuera de orden alfabético"
+]
+},
 "solución": {
 "pg": 368,
 "why": [
@@ -1370,13 +1166,7 @@
 "fuera de orden alfabético"
 ]
 },
-"sombrero": {
-"pg": 368,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"sollado": {
+"solador": {
 "pg": 369,
 "why": [
 "fuera de orden alfabético"
@@ -1388,40 +1178,47 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"soo": {
-"pg": 369,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
 "sub": {
 "pg": 371,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"tantear": {
+"tamafñ": {
 "pg": 378,
 "why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"tafilir": {
+"pg": 378,
+"why": [
+"no está en el diccionario de LibreOffice",
 "fuera de orden alfabético"
-]
-},
-"tañiir": {
-"pg": 378,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"techooso": {
-"pg": 379,
-"why": [
-"no está en el diccionario de LibreOffice"
 ]
 },
 "ad": {
 "pg": 379,
 "why": [
 "fuera de orden alfabético"
+]
+},
+"tembl'equear": {
+"pg": 380,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"tembl'or": {
+"pg": 380,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"tembl'oroso": {
+"pg": 380,
+"why": [
+"no está en el diccionario de LibreOffice"
 ]
 },
 "ten": {
@@ -1442,16 +1239,10 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"timid": {
-"pg": 385,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"tiroideo": {
+"tireoídeo": {
 "pg": 386,
 "why": [
-"fuera de orden alfabético"
+"no está en el diccionario de LibreOffice"
 ]
 },
 "tomadero": {
@@ -1466,7 +1257,7 @@
 "fuera de orden alfabético"
 ]
 },
-"trescientjos": {
+"trescient": {
 "pg": 395,
 "why": [
 "no está en el diccionario de LibreOffice"
@@ -1484,14 +1275,20 @@
 "fuera de orden alfabético"
 ]
 },
+"trilear": {
+"pg": 395,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
 "trine": {
 "pg": 395,
 "why": [
 "fuera de orden alfabético"
 ]
 },
-"últimamente": {
-"pg": 399,
+"trisagio": {
+"pg": 395,
 "why": [
 "fuera de orden alfabético"
 ]
@@ -1502,20 +1299,8 @@
 "no está en el diccionario de LibreOffice"
 ]
 },
-"valar": {
+"vicio": {
 "pg": 405,
-"why": [
-"fuera de orden alfabético"
-]
-},
-"vear": {
-"pg": 408,
-"why": [
-"no está en el diccionario de LibreOffice"
-]
-},
-"vial": {
-"pg": 416,
 "why": [
 "fuera de orden alfabético"
 ]
@@ -1526,8 +1311,20 @@
 "fuera de orden alfabético"
 ]
 },
-"boqui": {
+"vómitorápinentun": {
 "pg": 421,
+"why": [
+"no está en el diccionario de LibreOffice"
+]
+},
+"toqui": {
+"pg": 421,
+"why": [
+"fuera de orden alfabético"
+]
+},
+"zamba": {
+"pg": 425,
 "why": [
 "fuera de orden alfabético"
 ]

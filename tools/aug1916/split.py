@@ -15,7 +15,9 @@ for f in sorted(x for x in os.listdir(d) if x.endswith('.tsv')):
         L.setdefault((int(r['block_num']), int(r['par_num']), int(r['line_num'])), []).append(r)
     lines = []
     for ws in L.values():
-        lines.append((min(int(w['left']) for w in ws), min(int(w['top']) for w in ws), ' '.join(w['text'] for w in ws)))
+        t = ' '.join(w['text'] for w in ws)
+        t = re.sub(r'(?<=\d\.)ə', 'ª', t)   # ordinal 2.ª (the trained model reads ª as ə)
+        lines.append((min(int(w['left']) for w in ws), min(int(w['top']) for w in ws), t))
     lines.sort(key=lambda x: x[1])
     # library and scanner notes (HathiTrust / Google copies): not part of the book
     lines = [l for l in lines if not re.search(r'Google|Digitized|Original from|UNIVERSITY OF|Generated at|hathitrust|Public Domain|handle\.net', l[2], re.I)]

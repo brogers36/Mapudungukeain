@@ -17,3 +17,15 @@ del diccionario de 1916.
 `vote.py` (en la carpeta de arriba) combina dos lecturas del mismo tomo palabra por palabra: la de Tesseract y otra
 (un segundo escaneo, o la capa de texto que trae el PDF). Con la capa del PDF del Internet Archive cambió 845 palabras
 del tomo I y 2.933 del tomo II.
+
+## Resultado
+
+`aug.traineddata` (modelo entero, 1,5 MB) es `spa` de tessdata_best ajustado con 413 líneas transcritas (3.400
+iteraciones). En las 24 líneas apartadas (`held.txt`, 1.604 caracteres) el error por carácter baja de 8,0 % (`spa`
+instalado) y 7,9 % (`spa` de tessdata_best) a 1,4 %. De las 51 letras propias de Augusta (ŋ ə ü ʃ ·) en esas líneas,
+los modelos de español no leen ninguna; el ajustado lee bien el 90 %. Es una muestra chica: las cifras sirven para
+comparar modelos, no como error exacto del diccionario entero.
+
+    tesseract PAGE.png OUT -l aug --tessdata-dir ocrtrain --psm 4 tsv txt
+
+La carpeta necesita también `configs/` y `tessconfigs/` de la instalación de Tesseract (para `tsv`).

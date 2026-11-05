@@ -8,6 +8,7 @@ from difflib import SequenceMatcher
 raw = json.load(open(sys.argv[1], encoding='utf-8'))
 K = json.load(open(sys.argv[2], encoding='utf-8'))  # ordered headword list
 def strip_acc(s):
+    s = s.replace('ŋ', 'ng').replace('Ŋ', 'ng').replace('ʃ', 'sh').replace('ſ', 'sh')
     s = unicodedata.normalize('NFD', s)
     s = re.sub(r'ñ', 'ñ', s); s = re.sub(r'ü', 'ü', s)
     s = re.sub(r'[̀-ͯ]', '', s)

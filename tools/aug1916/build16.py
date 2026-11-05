@@ -20,10 +20,10 @@ def sa(s):
 VOW = 'aeiouü'
 def conv(w):
     """Augusta 1916 spelling (as OCR'd) -> Unificado, one word, lower case."""
-    w = sa(w.lower())
+    w = sa(w.lower().replace('ŋ', 'ng'))
     w = re.sub(r"[`'’]", '', w)
     w = re.sub(r'i{2,}', 'ü', w)
-    w = w.replace('q', 'g').replace('ŋ', 'ng').replace('ə', 'ü').replace('ſ', 'sh')
+    w = w.replace('q', 'g').replace('ŋ', 'ng').replace('ə', 'ü').replace('ſ', 'sh').replace('ʃ', 'sh')
     # glides: i/u next to a vowel inside the syllable become y/w
     w = re.sub(r'(?<=[aeouü])i(?![aeiouü])', 'y', w)
     w = re.sub(r'(?<![a-zñü])i(?=[aeouü])', 'y', w)
@@ -80,11 +80,13 @@ def mapu_word(tok):
     if core[0].isupper() and len(core) > 3 and is_es(core) and core.lower() not in V: return None
     c = conv(core)
     s = snap(c)
+    # Augusta's own letters (read by the trained model) only occur in Mapudungun
+    if re.search(r'[ŋəʃŊƏ]', core): return s or c
     sp = is_es(core)
     if sp and core.lower() not in MAPU_FN:
         if not s or V.get(s, 0) < 5 * max(1, ES[core.lower()] // 1000): return None
     if s: return s
-    if re.search(r'[jvzxbh]|c(?!h)|qu|gu[eiéí]|gü', core.lower()): return None
+    if re.search(r'[jvzxbh]|c(?!h)|qu|gu[eiéí]|gü', re.sub(r'[cs]h', '', core.lower())): return None
     if not sp and MARK.search(c): return c
     return None
 def fix_text(t, stem):
