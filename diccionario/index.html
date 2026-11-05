@@ -105,6 +105,11 @@ button{font-family:var(--body)}
 .box h3{font-size:1rem}
 .aug{font-size:.95rem;line-height:1.5}
 .aug .sense{display:block;margin-top:6px}
+.ex{border-top:1px solid var(--panel-2);padding-top:8px}
+.ex:first-of-type{border-top:0;padding-top:0}
+.exm{font-size:1.02rem}
+.exm b{color:var(--gold);font-weight:700}
+.exc{font-size:.9rem;color:var(--muted)}
 a.mw{color:var(--ink);text-decoration:underline;text-decoration-color:var(--teal);text-underline-offset:3px}
 .forms{display:flex;flex-wrap:wrap;gap:6px}
 .forms button{all:unset;cursor:pointer;background:var(--panel-2);border-radius:6px;padding:4px 9px;font-size:.92rem}
@@ -289,6 +294,23 @@ function linkMapu(text){
   return esc(text).replace(/[a-zA-ZäëïöüÜñÑḻṉṯ]+/g,w=>{ const lw=w.toLowerCase(); if(lw.length<2||ESHEAD.has(plain(lw))) return w;
     const hit=(idx.get(keyUni(lw))||[]).find(e=>e.m!=null||e.o!=="L"); return hit?`<a href="#/e/${encodeURIComponent(hit.id)}" class="mw">${G(w)}</a>`:w; }); }
 
+/* ===== Example sentences from the AVENUE corpus (about 0.6 MB), loaded when an entry is opened ===== */
+let EJ=null, ejLoading=null;
+function loadEJ(){ if(EJ) return Promise.resolve(EJ); if(ejLoading) return ejLoading;
+  ejLoading=new Promise(res=>{ const sc=document.createElement("script"); sc.src="ejemplos.js";
+    sc.onload=()=>{ EJ=window.DICC_EJ||{}; res(EJ); }; sc.onerror=()=>{ ejLoading=null; res(null); }; document.head.appendChild(sc); });
+  return ejLoading; }
+const foldEx=s=>String(s||"").toLowerCase().replace(/[()']/g,"").replace(/v/g,"f").normalize("NFD").replace(/[\u0300-\u0302\u0304-\u0307\u0309-\u036f]/g,"").normalize("NFC");
+function exampleRoots(e){ const c=h=>{ h=foldEx(h); const o=[h]; if(/[aeiouü]n$/.test(h)) o.push(h.slice(0,-1)); if(/ün$/.test(h)) o.push(h.slice(0,-2)); return o; };
+  return e.m!=null?c(e.m):[foldEx(e.r)].concat(c(e.h)); }
+function examplesHTML(e){ if(!EJ) return ""; const seen=new Set(), ex=[];
+  for(const r of exampleRoots(e)) (EJ[r]||[]).forEach(x=>{ if(!seen.has(x[0])&&ex.length<3){ seen.add(x[0]); ex.push(x); } });
+  if(!ex.length) return "";
+  const mark=(m,w)=>esc(m).replace(new RegExp("(^|[^\\p{L}'])("+esc(w).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\p{L}'])","u"),"$1<b>$2</b>");
+  return `<div class="box"><h3>${L("Ejemplos del habla (corpus AVENUE)","Examples from speech (AVENUE corpus)")}</h3>
+    ${ex.map(([m,c,w,v])=>`<div class="ex"><p class="exm">${mark(m,w)}</p><p class="exc">«${esc(c)}» <span class="muted">· ${esc(v)}</span></p></div>`).join("")}
+    <p class="hint">${L("Oraciones reales del corpus, con su traducción al español tal como se transcribió. La selección es automática y la ortografía es la del corpus.","Real sentences from the corpus, with their Spanish translation as transcribed. The selection is automatic and the spelling is the corpus's own.")}</p></div>`; }
+
 /* ===== Router ===== */
 const app=document.getElementById("app");
 function go(h){ if(location.hash===h) route(); else location.hash=h; }
@@ -399,10 +421,37 @@ function bindRes(root){ root.querySelectorAll(".res,[data-id]").forEach(b=>b.onc
 let KIDX=null;
 function kindex(){ if(KIDX) return KIDX; KIDX=new Map(); const add=(k,e)=>{ if(!k) return; let a=KIDX.get(k); if(!a) KIDX.set(k,a=[]); if(!a.includes(e)) a.push(e); };
   CORE.forEach(e=>{ if(!e.ph) add(e._k,e); }); AUG.forEach(e=>{ add(e._k,e); add(e._r,e); }); return KIDX; }
-function rootVariants(r,wide){ const v=[r]; const push=x=>{ if(!v.includes(x)) v.push(x); };
+/* Spelling variants tried when looking up a root. Tier 1 (always): u~w and i~y after a vowel. Tier 2 (only when tier 1
+   found nothing), each kept only where it fixed more AVENUE lookups than it broke: u or i written for ü, ü written for u or
+   i (kochü/kochi, küram/kuram), word-initial y for i (yagel/iagel), word-initial ng for n (ngütram/nütram), s or sh written
+   for d in roots of four letters or more (Pewenche sungu/düngu, wasküm/wadküm), and a final -e missing or written -i
+   (ni-y/nie-y, müli/müle; a final -i read as -e only when the -e word is frequent in AVENUE). */
+function rootVariants(r,wide){ const v=[r]; const push=x=>{ if(x&&!v.includes(x)) v.push(x); };
   push(r.replace(/([aeiouü])u(?=[^aeiouü]|$)/g,"$1w")); push(r.replace(/([aeiouü])w/g,"$1u")); push(r.replace(/([aeou])i(?=[^aeiouü]|$)/g,"$1y"));
-  if(wide) for(let i=0,n=0;i<r.length&&n<4;i++) if(r[i]==="u"||r[i]==="i"){ n++; push(r.slice(0,i)+"ü"+r.slice(i+1)); }
+  if(wide){
+    for(let i=0,n=0;i<r.length&&n<4;i++) if(r[i]==="u"||r[i]==="i"){ n++; push(r.slice(0,i)+"ü"+r.slice(i+1)); }
+    for(let i=0,n=0;i<r.length&&n<3;i++) if(r[i]==="ü"){ n++; push(r.slice(0,i)+"i"+r.slice(i+1)); push(r.slice(0,i)+"u"+r.slice(i+1)); }
+    if(/^y[aeou]/.test(r)) push("i"+r.slice(1));
+    if(/^ng/.test(r)) push(r.slice(1));
+    if(r.length>=4&&/sh?/.test(r)) { push(r.replace(/sh/g,"d")); push(r.replace(/s/g,"d")); }
+  }
   return v; }
+/* final -i for -e: only accepted when the -e form is a frequent word (AVENUE frequency 100 or more), so müli -> müle and
+   kiñi -> kiñe are found but fochi does not become foche */
+function finalE(root){ if(!/i$/.test(root)) return [];
+  const idx=kindex(), out=[];
+  for(const c of root.length>=3?[root+"e", root.slice(0,-1)+"e"]:[root+"e"]){ const k=keyUni(c);   /* two-letter roots: only a missing -e (ni -> nie) */
+    for(const kk of [k,k+"n"]) (idx.get(kk)||[]).forEach(e=>{ if(e.o!=="L"&&(e.f||0)>=100&&!out.includes(e)) out.push(e); }); }
+  return out; }
+/* Compounds: a root with no entry of its own that is a dictionary word plus a common compound head (kutran-che,
+   pichi-domo, küchan-longko) shows both parts. The heads are a short list because open splitting found mostly
+   accidental pairs (fü-tra, no-tu, pa-pel); the first part must be a word of three letters or more. */
+const COMPOUND_HEADS=["che","domo","wentru","longko","mapu","ruka","antü","pi","duam","piwke"];
+function compoundParts(root){
+  const idx=kindex(), hit=x=>{ const k=keyUni(x); return (idx.get(k)||idx.get(k+"n")||idx.get(k+"vn")||[]).filter(e=>e.o!=="L"&&!/^(part|suf)$/.test(e.p||"")); };
+  for(const b of COMPOUND_HEADS){ if(!root.endsWith(b)||root.length-b.length<3) continue;
+    const a=root.slice(0,-b.length), ha=hit(a), hb=hit(b); if(ha.length&&hb.length) return {a,b,ha,hb}; }
+  return null; }
 function entriesForRoot(root,morphs){
   const idx=kindex(), stems=[]; root=String(root).replace(/[()]/g,"").replace(/v/g,"f");   /* AVENUE writes v for f */
   let st=root; (morphs||[]).slice(0,3).forEach(m=>{ st+=String(m).replace(/[()]/g,"").replace(/v/g,"f"); stems.unshift(st); });
@@ -415,7 +464,7 @@ function entriesForRoot(root,morphs){
           for(const kk of isRoot?[k,k+"n",k+"vn"]:[k+"n",k+"vn",k]) (idx.get(kk)||[]).forEach(e=>{ if(!out.includes(e)) out.push(e); }); } } }
     return out; };
   /* the u/i -> ü spellings are tried only when nothing else matched, and never on roots shorter than three letters */
-  let out=look(false); if(!out.length&&root.length>=3) out=look(true);
+  let out=look(false); if(!out.length&&root.length>=3) out=look(true); if(!out.length) out=finalE(root);
   out.sort((x,y)=>(y.m!=null)-(x.m!=null));
   return out.slice(0,8); }
 /* short meaning of a root for the gloss line, in the reader's language */
@@ -434,12 +483,12 @@ function anaHTML(r,q){
   if(!r||!r.root) return "";
   const parts=[r.root].concat(r.morphs||[]);
   if(parts.length<2&&!r.mean) return "";
-  const hits=entriesForRoot(r.root,r.morphs);
-  if(!hits.length) return "";
+  let hits=entriesForRoot(r.root,r.morphs), cp=null;
+  if(!hits.length){ cp=compoundParts(r.root); if(!cp) return ""; hits=cp.ha.slice(0,3).concat(cp.hb.slice(0,2)); }
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
-    ${interlinear(r.root,r.morphs,r.gl)}
+    ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a),rootMeaning(cp.b)].filter(Boolean).join(" + "):undefined)}
     ${r.mean?`<p>${L("Significado aproximado: ","Approximate meaning (Spanish): ")}«${esc(r.mean)}»</p>`:""}
-    ${hits.length?`<p class="hint">${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:</p><div class="list">${hits.map(resRow).join("")}</div>`
+    ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`,`Compound root <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
     <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
 
@@ -485,12 +534,14 @@ function entry(id){
         :a.o==="A"?L("Entrada de Augusta (1916) que falta en la edición digital; el texto llega cortado.","An Augusta (1916) entry missing from the digital edition; the text is cut short.")
         :L("Texto de Augusta en la edición digital en Unificado. El español es de 1916 y algunos usos han cambiado.","Augusta's text from the digital edition in Unificado. The Spanish dates from 1916 and some usages have changed.")}</p></div>`:""}
     ${forms.length?`<div class="box"><h3>${L("Formas para armar","Forms to build")}</h3><div class="forms">${forms.map((b,i)=>`<button data-f="${i}">${esc(G(b.w))}</button>`).join("")}</div><div id="fout"></div></div>`:""}
+    <div id="exbox" data-eid="${esc(e.id)}"></div>
     <div class="row"><button class="btn" id="prac">${L("Practicar esta palabra","Practise this word")}</button></div>`;
   bindCommon(); bindRes(app.querySelector(".box")||document.createElement("div"));
   app.querySelectorAll(".box .res").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id)));
   document.getElementById("star").onclick=()=>{ toggleSave(e.id); entry(id); };
   app.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ const f=forms[+b.dataset.f];
     document.getElementById("fout").innerHTML=`<div style="margin-top:8px">${interlinear(f.m[0],f.m.slice(1),f.g.slice(1))}</div><p>«${esc(lang==="es"?f.es:f.en)}» <span class="muted">(${L("traducción aproximada","approximate translation")})</span></p>`; });
+  loadEJ().then(()=>{ const b=document.getElementById("exbox"); if(b&&b.dataset.eid===id) b.innerHTML=examplesHTML(e); });
   document.getElementById("prac").onclick=()=>{ if(!saved.includes(e.id)) toggleSave(e.id); go("#/jugar/tarjetas/guardadas/m"); };
 }
 function toggleSave(id){ const i=saved.indexOf(id); if(i>=0) saved.splice(i,1); else saved.push(id); sv("mpd_saved",saved); }
@@ -719,6 +770,8 @@ function about(){
       <p>${L(`<b>Español → mapudungun</b> (${(n.es||0).toLocaleString("es")} entradas): la otra mitad del diccionario de Augusta, en la misma edición digital. Aparece al buscar en español; las palabras mapuches del texto que tienen entrada propia están subrayadas.`,`<b>Spanish → Mapudungun</b> (${(n.es||0).toLocaleString("en")} entries): the other half of Augusta's dictionary, from the same digital edition. It appears when you search in Spanish; Mapudungun words in the text that have their own entry are underlined.`)}</p>
       <p>${L(`<b>Del analizador</b> (${n.parser||0} entradas y ${n.loans||0} préstamos del español): entradas de Augusta que faltan en la edición digital, raíces que el analizador reconoce por dictamen, y las raíces tomadas del español que aparecen en el corpus AVENUE.`,`<b>From the parser</b> (${n.parser||0} entries and ${n.loans||0} loans from Spanish): Augusta entries missing from the digital edition, roots the parser recognizes by ruling, and the Spanish-borrowed roots that occur in the AVENUE corpus.`)}</p>
       <p>${L("Las marcas <b>Revisado</b> y <b>Sin revisar</b> dicen si una entrada ya fue revisada por un hablante o lingüista. Las que no, son borradores.","The <b>Reviewed</b> and <b>Not yet reviewed</b> labels say whether an entry has been checked by a speaker or linguist. Those that haven't are drafts.")}</p></div>
+    <div class="box"><h3>${L("Ejemplos","Examples")}</h3>
+      <p>${L("Muchas entradas muestran hasta tres oraciones reales del corpus AVENUE con su traducción al español, elegidas automáticamente entre las que están enteramente en mapudungun.","Many entries show up to three real sentences from the AVENUE corpus with their Spanish translation, chosen automatically among those entirely in Mapudungun.")}</p></div>
     <div class="box"><h3>${L("El analizador","The analyser")}</h3>
       <p>${L("Si buscas una forma conjugada, un analizador morfológico la divide en raíz y sufijos y busca la raíz. Funciona sin conexión una vez cargado, pero puede equivocarse; los significados que propone son aproximados.","If you search for an inflected form, a morphological analyser splits it into root and suffixes and looks up the root. It works offline once loaded, but it can be wrong; the meanings it proposes are approximate.")}</p></div>
     <div class="box"><h3>${L("Fuentes","Sources")}</h3>

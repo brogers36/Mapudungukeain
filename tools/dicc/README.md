@@ -17,13 +17,25 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 | `rootfreq.json` | frecuencia en el corpus AVENUE sumada por raíz |
 | `revisiones.json` | (opcional) las decisiones exportadas desde la copia maestra |
 
+## Analizador
+
+El diccionario usa el analizador **desde el build 136** sin cambios: los dictámenes viven en el propio analizador
+(`tools/parser/make_136.py` muestra cuáles se escribieron sobre el build 131). `motor_patches.js` y `motor_edits.json` quedan
+vacíos; úsalos solo para un dictamen que todavía no esté en el analizador.
+
+## Ejemplos
+
+`build_examples.js` toma del corpus AVENUE hasta tres oraciones por raíz (solo mapudungun, sin cambio de código al
+español, sin nombres propios, de 3 a 12 palabras) y escribe `diccionario/ejemplos.js`.
+
 ## Reconstruir
 
 ```
-node extract.js ../../index.html PARSER.html GOLD.csv .        # game_vocab.json, builder.json, motor.js
+node extract.js ../../index.html "Mapudungun Verb Parser 136.html" GOLD.csv .   # game_vocab.json, builder.json, motor.js
 cp motor.js ../../diccionario/
 python3 builder_en.py builder.json builder_en.json
-python3 build_dict.py ../../diccionario/datos.js
+python3 build_dict.py ../../diccionario/datos.js            # también escribe datos_es.js
+node build_examples.js CORPUS_DIR ../../diccionario/motor.js ../../diccionario/datos.js ../../diccionario/ejemplos.js ../../diccionario/datos_es.js
 sed "s/__VERSION__/$(date +%Y%m%d%H%M%S)/" sw_template.js > ../../diccionario/sw.js
 python3 build_master.py ../../diccionario/datos.js copia_maestra.html   # copia de revisión; NO se publica
 ```

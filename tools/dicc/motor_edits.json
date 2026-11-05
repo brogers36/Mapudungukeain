@@ -1,12 +1,1 @@
-[
- {
-  "why": "chillka-tu-, and chilka-tu- as its spelling, mean 'leer'; chilka- without -tu- keeps 'marcar animales' (analyst ruling 2026-11-04)",
-  "old": "      steps.push('-l-ka- con küme-: tema lexicalizado küme-l-ka- \\u00abestar bien\\u00bb (decisión del analista)'); }",
-  "new": "      steps.push('-l-ka- con küme-: tema lexicalizado küme-l-ka- \\u00abestar bien\\u00bb (decisión del analista)'); }\n    /* chillka-tu- 'leer, estudiar'; chilka- is read as a spelling of chillka- only when -tu- follows (analyst ruling 2026-11-04),\n       so chilka-n keeps Augusta's 'marcar los animales' */\n    if(/^chill?ka$/.test(p.root) && ms[0] && /^n?tu$/.test(ms[0].f)){\n      lex={inf:'leer', comp:''}; i0=1; hadVblz=true;\n      steps.push('-tu- con chillka- (o chilka-): tema lexicalizado chillka-tu- \\u00ableer\\u00bb (decisión del analista)'); }"
- },
- {
-  "why": "Underlying cause of chillka/chilla/chilka being split as chi-…: the AVENUE frequency bucket counts the bare wordform, so a frequent free word (chi, 8,801 tokens) that is attested only weakly (through the spelling fold) outranked the dictionary root. Weakly attested roots now get at most bucket 1. Gold v38 +1 (0 broken), blind set 3 +1, blind set 1 unchanged; 24 of the top 20,000 AVENUE types change (2026-11-04).",
-  "old": "    const fb = (a && attestedStrong(c.root)) ? _b + 1 : _b;",
-  "new": "    /* 2026-11-04: a root attested only weakly (via the spelling fold or the loan list) gets at most bucket 1; ROOTFREQ counts\n       bare wordforms, so a frequent free word such as chi (8,801 tokens) otherwise beat chillka-, chilla-, chilka- */\n    const fb = (a && attestedStrong(c.root)) ? _b + 1 : (a ? Math.min(1, _b) : _b);"
- }
-]
+[]
