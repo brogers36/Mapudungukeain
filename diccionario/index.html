@@ -282,7 +282,7 @@ function route(){
   return home();
 }
 function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
-function topBar(){ return `<div class="ctl"><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
+function topBar(){ return `<div class="ctl"><a class="purse" href="${GAME_URL}" style="text-decoration:none;color:inherit" title="Mapudungukeaiñ Fill Püle">🎮 ${L("Juego","Game")}</a><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
 function bindCommon(){
   app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{ lang=b.dataset.l; sv("mpk_lang",lang); document.documentElement.lang=lang; route(); });
   app.querySelectorAll("[data-go]").forEach(b=>b.onclick=ev=>{ ev.preventDefault(); go(b.dataset.go); });
