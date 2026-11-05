@@ -1,7 +1,12 @@
 [
  {
-  "why": "chillka-tu- means 'leer', not 'usar libro' (analyst ruling 2026-11-04)",
+  "why": "chillka-tu- (also spelled chilka-tu-) means 'leer', not 'usar libro' (analyst ruling 2026-11-04)",
   "old": "                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};",
-  "new": "                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chillka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- 'leer, estudiar' (analyst ruling 2026-11-04) */\n                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};"
+  "new": "                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chill?ka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- (also spelled chilka-tu-) 'leer, estudiar' (analyst ruling 2026-11-04) */\n                  else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};"
+ },
+ {
+  "why": "Underlying cause of chillka/chilla/chilka being split as chi-…: the AVENUE frequency bucket counts the bare wordform, so a frequent free word (chi, 8,801 tokens) that is attested only weakly (through the spelling fold) outranked the dictionary root. Weakly attested roots now get at most bucket 1. Gold v38 +1 (0 broken), blind set 3 +1, blind set 1 unchanged; 24 of the top 20,000 AVENUE types change (2026-11-04).",
+  "old": "    const fb = (a && attestedStrong(c.root)) ? _b + 1 : _b;",
+  "new": "    /* 2026-11-04: a root attested only weakly (via the spelling fold or the loan list) gets at most bucket 1; ROOTFREQ counts\n       bare wordforms, so a frequent free word such as chi (8,801 tokens) otherwise beat chillka-, chilla-, chilka- */\n    const fb = (a && attestedStrong(c.root)) ? _b + 1 : (a ? Math.min(1, _b) : _b);"
  }
 ]

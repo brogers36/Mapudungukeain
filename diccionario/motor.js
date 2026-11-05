@@ -827,7 +827,9 @@ function parse(word,cat,minRoot,decomp){
        (Smeets, "dejar") and the analysis posits no -ku- suffix at all. */
     const tukuOK = tukuAtomic(c) ? 1 : 0;
     const _b = Math.min(2, Math.floor(Math.log10(rootFreq(c.root) + 1)));
-    const fb = (a && attestedStrong(c.root)) ? _b + 1 : _b;
+    /* 2026-11-04: a root attested only weakly (via the spelling fold or the loan list) gets at most bucket 1; ROOTFREQ counts
+       bare wordforms, so a frequent free word such as chi (8,801 tokens) otherwise beat chillka-, chilla-, chilka- */
+    const fb = (a && attestedStrong(c.root)) ? _b + 1 : (a ? Math.min(1, _b) : _b);
     return [tukuOK, a, fb, mPref, fin, uPref, a? c.root.length : -c.m.length];
   }
   function better(a,b){const x=key(a),y=key(b);
@@ -2796,7 +2798,7 @@ var MEANING = (function(){
         /* verbaliser on a non-verbal root */
         var ntext=predicate(sense, p.root);
         if(!lex){ if(/^(nge|ngi|ng|ge)$/.test(e.vblz)) lex={inf:'ser', comp:ntext};
-                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chillka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- 'leer, estudiar' (analyst ruling 2026-11-04) */
+                  else if(/^(tu|ntu)$/.test(e.vblz) && /^chill?ka$/.test(p.root)) lex={inf:'leer', comp:''};   /* chillka-tu- (also spelled chilka-tu-) 'leer, estudiar' (analyst ruling 2026-11-04) */
                   else if(/^(tu|ntu)$/.test(e.vblz)) lex={inf:consumeVerb(sense, p.root)||'usar', comp:ntext, tuObj:true};
                   else if(/^(ye|yi)$/.test(e.vblz)) lex={inf:'tener', comp:ntext};
                   else lex={inf:'hacer', comp:ntext}; }
