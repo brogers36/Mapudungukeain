@@ -3,6 +3,7 @@
   "short_name": "Nemülkawe",
   "description": "Diccionario mapudungun, español e inglés, con juegos de vocabulario",
   "lang": "es",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
