@@ -180,7 +180,10 @@ let graf=["uni","azu","rag"].includes(ld("mpk_graf","uni"))?ld("mpk_graf","uni")
 let saved=ld("mpd_saved",[]), srs=ld("mpd_srs",{}), stats=ld("mpd_stats",{});
 const nuts=()=>ld("mpk_nuts",0)||0;
 const addNuts=n=>{ if(n>0) sv("mpk_nuts",nuts()+n); };
-const L=(es,en)=>lang==="es"?es:en;
+/* Mapudungun words in the interface (title, the game's name, ngülliw) follow the chosen grafemario like the entries do */
+function GW(s){ try{ if(graf==="uni"||s==null) return s;
+  return ["Yeniekeafiel ñi Kewün Fill Püle","Mapudungukeaiñ Fill Püle","Tañi Nemülkawe","Nemülkawe","Ngülliw","ngülliw"].reduce((t,w)=>t.split(w).join(G(w)),String(s)); }catch(e){ return s; } }
+const L=(es,en)=>GW(lang==="es"?es:en);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const pick=(a,n)=>shuffle(a).slice(0,n);
@@ -318,6 +321,7 @@ const app=document.getElementById("app");
 function go(h){ if(location.hash===h) route(); else location.hash=h; }
 window.addEventListener("hashchange",route);
 function route(){
+  document.title=GW("Tañi Nemülkawe");
   const h=decodeURIComponent(location.hash.slice(1)||"/"), p=h.split("/").filter(Boolean);
   window.scrollTo(0,0);
   if(!p.length) return home();
@@ -330,7 +334,7 @@ function route(){
   return home();
 }
 function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
-function topBar(){ return `<div class="ctl"><a class="purse" href="${GAME_URL}" style="text-decoration:none;color:inherit" title="Mapudungukeaiñ Fill Püle">🎮 ${L("Juego","Game")}</a><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
+function topBar(){ return `<div class="ctl"><a class="purse" href="${GAME_URL}" style="text-decoration:none;color:inherit" title="${GW("Mapudungukeaiñ Fill Püle")}">🎮 ${L("Juego","Game")}</a><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
 function bindCommon(){
   app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{ lang=b.dataset.l; sv("mpk_lang",lang); document.documentElement.lang=lang; route(); });
   app.querySelectorAll("[data-go]").forEach(b=>b.onclick=ev=>{ ev.preventDefault(); go(b.dataset.go); });
@@ -344,7 +348,7 @@ function home(){
   const nSaved=saved.length, due=dueCards(CORE.filter(e=>!e.ph)).length;
   app.innerHTML=`
     <div class="top"><div><p class="eyebrow">${L("Diccionario mapudungun · español · inglés","Mapudungun · Spanish · English dictionary")}</p>
-      <h1>Tañi Nemülkawe<small>Yeniekeafiel ñi Kewün Fill Püle</small></h1></div>${topBar()}</div>
+      <h1>${GW("Tañi Nemülkawe")}<small>${GW("Yeniekeafiel ñi Kewün Fill Püle")}</small></h1></div>${topBar()}</div>
     <div class="search" role="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false"
       placeholder="${L("Mapudungun o español","Mapudungun or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
       <button class="clr" id="clr" aria-label="${L("Borrar","Clear")}" ${lastQ?"":"hidden"}>×</button></div>
@@ -356,7 +360,7 @@ function home(){
         <button class="card" data-go="#/juegos"><span class="ic">🎲</span><b>${L("Juegos","Games")}</b><small>${L("Practica el vocabulario y gana ngülliw","Practise vocabulary and earn ngülliw")}</small></button>
         <button class="card" data-go="#/temas"><span class="ic">🗂</span><b>${L("Temas","Topics")}</b><small>${L(`${CORE.length} palabras y frases`,`${CORE.length} words and phrases`)}</small></button>
         <button class="card" data-go="#/guardadas"><span class="ic">⭐</span><b>${L("Mis palabras","My words")}</b><small>${nSaved?L(`${nSaved} guardadas · ${due} para repasar`,`${nSaved} saved · ${due} to review`):L("Guarda palabras con ☆","Save words with ☆")}</small></button>
-        <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>Mapudungukeaiñ Fill Püle</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
+        <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>${GW("Mapudungukeaiñ Fill Püle")}</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
         <button class="card" data-go="#/acerca"><span class="ic">📖</span><b>${L("Acerca","About")}</b><small>${L("Fuentes y cómo usarlo","Sources and how to use it")}</small></button>
       </nav>
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}

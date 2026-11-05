@@ -220,6 +220,18 @@ footer{padding-block:28px 40px;color:var(--muted);font-size:.9rem;display:flex;f
   set(saved==="en"?"en":"es");
   document.getElementById("l-es").onclick=function(){ set("es"); };
   document.getElementById("l-en").onclick=function(){ set("en"); };
+  /* Mapudungun names on the page follow the grafemario chosen in the dictionary or the game */
+  var g=null; try{ g=JSON.parse(localStorage.getItem("mpk_graf")); }catch(e){}
+  var MAP={azu:{ng:"g",g:"q",d:"z",tr:"tx"},rag:{ng:"g",g:"q",d:"z",tr:"x",ch:"c",ll:"j","ü":"v",sh:"s"}}[g];
+  if(MAP){
+    var conv=function(w){ return w.replace(/ng|tr|ch|ll|sh|[gdü]/gi,function(x){ var lo=x.toLowerCase(),r=MAP[lo]; if(r==null) return x;
+      if(x!==lo&&x===x.toUpperCase()) return r.toUpperCase(); if(x[0]!==lo[0]) return r[0].toUpperCase()+r.slice(1); return r; }); };
+    var W=["Yeniekeafiel ñi Kewün Fill Püle","Mapudungukeaiñ Fill Püle","Tañi Nemülkawe","Nemülkawe","Ngülliw","ngülliw"];
+    var fix=function(t){ return W.reduce(function(a,w){ return a.split(w).join(conv(w)); },t); };
+    var tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT), n;
+    while((n=tw.nextNode())){ var v=fix(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; }
+    document.title=fix(document.title);
+  }
 })();
 </script>
 <script>
