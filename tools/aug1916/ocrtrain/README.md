@@ -20,10 +20,11 @@ del tomo I y 2.933 del tomo II.
 
 ## Resultado
 
-`aug.traineddata` (modelo entero, 1,5 MB) es `spa` de tessdata_best ajustado con 413 líneas transcritas (3.400
-iteraciones). En las 24 líneas apartadas (`held.txt`, 1.604 caracteres) el error por carácter baja de 8,0 % (`spa`
-instalado) y 7,9 % (`spa` de tessdata_best) a 1,4 %. De las 51 letras propias de Augusta (ŋ ə ü ʃ ·) en esas líneas,
-los modelos de español no leen ninguna; el ajustado lee bien el 90 %. Es una muestra chica: las cifras sirven para
+`aug.traineddata` (modelo entero, 1,5 MB) es `spa` de tessdata_best ajustado con 550 líneas transcritas: las 413 de
+`lines/` más 137 (`aug2_*`) elegidas entre las de menor confianza del primer modelo (4.000 iteraciones). En las 24
+líneas apartadas (`held.txt`, 1.604 caracteres) el error por carácter baja de 8,0 % (`spa` instalado) y 7,9 % (`spa`
+de tessdata_best) a 1,4 %. De las 51 letras propias de Augusta (ŋ ə ü ʃ ·) en esas líneas, los modelos de español no
+leen ninguna; el primer modelo ajustado (413 líneas) leía mal 5 y este 1. Es una muestra chica: las cifras sirven para
 comparar modelos, no como error exacto del diccionario entero.
 
     tesseract PAGE.png OUT -l aug --tessdata-dir ocrtrain --psm 4 tsv txt
