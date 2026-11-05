@@ -122,6 +122,15 @@ for e in A:
         e['en'] = x[0]; nen += 1
     elif e['s'].startswith('Véase '):
         e['en'] = 'See ' + e['s'][6:]
+# OCR corrections from the master copy: "ocr:<word>" -> fix replaces that Mapudungun word everywhere in Augusta's
+# text; "esh:<headword>" -> fix renames a Spanish headword of the Spanish -> Mapudungun half
+OCRFIX = {k[4:]: v['fix'] for k, v in rev.items() if k.startswith('ocr:') and v.get('fix')}
+ESHFIX = {k[4:]: v['fix'] for k, v in rev.items() if k.startswith('esh:') and v.get('fix')}
+def ocrfix(t):
+    if not OCRFIX: return t
+    return re.sub(r'[A-Za-zÁÉÍÓÚÑÜáéíóúñüḻṉṯ]+', lambda m: OCRFIX.get(m.group(0).lower(), m.group(0)) if m.group(0).lower() in OCRFIX else m.group(0), t)
+for e in A:
+    if e.get('o') is None: e['d'] = ocrfix(e['d']); e['s'] = ocrfix(e['s'])
 # reviewer decisions
 nrev = 0
 for e in core + A:
@@ -140,7 +149,8 @@ for b in B:
 # Spanish -> Mapudungun: volume II (español-araucano) of the 1916 original, OCR'd (tools/aug1916/build_es16.py).
 # Written to a separate file that the app loads only when someone searches in Spanish.
 _esf = P('../aug1916/augusta1916_es.json')
-ES = [{'id': 'e:' + h, 'h': h, 'd': ' ‖ '.join(t), 'o': None} for h, t in json.load(open(_esf, encoding='utf-8')).items()] if os.path.exists(_esf) else []
+_esflags = json.load(open(P('../aug1916/augusta1916_es_flags.json'), encoding='utf-8')) if os.path.exists(P('../aug1916/augusta1916_es_flags.json')) else {}
+ES = [{'id': 'e:' + ESHFIX.get(h, h), 'h': ESHFIX.get(h, h), 'd': ocrfix(' ‖ '.join(t)), 'o': None, 'u': 1 if (h in _esflags and h not in ESHFIX) else 0} for h, t in json.load(open(_esf, encoding='utf-8')).items()] if os.path.exists(_esf) else []
 open(os.path.join(os.path.dirname(sys.argv[1]), 'datos_es.js'), 'w', encoding='utf-8').write(
     'window.DICC_ES=' + json.dumps(ES, ensure_ascii=False, separators=(',', ':')) + ';\n')
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,

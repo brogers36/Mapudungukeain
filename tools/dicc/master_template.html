@@ -44,7 +44,7 @@ main{padding:12px 16px 80px;max-width:1100px;margin:0 auto}
   <p class="help">Tus cambios se guardan en este navegador mientras trabajas. Para publicarlos, toca <b>Exportar revisiones</b> y guarda el archivo <code>revisiones.json</code>; luego súbelo al repositorio en <code>tools/dicc/revisiones.json</code> (o envíalo para que se integre). <b>Importar</b> carga un archivo de revisiones anterior, por ejemplo desde otro computador.</p>
   <div class="bar">
     <input type="search" id="q" placeholder="Buscar (mapudungun, español, inglés)">
-    <select id="part"><option value="core">Núcleo</option><option value="aug">Augusta</option></select>
+    <select id="part"><option value="core">Núcleo</option><option value="aug">Augusta</option><option value="ocr">OCR: palabras mapuches</option><option value="esh">OCR: titulares en español</option></select>
     <select id="st"><option value="all">Todas</option><option value="0">Sin revisar</option><option value="1">Revisadas</option><option value="2">Marcadas para discutir</option><option value="chg">Con cambios</option><option value="noen">Sin inglés</option></select>
     <select id="th"><option value="">Todos los temas</option></select>
     <select id="sort"><option value="f">Por frecuencia (AVENUE)</option><option value="az">A–Z</option></select>
@@ -64,21 +64,27 @@ const saveRev=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(REV)); }catch(e
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fold=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const CORE=DATA.core, AUG=DATA.aug;
+/* OCR review lists: Mapudungun words the parser could not analyse, and Spanish headwords that are not in the
+   LibreOffice dictionary or are out of alphabetical order. A correction goes to "fix"; build_dict.py applies it. */
+const OCR=(DATA.ocr||[]).map(x=>({id:"ocr:"+x.w,w:x.w,n:x.n,where:x.where,root:x.root}));
+const ESH=(DATA.esh||[]).map(x=>({id:"esh:"+x.h,h:x.h,pg:x.pg,why:x.why,d:x.d}));
+const LISTS={core:CORE,aug:AUG,ocr:OCR,esh:ESH};
 const THEMES=[...new Set(CORE.map(e=>e.t))].sort();
 document.getElementById("th").innerHTML+=THEMES.map(t=>`<option value="${t}">${t}</option>`).join("");
 const cur=(e,k)=>{ const r=REV[e.id]; return r&&r[k]!=null?r[k]:e[k]; };  /* e already carries published revisions (merged at build) */
 const status=e=>{ const r=REV[e.id]; return r&&r.st!=null?r.st:(e.st||0); };
-const changed=e=>{ const r=REV[e.id]; return !!r&&["m","es","en","t","s","note"].some(k=>r[k]!=null&&r[k]!==(e[k]||"")); };
+const changed=e=>{ const r=REV[e.id]; return !!r&&["m","es","en","t","s","note","fix"].some(k=>r[k]!=null&&r[k]!==(e[k]||"")); };
 function setField(e,k,v){ const r=REV[e.id]||(REV[e.id]={}); if(v===(e[k]||"")) delete r[k]; else r[k]=v; r.when=new Date().toISOString(); if(Object.keys(r).filter(x=>x!=="when").length===0) delete REV[e.id]; saveRev(); }
 function setStatus(e,v){ const r=REV[e.id]||(REV[e.id]={}); r.st=v; r.when=new Date().toISOString(); saveRev(); }
 let page=0; const PER=40;
 function filtered(){
   const part=document.getElementById("part").value, st=document.getElementById("st").value, th=document.getElementById("th").value, q=fold(document.getElementById("q").value.trim());
-  let L=part==="core"?CORE:AUG;
+  let L=LISTS[part];
   if(th&&part==="core") L=L.filter(e=>e.t===th);
   if(st==="chg") L=L.filter(changed); else if(st==="noen") L=L.filter(e=>!cur(e,"en")); else if(st!=="all") L=L.filter(e=>String(status(e))===st);
-  if(q) L=L.filter(e=>[cur(e,"m")||e.h,cur(e,"es")||cur(e,"s"),cur(e,"en"),e.d].some(x=>fold(x).includes(q)));
+  if(q) L=L.filter(e=>[cur(e,"m")||e.h||e.w,cur(e,"es")||cur(e,"s"),cur(e,"en"),e.d,cur(e,"fix")].some(x=>fold(x).includes(q)));
   const so=document.getElementById("sort").value;
+  if(part==="ocr"||part==="esh") return so==="az"?L.slice().sort((a,b)=>(a.w||a.h).localeCompare(b.w||b.h,"es")):L;
   L=L.slice().sort(so==="az"?((a,b)=>(a.m||a.h).localeCompare(b.m||b.h,"es")):((a,b)=>(b.f||0)-(a.f||0)));
   return L; }
 function render(){
@@ -86,6 +92,16 @@ function render(){
   const part=document.getElementById("part").value;
   const rows=L.slice(page*PER,page*PER+PER).map((e,i)=>{ const s=status(e);
     const core=part==="core";
+    if(part==="ocr") return `<article class="e${s===1?" ok":s===2?" flag":""}${changed(e)?" chg":""}" data-i="${esc(e.id)}">
+      <div class="h"><b>${esc(e.w)}</b><span class="meta">${e.n} vez/veces${e.root?" · el analizador propone la raíz "+esc(e.root):""}</span></div>
+      <div class="aug">Aparece en: ${e.where.map(([v,h])=>`${v==="I"?"mapu→esp":"esp→mapu"} <b>${esc(h)}</b>`).join(" · ")}</div>
+      <div class="f"><label>corrección</label><input data-k="fix" value="${esc(cur(e,"fix")||"")}" placeholder="vacío = está bien así"></div>
+      <div class="acts"><button class="ok" data-st="1" aria-pressed="${s===1}">✓ Está bien / corregida</button><button class="flag" data-st="2" aria-pressed="${s===2}">⚑ Discutir</button><button data-st="0" aria-pressed="${s===0}">Sin revisar</button></div></article>`;
+    if(part==="esh") return `<article class="e${s===1?" ok":s===2?" flag":""}${changed(e)?" chg":""}" data-i="${esc(e.id)}">
+      <div class="h"><b>${esc(e.h)}</b><span class="meta">pág. ${e.pg} del PDF · ${esc(e.why.join("; "))}</span></div>
+      <div class="aug">${esc(e.d)}</div>
+      <div class="f"><label>titular correcto</label><input data-k="fix" value="${esc(cur(e,"fix")||"")}" placeholder="vacío = está bien así"></div>
+      <div class="acts"><button class="ok" data-st="1" aria-pressed="${s===1}">✓ Está bien / corregido</button><button class="flag" data-st="2" aria-pressed="${s===2}">⚑ Discutir</button><button data-st="0" aria-pressed="${s===0}">Sin revisar</button></div></article>`;
     return `<article class="e${s===1?" ok":s===2?" flag":""}${changed(e)?" chg":""}" data-i="${esc(e.id)}">
       <div class="h"><b>${esc(core?e.m:e.h)}</b><span class="meta">${core?`${esc(e.t)} · ${e.o==="juego"?"juego: "+esc(e.src):"frecuente"}`:`${esc(e.p||"")} · raíz ${esc(e.r)}`} · AVENUE ${e.f||0}</span></div>
       <div class="f">
@@ -105,7 +121,7 @@ function render(){
     <div class="pager"><button id="pv" ${page?"":"disabled"}>←</button><span>${n.toLocaleString("es")} entradas · página ${page+1} de ${pages}</span><button id="nx" ${page<pages-1?"":"disabled"}>→</button></div>
     ${rows||"<p>No hay entradas con estos filtros.</p>"}
     <div class="pager"><button id="pv2" ${page?"":"disabled"}>←</button><span>página ${page+1} de ${pages}</span><button id="nx2" ${page<pages-1?"":"disabled"}>→</button></div>`;
-  const BY=new Map((part==="core"?CORE:AUG).map(e=>[e.id,e]));
+  const BY=new Map(LISTS[part].map(e=>[e.id,e]));
   document.querySelectorAll(".e").forEach(a=>{ const e=BY.get(a.dataset.i);
     a.querySelectorAll("[data-k]").forEach(inp=>inp.onchange=()=>{ setField(e,inp.dataset.k,inp.value.trim()); a.classList.toggle("chg",changed(e)); });
     a.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ setStatus(e,+b.dataset.st); render(); }); });
@@ -114,7 +130,8 @@ function render(){
   stats(); }
 function stats(){
   const c=CORE.filter(e=>status(e)===1).length, a=AUG.filter(e=>status(e)===1).length, f=Object.values(REV).filter(r=>r.st===2).length, ch=Object.keys(REV).length;
-  document.getElementById("stats").textContent=`Núcleo revisado: ${c}/${CORE.length} · Augusta revisado: ${a}/${AUG.length} · Para discutir: ${f} · Entradas con cambios o marca: ${ch}`; }
+  const o=OCR.filter(e=>status(e)===1).length, h=ESH.filter(e=>status(e)===1).length;
+  document.getElementById("stats").textContent=`Núcleo revisado: ${c}/${CORE.length} · Augusta revisado: ${a}/${AUG.length} · OCR mapu: ${o}/${OCR.length} · OCR titulares: ${h}/${ESH.length} · Para discutir: ${f} · Entradas con cambios o marca: ${ch}`; }
 ["q","part","st","th","sort"].forEach(id=>document.getElementById(id).addEventListener(id==="q"?"input":"change",()=>{ page=0; render(); }));
 document.getElementById("exp").onclick=()=>{
   /* the export is cumulative: decisions already published (DATA.rev) plus this browser's, newest wins per entry */
