@@ -20,7 +20,31 @@ for k in aug1:
 SEPS = r'(?:\|\||\[\||\|\]|\|l|l\||\]\||\|\[)'
 def sp_ok(w):
     w = w.lower()
-    return is_es(w) or w in ES
+    if is_es(w) or w in ES: return True
+    m = re.match(r'(.+?)(ad|id)(o|a|os|as)$', w)
+    return bool(m and any(m.group(1) + x in ES for x in ('ar', 'er', 'ir')))
+def accent(w):
+    if w in ES: return w
+    for i, ch in enumerate(w):
+        if ch in 'aeiou':
+            w2 = w[:i] + 'áéíóú'['aeiou'.index(ch)] + w[i+1:]
+            if w2 in ES: return w2
+    return w
+_snap1 = snap
+def snap(c):
+    r = _snap1(c)
+    if r: return r
+    # two misreadings in one word (doyun -> düngun: ə read as o, ŋ as y)
+    best = None
+    for a, b in CONF:
+        for m in re.finditer(re.escape(a), c):
+            v = c[:m.start()] + b + c[m.end():]
+            for a2, b2 in CONF:
+                for m2 in re.finditer(re.escape(a2), v):
+                    w = v[:m2.start()] + b2 + v[m2.end():]
+                    f = V.get(w, 0)
+                    if f >= 20 and (best is None or f > best[1]): best = (w, f)
+    return best[0] if best else None
 def head_of(t):
     t = re.sub(r'^[\W\d]+', '', t)
     m = re.match(r"([A-Za-zÁÉÍÓÚÜÑáéíóúüñ|!\[\]']+)", t)
@@ -38,14 +62,29 @@ out = {}; bad = 0
 for e in raw:
     h, stem, rest = head_of(e['t'])
     if not h or len(h) < 2: bad += 1; continue
+    if not sp_ok(h):
+        # the bar read as a space: "zamb| o, adj." -> zambo, stem zamb
+        mj = re.match(r"\s*[¡!|\[\]l1]?\s*([a-záéíóúñü]{1,9})(?=[\s,.:;])", rest)
+        if mj and sp_ok(h + mj.group(1)): stem, h, rest = h, h + mj.group(1), rest[mj.end():]
+    if not sp_ok(h):
+        # accents the OCR dropped (peninsula -> península)
+        for i, ch in enumerate(h):
+            if ch in 'aeiou':
+                h2 = h[:i] + 'áéíóú'['aeiou'.index(ch)] + h[i+1:]
+                if h2 in ES: stem = h2 if stem == h else stem; h = h2; break
     if not sp_ok(h) and stem == h:
         # the bar read as a letter (abroch|ar -> abrochuar): drop one character
-        for i in range(2, len(h)):
-            if sp_ok(h[:i] + h[i+1:]): stem, h = h[:i], h[:i] + h[i+1:]; break
+        done = False
+        for k in (1, 2):
+            for i in range(2, len(h) - k + 1):
+                if sp_ok(h[:i] + h[i+k:]): stem, h = h[:i], h[:i] + h[i+k:]; done = True; break
+            if done: break
     if not sp_ok(h):
         c = SC.correction(h)
         if c and c != h and len(c) == len(h): h = c; stem = h if stem == h else stem
         else: bad += 1
+    a2 = accent(h)
+    if a2 != h: stem = a2 if stem == h else stem; h = a2
     if stem == h:
         # no bar printed or read: the stem is what the first "—" form attaches to (abrum|ado ... —ar)
         mx = re.search(r'[-—–]{1,2}\s?([a-záéíóúñü]{1,6})\b', rest)

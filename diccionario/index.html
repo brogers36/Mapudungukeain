@@ -287,7 +287,7 @@ function loadES(){ if(ESD) return Promise.resolve(ESD); if(esLoading) return esL
     sc.onload=()=>{ ESD=(window.DICC_ES||[]); ESD.forEach(e=>{ e._h=plain(e.h); BYID.set(e.id,e); }); res(ESD); };
     sc.onerror=()=>{ esLoading=null; res(null); }; document.head.appendChild(sc); });
   return esLoading; }
-function esRow(e){ const t=e.d.replace(/^(?:(?:act|adj|adv|m|f|intr|refl|prep|pron|conj|interj|loc|num|pl|part|impers|modif|com|lug|temp|copul|interr|interrog|cant|neg|pers|pos|dem|indef|ord|card|distr|compar|aum|dim)\.\s*)+/,"");
+function esRow(e){ const t=e.d.replace(/^(?:(?:act|adj|adv|m|f|intr|refl|prep|pron|conj|interj|loc|num|pl|part|impers|modif|com|lug|temp|copul|interr|interrog|cant|neg|pers|pos|dem|indef|ord|card|distr|compar|aum|dim|a|n|r|p)\.\s*,?\s*)+/,"").replace(/^[\s,.:;]+/,"");
   return `<button class="res" data-id="${esc(e.id)}"><span class="w" style="font-family:var(--body);font-weight:700">${esc(e.h)}</span><span class="g">${esc(t.length>110?t.slice(0,107)+"…":t)}</span></button>`; }
 /* Mapudungun words inside Augusta's Spanish -> Mapudungun text become links when they are dictionary headwords */
 function linkMapu(text){
