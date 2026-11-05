@@ -137,7 +137,10 @@ for b in B:
     for x, y in SUBS: b['es'] = re.sub(r'\b' + x + r'\b', y, b['es'])
 # Spanish -> Mapudungun half of Augusta (extract_es.py), plus the few the parser has and the digital edition lacks.
 # Written to a separate file that the app loads only when someone searches in Spanish.
-ES = []   # vol. II (español-araucano) of the 1916 original has not been OCR'd yet
+# Spanish -> Mapudungun: volume II (español-araucano) of the 1916 original, OCR'd (tools/aug1916/build_es16.py).
+# Written to a separate file that the app loads only when someone searches in Spanish.
+_esf = P('../aug1916/augusta1916_es.json')
+ES = [{'id': 'e:' + h, 'h': h, 'd': ' ‖ '.join(t), 'o': None} for h, t in json.load(open(_esf, encoding='utf-8')).items()] if os.path.exists(_esf) else []
 open(os.path.join(os.path.dirname(sys.argv[1]), 'datos_es.js'), 'w', encoding='utf-8').write(
     'window.DICC_ES=' + json.dumps(ES, ensure_ascii=False, separators=(',', ':')) + ';\n')
 data = {'v': time.strftime('%Y%m%d%H%M%S'), 'core': core, 'aug': A, 'build': B,
