@@ -270,9 +270,9 @@ function home(){
     <div class="top"><div><p class="eyebrow">${L("Diccionario mapudungun · español · inglés","Mapudungun · Spanish · English dictionary")}</p>
       <h1>Tañi Nemülkawe<small>Yeniekeafiel ñi Kewün Fill Püle</small></h1></div>${topBar()}</div>
     <div class="search" role="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false"
-      placeholder="${L("Busca en mapudungun, español o inglés","Search in Mapudungun, Spanish or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
+      placeholder="${L("Mapudungun o español","Mapudungun or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
       <button class="clr" id="clr" aria-label="${L("Borrar","Clear")}" ${lastQ?"":"hidden"}>×</button></div>
-    <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work.")}</p>
+    <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios. Para buscar en inglés, cambia a <b>EN</b> arriba.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>rukamew</b>. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work. To search in Spanish, switch to <b>ES</b> above.")}</p>
     <div id="out"></div>
     <div id="hubwrap">
       <nav class="hub" aria-label="${L("Secciones","Sections")}">
@@ -301,12 +301,13 @@ function search(q){
   const wordRe=new RegExp("(^|[^a-z])"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   for(const e of CORE){ let s=0;
     if(e._k===k) s=100; else if(e._k.startsWith(k)) s=70-Math.min(20,e._k.length-k.length);
-    if(pq.length>1){ if(wordRe.test(e._es)||wordRe.test(e._en)) s=Math.max(s,60); else if(pq.length>3&&(e._es.includes(pq)||e._en.includes(pq))) s=Math.max(s,40); }
+    const gq=lang==="es"?e._es:e._en;   /* glosses are searched only in the language chosen with the ES/EN toggle */
+    if(pq.length>1){ if(wordRe.test(gq)) s=Math.max(s,60); else if(pq.length>3&&gq.includes(pq)) s=Math.max(s,40); }
     if(s) score.push([s+5,e]); }
   for(const e of AUG){ let s=0;
     if(e._k===k||e._r===k) s=95; else if(e._k.startsWith(k)) s=55-Math.min(20,e._k.length-k.length);
     if(pq.length>2&&!s){ const lead=new RegExp("^(el |la |los |las |un |una )?"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b");
-      if(lead.test(e._s)||(e.en&&lead.test(e._en))) s=50; else if(wordRe.test(e._s)) s=35; else if(e.en&&wordRe.test(e._en)) s=35; }
+      const ga=lang==="es"?e._s:e._en; if(ga){ if(lead.test(ga)) s=50; else if(wordRe.test(ga)) s=35; } }
     if(s) score.push([s+Math.min(4,Math.log10(1+(e.f||0))),e]); }
   score.sort((a,b)=>b[0]-a[0]);
   const exact=score.some(([s,e])=>s>=95);
@@ -618,6 +619,8 @@ function about(){
       <p class="hint">Augusta, F. J. de, Painemilla Ñamcucheu, P. S., Colüñ, J. F., &amp; Huenuñamco, D. S. (2019). <i>Diccionario mapudungun–español / español–mapudungun</i> [${L("edición digital, adaptada del Corpus Lexicográfico del Mapudungun (CORLEXIM)","digital edition, adapted from the Corpus Lexicográfico del Mapudungun (CORLEXIM)")}].</p>
       <p class="hint">Duan, M., Fasola, C., Rallabandi, S. K., Vega, R., Anastasopoulos, A., Levin, L., &amp; Black, A. W. (2020). A resource for computational experiments on Mapudungun. <i>Proceedings of LREC 2020</i>, 2872–2877.</p>
       <p class="hint">Smeets, I. (2008). <i>A grammar of Mapuche</i>. Mouton de Gruyter.</p></div>
+    <div class="box"><h3>${L("El juego y el diccionario","The game and the dictionary")}</h3>
+      <p>${L("El sitio de las dos apps explica cada una y cómo instalarlas:","The site for both apps explains each one and how to install them:")} <a href="../apps/">brogers36.github.io/Mapudungukeain/apps</a></p></div>
     <div class="box"><h3>${L("Instalar","Install")}</h3>
       <p>${L("Android: en Chrome, toca <b>Instalar la app</b> o el menú ⋮ → <b>Instalar app</b>. iPhone/iPad: en Safari, <b>Compartir</b> → <b>Añadir a pantalla de inicio</b>. Funciona sin conexión.","Android: in Chrome, tap <b>Install the app</b> or the ⋮ menu → <b>Install app</b>. iPhone/iPad: in Safari, <b>Share</b> → <b>Add to Home Screen</b>. It works offline.")}</p></div>`;
   bindCommon(); }
