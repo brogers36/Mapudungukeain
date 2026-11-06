@@ -3733,6 +3733,13 @@ menu();
 <button id="pwaInstall" hidden style="position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:#c8322f;color:#f3efe6;border:0;border-radius:999px;padding:12px 18px;font:700 1rem 'Atkinson Hyperlegible',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer">Instalar la app</button>
 <script>
 if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+/* Inside an installed app, a link to the other app (game <-> dictionary) would open in an in-app browser window, where
+   Android cannot install it properly (it makes a Chrome shortcut, with the Chrome badge, that opens in the browser).
+   Open such links outside instead: Android hands them to the other installed app, or to Chrome, where it can be installed. */
+(function(){ const sa=()=>{ try{ return ["standalone","minimal-ui","fullscreen"].some(m=>matchMedia("(display-mode: "+m+")").matches)||navigator.standalone===true; }catch(e){ return false; } };
+  document.addEventListener("click",ev=>{ const a=ev.target.closest&&ev.target.closest("a[href]"); if(!a||!sa()) return;
+    const u=new URL(a.href,location.href); if(u.origin!==location.origin) return;
+    if(!(/\/(diccionario|acerca)\//.test(u.pathname))) return; ev.preventDefault(); window.open(u.href,"_blank","noopener"); },true); })();
 (function(){ let ev=null; const b=document.getElementById('pwaInstall');
   try{ if((localStorage.getItem('mpk_lang')||'').indexOf('en')>=0) b.textContent='Install the app'; }catch(e){}
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); ev=e; b.hidden=false; });

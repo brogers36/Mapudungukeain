@@ -215,7 +215,9 @@ function installBox(){
   if(asOwnApp()) return "";
   const steps=isIOS
     ?`<p>${L("En <b>Safari</b>, toca <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y luego <b>Añadir a pantalla de inicio</b>.","In <b>Safari</b>, tap <b>Share</b> (the square with the up arrow), then <b>Add to Home Screen</b>.")}</p>`
-    :`<p>${L("En <b>Chrome</b>, abre el menú <b>⋮</b> (arriba a la derecha) y toca <b>Instalar app</b> o <b>Añadir a la pantalla de inicio</b>. Si no aparece, puede que ya esté instalada: búscala en tu pantalla de inicio.","In <b>Chrome</b>, open the <b>⋮</b> menu (top right) and tap <b>Install app</b> or <b>Add to Home screen</b>. If it isn't there, it may already be installed: look for it on your home screen.")}</p>`;
+    :`<p>${L("En <b>Chrome</b>, abre el menú <b>⋮</b> (arriba a la derecha) y toca <b>Instalar app</b>. Si aparece <b>Añadir a la pantalla de inicio</b>, tócalo y elige <b>Instalar</b>, no «Crear acceso directo».","In <b>Chrome</b>, open the <b>⋮</b> menu (top right) and tap <b>Install app</b>. If you see <b>Add to Home screen</b>, tap it and choose <b>Install</b>, not «Create shortcut».")}</p>
+      <p>${L("Si abriste el diccionario desde el juego instalado, primero ábrelo en Chrome: menú <b>⋮</b> → <b>Abrir en Chrome</b>. Desde la ventana del juego solo se puede crear un acceso directo.","If you opened the dictionary from the installed game, open it in Chrome first: <b>⋮</b> menu → <b>Open in Chrome</b>. From the game's window only a shortcut can be made.")}</p>
+      <p>${L("Si ya tienes un ícono con el logo de Chrome, es un acceso directo, no la app: mantenlo presionado, quítalo y vuelve a instalar desde Chrome.","If you already have an icon with the Chrome logo, it's a shortcut, not the app: long-press it, remove it, and install again from Chrome.")}</p>`;
   return `<div class="box" id="instbox"><p class="eyebrow">${L("Instalar en el teléfono","Install on your phone")}</p>
     <button class="btn" id="instbtn">📲 ${L("Instalar la app","Install the app")}</button>
     <div id="inststeps" ${instOpen?"":"hidden"}>${steps}</div>
@@ -891,6 +893,13 @@ route();
 </script>
 <script>
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+/* Inside an installed app, a link to the other app (game <-> dictionary) would open in an in-app browser window, where
+   Android cannot install it properly (it makes a Chrome shortcut, with the Chrome badge, that opens in the browser).
+   Open such links outside instead: Android hands them to the other installed app, or to Chrome, where it can be installed. */
+(function(){ const sa=()=>{ try{ return ["standalone","minimal-ui","fullscreen"].some(m=>matchMedia("(display-mode: "+m+")").matches)||navigator.standalone===true; }catch(e){ return false; } };
+  document.addEventListener("click",ev=>{ const a=ev.target.closest&&ev.target.closest("a[href]"); if(!a||!sa()) return;
+    const u=new URL(a.href,location.href); if(u.origin!==location.origin) return;
+    if(!(!u.pathname.startsWith(new URL("./",location.href).pathname)||/\/acerca\//.test(u.pathname))) return; ev.preventDefault(); window.open(u.href,"_blank","noopener"); },true); })();
 
 </script>
 <script>
