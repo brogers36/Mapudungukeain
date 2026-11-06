@@ -21,7 +21,9 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match('./index.html')));
     return;
   }
-  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub)\.js$/.test(url.pathname)) {
+  /* the manifest and the icons too: Android's installer re-reads them from the site, and a stale cached copy makes the
+     install fall back to a Chrome shortcut */
+  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub|gramatica)\.js$|\/manifest\.webmanifest$|\/(icon-\d+|icon-maskable-\d+|apple-touch-icon)\.png$/.test(url.pathname)) {
     e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; })
       .catch(() => caches.match(req)));
     return;

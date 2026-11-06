@@ -212,7 +212,9 @@ window.addEventListener("appinstalled",()=>{ installEv=null; markInstalled(); re
 function refreshInstall(){ const b=document.getElementById("instbox"); if(b){ b.outerHTML=installBox()||""; bindInstall(); } }
 const SITE_URL="https://brogers36.github.io/Mapudungukeain/diccionario/";
 function installBox(){
-  if(asOwnApp()) return "";
+  if(displayStandalone()) return "";
+  /* marked as installed but opened in the browser: it may be a Chrome shortcut rather than the app, so keep the help */
+  if(asOwnApp()&&!instOpen) return `<div class="box" id="instbox"><p class="hint">${L("¿Se abre en Chrome o el ícono tiene el logo de Chrome?","Does it open in Chrome, or does the icon have the Chrome logo?")} <button class="back" id="instbtn" style="text-decoration:underline">${L("Instalar de nuevo","Install again")}</button></p></div>`;
   const steps=isIOS
     ?`<p>${L("En <b>Safari</b>, toca <b>Compartir</b> (el cuadrado con la flecha hacia arriba) y luego <b>Añadir a pantalla de inicio</b>.","In <b>Safari</b>, tap <b>Share</b> (the square with the up arrow), then <b>Add to Home Screen</b>.")}</p>`
     :`<p>${L("En <b>Chrome</b>, abre el menú <b>⋮</b> (arriba a la derecha) y toca <b>Instalar app</b>. Si aparece <b>Añadir a la pantalla de inicio</b>, tócalo y elige <b>Instalar</b>, no «Crear acceso directo».","In <b>Chrome</b>, open the <b>⋮</b> menu (top right) and tap <b>Install app</b>. If you see <b>Add to Home screen</b>, tap it and choose <b>Install</b>, not «Create shortcut».")}</p>
@@ -225,7 +227,7 @@ function installBox(){
 function bindInstall(){
   const b=document.getElementById("instbtn"); if(b) b.onclick=async()=>{
     if(installEv&&!displayStandalone()){ installEv.prompt(); try{ await installEv.userChoice; }catch(e){} installEv=null; refreshInstall(); return; }
-    instOpen=true; const st=document.getElementById("inststeps"); if(st){ st.hidden=false; st.scrollIntoView({block:"nearest"}); } };
+    instOpen=true; if(!document.getElementById("inststeps")) refreshInstall(); const st=document.getElementById("inststeps"); if(st){ st.hidden=false; st.scrollIntoView({block:"nearest"}); } };
   const d=document.getElementById("instdone"); if(d) d.onclick=()=>{ markInstalled(); refreshInstall(); };
   const c=document.getElementById("instcopy"); if(c) c.onclick=async()=>{ try{ await navigator.clipboard.writeText(SITE_URL); c.textContent=L("Copiada ✓","Copied ✓"); }catch(e){ c.textContent=SITE_URL; } };
 }
