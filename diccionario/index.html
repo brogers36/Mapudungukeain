@@ -865,9 +865,30 @@ if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator
 
 </script>
 <script>
-/* Anonymous visit counts on the public site only (same GoatCounter setup as the game: no cookies, no personal data). */
+/* Visit, install and section counts sent to GoatCounter as a 1x1 image request, the same setup as the game (no cookies,
+   no personal data, no third-party script). Only on the public site; nothing is sent from a local copy or while offline.
+   Sections (an entry, a theme, a game) are counted once per visit as events, without the word looked up. */
 (function(){ if(location.protocol!=='https:'||location.hostname!=='brogers36.github.io') return;
-  try{ var u='https://brogers36.goatcounter.com/count?p='+encodeURIComponent(location.pathname)+'&t='+encodeURIComponent(document.title)+'&r='+encodeURIComponent(document.referrer||'')+'&rnd='+Math.random().toString(36).slice(2); new Image().src=u; }catch(e){} })();
+  var BASE='https://brogers36.goatcounter.com/count';
+  function gc(path,title,event){ try{
+    var u=BASE+'?p='+encodeURIComponent(path)+'&t='+encodeURIComponent(title||'')+(event?'&e=true':'')+
+      (event?'':'&r='+encodeURIComponent(document.referrer||''))+'&s='+encodeURIComponent(screen.width+','+screen.height+','+(window.devicePixelRatio||1))+
+      '&rnd='+Math.random().toString(36).slice(2);
+    new Image().src=u; }catch(e){} }
+  gc(location.pathname||'/diccionario/', document.title, false);
+  window.addEventListener('appinstalled',function(){ gc('diccionario-app-installed','Diccionario: app installed',true); });
+  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  var seen=false; try{ seen=sessionStorage.getItem('mpk_gc_dlaunch')==='1'; }catch(e){}
+  if(standalone && !seen){ try{ sessionStorage.setItem('mpk_gc_dlaunch','1'); }catch(e){} gc('diccionario-home-screen-launch','Diccionario: opened from home screen',true); }
+  var done={};
+  function section(){ var p=decodeURIComponent(location.hash.slice(1)||'/').split('/').filter(Boolean), k;
+    if(!p.length) return; if(p[0]==='e') k='entrada'; else if(p[0]==='jugar') k='juego-'+(p[1]||''); else k=p[0];
+    if(done[k]) return; done[k]=1; gc('diccionario-'+k,'Diccionario: '+k,true); }
+  window.addEventListener('hashchange',section); section();
+  /* one search event per visit, sent once something has been typed */
+  document.addEventListener('input',function(ev){ if(done.busqueda||!ev.target||ev.target.tagName!=='INPUT') return;
+    done.busqueda=1; gc('diccionario-busqueda','Diccionario: búsqueda',true); },true);
+})();
 </script>
 </body>
 </html>
