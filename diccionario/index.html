@@ -182,7 +182,7 @@ const nuts=()=>ld("mpk_nuts",0)||0;
 const addNuts=n=>{ if(n>0) sv("mpk_nuts",nuts()+n); };
 /* Mapudungun words in the interface (title, the game's name, ngülliw) follow the chosen grafemario like the entries do */
 function GW(s){ try{ if(graf==="uni"||s==null) return s;
-  return ["Yeniekeafiel ñi Kewün Fill Püle","Mapudungukeaiñ Fill Püle","Tañi Nemülkawe","Nemülkawe","Ngülliw","ngülliw"].reduce((t,w)=>t.split(w).join(G(w)),String(s)); }catch(e){ return s; } }
+  return ["Miawülkeafiel ñi Kewün Fill Püle","Mapudungukeaiñ Fill Püle","Tañi Nemülkawe","Nemülkawe","Ngülliw","ngülliw"].reduce((t,w)=>t.split(w).join(G(w)),String(s)); }catch(e){ return s; } }
 const L=(es,en)=>GW(lang==="es"?es:en);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -348,7 +348,7 @@ function home(){
   const nSaved=saved.length, due=dueCards(CORE.filter(e=>!e.ph)).length;
   app.innerHTML=`
     <div class="top"><div><p class="eyebrow">${L("Diccionario mapudungun · español · inglés","Mapudungun · Spanish · English dictionary")}</p>
-      <h1>${GW("Tañi Nemülkawe")}<small>${GW("Yeniekeafiel ñi Kewün Fill Püle")}</small></h1></div>${topBar()}</div>
+      <h1>${GW("Tañi Nemülkawe")}<small>${GW("Miawülkeafiel ñi Kewün Fill Püle")}</small></h1></div>${topBar()}</div>
     <div class="search" role="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false"
       placeholder="${L("Mapudungun o español","Mapudungun or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
       <button class="clr" id="clr" aria-label="${L("Borrar","Clear")}" ${lastQ?"":"hidden"}>×</button></div>
