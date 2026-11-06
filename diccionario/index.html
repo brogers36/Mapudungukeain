@@ -64,6 +64,13 @@ button{font-family:var(--body)}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 .search .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:6px}
 .hint{font-size:.85rem;color:var(--muted)}
+.gram h3{margin:0;font-family:var(--body);font-size:1.05rem}.gram{scroll-margin-top:12px;margin-top:12px}.gitem{border-top:1px solid var(--panel-2);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.gm{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;color:var(--teal);font-size:1rem}
+.gitem p{margin:0}.gexs{display:flex;flex-wrap:wrap;gap:6px}
+.gex{all:unset;cursor:pointer;background:var(--panel-2);border-radius:6px;padding:5px 9px;display:inline-flex;flex-direction:column;gap:1px}
+.gex:hover,.gex:focus-visible{outline:2px solid var(--teal)}
+.gw{font-size:1rem}.gs{color:var(--muted);padding:0 1px}.gtr{font-size:.8rem;color:var(--muted)}
+.gtab{display:grid;grid-template-columns:auto 1fr auto;gap:6px 12px;align-items:center}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{all:unset;cursor:pointer;background:var(--panel);border:1.5px solid var(--panel-2);border-radius:999px;padding:5px 11px;font-size:.88rem}
 .chip:hover{border-color:var(--muted)}
@@ -169,6 +176,7 @@ footer{font-size:.8rem;color:var(--muted);text-align:center;padding-top:10px}
 <main class="wrap" id="app" aria-live="polite"><p class="muted">Cargando el diccionario…</p></main>
 <div class="band" aria-hidden="true"></div>
 <script src="datos.js"></script>
+<script src="gramatica.js"></script>
 <script>
 "use strict";
 /* ===== Storage: the game's keys (mpk_) are shared on purpose: language, grafemario and ngülliw carry over between
@@ -331,6 +339,7 @@ function route(){
   if(p[0]==="juegos") return games();
   if(p[0]==="jugar") return play(p[1],p[2]||"all",p[3]||"m");
   if(p[0]==="acerca") return about();
+  if(p[0]==="gramatica") return grammar();
   return home();
 }
 function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
@@ -361,6 +370,7 @@ function home(){
         <button class="card" data-go="#/temas"><span class="ic">🗂</span><b>${L("Temas","Topics")}</b><small>${L(`${CORE.length} palabras y frases`,`${CORE.length} words and phrases`)}</small></button>
         <button class="card" data-go="#/guardadas"><span class="ic">⭐</span><b>${L("Mis palabras","My words")}</b><small>${nSaved?L(`${nSaved} guardadas · ${due} para repasar`,`${nSaved} saved · ${due} to review`):L("Guarda palabras con ☆","Save words with ☆")}</small></button>
         <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>${GW("Mapudungukeaiñ Fill Püle")}</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
+        <button class="card" data-go="#/gramatica"><span class="ic">🧩</span><b>${L("Morfemas","Morphemes")}</b><small>${L("Sufijos del verbo, pu, ke, -chi, -kechi","Verb suffixes, pu, ke, -chi, -kechi")}</small></button>
         <button class="card" data-go="#/acerca"><span class="ic">📖</span><b>${L("Acerca","About")}</b><small>${L("Fuentes y cómo usarlo","Sources and how to use it")}</small></button>
       </nav>
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
@@ -832,6 +842,25 @@ function build(){
   }; show(); }
 
 /* ===== About ===== */
+/* ===== Morphemes: short guide to the verbal suffixes and the noun particles (data in gramatica.js) ===== */
+function gramWord(seg){ /* "amu-la-y" -> root in bold, suffixes separated by thin hyphens, all in the chosen grafemario */
+  return `<span class="gw">${seg.split(" ").map(w=>{ const ps=w.split("-"); return `<b>${esc(G(ps[0]))}</b>${ps.slice(1).map(x=>`<span class="gs">-</span>${esc(G(x))}`).join("")}`; }).join(" ")}</span>`; }
+function grammar(){
+  const R=window.GRAM; if(!R){ app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div><p>${L("No se pudo cargar.","Could not load.")}</p>`; bindCommon(); return; }
+  const T=o=>lang==="es"?o.es:o.en;
+  const exBtn=e=>`<button class="gex" data-q="${esc(e[0].replace(/-/g,""))}">${gramWord(e[0])}<span class="gtr">${esc(lang==="es"?e[1]:e[2])}</span></button>`;
+  const grp=g=>`<section class="box gram" id="g-${g.id}"><h3>${T(g)}</h3>${g.note?`<p class="hint">${T(g.note)}</p>`:""}
+    ${g.table?`<div class="gtab">${g.table.map(r=>`<div class="gm">${esc(G(r[0]))}</div><div>${esc(lang==="es"?r[1]:r[2])}</div>${exBtn([r[3],"",""]).replace('<span class="gtr"></span>',"")}`).join("")}</div>`:""}
+    ${(g.items||[]).map(it=>`<div class="gitem"><div class="gm">${esc(G(it.m))}</div><p>${T(it)}</p><div class="gexs">${it.ex.map(exBtn).join("")}</div></div>`).join("")}</section>`;
+  app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
+    <h2>${L("Morfemas","Morphemes")}</h2><p>${T(R.intro)}</p>
+    <nav class="chips" aria-label="${L("Secciones","Sections")}">${R.groups.map(g=>`<a class="chip" href="#g-${g.id}" data-jump="g-${g.id}">${T(g)}</a>`).join("")}</nav>
+    ${R.groups.map(grp).join("")}
+    <p class="hint">${T(R.source)}</p>`;
+  bindCommon();
+  app.querySelectorAll("[data-jump]").forEach(a=>a.onclick=ev=>{ ev.preventDefault(); const t=document.getElementById(a.dataset.jump); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); });
+  app.querySelectorAll(".gex").forEach(b=>b.onclick=()=>{ lastQ=b.dataset.q; go("#/"); });
+}
 function about(){
   const n=D.n||{};
   app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
