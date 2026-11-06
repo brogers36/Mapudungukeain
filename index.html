@@ -2118,13 +2118,13 @@ function menu(){
       return `<button class="xcard" id="${id}" ${open?"":"disabled"}><b>${esc(n)}</b><small>${open?esc(d):"🔒 "+t().locked(needOf(st))}</small></button>`}).join("")}</nav>
     <p class="eyebrow hub-h">${L2("Aprende y practica","Learn and practice")}</p>
     <nav class="hub tools" aria-label="${L2("Aprende y practica","Learn and practice")}">${[
+      ["help",t().howBtn,L2("Instrucciones","Instructions")],
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
       ["graf",L2("Grafemarios","Writing systems"),L2(`Ahora: ${GRAF_INFO[graf].name}`,`Now: ${GRAF_INFO[graf].name}`)],
       ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
-      ["help",t().howBtn,L2("Instrucciones","Instructions")],
       ["dicc",L2("Diccionario","Dictionary"),L2("Tañi Nemülkawe: busca y juega","Tañi Nemülkawe: look up and play")],
       ["about",L2("Acerca del juego","About the game"),L2("Qué es y cómo se hizo","What it is and how it was made")]
     ].map(([id,n,d])=>id==="dicc"
