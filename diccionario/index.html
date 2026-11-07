@@ -542,7 +542,7 @@ function enMeaning(r){
   if(!r||!r.who||!r.who.person) return ""; const pn=r.who.person, sub=EN_SUBJ[pn]; if(!sub) return "";
   const sp=String(r.mean||""); if(/^¿/.test(sp)) return "";   /* questions: the Spanish rendering is shown */
   const base=enVerbGloss(r.root); if(!base) return "";
-  const f=new Set(r.gl||[]), neg=f.has("NEG"), fut=f.has("NRLD"), past=f.has("IPD")||f.has("PLUPERF"), hab=f.has("CF"),
+  const f=new Set(r.gl||[]), neg=f.has("NEG"), fut=f.has("NRLD"), pastM=f.has("IPD")||f.has("PLUPERF"), hab=f.has("CF"),
     prog=f.has("STAT")||f.has("PROG.PERS"), pass=f.has("PASS"), caus=f.has("CAUS")||f.has("TRANS"), refl=f.has("REFL"),
     again=f.has("REST"), back=f.has("RET"), prox=f.has("PROX"), still=f.has("PERSIST"), must=f.has("FORCE"), really=f.has("AFF"),
     imp=/^¡/.test(sp)||f.has("IMP.3"), cond=/^si /.test(sp), report=/^dicen que /.test(sp);
@@ -553,10 +553,9 @@ function enMeaning(r){
   if(caus) v="make "+(obj||"someone")+" "+v;
   if(prog) v="be "+enForm(v,"ing");
   const third=pn==="3", plural=!/^(1sg|3)$/.test(pn), isBe=/^be\b/.test(v), rest=isBe?v.slice(2).trim():"";
-  const adv=still?(neg?"no longer":"still"):hab?(past?"":"usually"):prox?"just":"";
   const N=neg&&!still;   /* "no longer" carries the negation */
-  let vp;
   if(imp){ const head=(N?"do not ":"")+v; return (/^2/.test(pn)?head[0].toUpperCase()+head.slice(1):"Let "+(EN_OBJ[pn]||"him/her")+" "+head)+tail+"!"; }
+  function mkVP(past){ let vp; const adv=still?(neg?"no longer":"still"):hab?(past?"":"usually"):prox?"just":"";
   if(must) vp=(fut?"will have to":past?"had to":third?"has to":"have to").replace(/^(will|had|has|have)/,x=>N?(fut?"will not":past?"did not":third?"does not":"do not")+" have":x)+" "+v;
   else if(fut) vp="will "+(N?"not ":"")+(adv?adv+" ":"")+v;
   else if(hab&&past) vp=(N?"did not use to ":"used to ")+v;
@@ -564,6 +563,10 @@ function enMeaning(r){
   else if(prox&&!N) vp=(past?"had":third?"has":"have")+" just "+enForm(v,"pp");
   else if(N) vp=(past?"did":third?"does":"do")+" not "+(adv?adv+" ":"")+v;
   else vp=(adv?adv+" ":"")+(past?enForm(v,"past"):third?enForm(v,"p3"):v);
+  return vp; }
+  /* no -a- or -fu-: present or past, so both are shown (analyst ruling 2026-11-07: ilay 'he/she does not eat / did not eat') */
+  let vp=mkVP(pastM);
+  if(r.two&&!fut&&!pastM&&!cond){ const vq=mkVP(true); if(vq!==vp) vp+=" / "+vq; }
   let out=sub+" "+vp+tail;
   if(cond) out="if "+out; if(report) out="they say "+out;
   return out[0].toUpperCase()+out.slice(1); }

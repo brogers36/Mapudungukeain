@@ -2532,6 +2532,43 @@ var MEANING = (function(){
     if(ar) st=st.replace(/c$/,'qu').replace(/g$/,'gu').replace(/z$/,'c');
     return st+END[i];
   }
+  /* build137: preterite, for the past half of a tense-unmarked form (analyst ruling 2026-11-07: a finite form with no
+     -a- or -fu- is present or past, so the paraphrase shows both: ilay 'no come / no comió'). */
+  var IRR_PRET={
+    ser:['fui','fuiste','fue','fuimos','fueron'], ir:['fui','fuiste','fue','fuimos','fueron'],
+    dar:['di','diste','dio','dimos','dieron'], ver:['vi','viste','vio','vimos','vieron'],
+    estar:'estuv', tener:'tuv', andar:'anduv', haber:'hub', poder:'pud', poner:'pus', saber:'sup',
+    caber:'cup', querer:'quis', venir:'vin', hacer:'hic', decir:'dij', traer:'traj', conducir:'conduj',
+    producir:'produj', traducir:'traduj', introducir:'introduj', reducir:'reduj' };
+  function strongPret(st, i, j){
+    if(i===2) return st==='hic'?'hizo':st+'o';
+    return st+(['e','iste','o','imos', j?'eron':'ieron'])[i];
+  }
+  function conjPret(inf, p){
+    var b=baseInf(inf), i=PIDX[p]; if(i===undefined) i=2;
+    var pre='', ir=IRR_PRET[b];
+    if(!ir){ for(var k in IRR_PRET){ if(k.length>=4 && b.length>k.length && b.slice(-k.length)===k){ pre=b.slice(0,b.length-k.length); ir=IRR_PRET[k]; b=k; break; } } }
+    if(ir) return pre+(typeof ir==='string' ? strongPret(ir, i, /j$/.test(ir)) : ir[i]);
+    var st=b.slice(0,-2), e=b.slice(-2);
+    if(e==='ar'){
+      var s1=st; if(i===0) s1=st.replace(/c$/,'qu').replace(/g$/,'gu').replace(/z$/,'c');
+      return s1+['é','aste','ó','amos','aron'][i];
+    }
+    if(b==='reír'||b==='sonreír'||b==='freír') return b.slice(0,-4)+['reí','reíste','rió','reímos','rieron'][i];
+    if(e==='ír') e='ir';
+    /* -ir stem change in the 3rd persons: pedir pidió, dormir durmió, sentir sintió */
+    var st3=st;
+    if(e==='ir' && (E_I.test(b)||E_IE.test(b))) st3=st.replace(/e(?=[^e]*$)/,'i');
+    if(e==='ir' && O_UE.test(b)) st3=st.replace(/o(?=[^o]*$)/,'u');
+    /* vowel-final stems: leer leyó, caer cayó, oír oyó, construir construyó */
+    if(/[aeoú]$/.test(st) || (/[^gq]u$/.test(st) && e==='ir')){
+      var v=/[aeo]$/.test(st);
+      if(i===2) return st+'yó'; if(i===4) return st+'yeron';
+      return st+(v?['í','íste','','ímos'][i]:['í','iste','','imos'][i]);
+    }
+    if(i===2) return st3+'ió'; if(i===4) return st3+'ieron';
+    return st+['í','iste','','imos'][i];
+  }
   function conjCond(inf, p){
     var b=baseInf(inf), i=PIDX[p]; if(i===undefined) i=2;
     var st = IRR_COND[b] || b;
@@ -2878,6 +2915,13 @@ var MEANING = (function(){
        (dewma-l-enew 'me lo hace', not 'le me hace') */
     if(io && info.obj && info.obj!=='3' && !passive){ var li=clitics.indexOf('le'); if(li>=0){ clitics.splice(li,1); clitics.push('lo/la'); } }
     var verbs=chain.concat([{inf:lex.inf, comp:lex.comp, lexical:true}]);
+    /* build137: a finite form with no tense marker (no -a-, no -fu-, not imperative or conditional, no perfect) is present
+       or past, so both are given (analyst ruling 2026-11-07). Past is the preterite (amun 'voy / fui'), or the imperfect when
+       the outermost verb is stative or aspectual (suele/solía, está/estaba, sé/sabía). */
+    var twoTense=!info.nonfinite && !fut && !ipd && !info.imper && !info.imper3 && !info.sbjv &&
+                 !verbs.some(function(v){ return v.inf==='haber' && v.link==='part'; });
+    var IMPF_PAST=/^(ser|estar|soler|seguir|andar|tener|saber|conocer|haber|querer|poder|parecer)$/;
+    function buildVP(past){
     var out=[];
     for(var k=0;k<verbs.length;k++){
       var v=verbs[k], form;
@@ -2887,6 +2931,7 @@ var MEANING = (function(){
         else if(info.imper3){ form=conjSubj(v.inf, person); }
         else if(fut && ipd){ form=conjCond(v.inf, person); }
         else if(ipd){ form=conjImpf(v.inf, person); }
+        else if(past) form=(IMPF_PAST.test(baseInf(v.inf)) && v.link!=='part')? conjImpf(v.inf, person) : conjPret(v.inf, person);   /* passive: fue visto */
         else form=conjPres(v.inf, person);
       } else {
         var link=verbs[k-1].link;
@@ -2905,6 +2950,10 @@ var MEANING = (function(){
     if(clitics.length && procl) vp=clitics.join(' ')+' '+vp;
     else if(clitics.length) vp=vp+' ('+clitics.join(', ')+')';
     if(neg) vp=(yaNo?'ya no ':'no ')+vp;
+    return vp;
+    }
+    var vp=buildVP(false);
+    if(twoTense){ var vpPast=buildVP(true); if(vpPast!==vp) vp=vp+' / '+vpPast; }
     var subj=SUBJ_PRON[person];
     var sentence;
     if(info.nonfinite){
@@ -2930,7 +2979,7 @@ var MEANING = (function(){
     if(caveatIpd) caveat.push('-fu- impeditivo: pasado, o acción que no llegó a cumplirse o ya no vale');
     if(!info.nonfinite && !fut && !ipd && sense.verb) caveat.push('sin marca de tiempo: en verbos dinámicos suele leerse como pasado reciente');
     return {ok:true, sense:sense, sentence:sentence.replace(/\s+/g,' ').trim(), steps:steps, notes:info.notes.concat(caveat),
-            person:person, obj:info.obj, inverse:info.inverse};
+            person:person, obj:info.obj, inverse:info.inverse, twoTense:!!(twoTense && vpPast!==undefined)};
   }
 
   /* Leipzig-style gloss line: root sense, then each suffix's gloss code */
