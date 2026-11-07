@@ -425,24 +425,25 @@ const KULTRUN_PIC = {svg:`<svg viewBox="0 0 30 24" width="1.2em" height="1em" ar
 // ===== Verb morphology (rule-generated, indicative 1sg/2sg/3sg) =====
 const PERS = {es:["yo","tú","él/ella"], en:["I","you","she/he"]};
 const VERBS = [
-  {s:"amu",v:1,es:{p:["voy","vas","va"],f:["iré","irás","irá"]},en:["go","goes"]},
-  {s:"i",v:2,es:{p:["como","comes","come"],f:["comeré","comerás","comerá"]},en:["eat","eats"]},
-  {s:"pütoko",v:1,es:{p:["bebo","bebes","bebe"],f:["beberé","beberás","beberá"]},en:["drink","drinks"]},
-  {s:"umawtu",v:1,es:{p:["duermo","duermes","duerme"],f:["dormiré","dormirás","dormirá"]},en:["sleep","sleeps"]},
-  {s:"lef",v:0,es:{p:["corro","corres","corre"],f:["correré","correrás","correrá"]},en:["run","runs"]},
-  {s:"püru",v:1,es:{p:["bailo","bailas","baila"],f:["bailaré","bailarás","bailará"]},en:["dance","dances"]},
-  {s:"dungu",v:1,es:{p:["hablo","hablas","habla"],f:["hablaré","hablarás","hablará"]},en:["speak","speaks"]},
-  {s:"küpa",v:1,es:{p:["vengo","vienes","viene"],f:["vendré","vendrás","vendrá"]},en:["come","comes"]}
+  {s:"amu",v:1,es:{p:["voy","vas","va"],pt:["fui","fuiste","fue"],f:["iré","irás","irá"]},en:["go","goes","went"]},
+  {s:"i",v:2,es:{p:["como","comes","come"],pt:["comí","comiste","comió"],f:["comeré","comerás","comerá"]},en:["eat","eats","ate"]},
+  {s:"pütoko",v:1,es:{p:["bebo","bebes","bebe"],pt:["bebí","bebiste","bebió"],f:["beberé","beberás","beberá"]},en:["drink","drinks","drank"]},
+  {s:"umawtu",v:1,es:{p:["duermo","duermes","duerme"],pt:["dormí","dormiste","durmió"],f:["dormiré","dormirás","dormirá"]},en:["sleep","sleeps","slept"]},
+  {s:"lef",v:0,es:{p:["corro","corres","corre"],pt:["corrí","corriste","corrió"],f:["correré","correrás","correrá"]},en:["run","runs","ran"]},
+  {s:"püru",v:1,es:{p:["bailo","bailas","baila"],pt:["bailé","bailaste","bailó"],f:["bailaré","bailarás","bailará"]},en:["dance","dances","danced"]},
+  {s:"dungu",v:1,es:{p:["hablo","hablas","habla"],pt:["hablé","hablaste","habló"],f:["hablaré","hablarás","hablará"]},en:["speak","speaks","spoke"]},
+  {s:"küpa",v:1,es:{p:["vengo","vienes","viene"],pt:["vine","viniste","vino"],f:["vendré","vendrás","vendrá"]},en:["come","comes","came"]}
 ];
 const SUF = {pres:v=>v?["n","ymi","y"]:["ün","imi","i"], neg:()=>["lan","laymi","lay"], fut:()=>["an","aymi","ay"]};
 // v:2 marks the root i- 'eat' (vowel stem, per the parser lexicon); it conjugates like a vowel stem
+// Without -a- (future) the form is present or past, so pres and neg show both (analyst ruling 2026-11-07: amun 'voy / fui')
 function vform(vb,tense,p){
   const m = vb.s + SUF[tense](vb.v)[p];
   const pe = PERS.es[p], pn = PERS.en[p];
-  const es = tense==="fut" ? `${pe} ${vb.es.f[p]}` : tense==="neg" ? `${pe} no ${vb.es.p[p]}` : `${pe} ${vb.es.p[p]}`;
+  const es = tense==="fut" ? `${pe} ${vb.es.f[p]}` : tense==="neg" ? `${pe} no ${vb.es.p[p]} / no ${vb.es.pt[p]}` : `${pe} ${vb.es.p[p]} / ${vb.es.pt[p]}`;
   const en = tense==="fut" ? `${pn} will ${vb.en[0]}` :
-             tense==="neg" ? (p===2?`${pn} doesn't ${vb.en[0]}`:`${pn} don't ${vb.en[0]}`) :
-             (p===2?`${pn} ${vb.en[1]}`:`${pn} ${vb.en[0]}`);
+             tense==="neg" ? (p===2?`${pn} doesn't / didn't ${vb.en[0]}`:`${pn} don't / didn't ${vb.en[0]}`) :
+             (p===2?`${pn} ${vb.en[1]} / ${vb.en[2]}`:`${pn} ${vb.en[0]} / ${vb.en[2]}`);
   return {m,es,en};
 }
 function genVerbs(tenses,n){
@@ -492,16 +493,16 @@ function genCount(n){
 
 // ===== Expert stage: object -fi-, dual/plural, denominal verbs =====
 const FI = [
-  {s:"pe", es:["lo vi","lo viste","lo vio"], esn:["no lo vi","no lo viste","no lo vio"],
-           en:["I saw it","you saw it","she/he saw it"], enn:["I didn't see it","you didn't see it","she/he didn't see it"]},
-  {s:"kintu", es:["lo busco","lo buscas","lo busca"], esn:["no lo busco","no lo buscas","no lo busca"],
-           en:["I look for it","you look for it","she/he looks for it"], enn:["I don't look for it","you don't look for it","she/he doesn't look for it"]},
-  {s:"leli", es:["lo miro","lo miras","lo mira"], esn:["no lo miro","no lo miras","no lo mira"],
-           en:["I look at it","you look at it","she/he looks at it"], enn:["I don't look at it","you don't look at it","she/he doesn't look at it"]},
-  {s:"ngilla", es:["lo compré","lo compraste","lo compró"], esn:["no lo compré","no lo compraste","no lo compró"],
-           en:["I bought it","you bought it","she/he bought it"], enn:["I didn't buy it","you didn't buy it","she/he didn't buy it"]},
-  {s:"kim", es:["lo sé","lo sabes","lo sabe"], esn:["no lo sé","no lo sabes","no lo sabe"],
-           en:["I know it","you know it","she/he knows it"], enn:["I don't know it","you don't know it","she/he doesn't know it"]}
+  {s:"pe", es:["lo veo / lo vi","lo ves / lo viste","lo ve / lo vio"], esn:["no lo veo / no lo vi","no lo ves / no lo viste","no lo ve / no lo vio"],
+           en:["I see / saw it","you see / saw it","she/he sees / saw it"], enn:["I don't / didn't see it","you don't / didn't see it","she/he doesn't / didn't see it"]},
+  {s:"kintu", es:["lo busco / lo busqué","lo buscas / lo buscaste","lo busca / lo buscó"], esn:["no lo busco / no lo busqué","no lo buscas / no lo buscaste","no lo busca / no lo buscó"],
+           en:["I look / looked for it","you look / looked for it","she/he looks / looked for it"], enn:["I don't / didn't look for it","you don't / didn't look for it","she/he doesn't / didn't look for it"]},
+  {s:"leli", es:["lo miro / lo miré","lo miras / lo miraste","lo mira / lo miró"], esn:["no lo miro / no lo miré","no lo miras / no lo miraste","no lo mira / no lo miró"],
+           en:["I look / looked at it","you look / looked at it","she/he looks / looked at it"], enn:["I don't / didn't look at it","you don't / didn't look at it","she/he doesn't / didn't look at it"]},
+  {s:"ngilla", es:["lo compro / lo compré","lo compras / lo compraste","lo compra / lo compró"], esn:["no lo compro / no lo compré","no lo compras / no lo compraste","no lo compra / no lo compró"],
+           en:["I buy / bought it","you buy / bought it","she/he buys / bought it"], enn:["I don't / didn't buy it","you don't / didn't buy it","she/he doesn't / didn't buy it"]},
+  {s:"kim", es:["lo sé / lo sabía","lo sabes / lo sabías","lo sabe / lo sabía"], esn:["no lo sé / no lo sabía","no lo sabes / no lo sabías","no lo sabe / no lo sabía"],
+           en:["I know / knew it","you know / knew it","she/he knows / knew it"], enn:["I don't / didn't know it","you don't / didn't know it","she/he doesn't / didn't know it"]}
 ];
 function fiForm(vb,neg,p){return {m:vb.s+(neg?"la":"")+"fi"+["ñ","mi",""][p], es:(neg?vb.esn:vb.es)[p], en:(neg?vb.enn:vb.en)[p]}}
 function genFi(n,negs=[false,true]){
@@ -520,9 +521,9 @@ function genFi(n,negs=[false,true]){
 const PL_SUF=["yu","iñ","ymu","ymün","yngu","yngün"];
 const PL_PRON={es:["nosotros dos","nosotros","ustedes dos","ustedes","ellos dos","ellos"],en:["we two","we","you two","you all","they two","they"]};
 const PL_VERBS=[
-  {s:"amu",es:["vamos","van"],en:"go"},{s:"küpa",es:["venimos","vienen"],en:"come"},
-  {s:"dungu",es:["hablamos","hablan"],en:"speak"},{s:"pütoko",es:["bebemos","beben"],en:"drink"},
-  {s:"umawtu",es:["dormimos","duermen"],en:"sleep"},{s:"püru",es:["bailamos","bailan"],en:"dance"}
+  {s:"amu",es:["vamos / fuimos","van / fueron"],en:"go / went"},{s:"küpa",es:["venimos / vinimos","vienen / vinieron"],en:"come / came"},
+  {s:"dungu",es:["hablamos","hablan / hablaron"],en:"speak / spoke"},{s:"pütoko",es:["bebemos / bebimos","beben / bebieron"],en:"drink / drank"},
+  {s:"umawtu",es:["dormimos","duermen / durmieron"],en:"sleep / slept"},{s:"püru",es:["bailamos","bailan / bailaron"],en:"dance / danced"}
 ];
 function plForm(vb,i){return {m:vb.s+PL_SUF[i], es:`${PL_PRON.es[i]} ${vb.es[i<2?0:1]}`, en:`${PL_PRON.en[i]} ${vb.en}`}}
 function genPl(n){
@@ -569,8 +570,8 @@ const ASP_VERBS=[
 ];
 function aspForm(vb,a,p){
   const m=vb.s+a+["n","ymi","y"][p];
-  if(a==="ke") return {m,es:`${["suelo","sueles","suele"][p]} ${vb.es[0]}`,en:`${["I usually","you usually","she/he usually"][p]} ${vb.en[0]}`};
-  return {m,es:`${["estoy","estás","está"][p]} ${vb.es[1]}`,en:`${["I am","you are","she/he is"][p]} ${vb.en[1]}`};
+  if(a==="ke") return {m,es:`${["suelo / solía","sueles / solías","suele / solía"][p]} ${vb.es[0]}`,en:`${["I usually","you usually","she/he usually"][p]} ${vb.en[0]} / used to ${vb.en[0]}`};
+  return {m,es:`${["estoy / estaba","estás / estabas","está / estaba"][p]} ${vb.es[1]}`,en:`${["I am / was","you are / were","she/he is / was"][p]} ${vb.en[1]}`};
 }
 function genAsp(a,n){
   const out=[],seen=new Set(), other=a==="ke"?"le":"ke";
@@ -591,8 +592,8 @@ const AM_VERBS=[
 ];
 function amForm(vb,d,p){
   const m=vb.s+d+["n","ymi","y"][p];
-  const es = d==="me" ? `${["fui","fuiste","fue"][p]} a ${vb.es}` : `${["vine","viniste","vino"][p]} a ${vb.es}`;
-  const en = `${["I","you","she/he"][p]} ${d==="me"?"went":"came"} to ${vb.en}`;
+  const es = d==="me" ? `${["voy / fui","vas / fuiste","va / fue"][p]} a ${vb.es}` : `${["vengo / vine","vienes / viniste","viene / vino"][p]} a ${vb.es}`;
+  const en = `${["I","you","she/he"][p]} ${d==="me"?(p===2?"goes / went":"go / went"):(p===2?"comes / came":"come / came")} to ${vb.en}`;
   return {m,es,en};
 }
 function genAm(n){
@@ -611,17 +612,17 @@ function genAm(n){
 // ===== Reportative / mirative -(ü)rke- (all forms attested in AVENUE) =====
 const RKE_G={
   "mülerkefuy":["había (dicen)","there was (they say)"],"mülefuy":["había","there was"],"mülekefuy":["solía haber","there used to be"],
-  "mülerkey":["dicen que hay","they say there is"],"müley":["hay","there is"],"mülekey":["suele haber","there usually is"],
+  "mülerkey":["dicen que hay / había","they say there is / was"],"müley":["hay / había","there is / was"],"mülekey":["suele / solía haber","there usually is / there used to be"],
   "nierkefuy":["dicen que tenía","they say she/he had"],"niefuy":["tenía","she/he had"],"niekefuy":["solía tener","she/he used to have"],
-  "nierkey":["dicen que tiene","they say she/he has"],"niey":["tiene","she/he has"],"niekey":["suele tener","she/he usually has"],
-  "nierkeymi":["resulta que tienes","it turns out you have"],"nieymi":["tienes","you have"],
-  "kimürkey":["dicen que sabe","they say she/he knows"],"kimi":["sabe","she/he knows"],"kimkey":["suele saber","she/he usually knows"],"kimürkefuy":["dicen que sabía","they say she/he knew"],
-  "femürkey":["dicen que lo hizo así","they say she/he did it that way"],"femi":["lo hizo así","she/he did it that way"],"femkey":["suele hacerlo así","she/he usually does it that way"],
-  "femürken":["resulta que lo hice así","it turns out I did it that way"],
-  "konürkey":["dicen que entró","they say she/he went in"],"koni":["entró","she/he went in"],"konkey":["suele entrar","she/he usually goes in"],
-  "kümerkey":["resulta que es bueno","it turns out it is good"],"kümey":["es bueno","it is good"],"kümekey":["suele ser bueno","it is usually good"],"kümerkelay":["resulta que no es bueno","it turns out it is not good"],
-  "küparkey":["dicen que vino","they say she/he came"],"küpay":["vino","she/he came"],"küpakey":["suele venir","she/he usually comes"],
-  "pirkey":["dicen que dijo","they say she/he said"],"piy":["dijo","she/he said"],"pikey":["suele decir","she/he usually says"]
+  "nierkey":["dicen que tiene / tenía","they say she/he has / had"],"niey":["tiene / tenía","she/he has / had"],"niekey":["suele / solía tener","she/he usually has / used to have"],
+  "nierkeymi":["resulta que tienes / tenías","it turns out you have / had"],"nieymi":["tienes / tenías","you have / had"],
+  "kimürkey":["dicen que sabe / sabía","they say she/he knows / knew"],"kimi":["sabe / sabía","she/he knows / knew"],"kimkey":["suele / solía saber","she/he usually knows / used to know"],"kimürkefuy":["dicen que sabía","they say she/he knew"],
+  "femürkey":["dicen que lo hace / lo hizo así","they say she/he does / did it that way"],"femi":["lo hace / lo hizo así","she/he does / did it that way"],"femkey":["suele / solía hacerlo así","she/he usually does / used to do it that way"],
+  "femürken":["resulta que lo hago / lo hice así","it turns out I do / did it that way"],
+  "konürkey":["dicen que entra / entró","they say she/he goes / went in"],"koni":["entra / entró","she/he goes / went in"],"konkey":["suele / solía entrar","she/he usually goes / used to go in"],
+  "kümerkey":["resulta que es / era bueno","it turns out it is / was good"],"kümey":["es bueno / era bueno","it is / was good"],"kümekey":["suele / solía ser bueno","it is usually / used to be good"],"kümerkelay":["resulta que no es / no era bueno","it turns out it is / was not good"],
+  "küparkey":["dicen que viene / vino","they say she/he comes / came"],"küpay":["viene / vino","she/he comes / came"],"küpakey":["suele / solía venir","she/he usually comes / used to come"],
+  "pirkey":["dicen que dice / dijo","they say she/he says / said"],"piy":["dice / dijo","she/he says / said"],"pikey":["suele / solía decir","she/he usually says / used to say"]
 };
 const RKE=[
   {m:"mülerkefuy",d:["mülefuy","mülekefuy","mülerkey"]},{m:"nierkefuy",d:["niefuy","niekefuy","nierkey"]},
@@ -691,14 +692,14 @@ const AEL_G={
   "Fey ta mi chillkatuael":["Esto es para que estudies","This is so you can study"],
   "Fey ta ñi chillkatuael":["Esto es para que yo estudie (o: para que él/ella estudie)","This is so I can study (or: so she/he can study)"],
   "Fey ta mi chillkatukeel":["Esto es lo que estudias","This is what you study"],
-  "Müley mi amuael":["Tienes que ir","You have to go"],
-  "Müley ñi amuael":["Tengo que ir (o: tiene que ir)","I have to go (or: she/he has to go)"],
-  "Ayün mi küpayael":["Quiero que vengas","I want you to come"],
-  "Ayün ñi küpayael":["Quiero venir (o: quiero que venga él/ella)","I want to come (or: I want her/him to come)"],
+  "Müley mi amuael":["Tienes / Tenías que ir","You have / had to go"],
+  "Müley ñi amuael":["Tengo / Tenía que ir (o: tiene / tenía que ir)","I have / had to go (or: she/he has / had to go)"],
+  "Ayün mi küpayael":["Quiero que vengas / Quería que vinieras","I want / wanted you to come"],
+  "Ayün ñi küpayael":["Quiero / Quería venir (o: quiero que venga / quería que viniera él/ella)","I want / wanted to come (or: I want / wanted her/him to come)"],
   "Tüfa mi iyael":["Esta es tu comida (lo que vas a comer)","This is your food (what you will eat)"],
   "Tüfa ñi iyael":["Esta es mi comida (o: su comida)","This is my food (or: her/his food)"],
-  "Elufiñ kofke ñi iyael":["Le di pan para que comiera","I gave her/him bread to eat"],
-  "Pifiñ ñi küpayael":["Le dije que viniera","I told her/him to come"]
+  "Elufiñ kofke ñi iyael":["Le doy pan para que coma / Le di pan para que comiera","I give / gave her/him bread to eat"],
+  "Pifiñ ñi küpayael":["Le digo que venga / Le dije que viniera","I tell / told her/him to come"]
 };
 const AEL=[
   {m:"Fey ta mi chillkatuael",d:["Fey ta ñi chillkatuael","Fey ta mi chillkatukeel","Ayün mi küpayael"]},
@@ -717,19 +718,19 @@ function genAel(n){ return shuffle(AEL).slice(0,n).map(r=>({...aelForm(r.m),dist
 
 // ===== Verbalization: how non-verbal words become verbs (Kimche). Target forms attested in AVENUE except where noted =====
 const VERBAL=[
-  {b:"küme",c:{es:"adjetivo",en:"adjective"},m:"kümey",es:"es bueno",en:"it is good",d:["kümetuy","kümewi","kümen"]},
-  {b:"pichi",c:{es:"adjetivo",en:"adjective"},m:"pichiy",es:"es pequeño",en:"it is small",d:["pichituy","pichiwi","pichin"]},
-  {b:"machi",c:{es:"sustantivo",en:"noun"},m:"machingen",es:"soy machi",en:"I am a machi",d:["machiwün","machin","machiy"]},
-  {b:"mapuche",c:{es:"sustantivo",en:"noun"},m:"mapuchengen",es:"soy mapuche",en:"I am Mapuche",d:["mapuchetun","mapuchewün","mapuchen"]},
-  {b:"wentru",c:{es:"sustantivo",en:"noun"},m:"wentrungey",es:"es hombre",en:"he is a man",d:["wentrutuy","wentruwi","wentruy"]},
+  {b:"küme",c:{es:"adjetivo",en:"adjective"},m:"kümey",es:"es bueno / era bueno",en:"it is / was good",d:["kümetuy","kümewi","kümen"]},
+  {b:"pichi",c:{es:"adjetivo",en:"adjective"},m:"pichiy",es:"es pequeño / era pequeño",en:"it is / was small",d:["pichituy","pichiwi","pichin"]},
+  {b:"machi",c:{es:"sustantivo",en:"noun"},m:"machingen",es:"soy machi / era machi",en:"I am / was a machi",d:["machiwün","machin","machiy"]},
+  {b:"mapuche",c:{es:"sustantivo",en:"noun"},m:"mapuchengen",es:"soy mapuche / era mapuche",en:"I am / was Mapuche",d:["mapuchetun","mapuchewün","mapuchen"]},
+  {b:"wentru",c:{es:"sustantivo",en:"noun"},m:"wentrungey",es:"es hombre / era hombre",en:"he is / was a man",d:["wentrutuy","wentruwi","wentruy"]},
   {b:"ilo",c:{es:"sustantivo",en:"noun"},m:"ilotun",es:"comer carne",en:"to eat meat",d:["ilongen","ilowün","iloy"]},
   {b:"lawen",c:{es:"sustantivo",en:"noun"},m:"lawentun",es:"curar o curarse con remedios",en:"to treat (oneself) with medicine",d:["lawengen","lawenün","lawenwün"]},
   {b:"kawellu",c:{es:"sustantivo",en:"noun"},m:"kawellutun",es:"andar a caballo",en:"to ride a horse",d:["kawellungen","kawelluwün","kawellun"]},
   {b:"ruka",c:{es:"sustantivo",en:"noun"},m:"rukan",es:"hacer una casa",en:"to build a house",d:["rukangen","rukawün","rukay"]},
   {b:"kiñe",c:{es:"número",en:"numeral"},m:"kiñewün",es:"unirse, juntarse",en:"to come together, unite",d:["kiñengen","kiñetun","kiñen"]},
   {b:"chum",c:{es:"palabra de pregunta",en:"question word"},m:"chumleymi?",es:"¿cómo estás?",en:"how are you?",d:["chumtuymi?","chumwimi?","chumymi?"]},
-  {b:"pasa- (pasar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"pasay",es:"pasó",en:"it passed, she/he passed",d:["pasangey","pasatuy","pasawi"]},
-  {b:"kampia- (cambiar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"kampiay",es:"cambió",en:"it changed, she/he changed",d:["kampiangey","kampiatuy","kampiawi"]}
+  {b:"pasa- (pasar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"pasay",es:"pasa / pasó",en:"it passes / passed, she/he passes / passed",d:["pasangey","pasatuy","pasawi"]},
+  {b:"kampia- (cambiar)",c:{es:"préstamo del español",en:"Spanish loan"},m:"kampiay",es:"cambia / cambió",en:"it changes / changed, she/he changes / changed",d:["kampiangey","kampiatuy","kampiawi"]}
 ];
 function verbalForm(v){
   return {m:v.m,es:v.es,en:v.en,oneWay:true,
@@ -756,36 +757,36 @@ const GRAM={
      ["pu pichikeche",["pichikeche","pu che","füchake che"]],["pichikeche",["pu pichikeche","füchake che","kümeke che"]],["füchake che",["pichikeche","kümeke che","pu che"]],
      ["kümeke che",["kiñeke che","füchake che","pu che"]],["kiñeke che",["kümeke che","pu che","che"]],["wedake dungu",["fütake ruka","kümeke che","kiñeke che"]],["fütake ruka",["wedake dungu","kümeke che","pu che"]]]},
  kilno:{G:{
-   "amukilnge":["¡no vayas!","don't go!"],"amunge":["¡ve!","go!"],"amulaymi":["no fuiste","you didn't go"],"amunolu":["el que no va","the one who doesn't go"],
-   "femkilnge":["¡no lo hagas!","don't do it!"],"femnge":["¡hazlo!","do it!"],"femlay":["no lo hizo","she/he didn't do it"],"femnolu":["el que no lo hizo","the one who didn't do it"],
+   "amukilnge":["¡no vayas!","don't go!"],"amunge":["¡ve!","go!"],"amulaymi":["no vas / no fuiste","you don't / didn't go"],"amunolu":["el que no va","the one who doesn't go"],
+   "femkilnge":["¡no lo hagas!","don't do it!"],"femnge":["¡hazlo!","do it!"],"femlay":["no lo hace / no lo hizo","she/he doesn't / didn't do it"],"femnolu":["el que no lo hizo","the one who didn't do it"],
    "amukilpe":["¡que no vaya!","may she/he not go!"],"amupe":["¡que vaya!","let her/him go!"],
-   "konkilpe":["¡que no entre!","may she/he not come in!"],"konpe":["¡que entre!","let her/him come in!"],"konlay":["no entró","she/he didn't come in"],
-   "kimnolu":["el que no sabe","the one who doesn't know"],"kimlu":["el que sabe","the one who knows"],"kimlay":["no sabe","she/he doesn't know"],
+   "konkilpe":["¡que no entre!","may she/he not come in!"],"konpe":["¡que entre!","let her/him come in!"],"konlay":["no entra / no entró","she/he doesn't / didn't come in"],
+   "kimnolu":["el que no sabe","the one who doesn't know"],"kimlu":["el que sabe","the one who knows"],"kimlay":["no sabe / no sabía","she/he doesn't / didn't know"],
    "kimnole":["si no sabe","if she/he doesn't know"],"kimle":["si sabe","if she/he knows"],
    "nienolu":["el que no tiene","the one who has none"],"nielu":["el que tiene","the one who has"],"nienole":["si no tiene","if she/he doesn't have"],
-   "penole":["si no ve","if she/he doesn't see"],"pele":["si ve","if she/he sees"],"pelay":["no ve","she/he doesn't see"],"penolu":["el que no ve","the one who doesn't see"],
-   "akunolu":["el que no llegó","the one who didn't arrive"],"akulu":["el que llegó","the one who arrived"],"akulay":["no llegó","she/he didn't arrive"],
+   "penole":["si no ve","if she/he doesn't see"],"pele":["si ve","if she/he sees"],"pelay":["no ve / no vio","she/he doesn't / didn't see"],"penolu":["el que no ve","the one who doesn't see"],
+   "akunolu":["el que no llegó","the one who didn't arrive"],"akulu":["el que llegó","the one who arrived"],"akulay":["no llega / no llegó","she/he doesn't / didn't arrive"],
    "kimnofiel":["lo que no sabía","what she/he didn't know"],"kimfiel":["lo que sabía","what she/he knew"]},
   L:[["amukilnge",["amunge","amulaymi","amunolu"]],["femkilnge",["femnge","femlay","femnolu"]],["amukilpe",["amupe","amukilnge","amulaymi"]],["konkilpe",["konpe","konlay","amukilpe"]],
      ["kimnolu",["kimlu","kimlay","kimnole"]],["kimnole",["kimle","kimnolu","kimlay"]],["nienolu",["nielu","nienole","kimnolu"]],["penole",["pele","penolu","pelay"]],
      ["akunolu",["akulu","akulay","amunolu"]],["kimnofiel",["kimfiel","kimnolu","kimlay"]]]},
  nma:{G:{
-   "nentuñmangen":["me lo sacaron (a mí)","they took it out of me / from me"],"nentungen":["me sacaron (a mí)","they took me out"],
-   "nentuñmafiñ":["se lo saqué (a él o ella)*","I took it from her/him*"],"nentufiñ":["lo saqué","I took it out"],
-   "entuñmangi":["se lo sacaron (a él o ella)","they took it from her/him"],"entungi":["lo sacaron","it was taken out"],"entuy":["lo sacó","she/he took it out"],
-   "kimüñmalafiñ":["no le sé (algo suyo, p. ej. el nombre)","I don't know her/his (e.g. name)"],"kimlafiñ":["no lo sé","I don't know it"],
-   "kimüñmafiñ":["le sé (algo suyo)*","I know her/his (something)*"],"kimlan":["no sé","I don't know"],
-   "peñmangelay":["no se le ve (algo suyo)","her/his (thing) can't be seen"],"pengelay":["no se ve","it can't be seen"],"peñmafiñ":["le vi (algo suyo)*","I saw her/his (thing)*"],"pelay":["no vio","she/he didn't see"],
-   "ngillatuñmangi":["rogaron por él o ella","they prayed for her/him"],"ngillatungi":["se hizo rogativa","a prayer was held"],"ngillatuy":["hizo rogativa","she/he prayed"],
-   "ngillañmafiñ":["se lo compré (a él o ella)*","I bought it from her/him*"],"ngillafiñ":["lo compré","I bought it"],"ngillay":["compró","she/he bought"]},
+   "nentuñmangen":["me lo sacan / me lo sacaron (a mí)","they take / took it out of me, from me"],"nentungen":["me sacan / me sacaron (a mí)","they take / took me out"],
+   "nentuñmafiñ":["se lo saco / se lo saqué (a él o ella)*","I take / took it from her/him*"],"nentufiñ":["lo saco / lo saqué","I take / took it out"],
+   "entuñmangi":["se lo sacan / se lo sacaron (a él o ella)","they take / took it from her/him"],"entungi":["lo sacan / lo sacaron","it is / was taken out"],"entuy":["lo saca / lo sacó","she/he takes / took it out"],
+   "kimüñmalafiñ":["no le sé / no le sabía (algo suyo, p. ej. el nombre)","I don't / didn't know her/his (e.g. name)"],"kimlafiñ":["no lo sé / no lo sabía","I don't / didn't know it"],
+   "kimüñmafiñ":["le sé / le sabía (algo suyo)*","I know / knew her/his (something)*"],"kimlan":["no sé / no sabía","I don't / didn't know"],
+   "peñmangelay":["no se le ve / no se le vio (algo suyo)","her/his (thing) can't / couldn't be seen"],"pengelay":["no se ve / no se vio","it can't / couldn't be seen"],"peñmafiñ":["le veo / le vi (algo suyo)*","I see / saw her/his (thing)*"],"pelay":["no ve / no vio","she/he doesn't / didn't see"],
+   "ngillatuñmangi":["ruegan / rogaron por él o ella","they pray / prayed for her/him"],"ngillatungi":["se hace / se hizo rogativa","a prayer is / was held"],"ngillatuy":["hace / hizo rogativa","she/he prays / prayed"],
+   "ngillañmafiñ":["se lo compro / se lo compré (a él o ella)*","I buy / bought it from her/him*"],"ngillafiñ":["lo compro / lo compré","I buy / bought it"],"ngillay":["compra / compró","she/he buys / bought"]},
   L:[["nentuñmangen",["nentungen","nentuñmafiñ","nentufiñ"]],["entuñmangi",["entungi","entuy","nentuñmangen"]],["kimüñmalafiñ",["kimlafiñ","kimüñmafiñ","kimlan"]],
      ["peñmangelay",["pengelay","peñmafiñ","pelay"]],["ngillatuñmangi",["ngillatungi","ngillatuy","ngillañmafiñ"]],["ngillañmafiñ",["ngillafiñ","ngillay","ngillatuñmangi"]]]},
  kantu:{G:{
-   "kutranfaluwi":["se hace el enfermo","she/he pretends to be sick"],"kutrani":["está enfermo","she/he is sick"],"kutrankantuy":["juega a estar enfermo*","she/he plays at being sick*"],
-   "kimfaluwi":["se hace el que sabe","she/he pretends to know"],"kimi":["sabe","she/he knows"],"kimlay":["no sabe","she/he doesn't know"],
-   "umawtufaluwi":["se hace el dormido*","she/he pretends to sleep*"],"umawtuy":["duerme","she/he sleeps"],"umawtukantuy":["juega a dormir*","she/he plays at sleeping*"],
-   "feypikantuy":["lo dijo en broma","she/he said it as a joke"],"feypiy":["lo dijo","she/he said it"],"feypifaluwi":["fingió decirlo*","she/he pretended to say it*"],
-   "kütralkantuy":["juega a hacer fuego","she/he plays at making a fire"],"awkantuy":["juega","she/he plays"]},
+   "kutranfaluwi":["se hace / se hizo el enfermo","she/he pretends / pretended to be sick"],"kutrani":["está / estaba enfermo","she/he is / was sick"],"kutrankantuy":["juega / jugó a estar enfermo*","she/he plays / played at being sick*"],
+   "kimfaluwi":["se hace / se hizo el que sabe","she/he pretends / pretended to know"],"kimi":["sabe / sabía","she/he knows / knew"],"kimlay":["no sabe / no sabía","she/he doesn't / didn't know"],
+   "umawtufaluwi":["se hace / se hizo el dormido*","she/he pretends / pretended to sleep*"],"umawtuy":["duerme / durmió","she/he sleeps / slept"],"umawtukantuy":["juega / jugó a dormir*","she/he plays / played at sleeping*"],
+   "feypikantuy":["lo dice / lo dijo en broma","she/he says / said it as a joke"],"feypiy":["lo dice / lo dijo","she/he says / said it"],"feypifaluwi":["finge / fingió decirlo*","she/he pretends / pretended to say it*"],
+   "kütralkantuy":["juega / jugó a hacer fuego","she/he plays / played at making a fire"],"awkantuy":["juega / jugó","she/he plays / played"]},
   L:[["kutranfaluwi",["kutrani","kutrankantuy","kimfaluwi"]],["kimfaluwi",["kimi","kimlay","kutranfaluwi"]],["umawtufaluwi",["umawtuy","umawtukantuy","kutranfaluwi"]],
      ["feypikantuy",["feypiy","feypifaluwi","awkantuy"]],["kütralkantuy",["awkantuy","umawtukantuy","feypikantuy"]],["kutrankantuy",["kutranfaluwi","kutrani","awkantuy"]],["awkantuy",["kütralkantuy","umawtuy","feypikantuy"]]]}
 };
@@ -809,12 +810,12 @@ Object.assign(GRAM,{
      ["witrapüran",["witran","anüpüran","anünagün"]],["pürakintun",["inakintun","kintun","witrapüran"]],["inakintun",["pürakintun","kintun","trekatripan"]],
      ["llowdungun",["dungun","elkünun","inakintun"]],["elkünun",["llowdungun","anünagün","lefkonün"]]]},
  redup:{G:{
-   "ngümay":["lloró","she/he cried"],"ngümakefuy":["lloraba (de costumbre)","she/he used to cry"],"ngümangümangi":["lloraba y lloraba","she/he cried and cried"],
-   "tripay":["salió","it came out"],"tripatripangi":["sale y sale, a cada rato","it keeps coming out"],
-   "amuy":["fue","she/he went"],"amukey":["va (de costumbre)","she/he goes (habitually)"],"amuamungi":["sigue yendo","she/he keeps going"],
-   "piy":["dijo","she/he said"],"pipiyefiñ":["le estuve diciendo y diciendo","I kept telling her/him"],
-   "dunguy":["habló","she/he spoke"],"dungudunguy":["es hablador (habla y habla)","she/he is a chatterbox (talks and talks)"],
-   "trüntrüni":["tirita","she/he shivers"],"poypoyi":["se hinchó","it swelled up"],"wedwedngi":["es loco, imprudente","she/he is reckless, crazy"]},
+   "ngümay":["llora / lloró","she/he cries / cried"],"ngümakefuy":["lloraba (de costumbre)","she/he used to cry"],"ngümangümangi":["llora y llora / lloraba y lloraba","she/he cries and cries / cried and cried"],
+   "tripay":["sale / salió","it comes / came out"],"tripatripangi":["sale y sale / salía y salía, a cada rato","it keeps / kept coming out"],
+   "amuy":["va / fue","she/he goes / went"],"amukey":["va / iba (de costumbre)","she/he goes / went (habitually)"],"amuamungi":["sigue / seguía yendo","she/he keeps / kept going"],
+   "piy":["dice / dijo","she/he says / said"],"pipiyefiñ":["le estoy / estuve diciendo y diciendo","I keep / kept telling her/him"],
+   "dunguy":["habla / habló","she/he speaks / spoke"],"dungudunguy":["es / era hablador (habla y habla)","she/he is / was a chatterbox (talks and talks)"],
+   "trüntrüni":["tirita / tiritó","she/he shivers / shivered"],"poypoyi":["se hincha / se hinchó","it swells / swelled up"],"wedwedngi":["es / era loco, imprudente","she/he is / was reckless, crazy"]},
   L:[["ngümangümangi",["ngümay","ngümakefuy","tripatripangi"]],["ngümay",["ngümangümangi","ngümakefuy","amuy"]],["ngümakefuy",["ngümangümangi","ngümay","amukey"]],
      ["tripatripangi",["tripay","amuamungi","ngümangümangi"]],["amuamungi",["amuy","amukey","tripatripangi"]],["amukey",["amuamungi","amuy","ngümakefuy"]],
      ["pipiyefiñ",["piy","dungudunguy","amuamungi"]],["dungudunguy",["dunguy","pipiyefiñ","ngümangümangi"]],
@@ -825,32 +826,32 @@ Object.assign(GRAM,{
 // All forms attested in AVENUE (types.json counts); elürpuy normalizes AVENUE elurpuy.
 Object.assign(GRAM,{
  pu:{G:{
-   "konpuy":["entró allá","she/he went in (over there)"],"konpay":["entró (hacia acá)","she/he came in (toward here)"],"konmey":["fue a entrar","she/he went to go in"],
-   "tripapuy":["salió allá","she/he came out (over there)"],"tripapay":["salió (hacia acá), se asomó","she/he came out (toward here)"],
-   "pepufiñ":["llegué a verlo (allá)","I got to see her/him (there)"],"pemefiñ":["fui a verlo","I went to see her/him"],"pepay":["vino a ver","she/he came to see"],
-   "mülepuy":["está allá","she/he is over there"],"müley":["hay, está","there is; she/he is"],
+   "konpuy":["entra / entró allá","she/he goes / went in (over there)"],"konpay":["entra / entró (hacia acá)","she/he comes / came in (toward here)"],"konmey":["va / fue a entrar","she/he goes / went to go in"],
+   "tripapuy":["sale / salió allá","she/he comes / came out (over there)"],"tripapay":["sale / salió (hacia acá), se asoma / se asomó","she/he comes / came out (toward here)"],
+   "pepufiñ":["llego / llegué a verlo (allá)","I get / got to see her/him (there)"],"pemefiñ":["voy / fui a verlo","I go / went to see her/him"],"pepay":["viene / vino a ver","she/he comes / came to see"],
+   "mülepuy":["está / estaba allá","she/he is / was over there"],"müley":["hay / había, está / estaba","there is / was; she/he is / was"],
    "fentepuay":["hasta aquí llega (así terminan los relatos)","this is where it ends (how stories close)"],
-   "dungupuy":["habló allá","she/he spoke (over there)"],"dunguy":["habló","she/he spoke"]},
+   "dungupuy":["habla / habló allá","she/he speaks / spoke (over there)"],"dunguy":["habla / habló","she/he speaks / spoke"]},
   L:[["konpuy",["konpay","konmey","tripapuy"]],["konpay",["konpuy","konmey","tripapay"]],["tripapuy",["tripapay","konpuy","mülepuy"]],
      ["tripapay",["tripapuy","konpay","pepay"]],["pepufiñ",["pemefiñ","pepay","tripapuy"]],["pemefiñ",["pepufiñ","pepay","konmey"]],
      ["mülepuy",["müley","konpuy","fentepuay"]],["fentepuay",["mülepuy","tripapuy","dungupuy"]],["dungupuy",["dunguy","mülepuy","pepay"]]]},
  kiaw:{G:{
-   "miawi":["anda","she/he goes about"],
-   "trekayawi":["anda caminando, pasea","she/he walks around"],"trekay":["caminó","she/he walked"],
-   "lefkiawi":["anda corriendo","she/he runs around"],"lefi":["corrió","she/he ran"],
-   "küdawkiawi":["anda trabajando","she/he goes about working"],"küdawi":["trabajó","she/he worked"],
-   "dunguyawi":["anda hablando","she/he goes around talking"],"dunguy":["habló","she/he spoke"],
-   "kintuyawi":["anda buscando","she/he goes around looking"],"kintuy":["buscó","she/he looked for it"],
-   "femiawi":["anda así","she/he goes about like that"],"femi":["así es, así lo hizo","that's how it is; she/he did so"]},
+   "miawi":["anda / andaba","she/he goes / went about"],
+   "trekayawi":["anda / andaba caminando, pasea / paseaba","she/he walks / walked around"],"trekay":["camina / caminó","she/he walks / walked"],
+   "lefkiawi":["anda / andaba corriendo","she/he runs / ran around"],"lefi":["corre / corrió","she/he runs / ran"],
+   "küdawkiawi":["anda / andaba trabajando","she/he goes / went about working"],"küdawi":["trabaja / trabajó","she/he works / worked"],
+   "dunguyawi":["anda / andaba hablando","she/he goes / went around talking"],"dunguy":["habla / habló","she/he speaks / spoke"],
+   "kintuyawi":["anda / andaba buscando","she/he goes / went around looking"],"kintuy":["busca / buscó","she/he looks / looked for it"],
+   "femiawi":["anda / andaba así","she/he goes / went about like that"],"femi":["así es / era, así lo hace / lo hizo","that's how it is / was; she/he does / did so"]},
   L:[["trekayawi",["trekay","lefkiawi","miawi"]],["trekay",["trekayawi","lefi","küdawi"]],["lefkiawi",["lefi","trekayawi","küdawkiawi"]],
      ["lefi",["lefkiawi","trekay","femi"]],["küdawkiawi",["küdawi","dunguyawi","lefkiawi"]],["dunguyawi",["dunguy","küdawkiawi","kintuyawi"]],
      ["kintuyawi",["kintuy","trekayawi","dunguyawi"]],["femiawi",["femi","miawi","trekayawi"]],["miawi",["femiawi","trekayawi","trekay"]]]},
  rpu:{G:{
-   "yerpay":["pasó a buscar (de camino hacia acá)","she/he stopped by to pick up (on the way here)"],"yepay":["vino a buscar","she/he came to fetch"],"yemey":["fue a buscar","she/he went to fetch"],
-   "elürpay":["vino a dejar de paso","she/he dropped it off on the way here"],"elpay":["vino a dejar","she/he came to leave it"],"elürpuy":["lo dejó de paso (yendo)","she/he left it on the way there"],
-   "felerpuy":["resultó así, quedó así","it turned out that way"],"feley":["así es","that's how it is"],
-   "amulerpuy":["siguió avanzando","it kept advancing"],"amuley":["va, avanza","it is going, advancing"],
-   "machingerpun":["llegué a ser machi","I ended up becoming a machi"],"machingen":["soy machi","I am a machi"],
+   "yerpay":["pasa / pasó a buscar (de camino hacia acá)","she/he stops / stopped by to pick up (on the way here)"],"yepay":["viene / vino a buscar","she/he comes / came to fetch"],"yemey":["va / fue a buscar","she/he goes / went to fetch"],
+   "elürpay":["viene / vino a dejar de paso","she/he drops / dropped it off on the way here"],"elpay":["viene / vino a dejar","she/he comes / came to leave it"],"elürpuy":["lo deja / lo dejó de paso (yendo)","she/he leaves / left it on the way there"],
+   "felerpuy":["resulta / resultó así, queda / quedó así","it turns / turned out that way"],"feley":["así es / era","that's how it is / was"],
+   "amulerpuy":["sigue / siguió avanzando","it keeps / kept advancing"],"amuley":["va / iba, avanza / avanzaba","it is / was going, advancing"],
+   "machingerpun":["llego / llegué a ser machi","I end / ended up becoming a machi"],"machingen":["soy machi / era machi","I am / was a machi"],
    "chumlerpual":["cómo irá a quedar","how it would turn out"]},
   L:[["yerpay",["yepay","yemey","elürpay"]],["yepay",["yerpay","yemey","elpay"]],["elürpay",["elpay","elürpuy","yerpay"]],
      ["elürpuy",["elürpay","elpay","felerpuy"]],["felerpuy",["feley","amulerpuy","chumlerpual"]],["amulerpuy",["amuley","felerpuy","machingerpun"]],
@@ -915,10 +916,10 @@ function genImp(n){
 
 // ===== Inverse: 3rd person acting on 1sg (-enew) or 2sg (-eymew) =====
 const INV_VERBS=[
-  {s:"pe",inv:{es:["me vio","te vio"],en:["she/he saw me","she/he saw you"]},fi:{es:["lo vi","lo vio"],en:["I saw it","she/he saw it"]}},
-  {s:"leli",inv:{es:["me mira","te mira"],en:["she/he looks at me","she/he looks at you"]},fi:{es:["lo miro","lo mira"],en:["I look at it","she/he looks at it"]}},
-  {s:"kintu",inv:{es:["me busca","te busca"],en:["she/he looks for me","she/he looks for you"]},fi:{es:["lo busco","lo busca"],en:["I look for it","she/he looks for it"]}},
-  {s:"kim",inv:{es:["me conoce","te conoce"],en:["she/he knows me","she/he knows you"]},fi:{es:["lo sé","lo sabe"],en:["I know it","she/he knows it"]}}
+  {s:"pe",inv:{es:["me ve / me vio","te ve / te vio"],en:["she/he sees / saw me","she/he sees / saw you"]},fi:{es:["lo veo / lo vi","lo ve / lo vio"],en:["I see / saw it","she/he sees / saw it"]}},
+  {s:"leli",inv:{es:["me mira / me miró","te mira / te miró"],en:["she/he looks / looked at me","she/he looks / looked at you"]},fi:{es:["lo miro / lo miré","lo mira / lo miró"],en:["I look / looked at it","she/he looks / looked at it"]}},
+  {s:"kintu",inv:{es:["me busca / me buscó","te busca / te buscó"],en:["she/he looks / looked for me","she/he looks / looked for you"]},fi:{es:["lo busco / lo busqué","lo busca / lo buscó"],en:["I look / looked for it","she/he looks / looked for it"]}},
+  {s:"kim",inv:{es:["me conoce / me conocía","te conoce / te conocía"],en:["she/he knows / knew me","she/he knows / knew you"]},fi:{es:["lo sé / lo sabía","lo sabe / lo sabía"],en:["I know / knew it","she/he knows / knew it"]}}
 ];
 function invForms(vb){
   return [
@@ -934,21 +935,21 @@ function genInv(n){
 
 // ===== Kimche stage: suffix combinations (all forms parse cleanly in the user's parser) =====
 const COMBOS=[
-  {seg:["pe","me","fi","ñ"],es:"fui a verlo",en:"I went to see it"},
-  {seg:["pe","pa","fi","ñ"],es:"vine a verlo",en:"I came to see it"},
-  {seg:["kintu","me","fi","ñ"],es:"fui a buscarlo",en:"I went to look for it"},
-  {seg:["leli","pa","fi","ñ"],es:"vine a mirarlo",en:"I came to look at it"},
-  {seg:["kintu","pa","fi","mi"],es:"viniste a buscarlo",en:"you came to look for it"},
-  {seg:["amu","ke","la","n"],es:"no suelo ir",en:"I don't usually go"},
-  {seg:["dungu","ke","la","n"],es:"no suelo hablar",en:"I don't usually speak"},
-  {seg:["i","ke","la","n"],es:"no suelo comer",en:"I don't usually eat"},
+  {seg:["pe","me","fi","ñ"],es:"voy / fui a verlo",en:"I go / went to see it"},
+  {seg:["pe","pa","fi","ñ"],es:"vengo / vine a verlo",en:"I come / came to see it"},
+  {seg:["kintu","me","fi","ñ"],es:"voy / fui a buscarlo",en:"I go / went to look for it"},
+  {seg:["leli","pa","fi","ñ"],es:"vengo / vine a mirarlo",en:"I come / came to look at it"},
+  {seg:["kintu","pa","fi","mi"],es:"vienes / viniste a buscarlo",en:"you come / came to look for it"},
+  {seg:["amu","ke","la","n"],es:"no suelo / solía ir",en:"I don't usually go / didn't use to go"},
+  {seg:["dungu","ke","la","n"],es:"no suelo / solía hablar",en:"I don't usually speak / didn't use to speak"},
+  {seg:["i","ke","la","n"],es:"no suelo / solía comer",en:"I don't usually eat / didn't use to eat"},
   {seg:["pe","me","a","n"],es:"iré a ver",en:"I will go to see"},
   {seg:["ngilla","me","a","n"],es:"iré a comprar",en:"I will go to buy"},
   {seg:["pe","a","fi","ñ"],es:"lo veré",en:"I will see it"},
   {seg:["kim","a","fi","ñ"],es:"lo sabré",en:"I will know it"},
-  {seg:["pe","me","la","fi","ñ"],es:"no fui a verlo",en:"I didn't go to see it"},
+  {seg:["pe","me","la","fi","ñ"],es:"no voy / no fui a verlo",en:"I don't / didn't go to see it"},
   {seg:["pe","me","a","fi","ñ"],es:"iré a verlo",en:"I will go to see it"},
-  {seg:["pe","nge","n"],es:"me vieron, fui visto",en:"I was seen"}
+  {seg:["pe","nge","n"],es:"me ven / me vieron, soy / fui visto",en:"I am / was seen"}
 ];
 const cForm=c=>c.seg.join("");
 function permuteWrong(c,n){
@@ -990,13 +991,13 @@ function genCombo(n){
   });
 }
 const SENT=[
-  {m:"Inche pen kiñe trewa",es:"Vi un perro",en:"I saw a dog",d:["Inche pelan kiñe trewa","Inche pean kiñe trewa","Eymi peymi kiñe trewa"]},
-  {m:"Ñi chaw ngillafi kiñe kawellu",es:"Mi padre compró un caballo",en:"My father bought a horse",d:["Ñi chaw ngillalafi kiñe kawellu","Ñi ñuke ngillafi kiñe kawellu","Ñi chaw ngillafi epu kawellu"]},
-  {m:"Fey amuy ruka mew",es:"Ella/él fue a la casa",en:"She/he went to the house",d:["Fey küpay ruka mew","Fey amulay ruka mew","Fey amuay ruka mew"]},
-  {m:"Epu trewa lefingu",es:"Dos perros corrieron",en:"Two dogs ran",d:["Küla trewa lefingün","Epu ñarki lefingu","Epu trewa umawtuyngu"]},
-  {m:"Pichi che pütokoy ko",es:"El niño tomó agua",en:"The child drank water",d:["Pichi che pütokolay ko","Pichi che pütokoay ko","Pichi che iy kofke"]},
-  {m:"Ilotukelan",es:"No suelo comer carne",en:"I don't usually eat meat",d:["Ilotulan","Ilotuken","Ilotukelaymi"]},
-  {m:"Pemefiñ ñi ñuke",es:"Fui a ver a mi madre",en:"I went to see my mother",d:["Pepafiñ ñi ñuke","Pemefiñ ñi chaw","Pemelafiñ ñi ñuke"]},
+  {m:"Inche pen kiñe trewa",es:"Veo / Vi un perro",en:"I see / saw a dog",d:["Inche pelan kiñe trewa","Inche pean kiñe trewa","Eymi peymi kiñe trewa"]},
+  {m:"Ñi chaw ngillafi kiñe kawellu",es:"Mi padre compra / compró un caballo",en:"My father buys / bought a horse",d:["Ñi chaw ngillalafi kiñe kawellu","Ñi ñuke ngillafi kiñe kawellu","Ñi chaw ngillafi epu kawellu"]},
+  {m:"Fey amuy ruka mew",es:"Ella/él va / fue a la casa",en:"She/he goes / went to the house",d:["Fey küpay ruka mew","Fey amulay ruka mew","Fey amuay ruka mew"]},
+  {m:"Epu trewa lefingu",es:"Dos perros corren / corrieron",en:"Two dogs run / ran",d:["Küla trewa lefingün","Epu ñarki lefingu","Epu trewa umawtuyngu"]},
+  {m:"Pichi che pütokoy ko",es:"El niño toma / tomó agua",en:"The child drinks / drank water",d:["Pichi che pütokolay ko","Pichi che pütokoay ko","Pichi che iy kofke"]},
+  {m:"Ilotukelan",es:"No suelo / solía comer carne",en:"I don't usually eat / didn't use to eat meat",d:["Ilotulan","Ilotuken","Ilotukelaymi"]},
+  {m:"Pemefiñ ñi ñuke",es:"Voy / Fui a ver a mi madre",en:"I go / went to see my mother",d:["Pepafiñ ñi ñuke","Pemefiñ ñi chaw","Pemelafiñ ñi ñuke"]},
   {m:"Mapudungukeaiñ fill püle",es:"Hablaremos mapudungun en todas partes",en:"We will speak Mapudungun everywhere",d:["Mapudungukeiñ fill püle","Mapudungukelaiñ fill püle","Wingkadungukeaiñ fill püle"]}
 ];
 function genSent(n){
@@ -1287,14 +1288,16 @@ const CONJ_ES=["yo","tú","él/ella","nosotros dos","ustedes dos","ellos dos","n
 const CONJ_EN=["I","you","she/he","we two","you two","they two","we","you all","they"];
 const CONJ_V=["n","ymi","y","yu","ymu","yngu","iñ","ymün","yngün"], CONJ_C=["ün","imi","i","iyu","imu","ingu","iñ","imün","ingün"];
 const CONJ_VERBS=[
-  {s:"amu",v:1,es:["voy","vas","va","vamos","van","van"],en:["go","goes"]},
-  {s:"küpa",v:1,es:["vengo","vienes","viene","venimos","vienen","vienen"],en:["come","comes"]},
-  {s:"awkantu",v:1,es:["juego","juegas","juega","jugamos","juegan","juegan"],en:["play","plays"]},
-  {s:"ülkantu",v:1,es:["canto","cantas","canta","cantamos","cantan","cantan"],en:["sing","sings"]},
-  {s:"küdaw",v:0,es:["trabajo","trabajas","trabaja","trabajamos","trabajan","trabajan"],en:["work","works"]},
-  {s:"kon",v:0,es:["entro","entras","entra","entramos","entran","entran"],en:["go in","goes in"]}];
+  {s:"amu",v:1,es:["voy","vas","va","vamos","van","van"],pt:["fui","fuiste","fue","fuimos","fueron","fueron"],en:["go","goes","went"]},
+  {s:"küpa",v:1,es:["vengo","vienes","viene","venimos","vienen","vienen"],pt:["vine","viniste","vino","vinimos","vinieron","vinieron"],en:["come","comes","came"]},
+  {s:"awkantu",v:1,es:["juego","juegas","juega","jugamos","juegan","juegan"],pt:["jugué","jugaste","jugó","jugamos","jugaron","jugaron"],en:["play","plays","played"]},
+  {s:"ülkantu",v:1,es:["canto","cantas","canta","cantamos","cantan","cantan"],pt:["canté","cantaste","cantó","cantamos","cantaron","cantaron"],en:["sing","sings","sang"]},
+  {s:"küdaw",v:0,es:["trabajo","trabajas","trabaja","trabajamos","trabajan","trabajan"],pt:["trabajé","trabajaste","trabajó","trabajamos","trabajaron","trabajaron"],en:["work","works","worked"]},
+  {s:"kon",v:0,es:["entro","entras","entra","entramos","entran","entran"],pt:["entré","entraste","entró","entramos","entraron","entraron"],en:["go in","goes in","went in"]}];
+/* no -a- (future): present or past (analyst ruling 2026-11-07); a form that is the same in both (jugamos) is shown once */
+function conjEs(vb,j){ const a=vb.es[j], b=vb.pt[j]; return a===b?a:`${a} / ${b}`; }
 const CONJ_ESI=[0,1,2,3,4,5,3,4,5];
-function conjForm(vb,i){ return {m:`${CONJ_PRON[i]} ${vb.s}${(vb.v?CONJ_V:CONJ_C)[i]}`, es:`${CONJ_ES[i]} ${vb.es[CONJ_ESI[i]]}`, en:`${CONJ_EN[i]} ${vb.en[i===2?1:0]}`}; }
+function conjForm(vb,i){ return {m:`${CONJ_PRON[i]} ${vb.s}${(vb.v?CONJ_V:CONJ_C)[i]}`, es:`${CONJ_ES[i]} ${conjEs(vb,CONJ_ESI[i])}`, en:`${CONJ_EN[i]} ${vb.en[i===2?1:0]} / ${vb.en[2]}`}; }
 function genConj(n){ const out=[],seen=new Set();
   while(out.length<n){ const vb=CONJ_VERBS[Math.floor(Math.random()*CONJ_VERBS.length)], i=Math.floor(Math.random()*9);
     if(seen.has(vb.s+i)) continue; seen.add(vb.s+i);
@@ -1430,8 +1433,8 @@ const STAGES = [
     {m:"we",pic:"🌱",es:"nuevo, fresco",en:"new, fresh"},{m:"kuyfi",pic:"📜",es:"antiguo",en:"old, long ago"}]},
   { id:"puke", mt:"pu, -ke", es:"Plurales: pu y -ke", en:"Plurals: pu and -ke", kind:"verb",
     gen:()=>genGram("puke",8), examples:()=>gramExamples("puke"),
-    rule:{es:"Un sustantivo solo no dice cuántos hay: <b>che</b> es “persona” o “gente”. Para marcar plural se pone <b>pu</b> delante, sobre todo con personas: <b>pu che</b> “la gente”, <b>pu lamngen</b> “los hermanos” (en AVENUE, <b>pu che</b> aparece 376 veces). El sufijo <b>-ke</b> va en adjetivos y números e indica “cada uno, varios”: <b>kümeke che</b> “gente buena”, <b>kiñeke che</b> “algunas personas”, <b>füchake che</b> “los ancianos”; <b>pichikeche</b> “niños” es <b>pichi + -ke + che</b>. El verbo también puede marcar el plural: <b>amuyngün</b> “ellos fueron”. (* = forma formada por regla.)",
-          en:"A noun by itself doesn't say how many: <b>che</b> is “person” or “people”. To mark plural, put <b>pu</b> in front, especially with people: <b>pu che</b> “the people”, <b>pu lamngen</b> “the siblings” (in AVENUE, <b>pu che</b> occurs 376 times). The suffix <b>-ke</b> goes on adjectives and numbers and means “each one, several”: <b>kümeke che</b> “good people”, <b>kiñeke che</b> “some people”, <b>füchake che</b> “the elders”; <b>pichikeche</b> “children” is <b>pichi + -ke + che</b>. The verb can mark plural too: <b>amuyngün</b> “they went”. (* = form built by rule.)"}},
+    rule:{es:"Un sustantivo solo no dice cuántos hay: <b>che</b> es “persona” o “gente”. Para marcar plural se pone <b>pu</b> delante, sobre todo con personas: <b>pu che</b> “la gente”, <b>pu lamngen</b> “los hermanos” (en AVENUE, <b>pu che</b> aparece 376 veces). El sufijo <b>-ke</b> va en adjetivos y números e indica “cada uno, varios”: <b>kümeke che</b> “gente buena”, <b>kiñeke che</b> “algunas personas”, <b>füchake che</b> “los ancianos”; <b>pichikeche</b> “niños” es <b>pichi + -ke + che</b>. El verbo también puede marcar el plural: <b>amuyngün</b> “ellos van / fueron”. (* = forma formada por regla.)",
+          en:"A noun by itself doesn't say how many: <b>che</b> is “person” or “people”. To mark plural, put <b>pu</b> in front, especially with people: <b>pu che</b> “the people”, <b>pu lamngen</b> “the siblings” (in AVENUE, <b>pu che</b> occurs 376 times). The suffix <b>-ke</b> goes on adjectives and numbers and means “each one, several”: <b>kümeke che</b> “good people”, <b>kiñeke che</b> “some people”, <b>füchake che</b> “the elders”; <b>pichikeche</b> “children” is <b>pichi + -ke + che</b>. The verb can mark plural too: <b>amuyngün</b> “they go / went”. (* = form built by rule.)"}},
   { id:"nutramkan", mt:"Nütramkan", es:"Conversar", en:"Conversation", kind:"convo",
     gen:()=>shuffle(CONVO).map(convoItem),
     examples:()=>CONVO.map(c=>({m:`${c.q} → ${c.m}`,es:`${c.qg.es} → ${c.es}`,en:`${c.qg.en} → ${c.en}`})),
@@ -1545,12 +1548,12 @@ const STAGES = [
           en:"Vowel stem + <b>-n</b> (I), <b>-ymi</b> (you), <b>-y</b> (she/he). Consonant stem + <b>-ün</b>, <b>-imi</b>, <b>-i</b>."}},
   { id:"neg", mt:"-la-", es:"Negación", en:"Negation", kind:"verb", tenses:["neg"],
     gen:()=>genVerbs(["neg"],8),
-    rule:{es:"Para negar, se agrega <b>-la-</b> después de la raíz: <b>amu-la-n</b> “no voy”.",
-          en:"To negate, add <b>-la-</b> after the stem: <b>amu-la-n</b> “I don't go”."}},
+    rule:{es:"Para negar, se agrega <b>-la-</b> después de la raíz: <b>amu-la-n</b> “no voy / no fui”.",
+          en:"To negate, add <b>-la-</b> after the stem: <b>amu-la-n</b> “I don't / didn't go”."}},
   { id:"kilno", mt:"-kil-, -no-", es:"Otras negaciones: -kil- y -no-", en:"Other negatives: -kil- and -no-", kind:"verb",
     gen:()=>genGram("kilno",8), examples:()=>gramExamples("kilno"),
-    rule:{es:"<b>-la-</b> niega lo que se afirma: <b>amulay</b> “no fue”. Para prohibir se usa <b>-kil-</b> con las terminaciones del imperativo: <b>amu-kil-nge</b> “¡no vayas!”, <b>fem-kil-nge</b> “¡no lo hagas!”, <b>amu-kil-pe</b> “¡que no vaya!”. En las formas que no son verbo principal (el que…, si…, lo que…) se usa <b>-no-</b> (a veces <b>-nu-</b>): <b>kim-no-lu</b> “el que no sabe” (183 veces en AVENUE), <b>kim-no-le</b> “si no sabe”, <b>kim-no-fiel</b> “lo que no sabía”. Compara <b>kimlu</b> “el que sabe”, <b>kimle</b> “si sabe”, <b>kimlay</b> “no sabe”.",
-          en:"<b>-la-</b> negates a statement: <b>amulay</b> “she/he didn't go”. To forbid, use <b>-kil-</b> with the command endings: <b>amu-kil-nge</b> “don't go!”, <b>fem-kil-nge</b> “don't do it!”, <b>amu-kil-pe</b> “may she/he not go!”. In forms that are not the main verb (the one who…, if…, what…) use <b>-no-</b> (sometimes <b>-nu-</b>): <b>kim-no-lu</b> “the one who doesn't know” (183 times in AVENUE), <b>kim-no-le</b> “if she/he doesn't know”, <b>kim-no-fiel</b> “what she/he didn't know”. Compare <b>kimlu</b> “the one who knows”, <b>kimle</b> “if she/he knows”, <b>kimlay</b> “she/he doesn't know”."}},
+    rule:{es:"<b>-la-</b> niega lo que se afirma: <b>amulay</b> “no va / no fue”. Para prohibir se usa <b>-kil-</b> con las terminaciones del imperativo: <b>amu-kil-nge</b> “¡no vayas!”, <b>fem-kil-nge</b> “¡no lo hagas!”, <b>amu-kil-pe</b> “¡que no vaya!”. En las formas que no son verbo principal (el que…, si…, lo que…) se usa <b>-no-</b> (a veces <b>-nu-</b>): <b>kim-no-lu</b> “el que no sabe” (183 veces en AVENUE), <b>kim-no-le</b> “si no sabe”, <b>kim-no-fiel</b> “lo que no sabía”. Compara <b>kimlu</b> “el que sabe”, <b>kimle</b> “si sabe”, <b>kimlay</b> “no sabe / no sabía”.",
+          en:"<b>-la-</b> negates a statement: <b>amulay</b> “she/he doesn't / didn't go”. To forbid, use <b>-kil-</b> with the command endings: <b>amu-kil-nge</b> “don't go!”, <b>fem-kil-nge</b> “don't do it!”, <b>amu-kil-pe</b> “may she/he not go!”. In forms that are not the main verb (the one who…, if…, what…) use <b>-no-</b> (sometimes <b>-nu-</b>): <b>kim-no-lu</b> “the one who doesn't know” (183 times in AVENUE), <b>kim-no-le</b> “if she/he doesn't know”, <b>kim-no-fiel</b> “what she/he didn't know”. Compare <b>kimlu</b> “the one who knows”, <b>kimle</b> “if she/he knows”, <b>kimlay</b> “she/he doesn't / didn't know”."}},
   { id:"fut", mt:"-a-", es:"Futuro", en:"Future", kind:"verb", tenses:["fut"],
     gen:()=>genVerbs(["fut"],8),
     rule:{es:"Para el futuro, se agrega <b>-a-</b> después de la raíz: <b>amu-a-n</b> “iré”.",
@@ -1562,13 +1565,13 @@ const STAGES = [
   { id:"ke", mt:"-ke-", es:"Lo habitual", en:"Habits", kind:"verb",
     gen:()=>genAsp("ke",8),
     examples:()=>[0,1,2].map(p=>aspForm(ASP_VERBS[0],"ke",p)).concat([0,1,2].map(p=>aspForm(ASP_VERBS[4],"ke",p))),
-    rule:{es:"<b>-ke-</b> indica lo que se hace de costumbre: <b>amu-ke-n</b> “suelo ir”. Va después de la raíz y antes de la persona.",
-          en:"<b>-ke-</b> marks what someone usually does: <b>amu-ke-n</b> “I usually go”. It comes after the stem and before the person ending."}},
+    rule:{es:"<b>-ke-</b> indica lo que se hace de costumbre: <b>amu-ke-n</b> “suelo / solía ir”. Va después de la raíz y antes de la persona.",
+          en:"<b>-ke-</b> marks what someone usually does: <b>amu-ke-n</b> “I usually go / used to go”. It comes after the stem and before the person ending."}},
   { id:"le", mt:"-le-", es:"Lo que está pasando", en:"Ongoing actions", kind:"verb",
     gen:()=>genAsp("le",8),
     examples:()=>[0,1,2].map(p=>aspForm(ASP_VERBS[2],"le",p)).concat([0,1,2].map(p=>aspForm(ASP_VERBS[1],"le",p))),
-    rule:{es:"<b>-le-</b> presenta la acción en curso o como un estado: <b>dungu-le-n</b> “estoy hablando”. Compara con <b>-ke-</b>: <b>dungu-ke-n</b> “suelo hablar”.",
-          en:"<b>-le-</b> presents the action as ongoing or as a state: <b>dungu-le-n</b> “I am speaking”. Compare <b>-ke-</b>: <b>dungu-ke-n</b> “I usually speak”."}},
+    rule:{es:"<b>-le-</b> presenta la acción en curso o como un estado: <b>dungu-le-n</b> “estoy / estaba hablando”. Compara con <b>-ke-</b>: <b>dungu-ke-n</b> “suelo / solía hablar”.",
+          en:"<b>-le-</b> presents the action as ongoing or as a state: <b>dungu-le-n</b> “I am / was speaking”. Compare <b>-ke-</b>: <b>dungu-ke-n</b> “I usually speak / used to speak”."}},
   { id:"imp", mt:"-nge, -chi, -pe", es:"Imperativo", en:"Commands", kind:"verb",
     gen:()=>genImp(8),
     examples:()=>[0,1,2].map(k=>impForm(IMP_VERBS[0],k)).concat([0,1,2].map(k=>impForm(IMP_VERBS[1],k))),
@@ -1584,13 +1587,13 @@ const STAGES = [
   { id:"fi", mt:"-fi-", es:"Objeto de 3.ª persona", en:"Third-person object", kind:"verb",
     gen:()=>genFi(8),
     examples:()=>[0,1,2].map(p=>fiForm(FI[0],false,p)).concat([0,1,2].map(p=>fiForm(FI[0],true,p)),[0,1,2].map(p=>fiForm(FI[4],false,p))),
-    rule:{es:"<b>-fi-</b> marca un objeto de 3.ª persona: <b>pe-fi-ñ</b> “lo vi”. Persona: <b>-ñ</b> (yo), <b>-mi</b> (tú), nada (él/ella). La negación <b>-la-</b> va antes: <b>pe-la-fi-ñ</b> “no lo vi”. Ojo: sin otra marca, un verbo de evento como <b>pe-</b> o <b>ngilla-</b> se entiende en pasado.",
-          en:"<b>-fi-</b> marks a third-person object: <b>pe-fi-ñ</b> “I saw it”. Person: <b>-ñ</b> (I), <b>-mi</b> (you), nothing (she/he). Negation <b>-la-</b> comes first: <b>pe-la-fi-ñ</b> “I didn't see it”. Note: with no other marker, an event verb like <b>pe-</b> or <b>ngilla-</b> is read as past."}},
+    rule:{es:"<b>-fi-</b> marca un objeto de 3.ª persona: <b>pe-fi-ñ</b> “lo veo / lo vi”. Persona: <b>-ñ</b> (yo), <b>-mi</b> (tú), nada (él/ella). La negación <b>-la-</b> va antes: <b>pe-la-fi-ñ</b> “no lo veo / no lo vi”. Ojo: sin otra marca, un verbo de evento como <b>pe-</b> o <b>ngilla-</b> se entiende en pasado.",
+          en:"<b>-fi-</b> marks a third-person object: <b>pe-fi-ñ</b> “I see / saw it”. Person: <b>-ñ</b> (I), <b>-mi</b> (you), nothing (she/he). Negation <b>-la-</b> comes first: <b>pe-la-fi-ñ</b> “I don't / didn't see it”. Note: with no other marker, an event verb like <b>pe-</b> or <b>ngilla-</b> is read as past."}},
   { id:"ael", mt:"ñi … -ael", es:"Para que…, quiero que…", en:"So that…, I want you to…", kind:"verb",
     gen:()=>genAel(8),
     examples:()=>["Fey ta mi chillkatuael","Ayün mi küpayael","Müley ñi amuael","Tüfa mi iyael"].map(aelForm).concat([{m:"mi chillkatu-a-el",es:"(lo que) vas a estudiar",en:"(what) you will study"},{m:"mi chillkatu-ke-el",es:"(lo que) estudias",en:"(what) you study"}]),
-    rule:{es:"Un posesivo + verbo con <b>-ael</b> habla de algo que todavía no pasa: un propósito, un deseo o una obligación. El posesivo dice <b>quién</b> lo hace. En español corresponde al subjuntivo y en inglés a “so (that)…” o “want… to”: <b>Fey ta mi chillkatuael</b> “Esto es para que estudies / This is so you can study”; <b>Ayün mi küpayael</b> “Quiero que vengas”; <b>Müley ñi amuael</b> “Tengo que ir”. Después de <b>a</b> aparece una <b>y</b>: <b>küpa-y-ael</b>. Sin la <b>-a-</b>, <b>-el</b> habla de algo real o pasado: <b>mi chillkatukeel</b> “lo que estudias”. En AVENUE se escribe a menudo <b>-al</b>: <b>müli ñi amual</b> “tiene que ir”, <b>tañi kimal</b> “para aprender”.",
-          en:"A possessive + a verb with <b>-ael</b> talks about something that has not happened yet: a purpose, a wish or an obligation. The possessive says <b>who</b> does it. Spanish uses the subjunctive here and English “so (that)…” or “want… to”: <b>Fey ta mi chillkatuael</b> “This is so you can study”; <b>Ayün mi küpayael</b> “I want you to come”; <b>Müley ñi amuael</b> “I have to go”. After <b>a</b> a <b>y</b> appears: <b>küpa-y-ael</b>. Without the <b>-a-</b>, <b>-el</b> talks about something real or past: <b>mi chillkatukeel</b> “what you study”. AVENUE often spells it <b>-al</b>: <b>müli ñi amual</b> “she/he has to go”, <b>tañi kimal</b> “in order to learn”."}},
+    rule:{es:"Un posesivo + verbo con <b>-ael</b> habla de algo que todavía no pasa: un propósito, un deseo o una obligación. El posesivo dice <b>quién</b> lo hace. En español corresponde al subjuntivo y en inglés a “so (that)…” o “want… to”: <b>Fey ta mi chillkatuael</b> “Esto es para que estudies / This is so you can study”; <b>Ayün mi küpayael</b> “Quiero que vengas / Quería que vinieras”; <b>Müley ñi amuael</b> “Tengo / Tenía que ir”. Después de <b>a</b> aparece una <b>y</b>: <b>küpa-y-ael</b>. Sin la <b>-a-</b>, <b>-el</b> habla de algo real o pasado: <b>mi chillkatukeel</b> “lo que estudias”. En AVENUE se escribe a menudo <b>-al</b>: <b>müli ñi amual</b> “tiene / tenía que ir”, <b>tañi kimal</b> “para aprender”.",
+          en:"A possessive + a verb with <b>-ael</b> talks about something that has not happened yet: a purpose, a wish or an obligation. The possessive says <b>who</b> does it. Spanish uses the subjunctive here and English “so (that)…” or “want… to”: <b>Fey ta mi chillkatuael</b> “This is so you can study”; <b>Ayün mi küpayael</b> “I want / wanted you to come”; <b>Müley ñi amuael</b> “I have / had to go”. After <b>a</b> a <b>y</b> appears: <b>küpa-y-ael</b>. Without the <b>-a-</b>, <b>-el</b> talks about something real or past: <b>mi chillkatukeel</b> “what you study”. AVENUE often spells it <b>-al</b>: <b>müli ñi amual</b> “she/he has / had to go”, <b>tañi kimal</b> “in order to learn”."}},
   { id:"plural", mt:"Iñchiw, iñchiñ", es:"Dual y plural", en:"Dual and plural", kind:"verb",
     gen:()=>genPl(8),
     examples:()=>[0,1,2,3,4,5].map(i=>plForm(PL_VERBS[0],i)),
@@ -1604,20 +1607,20 @@ const STAGES = [
   { id:"am", mt:"-me-, -pa-", es:"Ir a hacer, venir a hacer", en:"Go and do, come and do", kind:"verb",
     gen:()=>genAm(8),
     examples:()=>[0,1,2].map(p=>amForm(AM_VERBS[0],"me",p)).concat([0,1,2].map(p=>amForm(AM_VERBS[0],"pa",p))),
-    rule:{es:"El movimiento asociado se marca en el verbo: <b>-me-</b> “ir a hacer” (<b>pe-me-n</b> “fui a ver”) y <b>-pa-</b> “venir a hacer” (<b>pe-pa-n</b> “vine a ver”).",
-          en:"Associated motion is marked on the verb: <b>-me-</b> “go and do” (<b>pe-me-n</b> “I went to see”) and <b>-pa-</b> “come and do” (<b>pe-pa-n</b> “I came to see”)."}},
+    rule:{es:"El movimiento asociado se marca en el verbo: <b>-me-</b> “ir a hacer” (<b>pe-me-n</b> “voy / fui a ver”) y <b>-pa-</b> “venir a hacer” (<b>pe-pa-n</b> “vengo / vine a ver”).",
+          en:"Associated motion is marked on the verb: <b>-me-</b> “go and do” (<b>pe-me-n</b> “I go / went to see”) and <b>-pa-</b> “come and do” (<b>pe-pa-n</b> “I come / came to see”)."}},
   { id:"pu", mt:"-pu-", es:"Allá: -pu-", en:"Over there: -pu-", kind:"verb",
     gen:()=>genGram("pu",8), examples:()=>gramExamples("pu"),
-    rule:{es:"<b>-pu-</b> dice que la acción ocurre <b>allá</b>, en un lugar lejos de quien habla: <b>kon-pu-y</b> “entró allá”, <b>tripa-pu-y</b> “salió allá”, <b>pe-pu-fiñ</b> “llegué a verlo (allá)”, <b>müle-pu-y</b> “está allá” (60 veces en AVENUE). Compara con <b>-pa-</b> “hacia acá”: <b>tripa-pa-y</b> “salió (hacia acá)”, <b>kon-pa-y</b> “entró (acá)”; y con <b>-me-</b> “ir a”: <b>pe-me-fiñ</b> “fui a verlo”. Con algunos verbos <b>-pu-</b> significa “llegar hasta un punto”: <b>fente-pu-a-y</b> “hasta aquí llega”, la frase con que se cierran muchos relatos (84 veces).",
-          en:"<b>-pu-</b> says the action happens <b>over there</b>, at a place away from the speaker: <b>kon-pu-y</b> “she/he went in over there”, <b>tripa-pu-y</b> “she/he came out over there”, <b>pe-pu-fiñ</b> “I got to see her/him (there)”, <b>müle-pu-y</b> “she/he is over there” (60 times in AVENUE). Compare <b>-pa-</b> “toward here”: <b>tripa-pa-y</b> “she/he came out (toward here)”, <b>kon-pa-y</b> “she/he came in”; and <b>-me-</b> “go and”: <b>pe-me-fiñ</b> “I went to see her/him”. With some verbs <b>-pu-</b> means “reach a point”: <b>fente-pu-a-y</b> “this is where it ends”, the phrase that closes many stories (84 times)."}},
+    rule:{es:"<b>-pu-</b> dice que la acción ocurre <b>allá</b>, en un lugar lejos de quien habla: <b>kon-pu-y</b> “entra / entró allá”, <b>tripa-pu-y</b> “sale / salió allá”, <b>pe-pu-fiñ</b> “llego / llegué a verlo (allá)”, <b>müle-pu-y</b> “está / estaba allá” (60 veces en AVENUE). Compara con <b>-pa-</b> “hacia acá”: <b>tripa-pa-y</b> “sale / salió (hacia acá)”, <b>kon-pa-y</b> “entra / entró (acá)”; y con <b>-me-</b> “ir a”: <b>pe-me-fiñ</b> “voy / fui a verlo”. Con algunos verbos <b>-pu-</b> significa “llegar hasta un punto”: <b>fente-pu-a-y</b> “hasta aquí llega”, la frase con que se cierran muchos relatos (84 veces).",
+          en:"<b>-pu-</b> says the action happens <b>over there</b>, at a place away from the speaker: <b>kon-pu-y</b> “she/he goes / went in over there”, <b>tripa-pu-y</b> “she/he comes / came out over there”, <b>pe-pu-fiñ</b> “I get / got to see her/him (there)”, <b>müle-pu-y</b> “she/he is / was over there” (60 times in AVENUE). Compare <b>-pa-</b> “toward here”: <b>tripa-pa-y</b> “she/he comes / came out (toward here)”, <b>kon-pa-y</b> “she/he comes / came in”; and <b>-me-</b> “go and”: <b>pe-me-fiñ</b> “I go / went to see her/him”. With some verbs <b>-pu-</b> means “reach a point”: <b>fente-pu-a-y</b> “this is where it ends”, the phrase that closes many stories (84 times)."}},
   { id:"kiaw", mt:"-(k)iaw-", es:"Andar haciendo: -(k)iaw-", en:"Going about doing: -(k)iaw-", kind:"verb",
     gen:()=>genGram("kiaw",8), examples:()=>gramExamples("kiaw"),
-    rule:{es:"<b>-(k)iaw-</b> dice que la acción se hace <b>andando</b> de un lado a otro, sin un rumbo fijo: <b>treka-yaw-i</b> “anda caminando, pasea”, <b>lef-kiaw-i</b> “anda corriendo”, <b>küdaw-kiaw-i</b> “anda trabajando”, <b>dungu-yaw-i</b> “anda hablando”. Después de vocal es <b>-yaw-</b>; después de consonante puede ser <b>-kiaw-</b>, <b>-iaw-</b> o <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “anda así”). Viene del verbo <b>miawün</b> “andar” (<b>miawi</b> “anda”, 145 veces en AVENUE).",
-          en:"<b>-(k)iaw-</b> says the action is done while <b>going about</b> from place to place, with no fixed direction: <b>treka-yaw-i</b> “she/he walks around”, <b>lef-kiaw-i</b> “she/he runs around”, <b>küdaw-kiaw-i</b> “she/he goes about working”, <b>dungu-yaw-i</b> “she/he goes around talking”. After a vowel it is <b>-yaw-</b>; after a consonant it can be <b>-kiaw-</b>, <b>-iaw-</b> or <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “she/he goes about like that”). It comes from the verb <b>miawün</b> “to go about” (<b>miawi</b> “she/he goes about”, 145 times in AVENUE)."}},
+    rule:{es:"<b>-(k)iaw-</b> dice que la acción se hace <b>andando</b> de un lado a otro, sin un rumbo fijo: <b>treka-yaw-i</b> “anda / andaba caminando, pasea / paseaba”, <b>lef-kiaw-i</b> “anda / andaba corriendo”, <b>küdaw-kiaw-i</b> “anda / andaba trabajando”, <b>dungu-yaw-i</b> “anda / andaba hablando”. Después de vocal es <b>-yaw-</b>; después de consonante puede ser <b>-kiaw-</b>, <b>-iaw-</b> o <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “anda / andaba así”). Viene del verbo <b>miawün</b> “andar” (<b>miawi</b> “anda / andaba”, 145 veces en AVENUE).",
+          en:"<b>-(k)iaw-</b> says the action is done while <b>going about</b> from place to place, with no fixed direction: <b>treka-yaw-i</b> “she/he walks / walked around”, <b>lef-kiaw-i</b> “she/he runs / ran around”, <b>küdaw-kiaw-i</b> “she/he goes / went about working”, <b>dungu-yaw-i</b> “she/he goes / went around talking”. After a vowel it is <b>-yaw-</b>; after a consonant it can be <b>-kiaw-</b>, <b>-iaw-</b> or <b>-yaw-</b> (<b>fem-kiaw-ki</b>, <b>fem-iaw-i</b>, <b>fem-yaw-i</b> “she/he goes / went about like that”). It comes from the verb <b>miawün</b> “to go about” (<b>miawi</b> “she/he goes / went about”, 145 times in AVENUE)."}},
   { id:"rpu", mt:"-rpa-, -rpu-", es:"De paso: -rpa- y -rpu-", en:"On the way: -rpa- and -rpu-", kind:"verb",
     gen:()=>genGram("rpu",8), examples:()=>gramExamples("rpu"),
-    rule:{es:"<b>-rpa-</b> y <b>-rpu-</b> juntan dos piezas: <b>-(ü)r-</b> “de paso, en el camino” y <b>-pa-</b> “hacia acá” o <b>-pu-</b> “allá”. <b>-rpa-</b> es “de paso, viniendo hacia acá”: <b>ye-rpa-y</b> “pasó a buscar”, <b>el-ürpa-y</b> “vino a dejar de paso” (compara <b>ye-pa-y</b> “vino a buscar”, <b>ye-me-y</b> “fue a buscar”). <b>-rpu-</b> es “de paso, yendo hacia allá”, y muy a menudo “llegar a, terminar”: <b>fele-rpu-y</b> “resultó así”, <b>amule-rpu-y</b> “siguió avanzando”, <b>machinge-rpu-n</b> “llegué a ser machi”, <b>chumle-rpu-a-l</b> “cómo irá a quedar”. En AVENUE <b>-rpu-</b> es unas diez veces más común que <b>-rpa-</b>, y <b>fele-rpu-</b> solo es más de la cuarta parte de los <b>-rpu-</b>.",
-          en:"<b>-rpa-</b> and <b>-rpu-</b> join two pieces: <b>-(ü)r-</b> “in passing, on the way” and <b>-pa-</b> “toward here” or <b>-pu-</b> “over there”. <b>-rpa-</b> is “in passing, on the way here”: <b>ye-rpa-y</b> “she/he stopped by to pick up”, <b>el-ürpa-y</b> “she/he dropped it off on the way” (compare <b>ye-pa-y</b> “she/he came to fetch”, <b>ye-me-y</b> “she/he went to fetch”). <b>-rpu-</b> is “in passing, on the way there”, and very often “end up, come to”: <b>fele-rpu-y</b> “it turned out that way”, <b>amule-rpu-y</b> “it kept advancing”, <b>machinge-rpu-n</b> “I ended up becoming a machi”, <b>chumle-rpu-a-l</b> “how it would turn out”. In AVENUE <b>-rpu-</b> is about ten times as common as <b>-rpa-</b>, and <b>fele-rpu-</b> alone is over a quarter of all <b>-rpu-</b>."}},
+    rule:{es:"<b>-rpa-</b> y <b>-rpu-</b> juntan dos piezas: <b>-(ü)r-</b> “de paso, en el camino” y <b>-pa-</b> “hacia acá” o <b>-pu-</b> “allá”. <b>-rpa-</b> es “de paso, viniendo hacia acá”: <b>ye-rpa-y</b> “pasa / pasó a buscar”, <b>el-ürpa-y</b> “viene / vino a dejar de paso” (compara <b>ye-pa-y</b> “viene / vino a buscar”, <b>ye-me-y</b> “va / fue a buscar”). <b>-rpu-</b> es “de paso, yendo hacia allá”, y muy a menudo “llegar a, terminar”: <b>fele-rpu-y</b> “resulta / resultó así”, <b>amule-rpu-y</b> “sigue / siguió avanzando”, <b>machinge-rpu-n</b> “llego / llegué a ser machi”, <b>chumle-rpu-a-l</b> “cómo irá a quedar”. En AVENUE <b>-rpu-</b> es unas diez veces más común que <b>-rpa-</b>, y <b>fele-rpu-</b> solo es más de la cuarta parte de los <b>-rpu-</b>.",
+          en:"<b>-rpa-</b> and <b>-rpu-</b> join two pieces: <b>-(ü)r-</b> “in passing, on the way” and <b>-pa-</b> “toward here” or <b>-pu-</b> “over there”. <b>-rpa-</b> is “in passing, on the way here”: <b>ye-rpa-y</b> “she/he stops / stopped by to pick up”, <b>el-ürpa-y</b> “she/he drops / dropped it off on the way” (compare <b>ye-pa-y</b> “she/he comes / came to fetch”, <b>ye-me-y</b> “she/he goes / went to fetch”). <b>-rpu-</b> is “in passing, on the way there”, and very often “end up, come to”: <b>fele-rpu-y</b> “it turns / turned out that way”, <b>amule-rpu-y</b> “it keeps / kept advancing”, <b>machinge-rpu-n</b> “I end / ended up becoming a machi”, <b>chumle-rpu-a-l</b> “how it would turn out”. In AVENUE <b>-rpu-</b> is about ten times as common as <b>-rpa-</b>, and <b>fele-rpu-</b> alone is over a quarter of all <b>-rpu-</b>."}},
   { id:"caus", mt:"-l-, -el-", es:"Causativos", en:"Causatives", kind:"derive",
     gen:()=>shuffle(CAUS).map(causItem),
     examples:()=>CAUS.map(c=>({m:`${c.v}- → ${c.m}`,es:c.es,en:c.en})),
@@ -1626,20 +1629,20 @@ const STAGES = [
   { id:"inv", mt:"-e-…-ew", es:"Cuando me lo hacen a mí", en:"When it's done to me", kind:"verb",
     gen:()=>genInv(8),
     examples:()=>invForms(INV_VERBS[0]).concat(invForms(INV_VERBS[3])),
-    rule:{es:"Si una 3.ª persona actúa sobre ti o sobre mí, el verbo usa la forma inversa: <b>pe-e-n-ew</b> “me vio”, <b>pe-e-y-mew</b> “te vio”. Compara con <b>-fi-</b>, donde yo actúo sobre una 3.ª persona: <b>pe-fi-ñ</b> “lo vi”.",
-          en:"When a third person acts on me or you, the verb takes the inverse form: <b>pe-e-n-ew</b> “she/he saw me”, <b>pe-e-y-mew</b> “she/he saw you”. Compare <b>-fi-</b>, where I act on a third person: <b>pe-fi-ñ</b> “I saw it”."}}
+    rule:{es:"Si una 3.ª persona actúa sobre ti o sobre mí, el verbo usa la forma inversa: <b>pe-e-n-ew</b> “me ve / me vio”, <b>pe-e-y-mew</b> “te ve / te vio”. Compara con <b>-fi-</b>, donde yo actúo sobre una 3.ª persona: <b>pe-fi-ñ</b> “lo veo / lo vi”.",
+          en:"When a third person acts on me or you, the verb takes the inverse form: <b>pe-e-n-ew</b> “she/he sees / saw me”, <b>pe-e-y-mew</b> “she/he sees / saw you”. Compare <b>-fi-</b>, where I act on a third person: <b>pe-fi-ñ</b> “I see / saw it”."}}
  ]},
  {id:"kch", es:"Kimche", en:"Kimche", need:60, levels:[
   { id:"combo", mt:"", es:"Varios sufijos juntos", en:"Several suffixes together", kind:"verb",
     gen:()=>genCombo(8),
     examples:()=>COMBOS.slice(0,8).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
-    rule:{es:"Los sufijos se suman en un orden fijo: raíz, movimiento (<b>-me-/-pa-</b>), aspecto (<b>-ke-</b>), negación (<b>-la-</b>), futuro (<b>-a-</b>), objeto (<b>-fi-</b>) y persona. <b>pe-me-la-fi-ñ</b> “no fui a verlo”.",
-          en:"Suffixes stack in a fixed order: root, motion (<b>-me-/-pa-</b>), aspect (<b>-ke-</b>), negation (<b>-la-</b>), future (<b>-a-</b>), object (<b>-fi-</b>) and person. <b>pe-me-la-fi-ñ</b> “I didn't go to see it”."}},
+    rule:{es:"Los sufijos se suman en un orden fijo: raíz, movimiento (<b>-me-/-pa-</b>), aspecto (<b>-ke-</b>), negación (<b>-la-</b>), futuro (<b>-a-</b>), objeto (<b>-fi-</b>) y persona. <b>pe-me-la-fi-ñ</b> “no voy / no fui a verlo”.",
+          en:"Suffixes stack in a fixed order: root, motion (<b>-me-/-pa-</b>), aspect (<b>-ke-</b>), negation (<b>-la-</b>), future (<b>-a-</b>), object (<b>-fi-</b>) and person. <b>pe-me-la-fi-ñ</b> “I don't / didn't go to see it”."}},
   { id:"rke", mt:"-(ü)rke-", es:"Dicen que…, resulta que…", en:"They say…, it turns out…", kind:"verb",
     gen:()=>genRke(8),
     examples:()=>[["müle-rke-fu-y","mülerkefuy"],["nie-rke-y","nierkey"],["kim-ürke-y","kimürkey"],["fem-ürke-n","femürken"],["küme-rke-y","kümerkey"],["pi-rke-y","pirkey"]].map(([s,m])=>({m:s,es:RKE_G[m][0],en:RKE_G[m][1]})),
-    rule:{es:"<b>-(ü)rke-</b> marca que lo dicho viene de otros (“dicen que”) o que el hablante se da cuenta de algo (“resulta que”, “es que”). Va antes de la persona: <b>nie-rke-y</b> “dicen que tiene”. Después de consonante es <b>-ürke-</b>: <b>kim-ürke-y</b>. Con <b>-fu-</b> es típico de los relatos: <b>müle-rke-fu-y</b> “había (dicen)”. También se usa con <b>inche</b>: <b>fem-ürke-n</b> “resulta que lo hice así”.",
-          en:"<b>-(ü)rke-</b> marks that what is said comes from others (“they say”) or that the speaker realises something (“it turns out”). It goes before the person ending: <b>nie-rke-y</b> “they say she/he has”. After a consonant it is <b>-ürke-</b>: <b>kim-ürke-y</b>. With <b>-fu-</b> it is typical of stories: <b>müle-rke-fu-y</b> “there was (they say)”. It is also used with <b>inche</b>: <b>fem-ürke-n</b> “it turns out I did it that way”."}},
+    rule:{es:"<b>-(ü)rke-</b> marca que lo dicho viene de otros (“dicen que”) o que el hablante se da cuenta de algo (“resulta que”, “es que”). Va antes de la persona: <b>nie-rke-y</b> “dicen que tiene / tenía”. Después de consonante es <b>-ürke-</b>: <b>kim-ürke-y</b>. Con <b>-fu-</b> es típico de los relatos: <b>müle-rke-fu-y</b> “había (dicen)”. También se usa con <b>inche</b>: <b>fem-ürke-n</b> “resulta que lo hago / lo hice así”.",
+          en:"<b>-(ü)rke-</b> marks that what is said comes from others (“they say”) or that the speaker realises something (“it turns out”). It goes before the person ending: <b>nie-rke-y</b> “they say she/he has / had”. After a consonant it is <b>-ürke-</b>: <b>kim-ürke-y</b>. With <b>-fu-</b> it is typical of stories: <b>müle-rke-fu-y</b> “there was (they say)”. It is also used with <b>inche</b>: <b>fem-ürke-n</b> “it turns out I do / did it that way”."}},
   { id:"dm", mt:"nga, may, ta, chi", es:"Partículas del discurso", en:"Discourse particles", kind:"verb",
     gen:()=>genDm(8),
     examples:()=>DM.map(d=>({m:d.m,es:d.es,en:d.en})),
@@ -1652,20 +1655,20 @@ const STAGES = [
           en:"In Mapudungun almost any word can work as a verb. The main routes are: <b>adjective + person ending</b>, with nothing else: <b>küme → kümey</b> “it is good” (905 times in AVENUE). <b>Noun + -nge-</b> “to be”: <b>machi → machingen</b> “I am a machi”, <b>mapuche → mapuchengen</b> “I am Mapuche” (251 times). <b>Noun + -tu-</b> “eat, use, take”: <b>ilo → ilotun</b> “to eat meat”, <b>lawen → lawentun</b> “to treat with medicine”. <b>Noun + -n</b> “make”: <b>ruka → rukan</b> “to build a house”. <b>Numeral + -w-</b>: <b>kiñe → kiñewün</b> “to unite”. <b>Question word + -le-</b>: <b>chum</b> “how” → <b>chumleymi?</b> “how are you?”. And <b>Spanish loans</b> come in as roots and take Mapudungun endings: <b>pasa- → pasay</b> “it passed”, <b>kampia- → kampiay</b> “it changed”. Choose the route that gives the meaning asked for."}},
   { id:"nma", mt:"-ñma-", es:"A otra persona le afecta: -ñma-", en:"Someone else is affected: -ñma-", kind:"verb",
     gen:()=>genGram("nma",6), examples:()=>gramExamples("nma"),
-    rule:{es:"<b>-ñma-</b> agrega a una persona afectada: aquella a quien se le quita algo o de quien es lo que se nombra. En español suele traducirse con <b>le</b> o <b>me</b>: <b>nentu-ñma-ngen</b> “me lo sacaron”, <b>kimü-ñma-lafiñ</b> “no le sé (el nombre)”, <b>pe-ñma-ngelay tañi kutran</b> “no se le ve la enfermedad”. Compara <b>nentungen</b> “me sacaron (a mí)”: sin <b>-ñma-</b>, la persona es lo sacado; con <b>-ñma-</b>, es a quien se lo sacan. Muchas palabras con <b>ñma</b> no llevan este sufijo (<b>rumeñma</b>). (* = forma formada por regla.)",
-          en:"<b>-ñma-</b> adds an affected person: the one something is taken from, or whose thing is meant. Spanish usually renders it with <b>le</b> or <b>me</b>: <b>nentu-ñma-ngen</b> “they took it out of me”, <b>kimü-ñma-lafiñ</b> “I don't know her/his (name)”, <b>pe-ñma-ngelay tañi kutran</b> “her/his illness can't be seen”. Compare <b>nentungen</b> “they took me out”: without <b>-ñma-</b> the person is what is taken; with it, the person is the one it is taken from. Many words containing <b>ñma</b> do not have this suffix (<b>rumeñma</b>). (* = form built by rule.)"}},
+    rule:{es:"<b>-ñma-</b> agrega a una persona afectada: aquella a quien se le quita algo o de quien es lo que se nombra. En español suele traducirse con <b>le</b> o <b>me</b>: <b>nentu-ñma-ngen</b> “me lo sacan / me lo sacaron”, <b>kimü-ñma-lafiñ</b> “no le sé / no le sabía (el nombre)”, <b>pe-ñma-ngelay tañi kutran</b> “no se le ve la enfermedad”. Compara <b>nentungen</b> “me sacan / me sacaron (a mí)”: sin <b>-ñma-</b>, la persona es lo sacado; con <b>-ñma-</b>, es a quien se lo sacan. Muchas palabras con <b>ñma</b> no llevan este sufijo (<b>rumeñma</b>). (* = forma formada por regla.)",
+          en:"<b>-ñma-</b> adds an affected person: the one something is taken from, or whose thing is meant. Spanish usually renders it with <b>le</b> or <b>me</b>: <b>nentu-ñma-ngen</b> “they take / took it out of me”, <b>kimü-ñma-lafiñ</b> “I don't / didn't know her/his (name)”, <b>pe-ñma-ngelay tañi kutran</b> “her/his illness can't be seen”. Compare <b>nentungen</b> “they take / took me out”: without <b>-ñma-</b> the person is what is taken; with it, the person is the one it is taken from. Many words containing <b>ñma</b> do not have this suffix (<b>rumeñma</b>). (* = form built by rule.)"}},
   { id:"kantu", mt:"-kantu-, -faluw-", es:"De juego o fingido: -kantu- y -faluw-", en:"In play or pretended: -kantu- and -faluw-", kind:"verb",
     gen:()=>genGram("kantu",7), examples:()=>gramExamples("kantu"),
-    rule:{es:"<b>-kantu-</b> dice que algo se hace de juego o en broma, sin que sea en serio: <b>feypi-kantu-y</b> “lo dijo en broma”, <b>kütral-kantu-y</b> “juega a hacer fuego”; <b>awkantun</b> “jugar” ya lo lleva. <b>-faluw-</b> dice que se finge para que otros lo crean: <b>kutran-faluw-i</b> “se hace el enfermo”, <b>kim-faluw-i</b> “se hace el que sabe”. La diferencia: con <b>-kantu-</b> todos saben que es juego; con <b>-faluw-</b> se quiere engañar. (* = forma formada por regla.)",
-          en:"<b>-kantu-</b> says something is done in play or in jest, not seriously: <b>feypi-kantu-y</b> “she/he said it as a joke”, <b>kütral-kantu-y</b> “she/he plays at making a fire”; <b>awkantun</b> “to play” already contains it. <b>-faluw-</b> says someone pretends so that others will believe it: <b>kutran-faluw-i</b> “she/he pretends to be sick”, <b>kim-faluw-i</b> “she/he pretends to know”. The difference: with <b>-kantu-</b> everyone knows it is play; with <b>-faluw-</b> the aim is to deceive. (* = form built by rule.)"}},
+    rule:{es:"<b>-kantu-</b> dice que algo se hace de juego o en broma, sin que sea en serio: <b>feypi-kantu-y</b> “lo dice / lo dijo en broma”, <b>kütral-kantu-y</b> “juega / jugó a hacer fuego”; <b>awkantun</b> “jugar” ya lo lleva. <b>-faluw-</b> dice que se finge para que otros lo crean: <b>kutran-faluw-i</b> “se hace / se hizo el enfermo”, <b>kim-faluw-i</b> “se hace / se hizo el que sabe”. La diferencia: con <b>-kantu-</b> todos saben que es juego; con <b>-faluw-</b> se quiere engañar. (* = forma formada por regla.)",
+          en:"<b>-kantu-</b> says something is done in play or in jest, not seriously: <b>feypi-kantu-y</b> “she/he says / said it as a joke”, <b>kütral-kantu-y</b> “she/he plays / played at making a fire”; <b>awkantun</b> “to play” already contains it. <b>-faluw-</b> says someone pretends so that others will believe it: <b>kutran-faluw-i</b> “she/he pretends / pretended to be sick”, <b>kim-faluw-i</b> “she/he pretends / pretended to know”. The difference: with <b>-kantu-</b> everyone knows it is play; with <b>-faluw-</b> the aim is to deceive. (* = form built by rule.)"}},
   { id:"compu", mt:"Lef + kon → lefkonün", es:"Dos verbos en uno: la composición", en:"Two verbs in one: compounding", kind:"verb",
     gen:()=>genGram("compu",8), examples:()=>gramExamples("compu"),
     rule:{es:"Dos raíces verbales pueden unirse en una sola palabra, y las terminaciones van solo al final. Muchas veces la primera raíz dice <b>cómo</b> y la segunda <b>hacia dónde</b> o con qué resultado: <b>lef</b> “correr” + <b>kon</b> “entrar” → <b>lefkonün</b> “entrar corriendo”; <b>leftripan</b> “salir corriendo, huir”; <b>trekatripan</b> “salir caminando”. Con <b>nag</b> “bajar” y <b>püra</b> “subir”: <b>anünagün</b> “sentarse” (el que está de pie) y <b>anüpüran</b> “incorporarse” (el que está acostado); <b>witrapüran</b> “levantarse” (42 veces en AVENUE). Con <b>kintu</b> “mirar, buscar”: <b>pürakintun</b> “mirar hacia arriba”, <b>inakintun</b> “seguir con la vista”. A veces el resultado es una palabra nueva: <b>llow</b> “recibir” + <b>dungu</b> “hablar” → <b>llowdungun</b> “contestar”; <b>el</b> “dejar” + <b>künu</b> “poner, dejar” → <b>elkünun</b> “dejar en un lugar” (96 veces). (* = forma formada por regla.)",
           en:"Two verb roots can join into one word, and the endings go only at the end. Often the first root says <b>how</b> and the second says <b>where to</b> or with what result: <b>lef</b> “run” + <b>kon</b> “enter” → <b>lefkonün</b> “to run in”; <b>leftripan</b> “to run out, flee”; <b>trekatripan</b> “to walk out”. With <b>nag</b> “go down” and <b>püra</b> “go up”: <b>anünagün</b> “to sit down” (from standing) and <b>anüpüran</b> “to sit up” (from lying down); <b>witrapüran</b> “to get up” (42 times in AVENUE). With <b>kintu</b> “look, search”: <b>pürakintun</b> “to look up”, <b>inakintun</b> “to follow with the eyes”. Sometimes the result is a new word: <b>llow</b> “receive” + <b>dungu</b> “speak” → <b>llowdungun</b> “to answer”; <b>el</b> “leave” + <b>künu</b> “put, leave” → <b>elkünun</b> “to leave somewhere” (96 times). (* = form built by rule.)"}},
   { id:"redup", mt:"Ngüma → ngümangüma", es:"Raíz doble: la reduplicación", en:"Doubled roots: reduplication", kind:"verb",
     gen:()=>genGram("redup",8), examples:()=>gramExamples("redup"),
-    rule:{es:"Repetir la raíz del verbo dice que la acción se repite o sigue y sigue: <b>ngüma</b> “llorar” → <b>ngümangümangi</b> “lloraba y lloraba”; <b>tripa</b> “salir” → <b>tripatripangi</b> “sale y sale”; <b>amu</b> “ir” → <b>amuamungi</b> “sigue yendo”; <b>pi</b> “decir” → <b>pipiyefiñ</b> “le estuve diciendo y diciendo”; <b>dungudunguy</b> “es hablador”. En AVENUE la raíz doble a menudo lleva <b>-nge-</b> antes de la persona (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), y a veces se escribe separada: <b>ngüma ngümangi</b>. No es lo mismo que <b>-ke-</b>, que dice que algo se hace de costumbre: <b>ngümakefuy</b> “lloraba (de costumbre)”, <b>amukey</b> “va (siempre)”. Algunos verbos solo se usan con la raíz doble: <b>trüntrünün</b> “tiritar”, <b>poypoyün</b> “hincharse”, <b>wedwedün</b> “ser travieso, loco”.",
-          en:"Repeating the verb root says the action repeats or goes on and on: <b>ngüma</b> “cry” → <b>ngümangümangi</b> “she/he cried and cried”; <b>tripa</b> “go out” → <b>tripatripangi</b> “it keeps coming out”; <b>amu</b> “go” → <b>amuamungi</b> “she/he keeps going”; <b>pi</b> “say” → <b>pipiyefiñ</b> “I kept telling her/him”; <b>dungudunguy</b> “she/he is a chatterbox”. In AVENUE the doubled root often takes <b>-nge-</b> before the person ending (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), and is sometimes written as two words: <b>ngüma ngümangi</b>. This is not the same as <b>-ke-</b>, which says something is done habitually: <b>ngümakefuy</b> “she/he used to cry”, <b>amukey</b> “she/he goes (always)”. Some verbs are used only with the doubled root: <b>trüntrünün</b> “to shiver”, <b>poypoyün</b> “to swell up”, <b>wedwedün</b> “to be mischievous, crazy”."}},
+    rule:{es:"Repetir la raíz del verbo dice que la acción se repite o sigue y sigue: <b>ngüma</b> “llorar” → <b>ngümangümangi</b> “llora y llora / lloraba y lloraba”; <b>tripa</b> “salir” → <b>tripatripangi</b> “sale y sale / salía y salía”; <b>amu</b> “ir” → <b>amuamungi</b> “sigue / seguía yendo”; <b>pi</b> “decir” → <b>pipiyefiñ</b> “le estoy / estuve diciendo y diciendo”; <b>dungudunguy</b> “es / era hablador”. En AVENUE la raíz doble a menudo lleva <b>-nge-</b> antes de la persona (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), y a veces se escribe separada: <b>ngüma ngümangi</b>. No es lo mismo que <b>-ke-</b>, que dice que algo se hace de costumbre: <b>ngümakefuy</b> “lloraba (de costumbre)”, <b>amukey</b> “va / iba (siempre)”. Algunos verbos solo se usan con la raíz doble: <b>trüntrünün</b> “tiritar”, <b>poypoyün</b> “hincharse”, <b>wedwedün</b> “ser travieso, loco”.",
+          en:"Repeating the verb root says the action repeats or goes on and on: <b>ngüma</b> “cry” → <b>ngümangümangi</b> “she/he cries and cries / cried and cried”; <b>tripa</b> “go out” → <b>tripatripangi</b> “it keeps / kept coming out”; <b>amu</b> “go” → <b>amuamungi</b> “she/he keeps / kept going”; <b>pi</b> “say” → <b>pipiyefiñ</b> “I keep / kept telling her/him”; <b>dungudunguy</b> “she/he is / was a chatterbox”. In AVENUE the doubled root often takes <b>-nge-</b> before the person ending (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), and is sometimes written as two words: <b>ngüma ngümangi</b>. This is not the same as <b>-ke-</b>, which says something is done habitually: <b>ngümakefuy</b> “she/he used to cry”, <b>amukey</b> “she/he goes / went (always)”. Some verbs are used only with the doubled root: <b>trüntrünün</b> “to shiver”, <b>poypoyün</b> “to swell up”, <b>wedwedün</b> “to be mischievous, crazy”."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
@@ -1674,8 +1677,8 @@ const STAGES = [
   { id:"segm", mt:"Pu pichi troy", es:"Separar la palabra", en:"Splitting the word", kind:"derive",
     gen:()=>genSeg(8),
     examples:()=>COMBOS.slice(8,14).map(c=>({m:`${c.seg.join("")} = ${c.seg.join("-")}`,es:c.es,en:c.en})),
-    rule:{es:"Elige dónde se separan la raíz y cada sufijo: <b>kintupafimi</b> = <b>kintu-pa-fi-mi</b> “viniste a buscarlo”.",
-          en:"Choose where the root and each suffix divide: <b>kintupafimi</b> = <b>kintu-pa-fi-mi</b> “you came to look for it”."}},
+    rule:{es:"Elige dónde se separan la raíz y cada sufijo: <b>kintupafimi</b> = <b>kintu-pa-fi-mi</b> “vienes / viniste a buscarlo”.",
+          en:"Choose where the root and each suffix divide: <b>kintupafimi</b> = <b>kintu-pa-fi-mi</b> “you come / came to look for it”."}},
   { id:"frases", mt:"Nütram", es:"Frases completas", en:"Whole sentences", kind:"derive",
     gen:()=>genSent(8),
     examples:()=>SENT.slice(0,4).map(x=>({m:x.m,es:x.es,en:x.en})),
