@@ -7,6 +7,10 @@ onmessage = ev => {
   try {
     const M = self.MOTOR; let w = String(word).toLowerCase().trim();
     if (M.ORTHO && sys && sys !== 'uni') { try { w = M.ORTHO.toUnificado(w, SYS[sys]).text; } catch (e) {} }
+    /* No Mapudungun verb ends in r: a word ending in r with nothing after it (cantar, enseñar, tomar) is a Spanish
+       infinitive, not a loan root plus interruptive -r-, so it gets no analysis (analyst ruling 2026-11-07).
+       Material after the r (enseñar-ün) is still parsed. */
+    if (/r$/.test(w)) { postMessage({id, r: null}); return; }
     let p = M.parse43(w, '', 3, false);
     if (p && !p.nvRule) { const c = M.inferCat(p.root); if (c) { const p2 = M.parse43(w, c, 3, false); if (p2 && !p2.nvRule) p = p2; } }
     if (p && p.root) {
