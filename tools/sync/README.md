@@ -6,6 +6,11 @@ desinstalar la app, recupera el progreso. Si el servicio no responde, el juego s
 
 Archivos: `worker.js` (el servicio), `schema.sql` (la tabla), `wrangler.toml` (para publicarlo con la línea de comandos).
 
+## Lo más simple: un solo comando desde tu computadora
+
+Con Node.js instalado y una copia del repositorio: `node tools/sync/deploy.mjs`. Abre el navegador una vez para
+autorizar tu cuenta de Cloudflare; después crea la base, la tabla y el servicio ya conectados, y muestra la dirección.
+
 ## Publicarlo desde el panel de Cloudflare (sin instalar nada)
 
 Los nombres de los menús pueden cambiar un poco.
