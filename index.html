@@ -615,30 +615,31 @@ const KAL=(()=>{
   const point=(x,y,rx,ry,ty)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/><path d="M95 ${ty} H${x+rx+5}" stroke="${GOLD}" stroke-width="3"/><path d="M${x+rx+11} ${ty-5} L${x+rx+5} ${ty} L${x+rx+11} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/>`;
   /* face: centre (40,30), head 16 x 19 */
   const X=40, Y=30;
-  const face=(o={})=>{
+  const face=(o={})=>{ const Yh=Y+(o.dy||0);
     let g=`<path d="M${X-24} 60 Q${X-22} ${Y+18} ${X} ${Y+17} Q${X+22} ${Y+18} ${X+24} 60Z" fill="${RED}"/><path d="M${X-24} 60 Q${X-22} ${Y+18} ${X} ${Y+17} Q${X+22} ${Y+18} ${X+24} 60" stroke="#9e2422" stroke-width="1.2" fill="none"/>`;
     g+=`<path d="M${X-5} ${Y+17.5} L${X} ${Y+24} L${X+5} ${Y+17.5}" fill="${SKD}"/>`;
-    g+=solid(`<rect x="${X-5}" y="${Y+10}" width="10" height="9" rx="3"/>`,SKD);
+    g+=solid(`<rect x="${X-5}" y="${Yh+10}" width="10" height="${Y+19-(Yh+10)}" rx="3"/>`,SKD);
     /* braids behind the shoulders */
-    g+=`<path d="M${X-15} ${Y-6} Q${X-20} ${Y+8} ${X-17} ${Y+24} M${X+15} ${Y-6} Q${X+20} ${Y+8} ${X+17} ${Y+24}" stroke="${HAIR}" stroke-width="7" fill="none"/>`;
+    g+=`<path d="M${X-15} ${Yh-6} Q${X-20} ${Yh+8} ${X-17} ${Yh+24} M${X+15} ${Yh-6} Q${X+20} ${Yh+8} ${X+17} ${Yh+24}" stroke="${HAIR}" stroke-width="7" fill="none"/>`;
     g+=[[X-17,Y+12],[X-17.6,Y+18],[X+17,Y+12],[X+17.6,Y+18]].map(([a,b])=>`<path d="M${a-3} ${b} q3 2 6 0" stroke="#3a2a1e" stroke-width="1" fill="none"/>`).join("");
     /* ears, head */
-    g+=solid(`<ellipse cx="${X-16}" cy="${Y+1}" rx="3.6" ry="5.4"/><ellipse cx="${X+16}" cy="${Y+1}" rx="3.6" ry="5.4"/><ellipse cx="${X}" cy="${Y}" rx="16" ry="19"/>`,SK);
-    g+=`<path d="M${X-16.6} ${Y-1} q-1.6 2.4 0 4.8 M${X+16.6} ${Y-1} q1.6 2.4 0 4.8" stroke="${SKD}" stroke-width="1.2" fill="none"/>`;
+    g+=solid(`<ellipse cx="${X-16}" cy="${Yh+1}" rx="3.6" ry="5.4"/><ellipse cx="${X+16}" cy="${Yh+1}" rx="3.6" ry="5.4"/><ellipse cx="${X}" cy="${Yh}" rx="16" ry="19"/>`,SK);
+    g+=`<path d="M${X-16.6} ${Yh-1} q-1.6 2.4 0 4.8 M${X+16.6} ${Yh-1} q1.6 2.4 0 4.8" stroke="${SKD}" stroke-width="1.2" fill="none"/>`;
     /* hair cap with a centre parting, and the trarilonko */
-    g+=`<path d="M${X-16.4} ${Y-2} C${X-17} ${Y-16} ${X-8} ${Y-20} ${X} ${Y-20} C${X+8} ${Y-20} ${X+17} ${Y-16} ${X+16.4} ${Y-2} C${X+14} ${Y-10} ${X+7} ${Y-12} ${X} ${Y-11} C${X-7} ${Y-12} ${X-14} ${Y-10} ${X-16.4} ${Y-2}Z" fill="${HAIR}"/>`;
-    g+=`<path d="M${X-15.8} ${Y-9} Q${X} ${Y-12.4} ${X+15.8} ${Y-9}" stroke="#ece7dc" stroke-width="3.4" fill="none"/><path d="M${X-15.8} ${Y-9} Q${X} ${Y-12.4} ${X+15.8} ${Y-9}" stroke="${RED}" stroke-width=".9" stroke-dasharray="1.4 2" fill="none"/><circle cx="${X}" cy="${Y-10.8}" r="2.5" fill="#d6d9e0" stroke="#9aa0ad" stroke-width=".6"/>`;
+    g+=`<path d="M${X-16.4} ${Yh-2} C${X-17} ${Yh-16} ${X-8} ${Yh-20} ${X} ${Yh-20} C${X+8} ${Yh-20} ${X+17} ${Yh-16} ${X+16.4} ${Yh-2} C${X+14} ${Yh-10} ${X+7} ${Yh-12} ${X} ${Yh-11} C${X-7} ${Yh-12} ${X-14} ${Yh-10} ${X-16.4} ${Yh-2}Z" fill="${HAIR}"/>`;
+    if(!o.noband) g+=`<path d="M${X-15.8} ${Yh-9} Q${X} ${Yh-12.4} ${X+15.8} ${Yh-9}" stroke="#ece7dc" stroke-width="3.4" fill="none"/><path d="M${X-15.8} ${Yh-9} Q${X} ${Yh-12.4} ${X+15.8} ${Yh-9}" stroke="${RED}" stroke-width=".9" stroke-dasharray="1.4 2" fill="none"/><circle cx="${X}" cy="${Yh-10.8}" r="2.5" fill="#d6d9e0" stroke="#9aa0ad" stroke-width=".6"/>`;
     /* brows, eyes, cheeks */
-    for(const sx of [-1,1]){ const ex=X+sx*6.4, ey=Y-1;
+    for(const sx of [-1,1]){ const ex=X+sx*6.4, ey=Yh-1;
       g+=`<path d="M${ex-3.6} ${ey-4.2} Q${ex} ${ey-6} ${ex+3.6} ${ey-4.4}" stroke="${HAIR}" stroke-width="1.3" fill="none"/>`;
       g+=`<path d="M${ex-3.8} ${ey} Q${ex} ${ey-3.2} ${ex+3.8} ${ey} Q${ex} ${ey+2.6} ${ex-3.8} ${ey}Z" fill="#fbf8f2" stroke="${OUT}" stroke-width=".6"/><circle cx="${ex}" cy="${ey-.2}" r="1.9" fill="#5a3418"/><circle cx="${ex}" cy="${ey-.2}" r=".9" fill="#120a06"/><circle cx="${ex+.6}" cy="${ey-.9}" r=".45" fill="#fff"/>`;
-      g+=`<ellipse cx="${X+sx*9.4}" cy="${Y+6}" rx="3" ry="1.8" fill="#d97a6a" opacity=".45"/>`; }
+      g+=`<ellipse cx="${X+sx*9.4}" cy="${Yh+6}" rx="3" ry="1.8" fill="#d97a6a" opacity=".45"/>`; }
     /* nose */
-    g+=`<path d="M${X-.6} ${Y+1} Q${X-1.6} ${Y+5} ${X-2.4} ${Y+6.6}" stroke="${SKD}" stroke-width="1.1" fill="none"/><path d="M${X-3.4} ${Y+7.4} Q${X-2.4} ${Y+8.8} ${X-.8} ${Y+8} M${X+.8} ${Y+8} Q${X+2.4} ${Y+8.8} ${X+3.4} ${Y+7.4}" stroke="${SKD}" stroke-width="1" fill="none"/><path d="M${X-1.8} ${Y+5.2} Q${X} ${Y+7.6} ${X+1.8} ${Y+5.2}" fill="${SKL}" opacity=".6"/>`;
+    g+=`<path d="M${X-.6} ${Yh+1} Q${X-1.6} ${Yh+5} ${X-2.4} ${Yh+6.6}" stroke="${SKD}" stroke-width="1.1" fill="none"/><path d="M${X-3.4} ${Yh+7.4} Q${X-2.4} ${Yh+8.8} ${X-.8} ${Yh+8} M${X+.8} ${Yh+8} Q${X+2.4} ${Yh+8.8} ${X+3.4} ${Yh+7.4}" stroke="${SKD}" stroke-width="1" fill="none"/><path d="M${X-1.8} ${Yh+5.2} Q${X} ${Yh+7.6} ${X+1.8} ${Yh+5.2}" fill="${SKL}" opacity=".6"/>`;
     /* mouth */
-    g+= o.teeth
-      ? `<path d="M${X-6.4} ${Y+11.4} Q${X} ${Y+19} ${X+6.4} ${Y+11.4} Q${X} ${Y+12.6} ${X-6.4} ${Y+11.4}Z" fill="#6a1a14"/><path d="M${X-5.4} ${Y+12.1} Q${X} ${Y+13} ${X+5.4} ${Y+12.1} L${X+4.6} ${Y+14.2} Q${X} ${Y+15} ${X-4.6} ${Y+14.2}Z" fill="#fbf8f2"/><path d="M${X-2.7} ${Y+12.5} V${Y+14.6} M${X} ${Y+12.7} V${Y+14.9} M${X+2.7} ${Y+12.5} V${Y+14.6}" stroke="#d8d2c4" stroke-width=".6"/><path d="M${X-6.4} ${Y+11.4} Q${X} ${Y+12.6} ${X+6.4} ${Y+11.4}" stroke="#8a3a30" stroke-width=".9" fill="none"/>`
-      : `<path d="M${X-5.4} ${Y+12} Q${X-2} ${Y+10.6} ${X} ${Y+11.4} Q${X+2} ${Y+10.6} ${X+5.4} ${Y+12} Q${X} ${Y+13} ${X-5.4} ${Y+12}Z" fill="#a8423a"/><path d="M${X-5.4} ${Y+12} Q${X} ${Y+16.4} ${X+5.4} ${Y+12} Q${X} ${Y+13} ${X-5.4} ${Y+12}Z" fill="#b8564a"/><path d="M${X-5.4} ${Y+12} Q${X} ${Y+13} ${X+5.4} ${Y+12}" stroke="#7a2a20" stroke-width=".8" fill="none"/>`;
+    if(o.tongue) g+=`<path d="M${X-6} ${Yh+11.6} Q${X} ${Yh+17} ${X+6} ${Yh+11.6} Q${X} ${Yh+12.8} ${X-6} ${Yh+11.6}Z" fill="#6a1a14"/><path d="M${X-4} ${Yh+12.6} Q${X-4.4} ${Yh+21} ${X} ${Yh+21} Q${X+4.4} ${Yh+21} ${X+4} ${Yh+12.6}Z" fill="#e0707a" stroke="#a8423a" stroke-width=".8"/><path d="M${X} ${Yh+14} V${Yh+19}" stroke="#b8505a" stroke-width=".8"/>`;
+    else g+= o.teeth
+      ? `<path d="M${X-6.4} ${Yh+11.4} Q${X} ${Yh+19} ${X+6.4} ${Yh+11.4} Q${X} ${Yh+12.6} ${X-6.4} ${Yh+11.4}Z" fill="#6a1a14"/><path d="M${X-5.4} ${Yh+12.1} Q${X} ${Yh+13} ${X+5.4} ${Yh+12.1} L${X+4.6} ${Yh+14.2} Q${X} ${Yh+15} ${X-4.6} ${Yh+14.2}Z" fill="#fbf8f2"/><path d="M${X-2.7} ${Yh+12.5} V${Yh+14.6} M${X} ${Yh+12.7} V${Yh+14.9} M${X+2.7} ${Yh+12.5} V${Yh+14.6}" stroke="#d8d2c4" stroke-width=".6"/><path d="M${X-6.4} ${Yh+11.4} Q${X} ${Yh+12.6} ${X+6.4} ${Yh+11.4}" stroke="#8a3a30" stroke-width=".9" fill="none"/>`
+      : `<path d="M${X-5.4} ${Yh+12} Q${X-2} ${Yh+10.6} ${X} ${Yh+11.4} Q${X+2} ${Yh+10.6} ${X+5.4} ${Yh+12} Q${X} ${Yh+13} ${X-5.4} ${Yh+12}Z" fill="#a8423a"/><path d="M${X-5.4} ${Yh+12} Q${X} ${Yh+16.4} ${X+5.4} ${Yh+12} Q${X} ${Yh+13} ${X-5.4} ${Yh+12}Z" fill="#b8564a"/><path d="M${X-5.4} ${Yh+12} Q${X} ${Yh+13} ${X+5.4} ${Yh+12}" stroke="#7a2a20" stroke-width=".8" fill="none"/>`;
     return g; };
   /* hand: palm and four fingers fanned, thumb to the side, nails, creases, a woven cuff at the wrist */
   const fingers=[[-8.4,-27,5.2,24,-8],[-2.8,-30,5.4,27,-2.5],[2.8,-28.6,5.2,26,3],[8.2,-23,4.6,20,10]];
@@ -657,7 +658,58 @@ const KAL=(()=>{
     kug:W("kug",hand+`<ellipse cx="47" cy="30" rx="19" ry="25" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`),
     namun:W("namun",foot+`<ellipse cx="50" cy="31" rx="22" ry="26" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`),
     foro:W("foro",face({teeth:true})+`<ellipse cx="${X}" cy="${Y+13.6}" rx="8" ry="3.8" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`+bone)
+    ,_:{W,face,point,hand,X,Y,GOLD,SK,SKD,SKL,OUT,solid}
   };
+})();
+
+
+// ===== Kalül III (more of the body) and Kalül IV (inside the body): same style as Kalül, the named part ringed =====
+const KAL3=(()=>{
+  const {W,face,point,hand,X,Y,GOLD,SK,SKD,SKL,OUT,solid}=KAL._;
+  const ring=(x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`;
+  /* a whole person, front view, filling the frame */
+  const body=()=>`<g transform="translate(50 59) scale(1.02) translate(-50 -57)">${POSE.fig({h:[50,10.5],n:[50,19],hp:[50,36],e1:[44,28],h1:[42.6,36.4],e2:[56,28],h2:[57.4,36.4],k1:[47,46.5],f1:[46.6,56.5],k2:[53,46.5],f2:[53.4,56.5],dir:0,face:"smile"})}</g>`;
+  /* magnifier over the back of the hand, showing the skin */
+  const lens=`<g><circle cx="70" cy="22" r="13" fill="${SKL}" stroke="#d6d9e0" stroke-width="3"/>${[[64,17],[69,14],[75,18],[66,24],[72,26],[77,24],[70,20],[63,28],[76,30]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".8" fill="${SKD}"/>`).join("")}<path d="M62 20 Q70 17 78 21 M63 27 Q70 24 77 28" stroke="${SKD}" stroke-width=".7" fill="none"/><path d="M80 32 L90 44" stroke="#6a4a2a" stroke-width="4.4"/><path d="M80 32 L90 44" stroke="#8a6a4a" stroke-width="2"/></g>`;
+  return {
+    pel:W("pel",face({dy:-10})+point(X,Y+13.6,6.4,4,Y+13.6)),
+    falke:W("falke",`<g transform="translate(46 26) scale(1.8) translate(-53 -24)">${body()}</g>`+point(53.2,22.4,8,7,22.4)),
+    luku:W("luku",`<g transform="translate(46 32) scale(1.8) translate(-51 -46)">${body()}</g>`+point(49.6,33,7.6,7.6,33)),
+    changull:W("changull",hand+ring(38.6,18,5.6,10)),
+    wili:W("wili",hand+point(38.2,12.4,4,3.4,12.4)),
+    tol:W("tol",face({noband:true})+point(X,Y-9,11,4,Y-9)),
+    kewun:W("kewun",face({tongue:true})+point(X,Y+17.6,5.4,4.4,Y+17.6)),
+    trawa:W("trawa",`<g transform="translate(-10 0)">${hand}</g>`+lens)
+  };
+})();
+const ANAT=(()=>{
+  const {GOLD}=KAL._, BG="#2c3150";
+  const W=(id,inner)=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><defs><clipPath id="an-${id}"><rect x="2" y="2" width="96" height="56" rx="6"/></clipPath></defs><g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="96" height="56" rx="6" fill="${BG}"/><g clip-path="url(#an-${id})">${inner}</g></g></svg>`;
+  /* body outline (head and torso) seen from the front, with the organs inside; the named one in colour, the rest faint */
+  const C={muello:"#e8a0b0",ponon:"#e88080",piwke:"#c8322f",pana:"#8a3a2a",putra:"#e8a070",kullche:"#e8b090",kushallkin:"#a8423a",kadi:"#f3ecdc"};
+  const ORG={
+    muello:`<path d="M42 8 Q42 2 50 2 Q58 2 58 8 Q59 13 54 13.5 Q50 14.4 46 13.5 Q41 13 42 8Z"/><path d="M50 2.6 V13 M44 6 Q47 7 46 10 M56 6 Q53 7 54 10" stroke="#b86a80" stroke-width=".7" fill="none"/>`,
+    ponon:`<path d="M47 22 Q38 22 36 32 Q35 40 40 41 Q46 41 47 36Z"/><path d="M53 22 Q62 22 64 32 Q65 40 60 41 Q54 41 53 36Z"/>`,
+    piwke:`<path d="M52 30 c2.4 -3.8 8 -1.6 5.6 3.4 l-5.6 5.4 l-5.6 -5.4 c-2.4 -5 3.2 -7.2 5.6 -3.4Z"/>`,
+    pana:`<path d="M36 41 Q36 38 44 38 Q52 38 52 41 Q50 46 42 46 Q36 45 36 41Z"/>`,
+    putra:`<path d="M54 40 Q60 38 63 42 Q64 47 58 48 Q54 48 53 45Z"/>`,
+    kullche:`<path d="M40 49 Q40 47 44 47 H56 Q60 47 60 49 V56 Q60 58 56 58 H44 Q40 58 40 56Z"/><path d="M43 50 H56 Q57 52 55 52.4 H45 Q43 53 44 54.6 H56" stroke="#c88a68" stroke-width="1" fill="none"/>`,
+    kushallkin:`<path d="M39 45 q-3 2 -1 5.4 q2 2 4 0 q-2 -2 -.6 -4 q-.8 -1.6 -2.4 -1.4Z"/><path d="M61 45 q3 2 1 5.4 q-2 2 -4 0 q2 -2 .6 -4 q.8 -1.6 2.4 -1.4Z"/>`,
+    kadi:`<g fill="none" stroke-width="1.6">${[23,27,31,35,39].map(y=>`<path d="M49 ${y} Q40 ${y} 35.5 ${y+4}"/><path d="M51 ${y} Q60 ${y} 64.5 ${y+4}"/>`).join("")}<path d="M50 21 V42" stroke-width="2.2"/></g>`
+  };
+  const RING={muello:[50,8,11,8,8],ponon:[50,31,17,12,24],piwke:[52,33,6.6,6.6,33],pana:[44,42,10,6,42],putra:[58,43,7.6,6.4,43],kullche:[50,52.6,13,7,52],kushallkin:[50,47.6,15,5,47.6],kadi:[50,32,17,13,24]};
+  const scene=key=>{
+    let g=`<path d="M32 60 Q30 24 36 20 Q42 17 46 16 V14 Q42 13 41.6 8 Q41.6 0 50 0 Q58.4 0 58.4 8 Q58 13 54 14 V16 Q58 17 64 20 Q70 24 68 60Z" fill="#3a4170" stroke="#6f78b0" stroke-width="1.4"/>`;
+    for(const [k,shape] of Object.entries(ORG)){
+      const on=k===key, col=C[k];
+      if(k==="kadi") g+=`<g stroke="${on?col:"#7d86b8"}" opacity="${on?1:.35}">${shape}</g>`;
+      else g+=`<g fill="${on?col:"#7d86b8"}" opacity="${on?1:.3}" stroke="${on?"#3a1a14":"none"}" stroke-width=".6">${shape}</g>`;
+    }
+    const [x,y,rx,ry,ty]=RING[key];
+    g=`<g transform="translate(4 4.6) scale(.92)">${g}`;
+    g+=`</g><g transform="translate(4 4.6) scale(.92)"><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/><path d="M95 ${ty} H${x+rx+5}" stroke="${GOLD}" stroke-width="3"/><path d="M${x+rx+11} ${ty-5} L${x+rx+5} ${ty} L${x+rx+11} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/></g>`;
+    return W(key,g); };
+  const D={}; for(const k of Object.keys(ORG)) D[k]=scene(k); return D;
 })();
 
 const NUT = `<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
@@ -1721,6 +1773,18 @@ const STAGES = [
     {m:"pütra",pic:{svg:ACT2.body("putra")},es:"estómago, barriga",en:"stomach, belly"},
     {m:"piwke",pic:{svg:ACT2.body("piwke")},es:"corazón",en:"heart"},
     {m:"mollfüñ",pic:{svg:ACT2.body("mollfun")},es:"sangre",en:"blood"}]},
+  { id:"kalul3", mt:"Kalül III", es:"Más partes del cuerpo", en:"More body parts", kind:"pic", words:[
+    {m:"pel",pic:{svg:KAL3.pel},es:"cuello",en:"neck"},{m:"falke",pic:{svg:KAL3.falke},es:"hombro",en:"shoulder"},
+    {m:"luku",pic:{svg:KAL3.luku},es:"rodilla",en:"knee"},{m:"changüll",pic:{svg:KAL3.changull},es:"dedo",en:"finger, toe"},
+    {m:"wili",pic:{svg:KAL3.wili},es:"uña",en:"nail"},{m:"tol",pic:{svg:KAL3.tol},es:"frente",en:"forehead"},
+    {m:"kewün",pic:{svg:KAL3.kewun},es:"lengua",en:"tongue"},{m:"trawa",pic:{svg:KAL3.trawa},es:"piel",en:"skin"}]},
+  { id:"kalul4", mt:"Kalül IV", es:"Dentro del cuerpo", en:"Inside the body", kind:"pic",
+    rule:{es:"<b>changüll</b> sirve para la mano y el pie: <b>changüllkug</b> “dedo de la mano”, <b>changüllnamun</b> “dedo del pie”. <b>kewün</b> es la lengua del cuerpo; el idioma es <b>dungun</b>.",
+          en:"<b>changüll</b> is used for hand and foot: <b>changüllkug</b> “finger”, <b>changüllnamun</b> “toe”. <b>kewün</b> is the tongue in the mouth; a language is <b>dungun</b>."}, words:[
+    {m:"müllo",pic:{svg:ANAT.muello},es:"sesos, cerebro",en:"brains"},{m:"ponon",pic:{svg:ANAT.ponon},es:"pulmón",en:"lung"},
+    {m:"piwke",pic:{svg:ANAT.piwke},es:"corazón",en:"heart"},{m:"pana",pic:{svg:ANAT.pana},es:"hígado",en:"liver"},
+    {m:"pütra",pic:{svg:ANAT.putra},es:"estómago, barriga",en:"stomach, belly"},{m:"küllche",pic:{svg:ANAT.kullche},es:"tripas, intestinos",en:"guts, intestines"},
+    {m:"kushallkiñ",pic:{svg:ANAT.kushallkin},es:"riñón",en:"kidney"},{m:"kadi foro",pic:{svg:ANAT.kadi},es:"costilla",en:"rib"}]},
   { id:"familia2", mt:"", es:"La familia II", en:"Family II", kind:"scene", words:[
     {m:"malle", es:"tío paterno (hermano del padre)", en:"paternal uncle (father's brother)"},
     {m:"weku", es:"tío materno (hermano de la madre)", en:"maternal uncle (mother's brother)"},
