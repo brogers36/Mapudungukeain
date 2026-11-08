@@ -595,6 +595,39 @@ const POSE=(()=>{
   return D;
 })();
 
+// ===== Kalül: a face close-up (or a large hand/foot) with the named part ringed and pointed at =====
+const KAL=(()=>{
+  const SK="#c98a5a", SKL="#d99a6a", SKD="#a96e44", OUT="#8a5a36", HAIR="#22160e", GOLD="#e8b53a", BG="#2c3150";
+  const W=inner=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="96" height="56" rx="6" fill="${BG}"/>${inner}</g></svg>`;
+  const point=(x,y,rx,ry,ty)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/><path d="M94 ${ty} H${x+rx+5}" stroke="${GOLD}" stroke-width="3"/><path d="M${x+rx+11} ${ty-5} L${x+rx+5} ${ty} L${x+rx+11} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/>`;
+  /* face centred at (42,32), radius 20 */
+  const face=(o={})=>{const X=42,Y=32,R=20;
+    let g=`<path d="M${X-R-2} ${Y-4} Q${X-R-6} ${Y+20} ${X-R+2} ${Y+26} M${X+R+2} ${Y-4} Q${X+R+6} ${Y+20} ${X+R-2} ${Y+26}" stroke="${HAIR}" stroke-width="7" fill="none"/>`;
+    g+=`<path d="M${X-14} 58 Q${X-14} ${Y+16} ${X} ${Y+16} Q${X+14} ${Y+16} ${X+14} 58Z" fill="#c8322f"/>`;
+    g+=`<ellipse cx="${X-R}" cy="${Y+2}" rx="4.4" ry="6.4" fill="${SK}" stroke="${OUT}" stroke-width="1"/><path d="M${X-R-1} ${Y-1} q-2 3 0 6" stroke="${SKD}" stroke-width="1.4" fill="none"/>`;
+    g+=`<ellipse cx="${X+R}" cy="${Y+2}" rx="4.4" ry="6.4" fill="${SK}" stroke="${OUT}" stroke-width="1"/>`;
+    g+=`<ellipse cx="${X}" cy="${Y}" rx="${R}" ry="${R+2}" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/>`;
+    g+=`<path d="M${X-R-1} ${Y-2} A${R+1} ${R+3} 0 0 1 ${X+R+1} ${Y-2} Q${X+R-2} ${Y-13} ${X} ${Y-13} Q${X-R+2} ${Y-13} ${X-R-1} ${Y-2}Z" fill="${HAIR}"/>`;
+    g+=`<path d="M${X-R+.5} ${Y-12.5} H${X+R-.5}" stroke="#ece7dc" stroke-width="4"/><path d="M${X-R+.5} ${Y-12.5} H${X+R-.5}" stroke="#c8322f" stroke-width="1" stroke-dasharray="1.6 2.2"/><circle cx="${X}" cy="${Y-12.5}" r="3" fill="#cfd3dc" stroke="#9aa0ad" stroke-width=".6"/>`;
+    for(const ex of [X-8,X+8]) g+=`<ellipse cx="${ex}" cy="${Y-2}" rx="4" ry="2.8" fill="#fbf8f2"/><circle cx="${ex}" cy="${Y-2}" r="2" fill="#4a2a14"/><circle cx="${ex}" cy="${Y-2}" r=".9" fill="#111"/><path d="M${ex-4.5} ${Y-6.6} Q${ex} ${Y-8.4} ${ex+4.5} ${Y-6.6}" stroke="${HAIR}" stroke-width="1.4" fill="none"/>`;
+    g+=`<path d="M${X} ${Y-1} L${X-3} ${Y+8} Q${X} ${Y+10} ${X+3} ${Y+8.4}" stroke="${SKD}" stroke-width="1.6" fill="none"/>`;
+    g+= o.teeth ? `<path d="M${X-8} ${Y+13} Q${X} ${Y+22} ${X+8} ${Y+13}Z" fill="#6a1a14"/><path d="M${X-7} ${Y+13.4} H${X+7} V${Y+16} Q${X} ${Y+17} ${X-7} ${Y+16}Z" fill="#fbf8f2"/><path d="M${X-3.5} ${Y+13.4} V${Y+16.4} M${X} ${Y+13.4} V${Y+16.8} M${X+3.5} ${Y+13.4} V${Y+16.4}" stroke="#d8d2c4" stroke-width=".7"/>`
+                 : `<path d="M${X-7} ${Y+13} Q${X} ${Y+18} ${X+7} ${Y+13} Q${X} ${Y+15} ${X-7} ${Y+13}Z" fill="#a8423a"/><path d="M${X-7} ${Y+13} Q${X} ${Y+11.6} ${X+7} ${Y+13}" stroke="#7a2a20" stroke-width="1" fill="none"/>`;
+    return g; };
+  const hand=`<g transform="translate(46 37) scale(.82)"><path d="M-12 22 L-13 4 Q-16 -6 -18 -12 Q-19 -16 -15 -16 Q-12 -15 -10 -8 L-9 -2 L-9 -22 Q-9 -26 -5.6 -26 Q-2.6 -26 -2.6 -22 L-2.4 -6 L-2 -26 Q-2 -30 1.4 -30 Q4.6 -30 4.6 -26 L4.6 -6 L5.6 -24 Q5.8 -28 9 -27.6 Q12 -27 11.8 -23 L11 -5 L13 -18 Q13.6 -21 16.2 -20.4 Q18.6 -19.6 18 -16 L16 4 Q15 16 12 22Z" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/><path d="M-6 10 Q2 6 10 8 M-4 2 Q2 0 8 2" stroke="${SKD}" stroke-width="1.1" fill="none"/><path d="M-13 22 H12 V30 H-13Z" fill="#c8322f"/></g>`;
+  const foot=`<g transform="translate(46 38) scale(.9)"><path d="M-30 -24 H-14 V-8 Q-6 -8 6 -4 Q22 0 30 4 Q34 8 30 12 H-26 Q-32 10 -32 0Z" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/>${[[18,1.6],[23,3],[27,5],[30.4,7.4],[32.6,9.6]].map(([x,y],i)=>`<ellipse cx="${x}" cy="${y-1}" rx="${3.2-i*.3}" ry="${2.4-i*.15}" fill="${SKL}" stroke="${OUT}" stroke-width=".8"/>`).join("")}<path d="M-32 -24 H-12 V-30 H-32Z" fill="#34405e"/><path d="M-30 12 H30" stroke="#8a7a5a" stroke-width="2"/></g>`;
+  const bone=`<g transform="translate(78 44) rotate(-30)"><path d="M-10 -1.6 H10 V1.6 H-10Z" fill="#efe8d6" stroke="#b8ae96" stroke-width=".8"/>${[[-10,-2.6],[-10,2.6],[10,-2.6],[10,2.6]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="#efe8d6" stroke="#b8ae96" stroke-width=".8"/>`).join("")}<path d="M-10 -1 H10 V1 H-10Z" fill="#efe8d6"/></g>`;
+  return {
+    nge:W(face()+point(50,30,6.6,5,30)),
+    pilun:W(face()+point(62,34,6.6,9,34)),
+    yu:W(face()+point(42,37,6,6.6,37)),
+    wun:W(face()+point(42,46,10,5,46)),
+    kug:W(hand+point(48,30,19,24,30)),
+    namun:W(foot+point(46,37,33,16,24)),
+    foro:W(face({teeth:true})+point(42,47,9.6,4.6,40).replace(/<path d="M94 40[\s\S]*$/,"")+bone)
+  };
+})();
+
 const NUT = `<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
 const NUT_PIC = {svg:`<svg viewBox="0 0 20 20" width="1em" height="1em" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/></svg>`};
 const KULTRUN_PIC = {svg:`<svg viewBox="0 0 30 24" width="1.2em" height="1em" aria-hidden="true"><ellipse cx="15" cy="12" rx="13" ry="10" fill="#e8d6a0" stroke="#7a5a3c" stroke-width="1.5"/><path d="M15 2V22M2 12H28" stroke="#7a5a3c" stroke-width="1.2"/><g fill="#7a5a3c"><circle cx="9" cy="8" r="1.3"/><circle cx="21" cy="8" r="1.3"/><circle cx="9" cy="16" r="1.3"/><circle cx="21" cy="16" r="1.3"/></g></svg>`};
@@ -1522,10 +1555,10 @@ const STAGES = [
     {m:"mawün",pic:{svg:SCN.mawun},es:"lluvia",en:"rain"},{m:"kürüf",pic:{svg:SCN.kuruf},es:"viento",en:"wind"},
     {m:"mawida",pic:{svg:SCN.mawida},es:"bosque, montaña",en:"forest, wooded hills"}]},
   { id:"kalul", mt:"Kalül", es:"El cuerpo", en:"The body", kind:"pic", words:[
-    {m:"nge",pic:"👁️",es:"ojo",en:"eye"},{m:"pilun",pic:"👂",es:"oreja",en:"ear"},
-    {m:"yu",pic:"👃",es:"nariz",en:"nose"},{m:"wün",pic:"👄",es:"boca",en:"mouth"},
-    {m:"kug",pic:"✋",es:"mano",en:"hand"},{m:"namun",pic:"🦶",es:"pie",en:"foot"},
-    {m:"foro",pic:"🦴🦷",es:"diente, hueso",en:"tooth, bone"}]},
+    {m:"nge",pic:{svg:KAL.nge},es:"ojo",en:"eye"},{m:"pilun",pic:{svg:KAL.pilun},es:"oreja",en:"ear"},
+    {m:"yu",pic:{svg:KAL.yu},es:"nariz",en:"nose"},{m:"wün",pic:{svg:KAL.wun},es:"boca",en:"mouth"},
+    {m:"kug",pic:{svg:KAL.kug},es:"mano",en:"hand"},{m:"namun",pic:{svg:KAL.namun},es:"pie",en:"foot"},
+    {m:"foro",pic:{svg:KAL.foro},es:"diente, hueso",en:"tooth, bone"}]},
   { id:"color", mt:"", es:"Colores", en:"Colors", kind:"color", words:[
     {m:"kelü",pic:{c:"#c8322f"},es:"rojo",en:"red"},{m:"kallfü",pic:{c:"#2f5fd0"},es:"azul",en:"blue"},
     {m:"karü",pic:{c:"#2f9a4f"},es:"verde",en:"green"},{m:"chod",pic:{c:"#e8c21f"},es:"amarillo",en:"yellow"},
