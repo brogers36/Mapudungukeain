@@ -15,7 +15,7 @@ Los nombres de los menús pueden cambiar un poco.
    pestaña *Console*, pegar el contenido de `schema.sql` y ejecutarlo.
 3. **Servicio.** *Workers & Pages → Create → Worker* (plantilla «Hello World»). Nombre: `mapudungukeain-sync`.
    *Deploy*, luego *Edit code*: borrar lo que hay, pegar `worker.js` completo y *Deploy*.
-4. **Conectar la base.** En el Worker: *Settings → Bindings → Add → D1 database*. Variable name: `DB`; base:
+4. **Conectar la base.** En el Worker: *Bindings → Add binding → D1 database* (o *Settings → Bindings*). El nombre puede ser cualquiera (`DB` si lo pide); base:
    `mapudungukeain-sync`. Guardar (vuelve a publicarse solo).
 5. Copiar la dirección del Worker (algo como `https://mapudungukeain-sync.TU-SUBDOMINIO.workers.dev`).
 6. En `index.html` del juego, poner esa dirección en `var SYNC_URL="";` y publicar. Sin dirección, la opción no aparece.

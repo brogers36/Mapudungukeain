@@ -7,7 +7,7 @@
    PUT  /p/CODE  {data, base}  -> {updated} | 404 | 409 {updated}   base = the "updated" value the client last saw;
                                                                      a newer record on the server is not overwritten
                                                                      unless base is "force"
-   Binding: DB (D1). Variable: ORIGINS (comma-separated allowed origins). */
+   Binding: a D1 database (named DB, or any name). Variable: ORIGINS (comma-separated allowed origins). */
 const ALPH = "23456789abcdefghjkmnpqrstuvwxyz";          // no 0/o, 1/l/i
 const WORDS = ["kawellu", "ruka", "mapu", "lafken", "kürüf", "pewen", "antü", "küyen", "wenu", "mawida", "rayen", "trayenko",
   "kulliñ", "challa", "ketran", "ñamku", "choike", "pangi", "nawel", "lemu", "lif", "kütral", "mawün", "pire"]
@@ -32,12 +32,15 @@ const json = (obj, status, h) => new Response(JSON.stringify(obj), { status, hea
 export default {
   async fetch(req, env) {
     const h = cors(req, env), url = new URL(req.url);
+    /* the D1 database: bound as DB, or under whatever name the dashboard gave it */
+    const DB = env.DB || Object.values(env).find(v => v && typeof v.prepare === "function" && typeof v.batch === "function");
+    if (!DB) return json({ error: "no database bound" }, 500, h);
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: h });
     try {
       if (req.method === "POST" && url.pathname === "/new") {
         for (let i = 0; i < 5; i++) {
           const code = newCode(), now = Date.now();
-          const r = await env.DB.prepare("INSERT OR IGNORE INTO progress (code, data, updated, created) VALUES (?, '{}', ?, ?)")
+          const r = await DB.prepare("INSERT OR IGNORE INTO progress (code, data, updated, created) VALUES (?, '{}', ?, ?)")
             .bind(code, now, now).run();
           if (r.meta.changes) return json({ code, updated: now }, 201, h);
         }
@@ -48,7 +51,7 @@ export default {
         const code = decodeURIComponent(m[1]).toLowerCase();
         if (!CODE_RE.test(code)) return json({ error: "bad code" }, 404, h);
         if (req.method === "GET") {
-          const row = await env.DB.prepare("SELECT data, updated FROM progress WHERE code = ?").bind(code).first();
+          const row = await DB.prepare("SELECT data, updated FROM progress WHERE code = ?").bind(code).first();
           if (!row) return json({ error: "not found" }, 404, h);
           return json({ data: JSON.parse(row.data), updated: row.updated }, 200, h);
         }
@@ -59,11 +62,11 @@ export default {
           const data = body && body.data;
           if (!data || typeof data !== "object" || Array.isArray(data)) return json({ error: "bad data" }, 400, h);
           for (const [k, v] of Object.entries(data)) if (!/^mpk_[\w.-]{1,40}$/.test(k) || typeof v !== "string") return json({ error: "bad key" }, 400, h);
-          const row = await env.DB.prepare("SELECT updated FROM progress WHERE code = ?").bind(code).first();
+          const row = await DB.prepare("SELECT updated FROM progress WHERE code = ?").bind(code).first();
           if (!row) return json({ error: "not found" }, 404, h);
           if (body.base !== "force" && Number(body.base) !== row.updated) return json({ error: "conflict", updated: row.updated }, 409, h);
           const now = Math.max(Date.now(), row.updated + 1);
-          await env.DB.prepare("UPDATE progress SET data = ?, updated = ? WHERE code = ?").bind(JSON.stringify(data), now, code).run();
+          await DB.prepare("UPDATE progress SET data = ?, updated = ? WHERE code = ?").bind(JSON.stringify(data), now, code).run();
           return json({ updated: now }, 200, h);
         }
       }
