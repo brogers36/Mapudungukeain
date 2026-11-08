@@ -91,6 +91,7 @@ button{font-family:var(--body)}
 .prompt .ask{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
 .prompt .big{font-family:var(--display);font-size:clamp(2rem,9vw,2.8rem);line-height:1.05}
 .prompt .pic{font-size:4.2rem;min-height:4.4rem}
+.prompt .pic svg[viewBox="0 0 100 60"],.fc .pic svg[viewBox="0 0 100 60"]{width:3.4em;height:2.04em}
 .prompt .dots{grid-template-columns:repeat(5,16px);gap:7px}
 .prompt .dots i{width:16px;height:16px}
 .prompt .swatch{width:90px;height:60px}
@@ -441,6 +442,108 @@ const SCN=(()=>{
     mamull:W(`${ground()}${[[30,48],[56,48],[43,36]].map(([x,y])=>`<rect x="${x-20}" y="${y-6}" width="40" height="12" rx="6" fill="#9a5b2e"/><ellipse cx="${x+20}" cy="${y}" rx="4.5" ry="6" fill="#d9a86a" stroke="#9a5b2e" stroke-width="1"/><ellipse cx="${x+20}" cy="${y}" rx="2" ry="3" fill="none" stroke="#b07a42" stroke-width="1"/>`).join("")}`),
     chinge:W(`${ground()}<path d="M58 44 Q76 46 78 26 Q80 8 92 10 Q86 18 88 30 Q88 50 66 54Z" fill="#1d1b20"/><path d="M80 24 Q82 14 90 12" stroke="#f3efe6" stroke-width="3" fill="none"/><path d="M20 50 Q22 34 42 32 Q62 32 66 48 Q62 54 42 54 Q24 56 20 50Z" fill="#1d1b20"/><path d="M24 42 Q40 30 64 42" stroke="#f3efe6" stroke-width="3.2" fill="none"/><path d="M28 54 V57 M38 54 V57 M50 54 V57 M60 53 V57" stroke="#1d1b20" stroke-width="3"/><path d="M22 46 Q12 46 10 50 Q14 52 22 51Z" fill="#1d1b20"/><circle cx="17" cy="47" r="1" fill="#f3efe6"/>`)
   };
+})();
+
+// ===== Action pictures: one figure (trarilonko, red shirt, trarüwe belt) posed for each verb, with props =====
+const POSE=(()=>{
+  const SK="#c98a5a", SKD="#a96e44", HAIR="#22160e", SHIRT="#c8322f", SHIRTD="#9e2422", PANTS="#34405e", SHOE="#2a1a10", GOLD="#e8b53a", WOOD="#9a5b2e", INK="#2a2652", PALE="#8b86ad";
+  const W=inner=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+  const P=a=>a.join(" ");
+  /* f = {h:[x,y] head, n:neck, hp:hip, e1,h1 back arm elbow/hand, e2,h2 front arm, k1,f1 back leg knee/foot, k2,f2 front leg,
+          dir: 1 right / -1 left / 0 front, face, r head radius, fade, noLegs} */
+  function fig(f){
+    const r=f.r||6.4, d=f.dir??1, [hx,hy]=f.h, op=f.fade?` opacity="${f.fade}"`:"";
+    const leg=(k,ft)=>`<path d="M${P(f.hp)} L${P(k)} L${P(ft)}" stroke="${PANTS}" stroke-width="5.4" fill="none"/><ellipse cx="${ft[0]+(d||0)*1.6}" cy="${ft[1]}" rx="3.4" ry="1.8" fill="${SHOE}"/>`;
+    const arm=(e,h,back)=>`<path d="M${P(f.n)} L${P(e)}" stroke="${back?SHIRTD:SHIRT}" stroke-width="4.6" fill="none"/><path d="M${P(e)} L${P(h)}" stroke="${back?SKD:SK}" stroke-width="3.6" fill="none"/><circle cx="${h[0]}" cy="${h[1]}" r="2.3" fill="${back?SKD:SK}"/>`;
+    let s=`<g${op}>`;
+    if(!f.noLegs) s+=leg(f.k1,f.f1);
+    s+=arm(f.e1,f.h1,true);
+    if(!f.noLegs) s+=leg(f.k2,f.f2);
+    // torso: shirt from neck to hip, belt at the hip
+    const [nx,ny]=f.n,[px,py]=f.hp;
+    s+=`<path d="M${nx} ${ny+2} L${px} ${py-2}" stroke="${SHIRT}" stroke-width="11"/>`;
+    const ang=Math.atan2(py-ny,px-nx), bx=px-Math.cos(ang)*3.2, by=py-Math.sin(ang)*3.2, ox=Math.sin(ang)*5.2, oy=-Math.cos(ang)*5.2;
+    s+=`<path d="M${bx-ox} ${by-oy} L${bx+ox} ${by+oy}" stroke="${GOLD}" stroke-width="2.4"/>`;
+    s+=`<path d="M${nx} ${ny} L${hx} ${hy+r*.6}" stroke="${SK}" stroke-width="3.2"/>`;
+    // head, hair, trarilonko, face
+    s+=`<circle cx="${hx}" cy="${hy}" r="${r}" fill="${SK}"/>`;
+    s+=`<path d="M${hx-r} ${hy-.6} A${r} ${r} 0 0 1 ${hx+r} ${hy-.6} Q${hx+r*.4*(d||0)} ${hy-r*.55} ${hx-r*.1*(d||0)} ${hy-r*.35}Z" fill="${HAIR}"/>`;
+    if(d) s+=`<path d="M${hx-d*r*.8} ${hy-r*.3} Q${hx-d*r*1.25} ${hy+r*.5} ${hx-d*r*1.05} ${hy+r*1.25}" stroke="${HAIR}" stroke-width="${r*.42}" fill="none"/>`;
+    else s+=`<path d="M${hx-r*.95} ${hy-r*.2} Q${hx-r*1.2} ${hy+r*.6} ${hx-r*.9} ${hy+r*1.2} M${hx+r*.95} ${hy-r*.2} Q${hx+r*1.2} ${hy+r*.6} ${hx+r*.9} ${hy+r*1.2}" stroke="${HAIR}" stroke-width="${r*.36}" fill="none"/>`;
+    /* trarilonko: a band across the forehead, with a small silver plate in front */
+    const ty=hy-r*.42, tw=Math.sqrt(r*r-(r*.42)**2);
+    s+=`<path d="M${hx-tw} ${ty} L${hx+tw} ${ty}" stroke="#e9e4da" stroke-width="${r*.26}"/>`;
+    if(d) s+=`<circle cx="${hx+d*tw*.55}" cy="${ty}" r="${r*.2}" fill="#c9cdd6"/>`; else s+=`<circle cx="${hx}" cy="${ty}" r="${r*.2}" fill="#c9cdd6"/>`;
+    s+=face(hx,hy,r,d,f.face||"smile");
+    return s+`</g>`;
+  }
+  function face(x,y,r,d,kind){
+    const ex=d?[x+d*r*.18,x+d*r*.62]:[x-r*.34,x+r*.34], ey=y+r*.02, mx=d?x+d*r*.42:x, my=y+r*.5, k=r/6.4;
+    const eyes=kind==="sleep"||kind==="laugh"||kind==="cry"
+      ? ex.map(e=>`<path d="M${e-1.3*k} ${ey} Q${e} ${ey+(kind==="cry"?-1.2:1.3)*k} ${e+1.3*k} ${ey}" stroke="${HAIR}" stroke-width="${.9*k}" fill="none"/>`).join("")
+      : ex.map(e=>`<circle cx="${e}" cy="${ey}" r="${.95*k}" fill="${HAIR}"/>`).join("");
+    const m={
+      smile:`<path d="M${mx-1.6*k} ${my-.3*k} Q${mx} ${my+1.2*k} ${mx+1.6*k} ${my-.3*k}" stroke="#7a2a20" stroke-width="${.9*k}" fill="none"/>`,
+      open:`<ellipse cx="${mx}" cy="${my}" rx="${1.5*k}" ry="${1.3*k}" fill="#5a1a14"/>`,
+      shout:`<ellipse cx="${mx}" cy="${my}" rx="${2*k}" ry="${2.1*k}" fill="#5a1a14"/>`,
+      sip:`<circle cx="${mx}" cy="${my-.2*k}" r="${.8*k}" fill="#5a1a14"/>`,
+      sleep:`<path d="M${mx-1*k} ${my} H${mx+1*k}" stroke="#7a2a20" stroke-width="${.8*k}"/>`,
+      laugh:`<path d="M${mx-2.6*k} ${my-.8*k} Q${mx} ${my+3.6*k} ${mx+2.6*k} ${my-.8*k}Z" fill="#5a1a14"/><path d="M${mx-1.3*k} ${my+1.2*k} Q${mx} ${my+.4*k} ${mx+1.3*k} ${my+1.2*k} Q${mx} ${my+2.4*k} ${mx-1.3*k} ${my+1.2*k}Z" fill="#e0707a"/>`,
+      cry:`<path d="M${mx-1.8*k} ${my+.8*k} Q${mx} ${my-.8*k} ${mx+1.8*k} ${my+.8*k}" stroke="#7a2a20" stroke-width="${.9*k}" fill="none"/>`,
+      think:`<path d="M${mx-1.2*k} ${my} H${mx+1.4*k}" stroke="#7a2a20" stroke-width="${.8*k}"/>`
+    }[kind]||"";
+    const tears=kind==="cry"?ex.map(e=>`<path d="M${e} ${ey+1.4*k} q${-.8*k} ${2.4*k} 0 ${3.4*k} q${.8*k} ${-1*k} 0 ${-3.4*k}Z" fill="#7cc4f0"/>`).join(""):"";
+    return eyes+m+tears;
+  }
+  /* stock poses (feet on the ground line y=56) */
+  const stand=(x,o={})=>fig(Object.assign({h:[x,12],n:[x,20],hp:[x,36],e1:[x-4,28],h1:[x-5,35],e2:[x+4,28],h2:[x+5,35],k1:[x-2,46],f1:[x-3,56],k2:[x+2,46],f2:[x+3,56],dir:0},o));
+  const walk=(x,d=1,o={})=>fig(Object.assign({h:[x+d,12],n:[x,20],hp:[x-d,36],e1:[x-d*4,27],h1:[x-d*7,33],e2:[x+d*4,27],h2:[x+d*7,32],k1:[x-d*4,46],f1:[x-d*9,56],k2:[x+d*3,45],f2:[x+d*6,56],dir:d},o));
+  const sit=(x,d=1,o={})=>fig(Object.assign({h:[x+d,14],n:[x,22],hp:[x-d,37],e1:[x+d*2,30],h1:[x+d*6,36],e2:[x+d*4,30],h2:[x+d*8,35],k1:[x+d*9,38],f1:[x+d*9,56],k2:[x+d*11,38],f2:[x+d*12,56],dir:d},o));
+  const ground=`<path d="M2 56.5 H98" stroke="#8a7a5a" stroke-width="1.8"/>`;
+  const arrow=(x1,y1,x2,y2,c=GOLD)=>{const a=Math.atan2(y2-y1,x2-x1),L=6;return `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${c}" stroke-width="3" fill="none"/><path d="M${x2-L*Math.cos(a-.5)} ${y2-L*Math.sin(a-.5)} L${x2} ${y2} L${x2-L*Math.cos(a+.5)} ${y2-L*Math.sin(a+.5)}" stroke="${c}" stroke-width="3" fill="none"/>`};
+  const ruka=(x,k=1)=>`<g transform="translate(${x} 56) scale(${k})"><path d="M-30 0 Q-30 -30 0 -34 Q30 -30 30 0Z" fill="#c9a25a"/>${[-24,-17,-10].map((dd,i)=>`<path d="M${-28+i*3} ${dd} Q0 ${dd-10+i*2} ${28-i*3} ${dd}" stroke="#a07a3a" stroke-width="1.5" fill="none"/>`).join("")}<path d="M-8 0 V-15 Q0 -22 8 -15 V0Z" fill="#2a1a10"/></g>`;
+  const bench=(x1,x2,y=40)=>`<rect x="${x1}" y="${y}" width="${x2-x1}" height="4.5" rx="1.5" fill="${WOOD}"/><path d="M${x1+3} ${y+4} V56 M${x2-3} ${y+4} V56" stroke="${WOOD}" stroke-width="3"/>`;
+  const notes=(x,y,c=GOLD)=>`<g fill="${c}" stroke="${c}"><path d="M${x} ${y} V${y-10} L${x+7} ${y-12} V${y-2}" stroke-width="1.6" fill="none"/><ellipse cx="${x-1.8}" cy="${y}" rx="2.4" ry="1.8"/><ellipse cx="${x+5.2}" cy="${y-2}" rx="2.4" ry="1.8"/></g>`;
+  const bubble=(x,y,w,h,tx,ty)=>`<path d="M${x} ${y} h${w} a3 3 0 0 1 3 3 v${h} a3 3 0 0 1 -3 3 h${-w+8} l-6 6 l1 -6 h-3 a3 3 0 0 1 -3 -3 v${-h} a3 3 0 0 1 3 -3Z" fill="#f3efe6"/>${[0,1,2].map(i=>`<path d="M${x+3} ${y+4+i*4} h${w-6-(i===2?8:0)}" stroke="${INK}" stroke-width="1.8"/>`).join("")}`;
+  const D={
+    // ---- Dungu ----
+    go:W(`${ground}${ruka(16,.5)}<path d="M28 56.5 H62" stroke="#c9b48a" stroke-width="1.6" stroke-dasharray="3 3"/>${walk(52,1)}${arrow(68,30,92,30)}`),
+    eat:W(`${ground}${bench(20,46)}${sit(34,1,{e2:[41,28],h2:[41,19],face:"open"})}<path d="M41 19 L46 27" stroke="#c9c4bc" stroke-width="1.6"/><rect x="54" y="40" width="34" height="4" rx="1.5" fill="${WOOD}"/><path d="M58 44 V56 M84 44 V56" stroke="${WOOD}" stroke-width="3"/><path d="M60 34 Q60 41 70 41 Q80 41 80 34Z" fill="#7a4522"/><ellipse cx="70" cy="34" rx="10" ry="2.2" fill="#e8c48a"/><path d="M66 30 q-2 -4 0 -8 M74 30 q-2 -4 0 -8" stroke="#f3efe6" stroke-width="1.4" fill="none" opacity=".7"/>`),
+    drink:W(`${ground}${stand(40,{dir:1,h:[41,12],e2:[47,26],h2:[48,17],face:"sip"})}<path d="M47 12 L54 11 L53 21 L48 21Z" fill="#cfe3f0" stroke="#7aa6c4" stroke-width="1"/><path d="M48.5 14 L53.6 13.6 L53.2 20 L48.6 20Z" fill="#5aa0d8"/><g transform="translate(74 56)"><path d="M-8 0 Q-12 -10 -7 -18 L-5 -24 H5 L7 -18 Q12 -10 8 0Z" fill="#b5653a"/><path d="M-5 -24 H5" stroke="#8a4a2a" stroke-width="2"/><path d="M-8 -12 H8" stroke="#e8c48a" stroke-width="1.4"/></g>`),
+    sleep:W(`<rect x="8" y="42" width="84" height="6" rx="2" fill="${WOOD}"/><path d="M12 48 V56 M88 48 V56 M10 42 V30" stroke="${WOOD}" stroke-width="3.5"/>${ground}<ellipse cx="20" cy="38" rx="9" ry="4.5" fill="#f3efe6"/><circle cx="24" cy="33" r="6.2" fill="${SK}"/><path d="M18 31 A6.2 6.2 0 0 1 28 28 Q24 30 20 35Z" fill="${HAIR}"/>${face(24,33,6.2,1,"sleep")}<path d="M28 34 Q30 26 52 28 Q82 26 86 34 Q88 42 84 43 H30 Q26 42 28 34Z" fill="${SHIRT}"/><path d="M34 31 L84 31 M32 37 L86 37" stroke="#f3efe6" stroke-width="1.4" stroke-dasharray="3 2"/><g fill="${GOLD}" font-family="sans-serif" font-weight="700"><text x="34" y="20" font-size="7">z</text><text x="41" y="13" font-size="9">z</text><text x="50" y="7" font-size="11">Z</text></g>`),
+    run:W(`${ground}${fig({h:[54,13],n:[52,21],hp:[46,35],e1:[44,26],h1:[38,30],e2:[58,28],h2:[62,22],k1:[38,40],f1:[30,46],k2:[56,42],f2:[56,56],dir:1,face:"open"})}<path d="M14 22 H30 M8 30 H28 M16 38 H30" stroke="${GOLD}" stroke-width="2.6"/><g fill="#a89070" opacity=".8"><circle cx="40" cy="54" r="2.4"/><circle cx="34" cy="55" r="1.8"/><circle cx="28" cy="55.5" r="1.2"/></g>`),
+    dance:W(`${ground}${fig({h:[50,12],n:[50,20],hp:[50,36],e1:[42,16],h1:[38,8],e2:[58,16],h2:[62,8],k1:[45,46],f1:[44,56],k2:[57,40],f2:[54,48],dir:0,face:"laugh"})}${notes(22,22)}${notes(76,18)}<path d="M30 40 q-4 -6 0 -12 M70 40 q4 -6 0 -12" stroke="${GOLD}" stroke-width="2" fill="none"/>`),
+    speak:W(`${ground}${stand(28,{dir:1,h:[29,12],e2:[33,28],h2:[39,26],face:"open"})}${bubble(46,6,42,10)}`),
+    listen:W(`${ground}${stand(66,{dir:-1,h:[65,12],e1:[62,28],h1:[61,35],e2:[73,20],h2:[70,11],face:"smile"})}<path d="M73 7 Q76 11 73 15" stroke="${GOLD}" stroke-width="1.4" fill="none"/>${stand(16,{dir:1,fade:.45,face:"open"})}${[0,1,2].map(i=>`<path d="M${32+i*7} ${4+i*0} q5 8 0 16" stroke="${GOLD}" stroke-width="2.4" fill="none" transform="translate(${i*2} ${2})"/>`).join("")}`),
+    // ---- Dungu II ----
+    come:W(`${ground}${walk(34,1)}${arrow(46,30,62,30)}${stand(80,{dir:-1,h:[79,12],e2:[74,16],h2:[71,7],face:"smile"})}<path d="M66 4 q-3 3 0 6 M62 2 q-4 5 0 10" stroke="${GOLD}" stroke-width="1.6" fill="none"/>`),
+    exit:W(`${ground}${ruka(30,.95)}${walk(56,1,{f1:[42,56]})}${arrow(68,30,92,30)}`),
+    sit:W(`${ground}${bench(36,72)}${sit(50,1,{e1:[52,30],h1:[56,37],e2:[54,30],h2:[60,36]})}${arrow(22,10,22,38)}`),
+    stand:W(`${ground}${bench(18,46)}${stand(60,{dir:1,h:[61,10],n:[60,18],hp:[60,34],k1:[58,45],k2:[62,45]})}${arrow(80,40,80,10)}<path d="M40 30 Q48 22 54 26" stroke="${PALE}" stroke-width="1.8" fill="none" stroke-dasharray="2 2"/>`),
+    cry:W(`<g transform="translate(50 33)">${(()=>{const r=16;return `<path d="M-20 27 Q-20 10 0 10 Q20 10 20 27Z" fill="${SHIRT}"/>`+`<circle cx="0" cy="-6" r="${r}" fill="${SK}"/><path d="M${-r} -6.6 A${r} ${r} 0 0 1 ${r} -6.6 Q4 -14 -2 -13Z" fill="${HAIR}"/><path d="M${-r*.95} -9 Q${-r*1.2} 4 ${-r*.9} 12 M${r*.95} -9 Q${r*1.2} 4 ${r*.9} 12" stroke="${HAIR}" stroke-width="5" fill="none"/><path d="M${-r*.91} -12.7 H${r*.91}" stroke="#e9e4da" stroke-width="4"/><circle cx="0" cy="-12.7" r="3" fill="#c9cdd6"/>`+face(0,-6,r,0,"cry")+`<path d="M-6 -2 q-3 8 -1 16 M6 -2 q3 8 1 16" stroke="#7cc4f0" stroke-width="2.4" fill="none"/>`})()}</g><g fill="#7cc4f0"><path d="M20 30 q-2 5 0 7 q2 -2 0 -7Z"/><path d="M80 34 q-2 5 0 7 q2 -2 0 -7Z"/></g>`),
+    shout:W(`${ground}${stand(30,{dir:1,h:[31,12],e1:[36,22],h1:[37,16],e2:[37,24],h2:[38,18],face:"shout"})}<g stroke="${GOLD}" stroke-width="2.8"><path d="M44 8 L56 2 M45 14 L62 14 M44 20 L56 26"/></g><path d="M66 6 L72 12 L78 4 L80 13 L90 10 L84 18 L94 22 L84 25 L88 34 L79 30 L74 38 L71 29 L62 30 L67 22Z" fill="#f3efe6"/><text x="73" y="24" font-size="11" font-weight="800" fill="${SHIRT}" font-family="sans-serif">!</text>`),
+    walk:W(`${ground}${walk(66,1)}<g fill="#8a7a5a">${[[12,52],[22,55],[32,52],[42,55],[52,52]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="3" ry="1.5"/>`).join("")}</g>`),
+    search:W(`${ground}${fig({h:[38,14],n:[36,21],hp:[32,36],e1:[30,28],h1:[30,35],e2:[42,18],h2:[42,11],k1:[30,46],f1:[28,56],k2:[36,46],f2:[38,56],dir:1,face:"think"})}<path d="M45 14 L80 34" stroke="${GOLD}" stroke-width="1.4" stroke-dasharray="3 2.5"/><g fill="#3d8a52"><circle cx="76" cy="46" r="9"/><circle cx="86" cy="48" r="8"/><circle cx="68" cy="50" r="6"/></g><text x="62" y="20" font-size="18" font-weight="800" fill="${GOLD}" font-family="sans-serif">?</text>`),
+    // ---- Küdaw ----
+    work:W(`${ground}${fig({h:[38,13],n:[38,21],hp:[37,36],e1:[44,14],h1:[50,8],e2:[46,16],h2:[52,9],k1:[34,46],f1:[32,56],k2:[42,46],f2:[44,56],dir:1,face:"smile"})}<path d="M51 8 L64 34" stroke="${WOOD}" stroke-width="2.6"/><path d="M62 30 L70 32 L66 39 L60 36Z" fill="#c9c4bc"/><rect x="60" y="46" width="30" height="10" rx="2" fill="#7a4a2a"/><ellipse cx="90" cy="51" rx="3" ry="5" fill="#d9a86a"/><path d="M72 40 l-3 -4 M78 41 l2 -5" stroke="${GOLD}" stroke-width="1.8"/>`),
+    laugh:W(`<g transform="translate(50 32)">${(()=>{const r=17;return `<circle cx="0" cy="0" r="${r}" fill="${SK}"/><path d="M${-r} -.6 A${r} ${r} 0 0 1 ${r} -.6 Q4 -8 -2 -7Z" fill="${HAIR}"/><path d="M${-r*.91} -6.7 H${r*.91}" stroke="#e9e4da" stroke-width="4"/><circle cx="0" cy="-6.7" r="3" fill="#c9cdd6"/>`+face(0,0,r,0,"laugh")})()}</g><g stroke="${GOLD}" stroke-width="2.4"><path d="M18 18 L26 22 M14 32 H24 M18 46 L26 42 M82 18 L74 22 M86 32 H76 M82 46 L74 42"/></g>`),
+    play:W(`${ground}${fig({h:[36,13],n:[36,21],hp:[38,36],e1:[30,22],h1:[26,16],e2:[32,26],h2:[28,19],k1:[34,46],f1:[30,56],k2:[42,46],f2:[46,56],dir:1,face:"open"})}<path d="M27 17 Q40 40 58 52 Q62 55 66 52" stroke="${WOOD}" stroke-width="3" fill="none"/><circle cx="76" cy="46" r="4" fill="#f3efe6" stroke="#8a7a5a" stroke-width="1"/><path d="M84 44 H94 M83 49 H92" stroke="${GOLD}" stroke-width="2"/>`),
+    write:W(`${ground}${bench(14,40)}${sit(26,1,{e1:[32,30],h1:[40,36],e2:[34,30],h2:[46,34],face:"think"})}<rect x="42" y="40" width="46" height="4" rx="1.5" fill="${WOOD}"/><path d="M46 44 V56 M84 44 V56" stroke="${WOOD}" stroke-width="3"/><path d="M48 39 L80 39 L82 33 L50 33Z" fill="#f3efe6"/><path d="M54 36 q4 -2 8 0 t8 0" stroke="${INK}" stroke-width="1.2" fill="none"/><path d="M46 34 L52 24" stroke="${GOLD}" stroke-width="2.2"/>`),
+    know:W(`${ground}${stand(44,{dir:1,h:[45,14],n:[44,22],hp:[44,37],e2:[50,24],h2:[50,16],face:"smile"})}<g transform="translate(64 14)"><circle r="7" fill="#f6d04a"/><rect x="-3" y="6" width="6" height="5" rx="1" fill="#c9c4bc"/>${[0,45,90,135,180,225,270,315].map(a=>`<path d="M${Math.cos(a*Math.PI/180)*10} ${Math.sin(a*Math.PI/180)*10} L${Math.cos(a*Math.PI/180)*14} ${Math.sin(a*Math.PI/180)*14}" stroke="${GOLD}" stroke-width="2"/>`).join("")}</g>`),
+    see:W(`${ground}${stand(24,{dir:1,face:"smile"})}<path d="M30 12 L76 18 M30 12 L76 26" stroke="${GOLD}" stroke-width="1.4" stroke-dasharray="3 2.5"/><g transform="translate(82 22)"><path d="M-8 0 Q0 -8 8 0 Q0 4 -8 0Z" fill="#6f9bff"/><circle cx="5" cy="-2" r="3.2" fill="#6f9bff"/><path d="M8 -2 l3 1 l-3 1Z" fill="${GOLD}"/><path d="M-4 -2 Q-8 -10 -14 -8" stroke="#6f9bff" stroke-width="2.4" fill="none"/></g><path d="M22 34 h0" />`),
+    enter:W(`${ground}${ruka(70,.95)}${walk(44,1,{fade:1})}${arrow(20,30,38,30)}`),
+    sing:W(`${ground}${stand(36,{dir:1,h:[37,12],e2:[40,26],h2:[37,24],face:"open"})}${notes(52,18)}${notes(68,10)}${notes(80,26)}`),
+    // ---- Küdaw II ----
+    weave:W(`${ground}<rect x="52" y="4" width="4" height="52" fill="${WOOD}"/><rect x="88" y="4" width="4" height="52" fill="${WOOD}"/><rect x="50" y="6" width="44" height="3.5" fill="${WOOD}"/><rect x="50" y="46" width="44" height="3.5" fill="${WOOD}"/><rect x="57" y="10" width="30" height="35" fill="${SHIRT}"/><path d="M72 14 L80 27 L72 40 L64 27Z" fill="#f3efe6"/><path d="M72 20 L76 27 L72 34 L68 27Z" fill="${INK}"/>${[60,66,72,78,84].map(x=>`<path d="M${x} 10 V45" stroke="#f3efe6" stroke-width=".5" opacity=".5"/>`).join("")}${sit(30,1,{h:[31,16],n:[30,24],hp:[29,39],e1:[40,30],h1:[54,28],e2:[42,32],h2:[56,34],k1:[38,40],f1:[38,56],k2:[40,40],f2:[41,56]})}`),
+    sweep:W(`${ground}${fig({h:[40,13],n:[40,21],hp:[40,36],e1:[46,25],h1:[50,28],e2:[46,30],h2:[52,36],k1:[37,46],f1:[35,56],k2:[44,46],f2:[46,56],dir:1,face:"smile"})}<path d="M48 22 L64 50" stroke="${WOOD}" stroke-width="2.4"/><path d="M60 46 L72 54 L64 57 L58 52Z" fill="#d9b85a"/><g fill="#a89070"><circle cx="78" cy="54" r="1.6"/><circle cx="84" cy="52" r="1.2"/><circle cx="82" cy="56" r="1.4"/><circle cx="90" cy="54" r="1"/></g>`),
+    wash:W(`${ground}${fig({h:[34,16],n:[34,24],hp:[30,38],e1:[42,32],h1:[50,40],e2:[44,34],h2:[54,42],k1:[28,47],f1:[26,56],k2:[36,46],f2:[38,56],dir:1,face:"smile"})}<path d="M46 40 L84 40 L80 56 L50 56Z" fill="#7aa6c4"/><path d="M47 42 H83" stroke="#cfe3f0" stroke-width="2"/><path d="M56 40 q4 -4 8 0 q4 -4 8 0" fill="#f3efe6"/>${[[60,32,3],[70,28,2.4],[78,34,2],[66,22,1.6]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#cfe3f0" stroke-width="1.2"/>`).join("")}`),
+    cut:W(`${ground}${stand(30,{dir:1,h:[31,12],e1:[36,28],h1:[44,36],e2:[37,26],h2:[48,28]})}<path d="M48 28 L60 36" stroke="#c9c4bc" stroke-width="2.6"/><path d="M46 26 L50 29" stroke="${HAIR}" stroke-width="3"/><rect x="42" y="38" width="48" height="4" rx="1.5" fill="${WOOD}"/><path d="M46 42 V56 M86 42 V56" stroke="${WOOD}" stroke-width="3"/><rect x="50" y="35" width="34" height="3" rx="1" fill="#d9a86a"/><g fill="#e8c48a" stroke="#b07a42" stroke-width=".8"><ellipse cx="66" cy="32" rx="5" ry="3"/><ellipse cx="74" cy="32" rx="4" ry="3"/><ellipse cx="81" cy="32.4" rx="3" ry="2.6"/></g>`),
+    buy:W(`${ground}${stand(26,{dir:1,e2:[32,26],h2:[40,26]})}<circle cx="44" cy="25" r="3.4" fill="${GOLD}" stroke="#a87a1a" stroke-width="1"/>${stand(74,{dir:-1,e2:[68,26],h2:[60,27],fade:1})}<path d="M50 20 Q58 14 60 22 Q60 30 52 30 Q46 28 50 20Z" fill="#d9a86a" stroke="#a87a42" stroke-width="1"/><path d="M38 34 Q50 42 62 34" stroke="${PALE}" stroke-width="1.6" fill="none" stroke-dasharray="2 2"/>`),
+    build:W(`${ground}<path d="M54 56 V20 M88 56 V20 M50 22 L71 8 L92 22" stroke="${WOOD}" stroke-width="3.2" fill="none"/><path d="M54 38 H88 M54 30 L88 46" stroke="${WOOD}" stroke-width="2.4"/>${fig({h:[30,13],n:[30,21],hp:[29,36],e1:[24,28],h1:[22,35],e2:[38,18],h2:[44,12],k1:[27,46],f1:[25,56],k2:[33,46],f2:[35,56],dir:1,face:"smile"})}<path d="M44 12 L52 24" stroke="${WOOD}" stroke-width="2"/><rect x="48" y="21" width="9" height="4.5" rx="1" fill="#6e6b67" transform="rotate(56 52 23)"/><path d="M58 30 l4 -3 M58 34 l5 0" stroke="${GOLD}" stroke-width="1.8"/>`),
+    read:W(`${ground}${bench(24,56)}${sit(38,1,{h:[39,14],e1:[42,30],h1:[50,28],e2:[44,32],h2:[54,30],face:"smile"})}<path d="M48 30 L56 18 L66 22 L58 34Z" fill="#f3efe6" stroke="${INK}" stroke-width=".8"/><path d="M58 34 L66 22 L74 20 L68 32Z" fill="#e6e1d4" stroke="${INK}" stroke-width=".8"/><path d="M52 27 L57 21 M54 29 L59 23 M60 30 L66 24 M62 31 L68 25" stroke="${INK}" stroke-width=".9"/>`),
+    cook:W(`${ground}${fig({h:[34,13],n:[34,21],hp:[33,36],e1:[30,28],h1:[30,35],e2:[42,24],h2:[52,28],k1:[31,46],f1:[29,56],k2:[37,46],f2:[39,56],dir:1,face:"smile"})}<path d="M52 28 L62 40" stroke="${WOOD}" stroke-width="2.2"/><path d="M54 36 Q54 50 68 50 Q82 50 82 36Z" fill="#3a3a40"/><ellipse cx="68" cy="36" rx="14" ry="3" fill="#c98a4a"/><path d="M52 36 h-3 M84 36 h3" stroke="#3a3a40" stroke-width="2.4"/><path d="M58 56 L78 52 M58 52 L78 56" stroke="#7a4a2a" stroke-width="3"/><path d="M62 52 q3 -6 6 0 q3 -6 6 0" fill="#e8642f"/><path d="M64 30 q-2 -5 0 -10 M72 30 q-2 -5 0 -10" stroke="#f3efe6" stroke-width="1.4" fill="none" opacity=".7"/>`)
+  };
+  return D;
 })();
 
 const NUT = `<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
@@ -1412,10 +1515,10 @@ const STAGES = [
     {m:"dewü",pic:"🐭",es:"ratón",en:"mouse"},{m:"üñüm",pic:"🐦",es:"pájaro",en:"bird"},
     {m:"chiñge",pic:{svg:SCN.chinge},es:"chingue, zorrillo",en:"skunk"}]},
   { id:"kudaw", mt:"Küdaw", es:"Lo que hacemos", en:"Everyday actions", kind:"pic", words:[
-    {m:"küdawün",pic:{svg:ACT.work},es:"trabajar",en:"to work"},{m:"ayen",pic:{svg:ACT.laugh},es:"reírse",en:"to laugh"},
-    {m:"awkantun",pic:{svg:ACT.play},es:"jugar",en:"to play"},{m:"wirin",pic:{svg:ACT.write},es:"escribir, dibujar",en:"to write, to draw"},
-    {m:"kimün",pic:{svg:ACT.know},es:"saber, conocer",en:"to know"},{m:"pen",pic:{svg:ACT.see},es:"ver, encontrar",en:"to see, to find"},
-    {m:"konün",pic:{svg:ACT.enter},es:"entrar",en:"to enter"},{m:"ülkantun",pic:{svg:ICON.sing},es:"cantar",en:"to sing"}]},
+    {m:"küdawün",pic:{svg:POSE.work},es:"trabajar",en:"to work"},{m:"ayen",pic:{svg:POSE.laugh},es:"reírse",en:"to laugh"},
+    {m:"awkantun",pic:{svg:POSE.play},es:"jugar",en:"to play"},{m:"wirin",pic:{svg:POSE.write},es:"escribir, dibujar",en:"to write, to draw"},
+    {m:"kimün",pic:{svg:POSE.know},es:"saber, conocer",en:"to know"},{m:"pen",pic:{svg:POSE.see},es:"ver, encontrar",en:"to see, to find"},
+    {m:"konün",pic:{svg:POSE.enter},es:"entrar",en:"to enter"},{m:"ülkantun",pic:{svg:POSE.sing},es:"cantar",en:"to sing"}]},
   { id:"conj", mt:"Amun, amuymi, amuy…", es:"Conjugar: las nueve personas", en:"Conjugating: all nine persons", kind:"verb",
     gen:()=>genConj(8),
     examples:()=>[0,1,2,3,4,5,6,7,8].map(i=>conjForm(CONJ_VERBS[0],i)).concat([0,2,6].map(i=>conjForm(CONJ_VERBS[4],i))),
@@ -1439,10 +1542,10 @@ const STAGES = [
     {m:"metawe",pic:"🏺",es:"cántaro",en:"jug"},{m:"challa",pic:{svg:ICON.pot},es:"olla",en:"pot"},
     {m:"kultrun",pic:KULTRUN_PIC,es:"tambor ceremonial",en:"ceremonial drum"}]},
   { id:"dungu", mt:"Dungu", es:"Acciones", en:"Actions", kind:"pic", words:[
-    {m:"amun",pic:{svg:ACT.go},es:"ir",en:"to go"},{m:"in",pic:{svg:ACT.eat},es:"comer",en:"to eat"},
-    {m:"pütokon",pic:{svg:ACT.drink},es:"beber",en:"to drink"},{m:"umawtun",pic:{svg:ACT.sleep},es:"dormir",en:"to sleep"},
-    {m:"lefün",pic:{svg:ACT.run},es:"correr",en:"to run"},{m:"pürun",pic:{svg:ACT.dance},es:"bailar",en:"to dance"},
-    {m:"dungun",pic:{svg:ACT.speak},es:"hablar",en:"to speak"},{m:"allkütun",pic:{svg:ACT.listen},es:"escuchar",en:"to listen"}]},
+    {m:"amun",pic:{svg:POSE.go},es:"ir",en:"to go"},{m:"in",pic:{svg:POSE.eat},es:"comer",en:"to eat"},
+    {m:"pütokon",pic:{svg:POSE.drink},es:"beber",en:"to drink"},{m:"umawtun",pic:{svg:POSE.sleep},es:"dormir",en:"to sleep"},
+    {m:"lefün",pic:{svg:POSE.run},es:"correr",en:"to run"},{m:"pürun",pic:{svg:POSE.dance},es:"bailar",en:"to dance"},
+    {m:"dungun",pic:{svg:POSE.speak},es:"hablar",en:"to speak"},{m:"allkütun",pic:{svg:POSE.listen},es:"escuchar",en:"to listen"}]},
   { id:"kinerakin", mt:"Rakin chem", es:"Contar cosas", en:"Counting things", kind:"count",
     gen:()=>genCount(8),
     rule:{es:"El número va antes del sustantivo, y el sustantivo no cambia: <b>küla trewa</b> “tres perros”.",
@@ -1518,23 +1621,23 @@ const STAGES = [
     {m:"lichi",pic:"🥛",es:"leche",en:"milk"},
     {m:"kuram",pic:"🥚",es:"huevo",en:"egg"}]},
   { id:"kudaw2", mt:"Küdaw II", es:"Más trabajos", en:"More work", kind:"pic", words:[
-    {m:"ngüren",pic:{svg:ACT2.weave},es:"tejer",en:"to weave"},
-    {m:"lepün",pic:{svg:ACT2.sweep},es:"barrer",en:"to sweep"},
-    {m:"küchan",pic:{svg:ACT2.wash},es:"lavar",en:"to wash"},
-    {m:"katrün",pic:{svg:ACT2.cut},es:"cortar",en:"to cut"},
-    {m:"ngillan",pic:{svg:ACT2.buy},es:"comprar",en:"to buy"},
-    {m:"dewman",pic:{svg:ACT2.build},es:"hacer, construir",en:"to make, to build"},
-    {m:"chillkatun",pic:{svg:ACT2.read},es:"leer, estudiar",en:"to read, to study"},
-    {m:"afümün",pic:{svg:ACT2.cook},es:"cocinar, cocer",en:"to cook"}]},
+    {m:"ngüren",pic:{svg:POSE.weave},es:"tejer",en:"to weave"},
+    {m:"lepün",pic:{svg:POSE.sweep},es:"barrer",en:"to sweep"},
+    {m:"küchan",pic:{svg:POSE.wash},es:"lavar",en:"to wash"},
+    {m:"katrün",pic:{svg:POSE.cut},es:"cortar",en:"to cut"},
+    {m:"ngillan",pic:{svg:POSE.buy},es:"comprar",en:"to buy"},
+    {m:"dewman",pic:{svg:POSE.build},es:"hacer, construir",en:"to make, to build"},
+    {m:"chillkatun",pic:{svg:POSE.read},es:"leer, estudiar",en:"to read, to study"},
+    {m:"afümün",pic:{svg:POSE.cook},es:"cocinar, cocer",en:"to cook"}]},
   { id:"dungu2", mt:"Dungu II", es:"Más acciones", en:"More actions", kind:"pic", words:[
-    {m:"küpan",pic:{svg:ACT2.come},es:"venir",en:"to come"},
-    {m:"tripan",pic:{svg:ACT2.exit},es:"salir",en:"to go out"},
-    {m:"anün",pic:{svg:ACT2.sit},es:"sentarse",en:"to sit down"},
-    {m:"witrapüran",pic:{svg:ACT2.stand},es:"levantarse, ponerse de pie",en:"to stand up"},
-    {m:"ngüman",pic:{svg:ACT2.cry},es:"llorar",en:"to cry"},
-    {m:"wirarün",pic:{svg:ACT2.shout},es:"gritar",en:"to shout"},
-    {m:"trekan",pic:{svg:ACT2.walk},es:"caminar, dar pasos",en:"to walk, to take steps"},
-    {m:"kintun",pic:{svg:ACT2.search},es:"buscar",en:"to look for"}]},
+    {m:"küpan",pic:{svg:POSE.come},es:"venir",en:"to come"},
+    {m:"tripan",pic:{svg:POSE.exit},es:"salir",en:"to go out"},
+    {m:"anün",pic:{svg:POSE.sit},es:"sentarse",en:"to sit down"},
+    {m:"witrapüran",pic:{svg:POSE.stand},es:"levantarse, ponerse de pie",en:"to stand up"},
+    {m:"ngüman",pic:{svg:POSE.cry},es:"llorar",en:"to cry"},
+    {m:"wirarün",pic:{svg:POSE.shout},es:"gritar",en:"to shout"},
+    {m:"trekan",pic:{svg:POSE.walk},es:"caminar, dar pasos",en:"to walk, to take steps"},
+    {m:"kintun",pic:{svg:POSE.search},es:"buscar",en:"to look for"}]},
   { id:"chem2", mt:"Chem? II", es:"Más preguntas", en:"More questions", kind:"scene", words:[
     {m:"chumngechi?",es:"¿cómo? (de qué manera)",en:"how? (in what way)"},
     {m:"chuchi?",es:"¿cuál?",en:"which?"},
