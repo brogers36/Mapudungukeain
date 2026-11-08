@@ -451,29 +451,49 @@ const POSE=(()=>{
   const P=a=>a.join(" ");
   /* f = {h:[x,y] head, n:neck, hp:hip, e1,h1 back arm elbow/hand, e2,h2 front arm, k1,f1 back leg knee/foot, k2,f2 front leg,
           dir: 1 right / -1 left / 0 front, face, r head radius, fade, noLegs} */
+  /* filled, outlined shapes instead of lines: a tapered limb between two points */
+  const shade=(c,k)=>{const n=parseInt(c.slice(1),16);const ch=v=>Math.max(0,Math.min(255,Math.round(v*k)));return "#"+[n>>16,(n>>8)&255,n&255].map(v=>ch(v).toString(16).padStart(2,"0")).join("")};
+  function cap(a,b,wa,wb,fill){
+    const dx=b[0]-a[0], dy=b[1]-a[1], L=Math.hypot(dx,dy)||1, nx=-dy/L, ny=dx/L;
+    const pts=[[a[0]+nx*wa/2,a[1]+ny*wa/2],[b[0]+nx*wb/2,b[1]+ny*wb/2],[b[0]-nx*wb/2,b[1]-ny*wb/2],[a[0]-nx*wa/2,a[1]-ny*wa/2]];
+    const shape=`<path d="M${pts.map(q=>q.map(v=>v.toFixed(2)).join(" ")).join(" L")}Z"/><circle cx="${a[0]}" cy="${a[1]}" r="${wa/2}"/><circle cx="${b[0]}" cy="${b[1]}" r="${wb/2}"/>`;
+    return `<g fill="${shade(fill,.62)}" stroke="${shade(fill,.62)}" stroke-width="1.5">${shape}</g><g fill="${fill}">${shape}</g>`;
+  }
+  /* f = {h:[x,y] head, n:neck, hp:hip, e1,h1 back arm elbow/hand, e2,h2 front arm, k1,f1 back leg knee/foot, k2,f2 front leg,
+          dir: 1 right / -1 left / 0 front, face, r head radius, fade, noLegs, shirt} */
   function fig(f){
-    const r=f.r||6.4, d=f.dir??1, [hx,hy]=f.h, op=f.fade?` opacity="${f.fade}"`:"";
-    const leg=(k,ft)=>`<path d="M${P(f.hp)} L${P(k)} L${P(ft)}" stroke="${PANTS}" stroke-width="5.4" fill="none"/><ellipse cx="${ft[0]+(d||0)*1.6}" cy="${ft[1]}" rx="3.4" ry="1.8" fill="${SHOE}"/>`;
-    const arm=(e,h,back)=>`<path d="M${P(f.n)} L${P(e)}" stroke="${back?SHIRTD:SHIRT}" stroke-width="4.6" fill="none"/><path d="M${P(e)} L${P(h)}" stroke="${back?SKD:SK}" stroke-width="3.6" fill="none"/><circle cx="${h[0]}" cy="${h[1]}" r="2.3" fill="${back?SKD:SK}"/>`;
+    const r=f.r||6.8, d=f.dir??1, [hx,hy]=f.h, op=f.fade?` opacity="${f.fade}"`:"", SH=f.shirt||SHIRT;
+    const [nx,ny]=f.n, [px,py]=f.hp;
+    const sh1=d?[nx-d*1.2,ny+2]:[nx-5.6,ny+2.4], sh2=d?[nx+d*1.2,ny+2]:[nx+5.6,ny+2.4];
+    const leg=(k,ft,back)=>{const c=back?shade(PANTS,.82):PANTS;return cap(f.hp,k,7,6,c)+cap(k,ft,6,4.8,c)+`<path d="M${ft[0]-3.2+(d||0)*.6} ${ft[1]+1.6} Q${ft[0]-3.4} ${ft[1]-2.2} ${ft[0]} ${ft[1]-2.2} Q${ft[0]+3.6+(d||0)*2} ${ft[1]-1.6} ${ft[0]+3.6+(d||0)*2.4} ${ft[1]+1.6}Z" fill="${SHOE}"/>`};
+    const arm=(sh,e,h,back)=>{const c=back?shade(SH,.8):SH, sk=back?SKD:SK;return cap(sh,e,6,5.2,c)+cap(e,h,4.4,3.8,sk)+`<circle cx="${h[0]}" cy="${h[1]}" r="2.6" fill="${sk}" stroke="${shade(sk,.7)}" stroke-width=".8"/>`};
     let s=`<g${op}>`;
-    if(!f.noLegs) s+=leg(f.k1,f.f1);
-    s+=arm(f.e1,f.h1,true);
-    if(!f.noLegs) s+=leg(f.k2,f.f2);
-    // torso: shirt from neck to hip, belt at the hip
-    const [nx,ny]=f.n,[px,py]=f.hp;
-    s+=`<path d="M${nx} ${ny+2} L${px} ${py-2}" stroke="${SHIRT}" stroke-width="11"/>`;
-    const ang=Math.atan2(py-ny,px-nx), bx=px-Math.cos(ang)*3.2, by=py-Math.sin(ang)*3.2, ox=Math.sin(ang)*5.2, oy=-Math.cos(ang)*5.2;
-    s+=`<path d="M${bx-ox} ${by-oy} L${bx+ox} ${by+oy}" stroke="${GOLD}" stroke-width="2.4"/>`;
-    s+=`<path d="M${nx} ${ny} L${hx} ${hy+r*.6}" stroke="${SK}" stroke-width="3.2"/>`;
-    // head, hair, trarilonko, face
-    s+=`<circle cx="${hx}" cy="${hy}" r="${r}" fill="${SK}"/>`;
-    s+=`<path d="M${hx-r} ${hy-.6} A${r} ${r} 0 0 1 ${hx+r} ${hy-.6} Q${hx+r*.4*(d||0)} ${hy-r*.55} ${hx-r*.1*(d||0)} ${hy-r*.35}Z" fill="${HAIR}"/>`;
-    if(d) s+=`<path d="M${hx-d*r*.8} ${hy-r*.3} Q${hx-d*r*1.25} ${hy+r*.5} ${hx-d*r*1.05} ${hy+r*1.25}" stroke="${HAIR}" stroke-width="${r*.42}" fill="none"/>`;
-    else s+=`<path d="M${hx-r*.95} ${hy-r*.2} Q${hx-r*1.2} ${hy+r*.6} ${hx-r*.9} ${hy+r*1.2} M${hx+r*.95} ${hy-r*.2} Q${hx+r*1.2} ${hy+r*.6} ${hx+r*.9} ${hy+r*1.2}" stroke="${HAIR}" stroke-width="${r*.36}" fill="none"/>`;
-    /* trarilonko: a band across the forehead, with a small silver plate in front */
-    const ty=hy-r*.42, tw=Math.sqrt(r*r-(r*.42)**2);
-    s+=`<path d="M${hx-tw} ${ty} L${hx+tw} ${ty}" stroke="#e9e4da" stroke-width="${r*.26}"/>`;
-    if(d) s+=`<circle cx="${hx+d*tw*.55}" cy="${ty}" r="${r*.2}" fill="#c9cdd6"/>`; else s+=`<circle cx="${hx}" cy="${ty}" r="${r*.2}" fill="#c9cdd6"/>`;
+    if(!f.noLegs) s+=leg(f.k1,f.f1,true);
+    s+=arm(sh1,f.e1,f.h1,true);
+    if(!f.noLegs) s+=leg(f.k2,f.f2,false);
+    /* torso: a shirt/tunic shape from shoulders to just below the hip, with the trarüwe (woven belt) */
+    const ang=Math.atan2(py-ny,px-nx), ux=Math.cos(ang), uy=Math.sin(ang), vx=-uy, vy=ux;
+    const wTop=d?6:8, wHip=d?6.2:7.4, top=[nx+ux*1,ny+uy*1], hem=[px+ux*3,py+uy*3];
+    const T=[[top[0]+vx*wTop,top[1]+vy*wTop],[hem[0]+vx*wHip,hem[1]+vy*wHip],[hem[0]-vx*wHip,hem[1]-vy*wHip],[top[0]-vx*wTop,top[1]-vy*wTop]];
+    const tp=`M${T.map(q=>q.map(v=>v.toFixed(2)).join(" ")).join(" L")}Z`;
+    s+=`<path d="${tp}" fill="${SH}" stroke="${shade(SH,.62)}" stroke-width="1.5" stroke-linejoin="round"/>`;
+    s+=`<path d="M${top[0]-vx*2.4} ${top[1]-vy*2.4} L${top[0]+ux*3.4} ${top[1]+uy*3.4} L${top[0]+vx*2.4} ${top[1]+vy*2.4}" fill="${SK}"/>`;
+    const b0=[px-ux*1.8,py-uy*1.8], b1=[px+ux*1.6,py+uy*1.6];
+    s+=`<path d="M${(b0[0]+vx*wHip*.97).toFixed(2)} ${(b0[1]+vy*wHip*.97).toFixed(2)} L${(b1[0]+vx*wHip).toFixed(2)} ${(b1[1]+vy*wHip).toFixed(2)} L${(b1[0]-vx*wHip).toFixed(2)} ${(b1[1]-vy*wHip).toFixed(2)} L${(b0[0]-vx*wHip*.97).toFixed(2)} ${(b0[1]-vy*wHip*.97).toFixed(2)}Z" fill="${GOLD}"/>`;
+    s+=[-.5,0,.5].map(t=>`<circle cx="${(px+vx*wHip*t).toFixed(2)}" cy="${(py+vy*wHip*t).toFixed(2)}" r=".7" fill="#7a2a20"/>`).join("");
+    s+=arm(sh2,f.e2,f.h2,false);
+    /* neck and head */
+    s+=cap([nx,ny+1],[hx,hy+r*.55],3.6,3.6,SK);
+    if(d) s+=`<path d="M${hx-d*r*.55} ${hy-r*.55} Q${hx-d*r*1.35} ${hy+r*.2} ${hx-d*r*1.2} ${hy+r*1.7}" stroke="${HAIR}" stroke-width="${r*.5}" fill="none"/>`;
+    else s+=`<path d="M${hx-r*.8} ${hy-r*.3} Q${hx-r*1.3} ${hy+r*.7} ${hx-r*1.05} ${hy+r*1.6} M${hx+r*.8} ${hy-r*.3} Q${hx+r*1.3} ${hy+r*.7} ${hx+r*1.05} ${hy+r*1.6}" stroke="${HAIR}" stroke-width="${r*.42}" fill="none"/>`;
+    s+=`<circle cx="${hx}" cy="${hy}" r="${r}" fill="${SK}" stroke="${shade(SK,.7)}" stroke-width="1"/>`;
+    if(d) s+=`<ellipse cx="${hx-d*r*.18}" cy="${hy+r*.12}" rx="${r*.17}" ry="${r*.24}" fill="${SKD}"/>`;
+    /* hair: a cap over the top of the head down to a fringe above the eyes */
+    const fx=d?hx+d*r*.35:hx;
+    s+=`<path d="M${hx-r*1.06} ${hy+r*.1} A${r*1.06} ${r*1.06} 0 0 1 ${hx+r*1.06} ${hy+r*.1} Q${hx+r*(d>0?.95:.8)} ${hy-r*.1} ${fx} ${hy-r*.16} Q${hx-r*(d<0?.95:.8)} ${hy-r*.1} ${hx-r*1.06} ${hy+r*.1}Z" fill="${HAIR}"/>`;
+    const ty=hy-r*.36, tw=Math.sqrt(r*r-(r*.36)**2)+.3;
+    s+=`<path d="M${hx-tw} ${ty} L${hx+tw} ${ty}" stroke="#ece7dc" stroke-width="${r*.27}"/><path d="M${hx-tw} ${ty} L${hx+tw} ${ty}" stroke="${SHIRT}" stroke-width="${r*.07}" stroke-dasharray="1.2 1.6"/>`;
+    s+=`<circle cx="${d?hx+d*tw*.55:hx}" cy="${ty}" r="${r*.22}" fill="#cfd3dc" stroke="#9aa0ad" stroke-width=".5"/>`;
     s+=face(hx,hy,r,d,f.face||"smile");
     return s+`</g>`;
   }
@@ -543,6 +563,7 @@ const POSE=(()=>{
     read:W(`${ground}${bench(24,56)}${sit(38,1,{h:[39,14],e1:[42,30],h1:[50,28],e2:[44,32],h2:[54,30],face:"smile"})}<path d="M48 30 L56 18 L66 22 L58 34Z" fill="#f3efe6" stroke="${INK}" stroke-width=".8"/><path d="M58 34 L66 22 L74 20 L68 32Z" fill="#e6e1d4" stroke="${INK}" stroke-width=".8"/><path d="M52 27 L57 21 M54 29 L59 23 M60 30 L66 24 M62 31 L68 25" stroke="${INK}" stroke-width=".9"/>`),
     cook:W(`${ground}${fig({h:[34,13],n:[34,21],hp:[33,36],e1:[30,28],h1:[30,35],e2:[42,24],h2:[52,28],k1:[31,46],f1:[29,56],k2:[37,46],f2:[39,56],dir:1,face:"smile"})}<path d="M52 28 L62 40" stroke="${WOOD}" stroke-width="2.2"/><path d="M54 36 Q54 50 68 50 Q82 50 82 36Z" fill="#3a3a40"/><ellipse cx="68" cy="36" rx="14" ry="3" fill="#c98a4a"/><path d="M52 36 h-3 M84 36 h3" stroke="#3a3a40" stroke-width="2.4"/><path d="M58 56 L78 52 M58 52 L78 56" stroke="#7a4a2a" stroke-width="3"/><path d="M62 52 q3 -6 6 0 q3 -6 6 0" fill="#e8642f"/><path d="M64 30 q-2 -5 0 -10 M72 30 q-2 -5 0 -10" stroke="#f3efe6" stroke-width="1.4" fill="none" opacity=".7"/>`)
   };
+  D.fig=fig;
   return D;
 })();
 
@@ -1397,16 +1418,16 @@ const NAT=(()=>{
 // ===== Person pictures for the pronoun lesson =====
 // Person pictures: S = speaker (red, speech bubble), L = listener (blue), O = other (green). Ringed = included in the pronoun.
 const PERS_PIC=(()=>{
-  const COL={S:"#c8322f",L:"#2f5fd0",O:"#3d8a52"}, SK="#c98a5a", HAIR="#2a1a10", GOLD="#e8b53a";
-  const fig=(x,r)=>`<circle cx="${x}" cy="23" r="5.2" fill="${SK}"/><path d="M${x-5.2} 21.5 Q${x} 14.5 ${x+5.2} 21.5" fill="${HAIR}"/>
-    <path d="M${x-6} 49 L${x-4.5} 31 Q${x} 28 ${x+4.5} 31 L${x+6} 49Z" fill="${COL[r]}"/><path d="M${x-3} 49 V56 M${x+3} 49 V56" stroke="#f3efe6" stroke-width="2.4" stroke-linecap="round"/>`;
-  const bubble=x=>`<path d="M${x+3} 4 h14 q3 0 3 3 v6 q0 3 -3 3 h-8 l-4 4 l1 -4 h-3 q-3 0 -3 -3 v-6 q0 -3 3 -3Z" fill="#f3efe6"/><path d="M${x+5} 9 h10 M${x+5} 12.5 h6" stroke="#2a2652" stroke-width="1.3"/>`;
+  /* the same drawn figure as the action pictures, facing front; shirt colour = role (red speaker, blue addressee, green other) */
+  const COL={S:"#c8322f",L:"#2f5fd0",O:"#3d8a52"}, GOLD="#e8b53a";
+  const person=(x,r,k)=>`<g transform="translate(${x} 57) scale(${k}) translate(${-x} -57)">${POSE.fig({h:[x,13],n:[x,21],hp:[x,37],e1:[x-6,29],h1:[x-7,37],e2:[x+6,29],h2:[x+7,37],k1:[x-3,47],f1:[x-3.4,56.5],k2:[x+3,47],f2:[x+3.4,56.5],dir:0,shirt:COL[r],face:r==="S"?"open":"smile"})}</g>`;
+  const bubble=x=>`<path d="M${x+4} 1 h15 q3 0 3 3 v6 q0 3 -3 3 h-9 l-4 4 l1 -4 h-3 q-3 0 -3 -3 v-6 q0 -3 3 -3Z" fill="#f3efe6"/><path d="M${x+6} 6 h11 M${x+6} 9.5 h7" stroke="#2a2652" stroke-width="1.3"/>`;
   return spec=>{ // spec like "S*|L|O" ; * = included
-    const items=spec.split("|"); const gap=100/(items.length+1); let svg="", ring=[];
-    items.forEach((it,i)=>{ const x=Math.round(gap*(i+1)); const r=it[0]; svg+=fig(x,r); if(r==="S") svg+=bubble(x); if(it.includes("*")) ring.push(x); });
-    const rx=Math.min(...ring)-10, rw=Math.max(...ring)-Math.min(...ring)+20;
+    const items=spec.split("|"), n=items.length, gap=100/(n+1), k=n>3?.74:.84; let svg="", ring=[];
+    items.forEach((it,i)=>{ const x=Math.round(gap*(i+1)); const r=it[0]; svg+=person(x,r,k); if(r==="S") svg+=bubble(x); if(it.includes("*")) ring.push(x); });
+    const half=n>3?10:11, rx=Math.min(...ring)-half, rw=Math.max(...ring)-Math.min(...ring)+half*2;
     const frame=`<rect x="${rx}" y="14" width="${rw}" height="45" rx="7" fill="${GOLD}" fill-opacity=".12" stroke="${GOLD}" stroke-width="2" stroke-dasharray="4 2.5"/>`;
-    return `<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true">${frame}${svg}</svg>`; };
+    return `<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${frame}${svg}</g></svg>`; };
 })();
 
 // ===== Full person paradigm (lesson after the pronouns) =====
