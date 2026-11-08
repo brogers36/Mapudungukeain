@@ -2127,6 +2127,7 @@ function menu(){
       ["graf",L2("Grafemarios","Writing systems"),L2(`Ahora: ${GRAF_INFO[graf].name}`,`Now: ${GRAF_INFO[graf].name}`)],
       ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
+      ["prog",L2("Tu progreso","Your progress"),load("lastBackup")?L2(`Última copia: ${load("lastBackup")}`,`Last backup: ${load("lastBackup")}`):L2("Guarda una copia: aún no tienes","Save a backup: you have none yet")],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
       ["dicc",L2("Diccionario","Dictionary"),L2("Tañi Nemülkawe: busca y juega","Tañi Nemülkawe: look up and play")],
       ["about",L2("Acerca del juego","About the game"),L2("Qué es y cómo se hizo","What it is and how it was made")]
@@ -2162,6 +2163,7 @@ function menu(){
   document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("repaso").onclick=()=>openRepaso();
   document.getElementById("help").onclick=help;
+  document.getElementById("prog").onclick=()=>{track("open/progress","Progreso");progress();};
   document.getElementById("x-lof").onclick=()=>{track("open/lof","Lof");lof();};
   document.getElementById("x-palin").onclick=()=>{track("open/palin","Palin");palin();};
   document.getElementById("x-epew").onclick=()=>{track("open/epew","Epew");epew();};
@@ -2803,6 +2805,54 @@ const HELP = {
   ["Dress the characters","In «Wardrobe» you spend ngülliw on clothing, jewelry, instruments, companions and backgrounds."],
   ["Practice more","«Pronunciation» explains how each letter sounds. «Reading» has short texts with questions."]]
 };
+/* ===== Progress backup: everything is stored only on this device (localStorage, keys "mpk_…"). Uninstalling the app
+   or clearing the browser's data for the site erases it, so players can save a copy (file or code) and restore it,
+   also to move their progress to another phone or browser. ===== */
+function progData(){ const d={}; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.startsWith("mpk_")) d[k]=localStorage.getItem(k); } }catch(e){} return d; }
+function progCode(){ const j=JSON.stringify({app:"mapudungukeain",v:1,at:new Date().toISOString(),d:progData()}); return "MPK1:"+btoa(unescape(encodeURIComponent(j))); }
+function progParse(txt){ txt=String(txt||"").trim(); let j=null;
+  try{ if(/^MPK1:/.test(txt)) j=JSON.parse(decodeURIComponent(escape(atob(txt.slice(5).replace(/\s+/g,""))))); else j=JSON.parse(txt); }catch(e){ return null; }
+  if(!j||j.app!=="mapudungukeain"||typeof j.d!=="object") return null;
+  const d={}; for(const [k,v] of Object.entries(j.d)) if(/^mpk_[\w.-]+$/.test(k)&&typeof v==="string") d[k]=v; return {at:j.at||"",d}; }
+function progress(){
+  S=null; clearInterval(vidTimer);
+  const n=Object.keys(progData()).length, day=new Date().toISOString().slice(0,10);
+  app.innerHTML=`
+    <div class="top"><div><p class="eyebrow">Mapudungukeaiñ Fill Püle</p><h2>${L2("Tu progreso","Your progress")}</h2></div>${langToggle()}</div>
+    <p>${L2("Tu progreso (niveles, nueces, ropa, palabras) se guarda solo en este teléfono o navegador. Si desinstalas la app o borras los datos de Chrome para el sitio, se pierde. Guarda una copia de vez en cuando; también sirve para pasar tu progreso a otro teléfono.","Your progress (levels, nuts, clothes, words) is stored only on this phone or browser. Uninstalling the app or clearing Chrome's data for the site erases it. Save a copy now and then; it also moves your progress to another phone.")}</p>
+    <div class="row"><button class="btn" id="pg-file">💾 ${L2("Guardar copia (archivo)","Save a copy (file)")}</button><button class="btn ghost" id="pg-copy">📋 ${L2("Copiar código","Copy code")}</button></div>
+    <p class="hint" id="pg-msg" aria-live="polite"></p>
+    <h3>${L2("Restaurar una copia","Restore a copy")}</h3>
+    <p class="hint">${L2("Elige el archivo de copia o pega el código. Reemplaza el progreso que hay ahora en este teléfono.","Choose the backup file or paste the code. It replaces the progress currently on this phone.")}</p>
+    <div class="row"><label class="btn ghost" for="pg-in">📂 ${L2("Elegir archivo","Choose file")}</label><input type="file" id="pg-in" accept=".json,.txt,application/json,text/plain" hidden></div>
+    <textarea id="pg-code" rows="3" style="width:100%;box-sizing:border-box" placeholder="MPK1:…" aria-label="${L2("Código de copia","Backup code")}"></textarea>
+    <div class="row"><button class="btn ghost" id="pg-use">${L2("Restaurar desde el código","Restore from the code")}</button></div>
+    <div id="pg-confirm"></div>
+    <div class="row"><button class="btn" id="hs">${L2("Volver","Back")}</button></div>`;
+  bindLang(progress);
+  const msg=t=>{ document.getElementById("pg-msg").textContent=t; };
+  document.getElementById("hs").onclick=menu;
+  document.getElementById("pg-file").onclick=()=>{ try{ const b=new Blob([progCode()],{type:"text/plain"}), a=document.createElement("a");
+    a.href=URL.createObjectURL(b); a.download="progreso-mapudungukeain-"+day+".txt"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+    save("lastBackup",day); msg(L2("Copia guardada en tus descargas.","Copy saved to your downloads.")); track("progress/export-file","Copia (archivo)"); }catch(e){ msg(L2("No se pudo guardar el archivo; usa «Copiar código».","Could not save the file; use «Copy code».")); } };
+  document.getElementById("pg-copy").onclick=async()=>{ const c=progCode(); const ta=document.getElementById("pg-code");
+    try{ await navigator.clipboard.writeText(c); msg(L2("Código copiado. Pégalo en un lugar seguro (por ejemplo, un correo para ti).","Code copied. Paste it somewhere safe (for example, an email to yourself).")); }
+    catch(e){ ta.value=c; ta.select(); msg(L2("Copia el código del cuadro de abajo.","Copy the code from the box below.")); }
+    save("lastBackup",day); track("progress/export-code","Copia (código)"); };
+  const ask=txt=>{ const r=progParse(txt), box=document.getElementById("pg-confirm");
+    if(!r||!Object.keys(r.d).length){ box.innerHTML=`<p class="hint">${L2("No es una copia válida del juego.","That is not a valid backup of the game.")}</p>`; return; }
+    const when=r.at?new Date(r.at).toLocaleDateString(lang==="es"?"es-CL":"en-US"):"?";
+    box.innerHTML=`<p>${L2(`Copia del ${when}. ¿Reemplazar el progreso de este teléfono con ella?`,`Backup from ${when}. Replace the progress on this phone with it?`)}</p><div class="row"><button class="btn" id="pg-yes">${L2("Sí, restaurar","Yes, restore")}</button><button class="btn ghost" id="pg-no">${L2("Cancelar","Cancel")}</button></div>`;
+    document.getElementById("pg-no").onclick=()=>{ box.innerHTML=""; };
+    document.getElementById("pg-yes").onclick=()=>{ try{ Object.keys(progData()).forEach(k=>localStorage.removeItem(k)); for(const [k,v] of Object.entries(r.d)) localStorage.setItem(k,v); track("progress/restore","Restaurar"); location.reload(); }
+      catch(e){ box.innerHTML=`<p class="hint">${L2("No se pudo restaurar.","Could not restore.")}</p>`; } }; };
+  document.getElementById("pg-use").onclick=()=>ask(document.getElementById("pg-code").value);
+  document.getElementById("pg-in").onchange=ev=>{ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>ask(rd.result); rd.readAsText(f); };
+  if(!n) msg(L2("Todavía no hay progreso guardado en este teléfono.","There is no saved progress on this phone yet."));
+}
+/* ask the browser to keep this site's data even when the phone is short of space */
+try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist().catch(()=>{}); }).catch(()=>{}); }catch(e){}
+
 function help(){
   S=null; clearInterval(vidTimer); helpSeen=true; save("seenHelp",1);
   app.innerHTML=`
