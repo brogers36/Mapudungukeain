@@ -234,7 +234,7 @@ table.par td.m{font-family:var(--display);font-size:1.05rem}
 .numtxt{font-family:var(--display);font-size:1.6rem;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .prompt .numtxt{font-size:2.6rem}
 .tf{display:grid;grid-template-columns:repeat(5,12px);gap:4px;justify-content:center}
-.tf i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--panel-2);box-sizing:border-box;display:block}
+.tf i{width:12px;height:12px;border-radius:50%;border:1.5px solid #6f7686;box-sizing:border-box;display:block}
 .tf i.a{background:var(--red);border-color:var(--red)} .tf i.b{background:var(--gold);border-color:var(--gold)}
 .prompt .tf,.fc .tf{grid-template-columns:repeat(5,22px);gap:8px} .prompt .tf i,.fc .tf i{width:22px;height:22px;border-width:2px}
 .nb{display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -418,6 +418,31 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 
 <script>
 // ===== Icons =====
+// ===== Scenes and objects drawn for the game, instead of emoji that older phones can't show (🛖 🪨 🪵 🦨 🧍 🪁)
+//       and so that "in / at a place" pictures show the person in the place =====
+const SCN=(()=>{
+  const SK="#c98a5a", HAIR="#2a1a10", BODY="#c8322f", LIMB="#f3efe6";
+  const W=inner=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+  /* a standing person, feet at (x,y), about 30 tall; k scales */
+  const man=(x,y,k=1)=>`<g transform="translate(${x} ${y}) scale(${k})"><path d="M-3 0 L-1 -12 M3 0 L1 -12" stroke="${LIMB}" stroke-width="3"/><path d="M0 -12 V-23" stroke="${BODY}" stroke-width="6.5"/><path d="M-3 -21 L-7 -12 M3 -21 L7 -12" stroke="${LIMB}" stroke-width="2.6"/><circle cx="0" cy="-28" r="4.6" fill="${SK}"/><path d="M-4.6 -29 Q0 -35 4.6 -29" fill="${HAIR}"/></g>`;
+  const ruka=(x,y,k=1,door=true)=>`<g transform="translate(${x} ${y}) scale(${k})"><path d="M-36 0 Q-36 -36 0 -40 Q36 -36 36 0Z" fill="#c9a25a"/>${[-30,-22,-14].map((d,i)=>`<path d="M${-34+i*3} ${d} Q0 ${d-12+i*2} ${34-i*3} ${d}" stroke="#a07a3a" stroke-width="1.6" fill="none"/>`).join("")}<path d="M-4 -40 Q0 -46 4 -40" stroke="#8a6a3a" stroke-width="2" fill="none"/>${door?`<path d="M-8 0 V-14 Q0 -21 8 -14 V0Z" fill="#2a1a10"/>`:""}</g>`;
+  const pine=(x,y,k=1,c="#2b5f3a")=>`<g transform="translate(${x} ${y}) scale(${k})"><rect x="-2" y="-8" width="4" height="8" fill="#6a4a2a"/><path d="M0 -38 L-11 -18 H-6 L-14 -6 H14 L6 -18 H11Z" fill="${c}"/></g>`;
+  const fire=(x,y,k=1)=>`<g transform="translate(${x} ${y}) scale(${k})"><path d="M-10 0 L10 -4 M-10 -4 L10 0" stroke="#7a4a2a" stroke-width="3.5"/><path d="M0 -26 C8 -16 10 -10 6 -4 C3 0 -3 0 -6 -4 C-10 -10 -6 -16 -2 -18 C-2 -12 2 -12 0 -26Z" fill="#e8642f"/><path d="M0 -14 C4 -9 4 -6 2 -4 C0 -2 -2 -3 -3 -5 C-4 -8 -1 -10 0 -14Z" fill="#f6d04a"/></g>`;
+  const ground=(c="#8a7a5a")=>`<path d="M2 56.5 H98" stroke="${c}" stroke-width="2"/>`;
+  return {
+    ruka:W(`${ground()}${ruka(50,56,1)}`),
+    rukaMew:W(`${ground()}${ruka(46,56,1)}<path d="M36 56 V36 Q46 27 56 36 V56Z" fill="#2a1a10"/>${man(46,56,.95)}<path d="M84 22 L76 30 M76 30 h6 M76 30 v-6" stroke="#e8b53a" stroke-width="2.6" fill="none"/>`),
+    lafkenMew:W(`<rect x="0" y="40" width="100" height="20" fill="#e3cf9a"/><path d="M40 60 Q52 44 100 40 V60Z" fill="#2f6fb0"/><path d="M50 52 q6 -4 12 0 t12 0 t12 0 M58 46 q6 -3 12 0 t12 0" stroke="#bfe0ff" stroke-width="2" fill="none"/>${man(24,56)}`),
+    mawidaMew:W(`${ground("#4f6a3a")}${pine(16,56,1.15,"#24502f")}${pine(78,56,1.2,"#24502f")}${pine(64,56,.85)}${pine(32,56,.8)}${man(48,56)}`),
+    wingkulMew:W(`<path d="M2 58 Q30 34 50 33 Q70 34 98 58Z" fill="#7a8a5a"/><path d="M38 38 Q50 30 62 38" stroke="#5f6e44" stroke-width="2" fill="none"/>${man(50,34,.95)}`),
+    kutralMew:W(`${ground()}<g transform="translate(34 56)"><path d="M-6 0 Q-6 -8 0 -9 L10 -9" stroke="${LIMB}" stroke-width="3" fill="none"/><path d="M0 -9 V-21" stroke="${BODY}" stroke-width="6.5"/><path d="M1 -18 L9 -13" stroke="${LIMB}" stroke-width="2.6"/><circle cx="0" cy="-26" r="4.6" fill="${SK}"/><path d="M-4.6 -27 Q0 -33 4.6 -27" fill="${HAIR}"/><rect x="-10" y="-9" width="14" height="4" rx="1.5" fill="#8a5a32"/></g>${fire(62,56,1)}`),
+    wenuMew:W(`${ground()}<path d="M70 14 q6 -6 12 0 q6 -6 12 0 q3 4 -2 6 h-20 q-5 -2 -2 -6Z" fill="#e6eef6"/><path d="M36 16 q7 -7 14 0 q7 -7 14 0" stroke="#f3efe6" stroke-width="3" fill="none"/><path d="M18 50 V14 M12 20 L18 12 L24 20" stroke="#e8b53a" stroke-width="3" fill="none"/>`),
+    kura:W(`${ground()}<path d="M22 56 L18 44 L28 32 L46 28 L58 36 L60 56Z" fill="#8d8a86"/><path d="M28 32 L36 44 L58 36 M36 44 L32 56" stroke="#6e6b67" stroke-width="1.6" fill="none"/><path d="M58 56 L62 44 L74 40 L84 48 L82 56Z" fill="#a19e99"/><path d="M62 44 L70 50 L74 40" stroke="#7e7b77" stroke-width="1.4" fill="none"/>`),
+    mamull:W(`${ground()}${[[30,48],[56,48],[43,36]].map(([x,y])=>`<rect x="${x-20}" y="${y-6}" width="40" height="12" rx="6" fill="#9a5b2e"/><ellipse cx="${x+20}" cy="${y}" rx="4.5" ry="6" fill="#d9a86a" stroke="#9a5b2e" stroke-width="1"/><ellipse cx="${x+20}" cy="${y}" rx="2" ry="3" fill="none" stroke="#b07a42" stroke-width="1"/>`).join("")}`),
+    chinge:W(`${ground()}<path d="M58 44 Q76 46 78 26 Q80 8 92 10 Q86 18 88 30 Q88 50 66 54Z" fill="#1d1b20"/><path d="M80 24 Q82 14 90 12" stroke="#f3efe6" stroke-width="3" fill="none"/><path d="M20 50 Q22 34 42 32 Q62 32 66 48 Q62 54 42 54 Q24 56 20 50Z" fill="#1d1b20"/><path d="M24 42 Q40 30 64 42" stroke="#f3efe6" stroke-width="3.2" fill="none"/><path d="M28 54 V57 M38 54 V57 M50 54 V57 M60 53 V57" stroke="#1d1b20" stroke-width="3"/><path d="M22 46 Q12 46 10 50 Q14 52 22 51Z" fill="#1d1b20"/><circle cx="17" cy="47" r="1" fill="#f3efe6"/>`)
+  };
+})();
+
 const NUT = `<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
 const NUT_PIC = {svg:`<svg viewBox="0 0 20 20" width="1em" height="1em" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/></svg>`};
 const KULTRUN_PIC = {svg:`<svg viewBox="0 0 30 24" width="1.2em" height="1em" aria-hidden="true"><ellipse cx="15" cy="12" rx="13" ry="10" fill="#e8d6a0" stroke="#7a5a3c" stroke-width="1.5"/><path d="M15 2V22M2 12H28" stroke="#7a5a3c" stroke-width="1.2"/><g fill="#7a5a3c"><circle cx="9" cy="8" r="1.3"/><circle cx="21" cy="8" r="1.3"/><circle cx="9" cy="16" r="1.3"/><circle cx="21" cy="16" r="1.3"/></g></svg>`};
@@ -542,7 +567,7 @@ function genPl(n){
 
 // noun -> verb (forms attested in Augusta via the parser dictionary)
 const DERIV=[
-  {n:"ruka",pic:"🛖",suf:"n",es:"hacer una casa",en:"to build a house"},
+  {n:"ruka",pic:{svg:SCN.ruka},suf:"n",es:"hacer una casa",en:"to build a house"},
   {n:"kofke",pic:"🍞",suf:"n",es:"hacer pan",en:"to make bread"},
   {n:"kofke",pic:"🍞",suf:"tun",es:"comer pan",en:"to eat bread"},
   {n:"challwa",pic:"🐟",suf:"n",es:"pescar",en:"to fish"},
@@ -1014,14 +1039,8 @@ const ICON = {
     <ellipse cx="50" cy="38" rx="10" ry="14" fill="#26242c"/>
     <ellipse cx="50" cy="24" rx="10" ry="5" fill="#f3efe6"/>
     <circle cx="50" cy="15" r="7.5" fill="#c98a7a"/><path d="M55 13 L62 17 L55 19Z" fill="#e8d6a0"/><circle cx="52" cy="13" r="1.4" fill="#111"/></svg>`,
-  small:`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true">
-    <g opacity=".28"><path d="M6 56 Q8 14 34 10 Q60 14 62 56Z" fill="#a9a3c8"/></g>
-    <path d="M70 56 Q71 38 82 36 Q93 38 94 56Z" fill="#c9a25a"/><rect x="79" y="46" width="6" height="10" fill="#2a2018"/>
-    <path d="M82 18 V30 M77 25 L82 31 L87 25" stroke="#e8b53a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
-  big:`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true">
-    <path d="M6 56 Q8 14 34 10 Q60 14 62 56Z" fill="#c9a25a"/><path d="M12 36 Q34 26 56 36" stroke="#8a6a3a" stroke-width="2" fill="none"/><rect x="28" y="40" width="12" height="16" fill="#2a2018"/>
-    <g opacity=".28"><path d="M70 56 Q71 38 82 36 Q93 38 94 56Z" fill="#a9a3c8"/></g>
-    <path d="M34 0 V6" stroke="#e8b53a" stroke-width="3" stroke-linecap="round"/></svg>`,
+  small:(()=>{const T=(x,sc,on)=>{const k=sc;return `<g transform="translate(${x} 56) scale(${k})">${on?`<rect x="-4" y="-22" width="8" height="22" rx="2" fill="#8a5a32"/><circle cx="0" cy="-34" r="16" fill="#2f8a4a"/><circle cx="-11" cy="-26" r="11" fill="#2f8a4a"/><circle cx="11" cy="-26" r="11" fill="#2f8a4a"/><circle cx="-5" cy="-38" r="6" fill="#4fae6a"/>`:`<g fill="none" stroke="#c4bfe0" stroke-width="${2.6/k}" stroke-dasharray="${4/k} ${3/k}" opacity=".95"><rect x="-4" y="-22" width="8" height="22" rx="2"/><path d="M-11 -15 A11 11 0 0 1 -14 -33 A16 16 0 0 1 14 -33 A11 11 0 0 1 11 -15Z"/></g>`}</g>`};return `<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><path d="M4 56.5 H96" stroke="#8a7a5a" stroke-width="2"/>${T(64,1.05,false)}${T(28,.52,true)}</svg>`})(),
+  big:(()=>{const T=(x,sc,on)=>{const k=sc;return `<g transform="translate(${x} 56) scale(${k})">${on?`<rect x="-4" y="-22" width="8" height="22" rx="2" fill="#8a5a32"/><circle cx="0" cy="-34" r="16" fill="#2f8a4a"/><circle cx="-11" cy="-26" r="11" fill="#2f8a4a"/><circle cx="11" cy="-26" r="11" fill="#2f8a4a"/><circle cx="-5" cy="-38" r="6" fill="#4fae6a"/>`:`<g fill="none" stroke="#c4bfe0" stroke-width="${2.6/k}" stroke-dasharray="${4/k} ${3/k}" opacity=".95"><rect x="-4" y="-22" width="8" height="22" rx="2"/><path d="M-11 -15 A11 11 0 0 1 -14 -33 A16 16 0 0 1 14 -33 A11 11 0 0 1 11 -15Z"/></g>`}</g>`};return `<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><path d="M4 56.5 H96" stroke="#8a7a5a" stroke-width="2"/>${T(38,1.05,true)}${T(80,.52,false)}</svg>`})(),
   tomorrow:`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true">
     <g opacity=".45"><rect x="4" y="10" width="36" height="42" rx="4" fill="#f3efe6"/><rect x="4" y="10" width="36" height="10" rx="3" fill="#c8322f"/>
       <path d="M13 36 L20 43 L32 28" stroke="#3fa86b" stroke-width="4" fill="none" stroke-linecap="round"/></g>
@@ -1169,21 +1188,24 @@ const NEW={
 };
 // Body diagrams: one figure, the named part in gold
 const BODYPART=(part)=>{
-  if(part==="ange") return W("0 0 100 60",`<rect x="28" y="2" width="44" height="56" rx="20" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3"/><ellipse cx="50" cy="31" rx="17" ry="22" fill="${GOLD}"/><path d="M33 22 Q50 2 67 22 Q60 14 50 14 Q40 14 33 22Z" fill="${HAIR}"/><circle cx="43" cy="28" r="2.2" fill="${HAIR}"/><circle cx="57" cy="28" r="2.2" fill="${HAIR}"/><path d="M50 30 v7" stroke="#a87a1a" stroke-width="2"/><path d="M43 43 Q50 47 57 43" stroke="#7a2a20" stroke-width="2.5" fill="none"/>`);
+  if(part==="ange") return W("0 0 100 60",`<rect x="28" y="2" width="44" height="56" rx="20" fill="none" stroke="${GOLD}" stroke-width="2.5" stroke-dasharray="4 3"/><ellipse cx="50" cy="31" rx="17" ry="22" fill="${GOLD}"/><path d="M33 22 Q50 2 67 22 Q60 14 50 14 Q40 14 33 22Z" fill="${HAIR}"/><circle cx="43" cy="28" r="2.2" fill="${HAIR}"/><circle cx="57" cy="28" r="2.2" fill="${HAIR}"/><path d="M50 30 v7" stroke="#a87a1a" stroke-width="2"/><path d="M43 43 Q50 47 57 43" stroke="#7a2a20" stroke-width="2.2" fill="none"/>`);
   if(part==="mollfun") return W("0 0 100 60",`<path d="M50 4 C62 22 68 34 66 42 C64 52 56 56 50 56 C44 56 36 52 34 42 C32 34 38 22 50 4Z" fill="${BODY}"/><path d="M42 40 Q42 48 48 50" stroke="#f3a0a0" stroke-width="3" fill="none"/>`);
-  const hl=p=>p===part?GOLD:MUTE;
-  const back=part==="furi";
-  let s=`<circle cx="50" cy="12" r="8" fill="${hl("lonko")}"/>`;
-  if(back) s=`<circle cx="50" cy="12" r="8" fill="${HAIR}"/>`;
-  if(part==="ange") s+=`<circle cx="50" cy="12" r="8" fill="${GOLD}"/>`;
-  if(!back) s+=`<circle cx="47" cy="11" r="1.3" fill="${HAIR}"/><circle cx="53" cy="11" r="1.3" fill="${HAIR}"/><path d="M47 15 Q50 17 53 15" stroke="${HAIR}" stroke-width="1.2" fill="none"/>`;
-  s+=`<rect x="42" y="21" width="16" height="20" rx="4" fill="${back?GOLD:MUTE}"/>`;
-  if(part==="putra") s+=`<ellipse cx="50" cy="35" rx="7" ry="5" fill="${GOLD}"/>`;
-  s+=`<path d="M42 24 L32 40 M58 24 L68 40" stroke="${hl("lipang")}" stroke-width="5" fill="none"/>`;
-  s+=`<path d="M46 41 L44 58 M54 41 L56 58" stroke="${hl("chang")}" stroke-width="5.5" fill="none"/>`;
-  if(part==="piwke") s+=`<path d="M53 26 c2 -3 6 -1 4 3 l-4 4 l-4 -4 c-2 -4 2 -6 4 -3Z" fill="${BODY}"/>`;
-  if(part==="mollfun") s+=`<path d="M74 14 C80 24 82 30 76 34 C70 30 72 24 74 14Z" fill="${BODY}" transform="translate(4 6)"/><path d="M68 40 l4 0" stroke="${BODY}" stroke-width="2"/>`;
-  if(back) s+=`<path d="M30 6 h10 M30 6 l3 -3 M30 6 l3 3" stroke="${LIMB}" stroke-width="1.5"/>`;
+  const back=part==="furi", OFF="#8b86ad";
+  const c=p=>p===part?GOLD:OFF, o=p=>p===part?1:.55;
+  /* figure: head 50,10 · torso 41-59 x 19-40 · arms · legs */
+  let s=`<g opacity="${o("lipang")}" stroke="${c("lipang")}" stroke-width="5.5" fill="none"><path d="M42 22 Q34 30 31 41"/><path d="M58 22 Q66 30 69 41"/></g>`;
+  s+=`<g opacity="${o("chang")}" stroke="${c("chang")}" stroke-width="6.5" fill="none"><path d="M46 39 L44 57"/><path d="M54 39 L56 57"/></g>`;
+  s+=`<rect x="41" y="18" width="18" height="23" rx="5" fill="${back?GOLD:OFF}" opacity="${back?1:.55}"/>`;
+  if(part==="putra") s+=`<ellipse cx="50" cy="34" rx="8" ry="6" fill="${GOLD}"/>`;
+  if(part==="piwke") s+=`<path d="M54 24 c2.4 -3.6 7.4 -1.4 5 3.6 l-5 5 l-5 -5 c-2.4 -5 2.6 -7.2 5 -3.6Z" fill="${BODY}" stroke="#fff" stroke-width=".8"/>`;
+  s+=`<circle cx="50" cy="10" r="8.5" fill="${c("lonko")}" opacity="${o("lonko")}"/>`;
+  if(back) s+=`<path d="M41.5 9 Q50 -2 58.5 9 Q58 16 50 17 Q42 16 41.5 9Z" fill="${HAIR}" opacity=".8"/>`;
+  else s+=`<circle cx="47" cy="9" r="1.3" fill="${HAIR}"/><circle cx="53" cy="9" r="1.3" fill="${HAIR}"/><path d="M47 13 Q50 15 53 13" stroke="${HAIR}" stroke-width="1.2" fill="none"/>`;
+  /* pointer to the part, and a dashed ring around it */
+  const P={lonko:[50,10,11,11,[62,10]],lipang:[67,34,7,10,[71,30]],chang:[55,49,7,11,[60,50]],putra:[50,34,11,8,[61,34]],piwke:[54,28,7,7,[61,28]],furi:[50,29,12,14,[62,29]]}[part];
+  if(P){ const [x,y,rx,ry,[tx,ty]]=P;
+    s+=`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="1.6" stroke-dasharray="3 2.5"/>`;
+    s+=`<path d="M94 ${ty} H${tx+4}" stroke="${GOLD}" stroke-width="3"/><path d="M${tx+9} ${ty-5} L${tx+3} ${ty} L${tx+9} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/>`; }
   return W("0 0 100 60",s);
 };
 // Colour + noun: silhouettes filled with the colour, light outline so dark colours show
@@ -1240,8 +1262,10 @@ const NAT=(()=>{
      <path d="M30 56 Q40 62 50 56" stroke="#1d3a24" stroke-width="2" fill="none"/><ellipse cx="40" cy="60" rx="12" ry="5" fill="#8ac28f" opacity=".6"/>`
   };
   const P={ // plants, 100x60
-   foye:`<rect x="46" y="30" width="8" height="28" fill="#cfc6b6"/><ellipse cx="50" cy="22" rx="28" ry="18" fill="#2f7a46"/>
-     <g fill="#f6f4ee">${[[34,16],[44,10],[58,12],[66,20],[40,26],[54,24],[62,30],[30,26]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6"/><circle cx="${x+3}" cy="${y+1}" r="2"/>`).join("")}</g>`,
+   foye:`<path d="M47 58 L48 30 Q50 26 52 30 L53 58Z" fill="#b9ad98"/><path d="M48 40 Q42 34 38 32 M52 36 Q58 30 62 30" stroke="#b9ad98" stroke-width="2.5" fill="none"/>
+     <path d="M50 4 C30 6 22 18 26 30 C28 40 40 42 50 40 C60 42 72 40 74 30 C78 18 70 6 50 4Z" fill="#2f7a46"/>
+     <g fill="#5fae6a">${[[34,16,-30],[44,9,-10],[58,10,15],[66,20,35],[38,30,-40],[62,32,40],[50,22,0]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="2.6" transform="rotate(${r} ${x} ${y})"/>`).join("")}</g>
+     <g fill="#fbfaf4">${[[40,20],[52,14],[63,24],[45,32],[57,31]].map(([x,y])=>[[0,0],[2.6,1.2],[-2.4,1.4],[0.6,-2.4]].map(([dx,dy])=>`<circle cx="${x+dx}" cy="${y+dy}" r="1.8"/>`).join("")+`<circle cx="${x}" cy="${y}" r=".9" fill="#e8c21f"/>`).join("")}</g>`,
    kulon:`<path d="M10 14 Q50 4 90 18" stroke="#5a4330" stroke-width="3" fill="none"/>
      <g fill="#2f7a46"><ellipse cx="24" cy="18" rx="8" ry="4" transform="rotate(20 24 18)"/><ellipse cx="74" cy="20" rx="8" ry="4" transform="rotate(-20 74 20)"/></g>
      ${[[40,14],[60,14]].map(([x,y])=>`<path d="M${x} ${y} V${y+10}" stroke="#5a4330" stroke-width="1.5"/>`+[[0,14],[-5,20],[5,20],[0,26],[-6,28],[6,28],[0,34],[-3,40],[3,40]].map(([dx,dy])=>`<circle cx="${x+dx}" cy="${y+dy}" r="3.4" fill="#3a1f3d"/>`).join("")).join("")}`,
@@ -1260,7 +1284,7 @@ const NAT=(()=>{
      ${[[38,48],[62,36],[38,22],[60,12]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="3.4" fill="#5fae6a"/>`).join("")}`
   };
   return {
-    animal:k=>S("0 0 80 80","1.4em","1.4em",A[k]),
+    animal:k=>S(({pudu:"6 24 68 52",chukaw:"6 14 68 62"})[k]||"0 0 80 80","1.6em","1.6em",A[k]),
     char:k=>S("0 0 80 80","","",A[k]).replace(' width="" height=""',''),
     plant:k=>S("0 0 100 60","2.3em","1.4em",P[k]),
     keys:{A:Object.keys(A),P:Object.keys(P)}
@@ -1379,14 +1403,14 @@ const STAGES = [
     {m:"tripantu",pic:{svg:ICON.year},es:"año",en:"year"}]},
   { id:"aliwen", mt:"Aliwen", es:"Plantas y paisaje", en:"Plants and landscape", kind:"pic", words:[
     {m:"aliwen",pic:"🌳",es:"árbol",en:"tree"},{m:"kachu",pic:"🌿",es:"pasto, hierba",en:"grass"},
-    {m:"rayen",pic:"🌺",es:"flor",en:"flower"},{m:"mamüll",pic:"🪵",es:"madera, palo",en:"wood, stick"},
-    {m:"kura",pic:"🪨",es:"piedra",en:"stone"},{m:"wingkul",pic:"⛰️",es:"cerro",en:"hill"},
+    {m:"rayen",pic:"🌺",es:"flor",en:"flower"},{m:"mamüll",pic:{svg:SCN.mamull},es:"madera, palo",en:"wood, stick"},
+    {m:"kura",pic:{svg:SCN.kura},es:"piedra",en:"stone"},{m:"wingkul",pic:"⛰️",es:"cerro",en:"hill"},
     {m:"wenu",pic:"⬆️☁️",es:"arriba, el cielo",en:"above, the sky"}]},
   { id:"kullin2", mt:"Kulliñ II", es:"Más animales", en:"More animals", kind:"pic", words:[
     {m:"ngürü",pic:"🦊",es:"zorro",en:"fox"},{m:"mañke",pic:{svg:ICON.condor},es:"cóndor",en:"condor"},
     {m:"filu",pic:"🐍",es:"culebra",en:"snake"},{m:"wakag",pic:"🐸",es:"rana",en:"frog"},
     {m:"dewü",pic:"🐭",es:"ratón",en:"mouse"},{m:"üñüm",pic:"🐦",es:"pájaro",en:"bird"},
-    {m:"chiñge",pic:"🦨",es:"chingue, zorrillo",en:"skunk"}]},
+    {m:"chiñge",pic:{svg:SCN.chinge},es:"chingue, zorrillo",en:"skunk"}]},
   { id:"kudaw", mt:"Küdaw", es:"Lo que hacemos", en:"Everyday actions", kind:"pic", words:[
     {m:"küdawün",pic:{svg:ACT.work},es:"trabajar",en:"to work"},{m:"ayen",pic:{svg:ACT.laugh},es:"reírse",en:"to laugh"},
     {m:"awkantun",pic:{svg:ACT.play},es:"jugar",en:"to play"},{m:"wirin",pic:{svg:ACT.write},es:"escribir, dibujar",en:"to write, to draw"},
@@ -1410,7 +1434,7 @@ const STAGES = [
     {m:"kachilla",pic:"🌾",es:"trigo",en:"wheat"},{m:"korü",pic:"🍲",es:"sopa, caldo",en:"soup, broth"},
     {m:"mansana",pic:"🍎",es:"manzana",en:"apple"},{m:"ngülliw",pic:NUT_PIC,es:"piñón",en:"pine nut (piñón)"}]},
   { id:"ruka", mt:"Ruka", es:"La casa", en:"The home", kind:"pic", words:[
-    {m:"ruka",pic:"🛖",es:"casa",en:"house"},{m:"kawitu",pic:"🛏️",es:"cama",en:"bed"},
+    {m:"ruka",pic:{svg:SCN.ruka},es:"casa",en:"house"},{m:"kawitu",pic:"🛏️",es:"cama",en:"bed"},
     {m:"wangku",pic:"🪑",es:"silla, banco",en:"chair, bench"},{m:"rali",pic:"🍽️",es:"plato",en:"plate"},
     {m:"metawe",pic:"🏺",es:"cántaro",en:"jug"},{m:"challa",pic:{svg:ICON.pot},es:"olla",en:"pot"},
     {m:"kultrun",pic:KULTRUN_PIC,es:"tambor ceremonial",en:"ceremonial drum"}]},
@@ -1428,9 +1452,9 @@ const STAGES = [
     {m:"chumül",es:"¿cuándo?",en:"when?"},{m:"chumngelu",es:"¿por qué?",en:"why?"},{m:"tunten",es:"¿cuánto(s)?",en:"how much? how many?"}]},
   { id:"adj", mt:"Pu dungu ñi felen", es:"Cómo son las cosas", en:"Describing things", kind:"pic", words:[
     {m:"pichi",pic:{svg:ICON.small},es:"pequeño",en:"small"},{m:"fücha",pic:{svg:ICON.big},es:"grande",en:"big"},
-    {m:"küme",pic:"👍",es:"bueno",en:"good"},{m:"kochi",pic:"🍯",es:"dulce",en:"sweet"},
-    {m:"kotrü",pic:"🧂",es:"salado",en:"salty"},{m:"are",pic:"🥵",es:"muy caliente",en:"very hot"},
-    {m:"we",pic:"🌱",es:"nuevo, fresco",en:"new, fresh"},{m:"kuyfi",pic:"📜",es:"antiguo",en:"old, long ago"}]},
+    {m:"küme",pic:"👍",es:"bueno",en:"good"},{m:"kochi",pic:"😋🍯",es:"dulce",en:"sweet"},
+    {m:"kotrü",pic:"😖🧂",es:"salado",en:"salty"},{m:"are",pic:"🥵",es:"muy caliente",en:"very hot"},
+    {m:"we",pic:"🌱✨",es:"nuevo, fresco",en:"new, fresh"},{m:"kuyfi",pic:"📜⏳",es:"antiguo",en:"old, long ago"}]},
   { id:"puke", mt:"pu, -ke", es:"Plurales: pu y -ke", en:"Plurals: pu and -ke", kind:"verb",
     gen:()=>genGram("puke",8), examples:()=>gramExamples("puke"),
     rule:{es:"Un sustantivo solo no dice cuántos hay: <b>che</b> es “persona” o “gente”. Para marcar plural se pone <b>pu</b> delante, sobre todo con personas: <b>pu che</b> “la gente”, <b>pu lamngen</b> “los hermanos” (en AVENUE, <b>pu che</b> aparece 376 veces). El sufijo <b>-ke</b> va en adjetivos y números e indica “cada uno, varios”: <b>kümeke che</b> “gente buena”, <b>kiñeke che</b> “algunas personas”, <b>füchake che</b> “los ancianos”; <b>pichikeche</b> “niños” es <b>pichi + -ke + che</b>. El verbo también puede marcar el plural: <b>amuyngün</b> “ellos van / fueron”. (* = forma formada por regla.)",
@@ -1441,9 +1465,9 @@ const STAGES = [
     rule:{es:"Elige la respuesta que corresponde a cada pregunta. <b>nien</b> “tengo”, <b>nieymi</b> “tienes”; <b>pingen</b> “me llaman”.",
           en:"Choose the answer that fits each question. <b>nien</b> “I have”, <b>nieymi</b> “you have”; <b>pingen</b> “I am called”."}},
   { id:"mew", mt:"mew", es:"Dónde: en, junto a", en:"Where: in, at", kind:"pic", words:[
-    {m:"ruka mew",pic:"🧍🛖",es:"en la casa",en:"in the house"},{m:"lafken mew",pic:"🧍🌊",es:"en el mar",en:"at the sea"},
-    {m:"mawida mew",pic:"🧍🌲",es:"en el monte",en:"in the woods"},{m:"wingkul mew",pic:"🧍⛰️",es:"en el cerro",en:"on the hill"},
-    {m:"kütral mew",pic:"🧍🔥",es:"junto al fuego",en:"by the fire"},{m:"wenu mew",pic:"🪁☁️",es:"arriba, en el cielo",en:"up in the sky"}]}
+    {m:"ruka mew",pic:{svg:SCN.rukaMew},es:"en la casa",en:"in the house"},{m:"lafken mew",pic:{svg:SCN.lafkenMew},es:"en el mar",en:"at the sea"},
+    {m:"mawida mew",pic:{svg:SCN.mawidaMew},es:"en el monte",en:"in the woods"},{m:"wingkul mew",pic:{svg:SCN.wingkulMew},es:"en el cerro",en:"on the hill"},
+    {m:"kütral mew",pic:{svg:SCN.kutralMew},es:"junto al fuego",en:"by the fire"},{m:"wenu mew",pic:{svg:SCN.wenuMew},es:"arriba, en el cielo",en:"up in the sky"}]}
  ]},
  {id:"int2", es:"Intermedio II", en:"Intermediate II", need:24, levels:[
   { id:"chalin2", mt:"Chalin II", es:"Más saludos", en:"More greetings", kind:"scene", words:[
