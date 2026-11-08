@@ -345,6 +345,9 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .lofsent{font-family:var(--display);font-size:1.2rem}
 .muted{color:var(--muted);font-size:.92rem}
 .score{font-family:var(--display);font-size:1.3rem;font-variant-numeric:tabular-nums}
+.envtabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.envtabs .btn{flex:1 1 0;min-width:96px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;line-height:1.15}.envtabs small{font-weight:400;font-size:.75rem;opacity:.85}
+.pal-burst{animation:palburst .5s ease-out forwards;transform-box:fill-box;transform-origin:center} @keyframes palburst{0%{opacity:0;transform:scale(.3)}30%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
+.epst{margin:18px 0 6px;font-size:1.1rem} .epst .muted{font-size:.85rem;font-weight:400}
 .pali-g{transition:transform .6s cubic-bezier(.3,.8,.3,1)} .pali-b{animation:palbounce .6s ease-out}
 @keyframes palbounce{40%{transform:translateY(-7px)}70%{transform:translateY(0)}85%{transform:translateY(-2px)}}
 .pali.goal{fill:var(--gold);stroke:#fff} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:2.4}
@@ -2027,7 +2030,11 @@ const PEOPLE = [
   {id:"ngenpin", type:"wentru", skin:SKIN.c, hair:"#8a8580", es:"orador ceremonial", en:"ceremonial speaker"},
   {id:"witralfe", type:"domo", skin:SKIN.a, hair:"#241a14", es:"tejedora", en:"weaver"},
   {id:"pichi domo", type:"domo", skin:SKIN.c, hair:"#1a1410", child:true, es:"niña", en:"girl"},
-  {id:"pichi wentru", type:"wentru", skin:SKIN.a, hair:"#241a14", child:true, es:"niño", en:"boy"}
+  {id:"pichi wentru", type:"wentru", skin:SKIN.a, hair:"#241a14", child:true, es:"niño", en:"boy"},
+  {id:"lawentuchefe", type:"domo", skin:SKIN.c, hair:"#3a2a20", es:"conocedora de las plantas medicinales", en:"expert in medicinal plants"},
+  {id:"Pascual Koña", type:"wentru", role:"lonko", elder:true, skin:SKIN.b, hair:"#d6d1c8", hist:1, es:"Pascual Coña, lonko de la zona del lago Budi (c. 1848–1927). Ya anciano, dictó su vida en mapudungun al misionero Ernesto Wilhelm de Moesbach; el libro, publicado en 1930, es uno de los grandes textos de la lengua.", en:"Pascual Coña, lonko from the Lake Budi area (c. 1848–1927). As an old man he dictated his life story in Mapudungun to the missionary Ernesto Wilhelm de Moesbach; the book, published in 1930, is one of the great texts of the language."},
+  {id:"Janequeo", type:"domo", role:"weychafe", skin:SKIN.a, hair:"#1a1410", hist:1, es:"Janequeo (Yanequén), lonko y weychafe pewenche (hacia 1587). Cuando los españoles mataron a su esposo Wepotaén, ella encabezó la resistencia. Su historia nos llega por cronistas coloniales y en parte es leyenda.", en:"Janequeo (Yanequén), Pewenche lonko and weychafe (around 1587). When the Spanish killed her husband Wepotaén, she led the resistance. Her story comes to us through colonial chroniclers and is partly legend."},
+  {id:"Külapang", type:"wentru", role:"weychafe", skin:SKIN.c, hair:"#1a1410", hist:1, es:"José Santos Külapang (Quilapán), toqui wenteche (murió en 1875). Desde 1868 encabezó la resistencia contra la ocupación militar chilena de la Araucanía.", en:"José Santos Külapang (Quilapán), wenteche toqui (died 1875). From 1868 he led the resistance against the Chilean military occupation of the Araucanía."}
 ];
 const SILVER="#d7dbe2";
 const ITEMS = [
@@ -2143,6 +2150,19 @@ const ITEMS = [
    svg:`<rect width="120" height="170" fill="#6a9ad0"/><path d="M0 108 Q60 92 120 108 V170 H0Z" fill="#3d6b3f"/><rect y="120" width="120" height="50" fill="#5a8d4a"/><path d="M6 166 L18 124 M114 166 L102 124 M18 124 H102" stroke="#e9e3cf" stroke-width="1.5" fill="none" opacity=".8"/><circle cx="24" cy="150" r="2.5" fill="#e9e3cf"/>`},
   {id:"bg-kuyen", m:"küyen", slot:"bg", for:["domo","wentru"], price:18, es:"fondo: noche de luna", en:"background: moonlit night", vb:"0 0 120 170",
    svg:`<rect width="120" height="170" fill="#141530"/><circle cx="88" cy="30" r="12" fill="#e9e3cf"/><circle cx="84" cy="27" r="2" fill="#cfc8b4"/>${[[14,18],[36,40],[60,14],[108,60],[22,70],[50,76]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3" fill="#f3efe6"/>`).join("")}<path d="M0 124 L30 100 L58 122 L92 96 L120 118 V170 H0Z" fill="#26284a"/><rect y="146" width="120" height="24" fill="#1d2a24"/>`}
+,
+  {id:"tokikura", m:"tokikura", slot:"hand", for:["weychafe","lonko"], price:22, es:"hacha de piedra, emblema del toki", en:"stone axe, the toki's emblem", vb:"82 62 30 54", svg:""},
+  {id:"chillka", m:"chillka", slot:"hand", for:["domo","wentru"], price:20, es:"libro, escrito", en:"book, writing", vb:"80 90 32 30", svg:""},
+  {id:"lawen-hand", m:"lawen", slot:"hand", for:["lawentuchefe","machi","domo"], price:14, es:"ramo de plantas medicinales", en:"bundle of medicinal plants", vb:"80 72 32 46", svg:""},
+  {id:"trarilonko-karu", m:"karü trarilonko", slot:"head", for:["wentru"], price:8, es:"cintillo de lana verde", en:"green wool headband", vb:"42 22 36 14", svg:""},
+  {id:"llangka-kallfu", m:"kallfü llangka", slot:"neck", for:["domo","wentru"], price:12, es:"collar de chaquiras azules", en:"blue bead necklace", vb:"42 46 36 20", svg:""},
+  {id:"ikulla-karu", m:"karü ikülla", slot:"cloak", for:["domo"], price:16, es:"rebozo verde", en:"green shawl", vb:"28 48 64 62", svg:""},
+  {id:"makun-lig", m:"lig makuñ", slot:"cloak", for:["wentru"], price:22, es:"poncho blanco", en:"white poncho", vb:"18 46 84 72", svg:""},
+  {id:"trariwe-kuru", m:"kurü trariwe", slot:"belt", for:["domo","wentru"], price:8, es:"faja negra", en:"black sash", vb:"36 92 48 20", svg:""},
+  {id:"pet-pudu", m:"püdü", slot:"pet", for:["domo","wentru"], price:14, es:"compañero: pudú", en:"companion: pudu", vb:"0 128 40 42", svg:""},
+  {id:"pet-choyke", m:"choyke", slot:"pet", for:["domo","wentru"], price:14, es:"compañero: ñandú", en:"companion: rhea", vb:"0 128 40 42", svg:""},
+  {id:"bg-trayenko", m:"trayenko", slot:"bg", for:["domo","wentru"], price:20, es:"fondo: cascada", en:"background: waterfall", vb:"0 0 120 170", svg:""},
+  {id:"bg-lewfu", m:"lewfü", slot:"bg", for:["domo","wentru"], price:18, es:"fondo: el río", en:"background: the river", vb:"0 0 120 170", svg:""}
 ];
 const SLOT_ORDER=["body","belt","cloak","neck","chest","pin","head","ears","hand","pet"];
 const fits=(it,p)=>!(p.blades&&it.slot==="hand") && (it.for.includes(p.type)||it.for.includes(p.id)||(p.role&&it.for.includes(p.role)));
@@ -3333,26 +3353,102 @@ const LOF=[
   s:`<g class="lf-glide"><path d="M0 0 C-8 -2 -18 -1 -30 2 L-35 4 L-30 4.4 L-33.6 6.4 L-28.4 5.6 L-30.4 8.6 L-24 5.6 C-14 4.4 -6 4.2 0 3.4 C6 4.2 14 4.4 24 5.6 L30.4 8.6 L28.4 5.6 L33.6 6.4 L30 4.4 L35 4 L30 2 C18 -1 8 -2 0 0Z" fill="#1d1d22"/><path d="M-27 3.2 C-17 1.4 -9 1.2 -3 1.6 M27 3.2 C17 1.4 9 1.2 3 1.6" stroke="#dcdcdc" stroke-width="1.4" fill="none" opacity=".85"/><ellipse cx="0" cy=".8" rx="2.2" ry="1.4" fill="#f2f2f2"/><circle cx="0" cy="-1.4" r="1.3" fill="#b5675b"/><path d="M-3 3.4 L0 7 L3 3.4" fill="#1d1d22"/></g>`,
   ma:"Kiñe mañke müley wenu mew.",ses:"Hay un cóndor arriba.",sen:"There is a condor up above."}
 ];
+/* animals shared by the Lof and the Vestuario, drawn standing on y=0 */
+const lfPudu=`<path d="M-6 -6 V0 M-3.4 -6 V0 M5 -6 V0 M7.6 -6 V0" stroke="#5a3a22" stroke-width="1.8" stroke-linecap="round"/><ellipse cx="1" cy="-9.4" rx="10" ry="5.2" fill="#8a5a34"/><ellipse cx="1.6" cy="-7.4" rx="7" ry="2.2" fill="#a87650" opacity=".7"/><path d="M10.4 -11 q2.6 -.6 2 1.6" stroke="#6e4426" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M-6.6 -11.6 Q-9.6 -16 -8.6 -20 L-4.6 -19.4 Q-5 -14.6 -2.6 -11Z" fill="#8a5a34"/><ellipse cx="-10" cy="-21.4" rx="4.6" ry="3.6" fill="#8a5a34"/><path d="M-14.2 -21.6 Q-15.8 -20 -14 -18.8 L-12 -19.6Z" fill="#3a2414"/><path d="M-8 -24 q2.6 -4 4.6 -2.6 q-1.2 3 -3.6 3.8Z" fill="#6e4426"/><path d="M-10.6 -24.6 l-.6 -3.4 M-9 -24.6 l.8 -3.2" stroke="#3a2414" stroke-width="1" stroke-linecap="round"/><circle cx="-11" cy="-22.2" r="1" fill="#1a1410"/><circle cx="-10.7" cy="-22.5" r=".32" fill="#fff"/>`;
+const lfChoyke=`<path d="M-1 -14 L-4.6 0 M3 -14 L5.4 0" stroke="#8a7a64" stroke-width="1.7" stroke-linecap="round"/><path d="M-7.4 0 h4 M4.4 0 h4" stroke="#6e604c" stroke-width="1.2" stroke-linecap="round"/><path d="M-12 -18 Q-10 -27 2 -27 Q13 -26 13 -17 Q11 -10.6 0 -10.6 Q-10 -10.6 -12 -18Z" fill="#9a958a"/><path d="M-12 -18 Q-8 -13.6 0 -12.6 Q-10 -11 -12 -18Z" fill="#6e6a62"/><path d="M-3 -24 Q4 -21.6 11 -20" stroke="#bdb8ac" stroke-width="1.2" fill="none"/><path d="M6 -14 q4 2 6 -1" stroke="#7c776c" stroke-width="1" fill="none"/><path d="M-8 -22 Q-11.6 -30 -9.4 -36" stroke="#9a958a" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="-10" cy="-37.4" rx="3.2" ry="2.3" fill="#8a857a"/><path d="M-12.8 -37.8 L-16.4 -37 L-12.8 -36.2Z" fill="#5a5448"/><circle cx="-10.4" cy="-38" r=".75" fill="#1a1410"/>`;
+const lfPangi=`<path d="M-24 0 Q-26 -6 -18 -8 H20 Q27 -7 25 0Z" fill="#7d7a73"/><path d="M-20 -7 Q0 -9 20 -7.6 Q23 -6.4 22 -4.4 Q0 -5.4 -20 -4.6Z" fill="#a8a49b"/><path d="M14 -11 Q24 -10 26 -2 Q27 3 23 6" stroke="#b8894f" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M23 6 q-1 2 -3 1.4" stroke="#5a3a22" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M-10 -8 Q-12 -17 2 -17 Q14 -17 16 -10 Q15 -7.4 8 -7.4 H-8Z" fill="#c49a62"/><path d="M-6 -15 Q4 -17.4 13 -13" stroke="#dcb985" stroke-width="1.4" fill="none"/><path d="M-12 -9 L-20 -8.4 M-11 -7.8 L-19 -7.2" stroke="#b8894f" stroke-width="2.4" stroke-linecap="round"/><circle cx="-12" cy="-14" r="5" fill="#c49a62"/><path d="M-15.6 -17.6 l-.6 -3 l2.6 1.6Z M-10 -18.6 l1.4 -2.8 l1 3Z" fill="#a87a44"/><ellipse cx="-15" cy="-12.4" rx="2.4" ry="1.8" fill="#efe2c8"/><circle cx="-16.6" cy="-13" r=".8" fill="#3a2414"/><circle cx="-13.6" cy="-15" r=".8" fill="#1a1410"/><circle cx="-10.6" cy="-15" r=".8" fill="#1a1410"/>`;
+const lfNarki=`<path d="M4 -1 Q12 0 11 -8 Q10.4 -12 7.4 -11.6" stroke="#5a5450" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M-5 0 Q-7 -9 -1 -12 Q5 -12.6 6 -5 Q6.4 -1 4 0Z" fill="#6e6862"/><path d="M-1 -2 Q0 -9 3 -9.4 Q5 -5 4 0Z" fill="#8a847e"/><circle cx="-1" cy="-15" r="4.6" fill="#6e6862"/><path d="M-5 -17 l-.6 -4 l3 2Z M1.6 -18.6 l2 -3 l.4 3.6Z" fill="#6e6862"/><path d="M-4.4 -18 l-.2 -1.6 l1 .8Z" fill="#d9a094"/><circle cx="-2.8" cy="-15.4" r=".8" fill="#e8c440"/><circle cx=".8" cy="-15.4" r=".8" fill="#e8c440"/><path d="M-1.8 -13.4 l.8 .6 l.8 -.6" stroke="#2a2420" stroke-width=".5" fill="none"/><path d="M-6 -13.6 l-3 -.6 M-6 -12.6 l-3 .6 M3.6 -13.6 l3 -.6 M3.6 -12.6 l3 .6" stroke="#cfc8bc" stroke-width=".35"/>`;
+const lfL=id=>LOF.find(q=>q.id===id).s;
+/* Lof environments: the first is free, the others are bought with ngülliw. A piece without env belongs to the valley. */
+const LOF_ENVS=[
+ {id:"lelfun",m:"lelfün",es:"el valle",en:"the valley",price:0},
+ {id:"lafkenmapu",m:"lafkenmapu",es:"la costa",en:"the coast",price:60},
+ {id:"pewenmapu",m:"pewenmapu",es:"tierra del pewen",en:"pewen country",price:80}
+];
+const envOf=p=>p.env||"lelfun";
+LOF.push(
+ {id:"mansana",m:"mansana",es:"manzano",en:"apple tree",price:20,x:30,y:188,sh:14,vb:"-20 -48 40 50",
+  s:`<path d="M-2.4 0 L-1.6 -22 H1.6 L2.4 0Z" fill="#6b4a30"/><path d="M0 -14 L-7 -21 M.6 -17 L7 -24" stroke="#6b4a30" stroke-width="1.8" stroke-linecap="round"/>${[[-9,-28,10,"#3f7a3a"],[8,-30,10,"#3f7a3a"],[0,-37,11,"#4d8a3e"],[-11,-35,7,"#4d8a3e"],[11,-38,7,"#5d9a48"],[0,-26,9,"#4d8a3e"]].map(([x,y,r,c])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`).join("")}<path d="M-6 -44 Q2 -48 10 -43" stroke="#7ab35e" stroke-width="2" fill="none" opacity=".7"/>${[[-10,-26],[-3,-34],[6,-28],[12,-36],[-12,-36],[3,-42],[-4,-22],[9,-22]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2" fill="#c8322f"/><circle cx="${x-.6}" cy="${y-.6}" r=".6" fill="#f08a7a"/>`).join("")}`,
+  ma:"Kiñe mansana müley ruka mew.",ses:"Hay un manzano en la casa.",sen:"There is an apple tree at the house."},
+ {id:"pilmaykeñ",m:"pilmaykeñ",es:"golondrinas",en:"swallows",price:15,x:130,y:54,k:1,z:0,sh:0,vb:"-12 -8 30 16",
+  s:`<g class="lf-glide">${[[0,0,1],[12,4,.8]].map(([x,y,k])=>`<g transform="translate(${x} ${y}) scale(${k})"><path d="M-9 -2 Q-4 -6 0 -1 Q4 -6 9 -2 Q4 -3 0 1 Q-4 -3 -9 -2Z" fill="#1d2a4a"/><path d="M0 .6 L-1.6 5 L0 3.4 L1.6 5Z" fill="#1d2a4a"/><path d="M-1 0 Q0 1.8 1 0" fill="#e9d6c4"/></g>`).join("")}</g>`,
+  ma:"Epu pilmaykeñ müley wenu mew.",ses:"Hay dos golondrinas arriba.",sen:"There are two swallows up above."},
+ {id:"ñarki",m:"ñarki",es:"gato",en:"cat",price:15,x:146,y:222,sh:10,vb:"-12 -24 26 26",s:lfNarki,
+  ma:"Ñi ñarki umawtuy ruka mew.",ses:"Mi gato durmió en la casa.",sen:"My cat slept at the house."},
+ /* ---- lafkenmapu: the coast ---- */
+ {id:"lil",env:"lafkenmapu",m:"lil",es:"peñasco",en:"rocky crag",price:25,x:46,y:146,sh:0,hz:0,vb:"-46 -56 92 60",
+  s:`<path d="M-40 0 Q-42 -20 -30 -34 Q-20 -50 -6 -46 Q6 -54 16 -40 Q30 -30 34 -12 Q36 -4 40 0Z" fill="#6f6a64"/><path d="M-40 0 Q-42 -20 -30 -34 Q-24 -40 -18 -40 Q-28 -24 -24 0Z" fill="#57524d"/><path d="M-6 -46 Q6 -54 16 -40 Q8 -42 0 -38Z" fill="#8a857e"/><path d="M-30 -28 Q-10 -34 12 -28 M-34 -14 Q0 -20 30 -12" stroke="#4e4a45" stroke-width="1" fill="none" opacity=".6"/><path d="M-20 -43 Q-6 -52 6 -48 Q14 -46 18 -40 Q4 -45 -20 -43Z" fill="#4f7a43"/><path d="M-44 1 Q-30 -2.4 -16 1 T16 1 T44 1" stroke="#f3f7fa" stroke-width="1.6" fill="none" opacity=".85" class="lf-shim"/>`,
+  ma:"Kiñe fücha lil müley.",ses:"Hay un gran peñasco.",sen:"There is a big rocky crag."},
+ {id:"challwa",env:"lafkenmapu",m:"challwa",es:"peces",en:"fish",price:15,x:250,y:118,k:1,z:1,sh:0,vb:"-14 -16 48 22",
+  s:`${[[0,0,25],[24,4,-20]].map(([x,y,r])=>`<g transform="translate(${x} ${y})"><path d="M-10 1 Q0 -12 10 -1" stroke="#e6f1fb" stroke-width=".8" stroke-dasharray="1.6 1.6" fill="none"/><g transform="translate(3 -8) rotate(${r})"><path d="M-6 0 Q0 -4 6 0 Q0 4 -6 0Z" fill="#8aa6b8"/><path d="M-6 0 Q0 2 6 0 Q0 4 -6 0Z" fill="#e6eef2"/><path d="M6 0 L10 -3.4 L9 0 L10 3.4Z" fill="#6e8ea2"/><circle cx="-3.6" cy="-.6" r=".7" fill="#14122a"/></g><path d="M-12 1.6 q2 -2 4 0 M8 1.6 q2 -2 4 0" stroke="#e6f1fb" stroke-width=".8" fill="none"/></g>`).join("")}`,
+  ma:"Fentren challwa müley lafken mew.",ses:"Hay muchos peces en el mar.",sen:"There are lots of fish in the sea."},
+ {id:"ñamku",env:"lafkenmapu",m:"ñamku",es:"aguilucho",en:"hawk",price:20,x:150,y:40,k:1,z:0,sh:0,vb:"-22 -4 44 12",
+  s:`<g class="lf-glide"><path d="M0 0 C-6 -3 -14 -2 -20 1 L-16 2 L-19 4 L-12 3 C-7 3 -3 2.6 0 2 C3 2.6 7 3 12 3 L19 4 L16 2 L20 1 C14 -2 6 -3 0 0Z" fill="#5a4636"/><path d="M-14 1.4 C-9 .4 -5 .4 -2 .8 M14 1.4 C9 .4 5 .4 2 .8" stroke="#8a6a4e" stroke-width=".8" fill="none"/><path d="M-3 2 L0 7 L3 2Z" fill="#efe7d2"/><circle cx="0" cy="-.6" r="1.7" fill="#3a2a1e"/></g>`,
+  ma:"Kiñe ñamku müley wenu mew.",ses:"Hay un aguilucho arriba.",sen:"There is a hawk up above."},
+ {id:"kollof",env:"lafkenmapu",m:"kollof",es:"cochayuyo",en:"bull kelp",price:20,x:280,y:170,sh:18,vb:"-20 -24 40 26",
+  s:`<path d="M-16 0 V-20 M16 0 V-20" stroke="#6e4f30" stroke-width="2" stroke-linecap="round"/><path d="M-18.4 -19.4 H18.4" stroke="#8a6a44" stroke-width="2.2" stroke-linecap="round"/>${Array.from({length:10},(_,i)=>{const x=-13.4+i*3,l=10+(i*7%5)*1.8;return `<path d="M${x} -19 Q${x+(i%2?1.4:-1.4)} ${-19+l/2} ${x+(i%2?.4:-.4)} ${-19+l}" stroke="${i%2?"#4a4a22":"#5e5a2a"}" stroke-width="2" fill="none" stroke-linecap="round"/>`}).join("")}<g transform="translate(-10 0)"><ellipse cx="0" cy="-2" rx="6" ry="2.4" fill="#4a4a22"/><path d="M-5 -2.4 Q0 -4.6 5 -2.4" stroke="#6e6a34" stroke-width="1" fill="none"/></g>`,
+  ma:"Kollof iyiñ.",ses:"Comimos cochayuyo.",sen:"We ate bull kelp."},
+ {id:"lk-wampo",env:"lafkenmapu",m:"wampo",es:"bote, canoa",en:"canoe",price:25,x:150,y:168,sh:22,vb:"-27 -10 54 15",
+  s:`<g transform="scale(1.7)">${lfL("wampo").replace(/<path d="M-12 3[^>]*>/,"")}</g><path d="M-6 -6 L14 -14" stroke="#8a6a44" stroke-width="1.4" stroke-linecap="round"/>`,
+  ma:"Wampo mew amuyiñ.",ses:"Fuimos en bote.",sen:"We went by canoe."},
+ {id:"challwafe",env:"lafkenmapu",m:"challwafe",es:"pescador",en:"fisherman",price:30,x:192,y:176,sh:10,req:"lk-wampo",vb:"-10 -42 34 44",
+  s:`<path d="M-2 -15 L-3 0 M2 -15 L3.4 0" stroke="#3b2a20" stroke-width="3" stroke-linecap="round"/><path d="M-5 -29 Q0 -31 5 -29 L5.4 -14 Q0 -12.6 -5.4 -14Z" fill="#2f4a8a"/><path d="M-5 -29 Q-2 -22 -5.4 -14" stroke="#1f3260" stroke-width="2" fill="none" opacity=".6"/><path d="M-5.4 -16.4 Q0 -14.8 5.4 -16.4 V-18.4 Q0 -16.8 -5.4 -18.4Z" fill="#c8322f"/><circle cx="0" cy="-33.6" r="4.4" fill="#a8714d"/><path d="M-4.6 -34.6 Q-4.8 -39.4 0 -39.4 Q4.8 -39.4 4.6 -34.6 Q2 -37 -4.6 -34.6Z" fill="#1d1715"/><circle cx="2" cy="-34" r=".6" fill="#14122a"/><path d="M4 -26 L12 -21" stroke="#a8714d" stroke-width="2.4" stroke-linecap="round"/><path d="M12 -21 Q22 -12 18 0 Q10 -2 9 -14Z" fill="#c9b484" fill-opacity=".18" stroke="#c9b484" stroke-width=".8"/><path d="M11 -17 L19 -8 M10 -11 L18 -16 M11 -5 L19 -4 M13 -20 L12 0" stroke="#c9b484" stroke-width=".5"/><g transform="translate(15 -6) rotate(70)"><path d="M-3 0 Q0 -2 3 0 Q0 2 -3 0Z" fill="#8aa6b8"/></g>`,
+  ma:"Ñi chaw challwafengey.",ses:"Mi padre es pescador.",sen:"My father is a fisherman."},
+ {id:"lk-kütral",env:"lafkenmapu",m:"kütral",es:"fuego",en:"fire",price:15,x:236,y:198,sh:0,vb:"-22 -34 44 38",s:lfL("kütral"),
+  ma:"Kütral mew afümkeiñ challwa.",ses:"En el fuego cocemos pescado.",sen:"We cook fish on the fire."},
+ /* ---- pewenmapu: pewen country ---- */
+ {id:"trayenko",env:"pewenmapu",m:"trayenko",es:"cascada",en:"waterfall",price:30,x:56,y:146,sh:0,hz:0,vb:"-32 -62 64 66",
+  s:`<path d="M-30 0 L-26 -50 Q-18 -60 -8 -58 L-7 -40 H7 L8 -58 Q20 -60 26 -48 L30 0Z" fill="#6f6a64"/><path d="M-30 0 L-26 -50 Q-22 -55 -16 -57 Q-22 -30 -20 0Z" fill="#57524d"/><path d="M-7.4 -57 Q0 -59 7.4 -57 V-1 H-7.4Z" fill="#d6ecf8"/>${[-5,-2.4,0,2.6,5].map((x,i)=>`<path d="M${x} -56 V-2" stroke="#fff" stroke-width="${i%2?1.4:.8}" class="lf-shim"/>`).join("")}${[[-20,-56,6],[-12,-59,5],[14,-59,5],[22,-52,6],[-24,-30,4],[24,-26,4]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.7}" fill="#3f6a3d"/>`).join("")}<ellipse cx="0" cy="0" rx="17" ry="3.6" fill="#4b80bd"/><ellipse cx="0" cy="-1.4" rx="10" ry="2.6" fill="#f3f7fa" opacity=".7"/>`,
+  ma:"Kiñe trayenko müley mawida mew.",ses:"Hay una cascada en el monte.",sen:"There is a waterfall in the woods."},
+ {id:"lewfü",env:"pewenmapu",m:"lewfü",es:"río",en:"river",price:30,x:0,y:0,abs:1,z:2,vb:"100 116 170 124",
+  s:`<path d="M248 122 Q236 128 224 132 Q196 142 186 156 Q174 172 150 188 Q126 204 116 240 L156 240 Q162 212 180 196 Q204 178 214 162 Q224 148 240 138 Q252 130 258 122Z" fill="#5f7f3a" opacity=".5" transform="translate(-1.5 1.5)"/><path d="M248 122 Q236 128 224 132 Q196 142 186 156 Q174 172 150 188 Q126 204 116 240 L156 240 Q162 212 180 196 Q204 178 214 162 Q224 148 240 138 Q252 130 258 122Z" fill="url(#lfRiver)"/><g stroke="#e6f1fb" stroke-linecap="round" fill="none" opacity=".6" class="lf-shim"><path d="M234 132 q-8 4 -14 6 M200 156 q-6 8 -12 12 M166 190 q-10 6 -16 12 M140 214 q-4 6 -6 12"/></g>`,
+  ma:"Lewfü mew müley challwa.",ses:"En el río hay peces.",sen:"There are fish in the river."},
+ {id:"pewentu",env:"pewenmapu",m:"pewen",es:"bosque de pewen",en:"pewen grove",price:35,x:306,y:150,sh:0,hz:0,vb:"-50 -104 100 112",
+  s:`<g transform="translate(-24 4) scale(.68)">${lfL("pewen")}</g><g transform="translate(26 6) scale(.6)">${lfL("pewen")}</g><g transform="scale(.9)">${lfL("pewen")}</g>`,
+  ma:"Fentren pewen müley.",ses:"Hay muchos pewen.",sen:"There are many pewen trees."},
+ {id:"ngülliw",env:"pewenmapu",m:"ngülliw",es:"piñones",en:"pine nuts",price:20,x:276,y:198,sh:12,req:"pewentu",vb:"-14 -18 28 20",
+  s:`${[[-6,-10],[-2,-12],[2,-11],[6,-10],[-4,-8],[0,-9],[4,-8]].map(([x,y])=>`<path d="M${x} ${y-3}C${x+2} ${y-1.6} ${x+2} ${y+1.6} ${x} ${y+3}C${x-2} ${y+1.6} ${x-2} ${y-1.6} ${x} ${y-3}Z" fill="#9a5a2e"/><path d="M${x} ${y-2} v3" stroke="#c9884e" stroke-width=".5"/>`).join("")}<path d="M-10 -8 L-8 0 H8 L10 -8Z" fill="#a8824a"/><path d="M-9.4 -5.4 H9.4 M-8.8 -2.6 H8.8" stroke="#7a5a30" stroke-width=".8"/><path d="M-6 -8 V0 M-2 -8 V0 M2 -8 V0 M6 -8 V0" stroke="#c49a62" stroke-width=".6"/><path d="M11 0 C12.6 -1.6 13 -3 12 -4.6 C10.6 -3.6 10 -1.6 11 0Z" fill="#9a5a2e"/>`,
+  ma:"Ñi kuku afümi ngülliw.",ses:"Mi abuela coció piñones.",sen:"My grandmother cooked pine nuts."},
+ {id:"pangi",env:"pewenmapu",m:"pangi",es:"puma",en:"puma",price:30,x:104,y:168,sh:0,vb:"-28 -24 56 32",s:lfPangi,
+  ma:"Pangi umawtuy mawida mew.",ses:"El puma duerme en el monte.",sen:"The puma sleeps in the woods."},
+ {id:"choyke",env:"pewenmapu",m:"choyke",es:"ñandú",en:"rhea",price:25,x:214,y:186,sh:14,vb:"-18 -42 34 44",s:lfChoyke,
+  ma:"Kiñe choyke lefi.",ses:"Un ñandú corrió.",sen:"A rhea ran."},
+ {id:"pw-ruka",env:"pewenmapu",m:"ruka",es:"casa",en:"house",price:30,x:170,y:150,sh:44,vb:"-46 -78 92 82",s:lfL("ruka"),
+  ma:"Pewenmapu mew müley ñi ruka.",ses:"Mi casa está en la tierra del pewen.",sen:"My house is in pewen country."}
+);
 const lfK=p=>p.k||Math.min(1.12,.56+.52*(p.y-118)/112);
 const lfPiece=(p,sel)=>`<g transform="translate(${p.x} ${p.y})${p.abs?"":` scale(${lfK(p).toFixed(3)})`}"${!p.abs&&p.y<146&&!p.k&&p.hz!==0?` filter="url(#lfHaze)"`:""}><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(G(p.m))}">${p.sh?lfSh(p.sh):""}${p.s}</g></g>`;
 const lfThumb=p=>`<svg viewBox="${p.vb}" aria-hidden="true">${p.s}</svg>`;
-function lofScene(sel){
-  const has=id=>lofOwned.includes(id);
-  const tufts=[[30,150],[150,140],[248,150],[320,170],[110,200],[176,226],[236,196],[26,214],[340,232],[270,186],[90,232],[200,134],[300,140],[140,232]];
-  return `<svg viewBox="0 0 360 240" class="lofsvg" role="img" aria-label="lof">
-    <defs>
-      <linearGradient id="lfSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f93cf"/><stop offset=".75" stop-color="#a9cbe6"/><stop offset="1" stop-color="#d9e8ee"/></linearGradient>
-      <linearGradient id="lfMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa35a"/><stop offset=".35" stop-color="#679448"/><stop offset="1" stop-color="#4c7a36"/></linearGradient>
-      <linearGradient id="lfRiver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8db6dc"/><stop offset="1" stop-color="#3d72b0"/></linearGradient>
-      <linearGradient id="lfLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ec3e4"/><stop offset="1" stop-color="#4b80bd"/></linearGradient>
-      <radialGradient id="lfSun"><stop offset="0" stop-color="#fff6d0"/><stop offset=".35" stop-color="#f6d77a" stop-opacity=".9"/><stop offset="1" stop-color="#f6d77a" stop-opacity="0"/></radialGradient>
-      <radialGradient id="lfGlow"><stop offset="0" stop-color="#ffc35a" stop-opacity=".75"/><stop offset="1" stop-color="#ffc35a" stop-opacity="0"/></radialGradient>
-      <radialGradient id="lfVig" cx=".5" cy=".45" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0b0a18" stop-opacity=".35"/></radialGradient>
-      <linearGradient id="lfHazeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfeaf0" stop-opacity="0"/><stop offset=".5" stop-color="#dfeaf0" stop-opacity=".55"/><stop offset="1" stop-color="#dfeaf0" stop-opacity="0"/></linearGradient>
-      <filter id="lfblur" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="1.3"/></filter>
-      <filter id="lfHaze"><feColorMatrix type="matrix" values=".82 0 0 0 .14  0 .82 0 0 .15  0 0 .82 0 .17  0 0 0 1 0"/></filter>
-    </defs>
-    <rect width="360" height="240" fill="url(#lfSky)"/>
+const LF_TUFTS=[[30,150],[150,140],[248,150],[320,170],[110,200],[176,226],[236,196],[26,214],[340,232],[270,186],[90,232],[200,134],[300,140],[140,232]];
+const lfTufts=(c,pts)=>`<g stroke="${c}" stroke-width=".9" stroke-linecap="round">${pts.map(([a,b])=>`<path d="M${a} ${b} l-2 -4 M${a+1} ${b} l0 -5 M${a+2} ${b} l2 -4"/>`).join("")}</g>`;
+function lofBg(env){
+  const tufts=LF_TUFTS;
+  if(env==="lafkenmapu") return `<rect width="360" height="240" fill="url(#lfSky)"/>
+    <circle cx="70" cy="70" r="40" fill="url(#lfSun)"/><circle cx="70" cy="70" r="11" fill="#fff3c4"/>
+    <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="62" cy="34" rx="22" ry="6"/><ellipse cx="74" cy="29" rx="12" ry="7"/><ellipse cx="54" cy="30" rx="9" ry="5"/></g><g opacity=".7"><ellipse cx="186" cy="22" rx="16" ry="4"/><ellipse cx="194" cy="18" rx="8" ry="5"/></g></g>
+    <path d="M236 98 Q262 82 292 88 Q316 84 344 98Z" fill="#8ea7c2"/><path d="M252 90 Q270 84 290 88" stroke="#a9bdd2" stroke-width="2" fill="none"/>
+    <rect y="97" width="360" height="47" fill="url(#lfSea)"/><path d="M0 97.5 H360" stroke="#dfeaf0" stroke-width="1" opacity=".7"/>
+    <g stroke="#fff6d0" stroke-linecap="round" opacity=".75" class="lf-shim"><path d="M62 102 h16 M56 108 h12 M72 108 h10 M60 115 h22 M66 122 h8"/></g>
+    <g stroke="#e6f1fb" stroke-linecap="round" fill="none" opacity=".45" class="lf-shim"><path d="M120 106 q10 -3 20 0 M200 112 q12 -3 24 0 M300 106 q10 -3 20 0 M150 124 q14 -4 28 0 M260 128 q12 -3 24 0 M20 130 q12 -3 24 0"/></g>
+    <path d="M0 141 Q60 133 120 139 T240 137 T360 139 V147 H0Z" fill="#f3f7fa" opacity=".85" class="lf-shim"/>
+    <path d="M0 143 Q90 135 180 141 T360 141 V240 H0Z" fill="url(#lfSand)"/>
+    <path d="M0 146 Q90 138 180 144 T360 144 V152 Q270 148 180 152 T0 151Z" fill="#c4ad7c" opacity=".55"/>
+    <g fill="#d8c08a" opacity=".6"><ellipse cx="90" cy="206" rx="40" ry="5"/><ellipse cx="300" cy="222" rx="50" ry="6"/></g>
+    ${lfTufts("#7a8a4a",[[320,170],[340,232],[16,220],[28,232],[350,190]])}`;
+  if(env==="pewenmapu") return `<rect width="360" height="240" fill="url(#lfSky)"/>
+    <circle cx="300" cy="34" r="34" fill="url(#lfSun)"/><circle cx="300" cy="34" r="10" fill="#fff3c4"/>
+    <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="62" cy="34" rx="22" ry="6"/><ellipse cx="74" cy="29" rx="12" ry="7"/><ellipse cx="54" cy="30" rx="9" ry="5"/></g><g opacity=".7"><ellipse cx="186" cy="22" rx="16" ry="4"/><ellipse cx="194" cy="18" rx="8" ry="5"/></g></g>
+    <path d="M0 98 L34 78 L64 90 L96 70 L124 84 L150 76 V120 H0Z M250 82 L280 70 L310 84 L338 72 L360 80 V120 H250Z" fill="#8ea7c2"/>
+    <path d="M140 106 L192 36 L202 33 L212 36 L268 106Z" fill="#7a8ea8"/><path d="M192 36 L202 33 L212 36 L240 76 L222 70 L206 44Z" fill="#6a7e98" opacity=".7"/>
+    <path d="M182 50 L192 36 L202 33 L212 36 L223 50 L216 48 L210 55 L204 48 L197 55 L191 48Z" fill="#f4f7fa"/>
+    <path d="M200 30 q-5 -8 2 -14 q6 -6 -1 -13" stroke="#eef0f2" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8" class="lf-smk"/>
+    <path d="M0 110 Q60 94 120 104 Q180 92 240 102 Q300 92 360 102 V126 H0Z" fill="#6f8a66"/>
+    <g fill="#5d7a56">${Array.from({length:28},(_,i)=>`<path d="M${4+i*13} ${108+Math.sin(i*1.3)*4} l3 -9 l3 9Z"/>`).join("")}</g>
+    <rect y="100" width="360" height="22" fill="url(#lfHazeG)"/>
+    <path d="M0 120 Q90 110 180 118 T360 116 V240 H0Z" fill="url(#lfAlp)"/>
+    <g fill="#8a8679" opacity=".75"><ellipse cx="300" cy="226" rx="10" ry="4"/><ellipse cx="40" cy="210" rx="7" ry="3"/><ellipse cx="236" cy="150" rx="6" ry="2.4"/></g>
+    ${lfTufts("#4f6a32",tufts)}`;
+  return `<rect width="360" height="240" fill="url(#lfSky)"/>
     <circle cx="300" cy="34" r="34" fill="url(#lfSun)"/><circle cx="300" cy="34" r="10" fill="#fff3c4"/>
     <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="62" cy="34" rx="22" ry="6"/><ellipse cx="74" cy="29" rx="12" ry="7"/><ellipse cx="54" cy="30" rx="9" ry="5"/></g><g opacity=".7"><ellipse cx="186" cy="22" rx="16" ry="4"/><ellipse cx="194" cy="18" rx="8" ry="5"/></g></g>
     <path d="M0 96 L28 82 L52 90 L80 72 L108 86 L140 76 L170 88 L196 80 L232 62 L246 56 L258 58 L276 74 L300 82 L330 70 L360 80 V120 H0Z" fill="#8ea7c2"/>
@@ -3364,30 +3460,62 @@ function lofScene(sel){
     <path d="M0 116 Q90 106 180 114 T360 112 V240 H0Z" fill="url(#lfMeadow)"/>
     <g fill="#5c8a42" opacity=".55"><ellipse cx="60" cy="168" rx="46" ry="8"/><ellipse cx="250" cy="200" rx="60" ry="9"/></g>
     <path d="M168 240 Q172 210 176 190 Q178 172 184 158 L192 158 Q190 176 192 192 Q196 214 212 240Z" fill="#b59a6a" opacity=".55"/>
-    <g stroke="#3f6a2d" stroke-width=".9" stroke-linecap="round">${tufts.map(([a,b])=>`<path d="M${a} ${b} l-2 -4 M${a+1} ${b} l0 -5 M${a+2} ${b} l2 -4"/>`).join("")}</g>
-    ${LOF.filter(p=>has(p.id)).sort((a,b)=>(a.z??a.y)-(b.z??b.y)).map(p=>lfPiece(p,sel)).join("")}
+    ${lfTufts("#3f6a2d",tufts)}`;
+}
+function lofScene(sel,env){
+  env=env||lofEnv;
+  const has=id=>lofOwned.includes(id);
+  return `<svg viewBox="0 0 360 240" class="lofsvg" role="img" aria-label="lof">
+    <defs>
+      <linearGradient id="lfSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f93cf"/><stop offset=".75" stop-color="#a9cbe6"/><stop offset="1" stop-color="#d9e8ee"/></linearGradient>
+      <linearGradient id="lfMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa35a"/><stop offset=".35" stop-color="#679448"/><stop offset="1" stop-color="#4c7a36"/></linearGradient>
+      <linearGradient id="lfRiver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8db6dc"/><stop offset="1" stop-color="#3d72b0"/></linearGradient>
+      <linearGradient id="lfLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ec3e4"/><stop offset="1" stop-color="#4b80bd"/></linearGradient>
+      <radialGradient id="lfSun"><stop offset="0" stop-color="#fff6d0"/><stop offset=".35" stop-color="#f6d77a" stop-opacity=".9"/><stop offset="1" stop-color="#f6d77a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="lfGlow"><stop offset="0" stop-color="#ffc35a" stop-opacity=".75"/><stop offset="1" stop-color="#ffc35a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="lfVig" cx=".5" cy=".45" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0b0a18" stop-opacity=".35"/></radialGradient>
+      <linearGradient id="lfHazeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfeaf0" stop-opacity="0"/><stop offset=".5" stop-color="#dfeaf0" stop-opacity=".55"/><stop offset="1" stop-color="#dfeaf0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="lfSand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6d3a2"/><stop offset="1" stop-color="#cdb27a"/></linearGradient>
+      <linearGradient id="lfSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb0dc"/><stop offset="1" stop-color="#2f63a8"/></linearGradient>
+      <linearGradient id="lfAlp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93a86a"/><stop offset=".4" stop-color="#7f9a58"/><stop offset="1" stop-color="#5f7a3e"/></linearGradient>
+      <filter id="lfblur" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="1.3"/></filter>
+      <filter id="lfHaze"><feColorMatrix type="matrix" values=".82 0 0 0 .14  0 .82 0 0 .15  0 0 .82 0 .17  0 0 0 1 0"/></filter>
+    </defs>
+    ${lofBg(env)}
+    ${LOF.filter(p=>has(p.id)&&envOf(p)===env).sort((a,b)=>(a.z??a.y)-(b.z??b.y)).map(p=>lfPiece(p,sel)).join("")}
     <rect width="360" height="240" fill="url(#lfVig)" pointer-events="none"/>
   </svg>`;
 }
+let lofEnvs=load("lofEnvs")||["lelfun"], lofEnv=load("lofEnvCur")||"lelfun";
 function lof(sel,msg){
   S=null; clearInterval(vidTimer);
   const ts=totalStars(), open=ts>=needOf("int");
   const p=sel?LOF.find(x=>x.id===sel):null;
+  if(p&&lofEnvs.includes(envOf(p))) lofEnv=envOf(p);
+  if(!lofEnvs.includes(lofEnv)) lofEnv="lelfun";
+  const E=LOF_ENVS.find(e=>e.id===lofEnv), here=LOF.filter(x=>envOf(x)===lofEnv), ownHere=here.filter(x=>lofOwned.includes(x.id)).length;
   app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Construye tu comunidad","Build your community")}</p><h2>Lof</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("int"))}</div>`}
-    <div class="bar-top">${purse()}<span class="purse">${lofOwned.length} / ${LOF.length}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
-    <div class="lofwrap">${lofScene(sel)}</div>
+    <div class="bar-top">${purse()}<span class="purse">${ownHere} / ${here.length}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div class="envtabs" role="tablist">${LOF_ENVS.map(e=>{ const own=lofEnvs.includes(e.id);
+      return own?`<button class="btn${e.id===lofEnv?"":" ghost"}" role="tab" aria-selected="${e.id===lofEnv}" data-env="${e.id}">${esc(G(e.m))}<small>${esc(gl(e))}</small></button>`
+        :`<button class="btn ghost" data-ebuyenv="${e.id}" ${!open||nuts<e.price?"disabled":""}>🔒 ${esc(G(e.m))}<small>${NUT}${e.price} · ${esc(gl(e))}</small></button>`}).join("")}</div>
+    <div class="lofwrap">${lofScene(sel,lofEnv)}</div>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
     ${p?`<div class="lofcard"><b>${esc(G(p.m))}</b> <span class="muted">${esc(gl(p))}</span><p class="lofsent">${esc(G(p.ma))}</p><p class="muted">${esc(L2(p.ses,p.sen))}</p></div>`
-       :`<p class="muted">${lofOwned.length?L2("Toca algo de tu lof para leer su frase.","Tap something in your lof to read its sentence."):L2("Compra la primera pieza para empezar tu lof.","Buy the first piece to start your lof.")}</p>`}
-    <div class="items">${LOF.map(x=>{ const own=lofOwned.includes(x.id);
-      const lock=x.req&&!lofOwned.includes(x.req);
-      return `<div class="item${own?" on":""}"><div class="th">${lfThumb(x)}</div><span class="nm">${esc(G(x.m))}</span><span class="gl">${esc(gl(x))}</span>${lock&&!own?`<span class="gl">🔒 ${L2("Primero","First")}: ${esc(G(x.req))}</span>`:""}
+       :`<p class="muted">${ownHere?L2("Toca algo de tu lof para leer su frase.","Tap something in your lof to read its sentence."):L2(`Compra la primera pieza para empezar: ${gl(E)}.`,`Buy the first piece to start: ${gl(E)}.`)}</p>`}
+    <div class="items">${here.map(x=>{ const own=lofOwned.includes(x.id);
+      const lock=x.req&&!lofOwned.includes(x.req), rq=lock?LOF.find(q=>q.id===x.req):null;
+      return `<div class="item${own?" on":""}"><div class="th">${lfThumb(x)}</div><span class="nm">${esc(G(x.m))}</span><span class="gl">${esc(gl(x))}</span>${lock&&!own?`<span class="gl">🔒 ${L2("Primero","First")}: ${esc(G(rq.m))}</span>`:""}
         ${own?`<button class="btn ghost" data-see="${x.id}">${L2("Ver","View")}</button>`
              :`<button class="btn" data-lbuy="${x.id}" ${!open||lock||nuts<x.price?"disabled":""}>${NUT}${x.price} · ${t().buy}</button>`}</div>`}).join("")}</div>
-    ${lofOwned.length===LOF.length?`<div class="rule">${L2("¡Tu lof está completo! Kümey.","Your lof is complete! Kümey.")}</div>`:""}`;
+    ${ownHere===here.length?`<div class="rule">${L2(`¡Completaste ${G(E.m)}! Kümey.`,`You completed ${G(E.m)}! Kümey.`)}${lofEnvs.length<LOF_ENVS.length?" "+L2("Ahora puedes abrir otro lugar.","Now you can open another place."):""}</div>`:""}`;
   bindLang(()=>lof(sel));
   document.getElementById("bk").onclick=menu;
+  app.querySelectorAll("[data-env]").forEach(b=>b.onclick=()=>{ lofEnv=b.dataset.env; save("lofEnvCur",lofEnv); lof(); });
+  app.querySelectorAll("[data-ebuyenv]").forEach(b=>b.onclick=()=>{ const e=LOF_ENVS.find(q=>q.id===b.dataset.ebuyenv);
+    if(nuts<e.price) return lof(null,t().need(e.price-nuts));
+    nuts-=e.price; lofEnvs.push(e.id); lofEnv=e.id; save("nuts",nuts); save("lofEnvs",lofEnvs); save("lofEnvCur",lofEnv); lof(null,t().bought(e.m)); });
   app.querySelectorAll(".lp").forEach(g=>{ g.onclick=()=>lof(g.dataset.id); g.onkeydown=e=>{ if(e.key==="Enter") lof(g.dataset.id); }; });
   app.querySelectorAll("[data-see]").forEach(b=>b.onclick=()=>lof(b.dataset.see));
   app.querySelectorAll("[data-lbuy]").forEach(b=>b.onclick=()=>{ const x=LOF.find(i=>i.id===b.dataset.lbuy);
@@ -3483,6 +3611,18 @@ const W_ART={
  "witral-hand":`<rect x="84" y="76" width="3.2" height="46" rx="1" fill="#6e4f30"/><rect x="110" y="76" width="3.2" height="46" rx="1" fill="#8a6a44"/><rect x="82" y="77.4" width="33" height="3.4" rx="1" fill="#8a6a44"/><rect x="82" y="115.6" width="33" height="3.4" rx="1" fill="#7a5a3c"/><g stroke="#e9e3cf" stroke-width=".6">${Array.from({length:10},(_,i)=>`<path d="M${89+i*2.2} 81 V94"/>`).join("")}</g><rect x="88" y="94" width="21" height="21.6" fill="#b7302c"/><path d="M88 96 H109 M88 113.6 H109" stroke="#14122a" stroke-width="1.6"/><path d="M98.5 97.6 l6.4 6.4 -6.4 6.4 -6.4 -6.4z" fill="#14122a"/><path d="M98.5 101 l3 3 -3 3 -3 -3z" fill="#efe7d2"/>`,
  "pali-hand":`<circle cx="92" cy="106" r="5.6" fill="#ece6d6"/><path d="M86.6 107 A5.6 5.6 0 0 0 97 109 Q90 110 86.6 107Z" fill="#c9bfa8"/><path d="M87.6 103 Q92 106 96.4 103" stroke="#8a6a3a" stroke-width=".8" fill="none"/><circle cx="90" cy="103.6" r="1.2" fill="#fff" opacity=".8"/>`,
  "panu":`<path d="M45 33 Q44 17 60 17 Q76 17 75 33 L78.4 48 L72 46.4 L71 31 Q60 25 49 31 L48 46.4 L41.6 48Z" fill="#c8322f"/><path d="M45 33 Q44 17 60 17 Q50 20 49 31 L48 46.4 L41.6 48Z" fill="#8a1e1c" opacity=".6"/><path d="M64 19 Q72 21 73.4 30" stroke="#e05a4a" stroke-width="1.2" fill="none"/><g fill="#f3efe6"><circle cx="52" cy="22" r="1.2"/><circle cx="60" cy="20" r="1.2"/><circle cx="68" cy="22" r="1.2"/><circle cx="45" cy="40" r="1.2"/><circle cx="75" cy="40" r="1.2"/><circle cx="56" cy="25" r=".9"/><circle cx="64" cy="25" r=".9"/></g>`,
+ "tokikura":`<path d="M85.6 113 L97.6 75" stroke="#6e5a4a" stroke-width="3" stroke-linecap="round"/><path d="M86.8 111 L97.8 76.6" stroke="#94806c" stroke-width=".8"/><path d="M91 75.4 Q96.6 65 106.4 68.6 Q109.4 75.4 103 82.6 Q96 83.4 91 75.4Z" fill="#3f5a52"/><path d="M91 75.4 Q96 82 103 82.6 Q97 80 93.6 74Z" fill="#2a3d38"/><path d="M95 72 Q99.4 67.6 105 69.6" stroke="#8fb0a3" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M92.4 78.6 L101.6 74.8 M93.4 81 L102.4 77.2" stroke="#c8322f" stroke-width="1.5"/>`,
+ "chillka":`<path d="M83 97 L96 100.6 L109 97 L109 114.6 L96 118.2 L83 114.6Z" fill="#6b3e22"/><path d="M84.4 98 L96 101.4 L96 116.4 L84.4 113Z" fill="#f3efe6"/><path d="M107.6 98 L96 101.4 L96 116.4 L107.6 113Z" fill="#e4ddc9"/><path d="M96 101.4 V116.4" stroke="#b9ae97" stroke-width=".7"/><g stroke="#8a8070" stroke-width=".55"><path d="M86.4 102.6 l7.6 2.2 M86.4 105.4 l7.6 2.2 M86.4 108.2 l7.6 2.2 M86.4 111 l5 1.4 M98 104.8 l7.6 -2.2 M98 107.6 l7.6 -2.2 M98 110.4 l7.6 -2.2 M98 113.2 l4.6 -1.3"/></g>`,
+ "lawen-hand":`<g stroke-linecap="round"><path d="M93 112 Q92 96 87 80 M94 112 Q96 94 96 76 M95 112 Q99 96 105 82" stroke="#4a6a2e" stroke-width="1.2" fill="none"/>${[[88.4,84,-30,"#4d8a3e"],[86.6,90,-60,"#5d9a48"],[90,96,-20,"#3f7a3a"],[96,80,0,"#4d8a3e"],[93.6,88,-40,"#5d9a48"],[98.4,90,40,"#3f7a3a"],[103.4,86,30,"#4d8a3e"],[101,94,60,"#5d9a48"]].map(([x,y,r,c])=>`<ellipse cx="${x}" cy="${y}" rx="1.7" ry="3.6" fill="${c}" transform="rotate(${r} ${x} ${y})"/>`).join("")}${[[87,79.4,"#f2f2ee"],[96,75,"#e8c440"],[105.4,81,"#b48ad0"],[90.6,77,"#f2f2ee"]].map(([x,y,c])=>`<circle cx="${x}" cy="${y}" r="1.5" fill="${c}"/>`).join("")}<path d="M91.6 104.6 h5" stroke="#c8322f" stroke-width="2"/></g>`,
+ "trarilonko-karu":wHeadband("#2f8a4f","#e8b53a"),
+ "llangka-kallfu":wBeads("#2f5fd0","#1f3b7a")+W_SIL(60,64.6,2.8),
+ "ikulla-karu":wShawl("#2f6b3f","#e8b53a","#c8322f"),
+ "makun-lig":wPoncho("#e9e3cf",[[78,"#6b1e22",2,null],[94,"#6b1e22",6,"#14122a",2.2,6]]),
+ "trariwe-kuru":wSash("#26242c","#c8322f","#f3efe6"),
+ "pet-pudu":wPet(`<g transform="translate(21 163)">${lfPudu}</g>`),
+ "pet-choyke":wPet(`<g transform="translate(22 163) scale(.92)">${lfChoyke}</g>`),
+ "bg-trayenko":wSky("wgF","#4f86c6","#cfe1ec")+`<g fill="#fff" opacity=".85"><ellipse cx="92" cy="20" rx="12" ry="3.4"/><ellipse cx="97" cy="17.6" rx="6" ry="3.6"/></g><path d="M0 36 L22 28 L42 40 L44 132 H0Z" fill="#6e7480"/><path d="M120 42 L96 32 L76 44 L74 132 H120Z" fill="#5e6470"/><path d="M0 36 L22 28 L30 32 L16 40 L8 132 H0Z" fill="#808692"/><path d="M42 40 Q59 34 76 44 L76 124 H42Z" fill="#cfe6f4"/>${[46,51,56,61,66,71].map((x,i)=>`<path d="M${x} ${40-(i%2)} V${122}" stroke="#fff" stroke-width="${i%2?1.6:1}" opacity=".85" class="lf-shim"/>`).join("")}<path d="M42 40 Q59 34 76 44" stroke="#fff" stroke-width="2" fill="none"/>${[[6,40,9],[18,32,8],[32,40,7],[84,40,8],[100,36,9],[114,44,8],[4,70,6],[112,78,7],[36,62,5],[82,66,5]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.7}" fill="#3f6a3d"/><ellipse cx="${x+1}" cy="${y-1.4}" rx="${r*.6}" ry="${r*.4}" fill="#5a8a4a"/>`).join("")}<ellipse cx="59" cy="126" rx="44" ry="8" fill="#3d72b0"/><ellipse cx="59" cy="124" rx="24" ry="5" fill="#f3f7fa" opacity=".6"/>`+wGround("#4f7a43","#3f6838")+wTufts("#2f5a2d",[[12,140],[98,138],[30,156],[90,158]]),
+ "bg-lewfu":wSky("wgV","#5a8acb","#d6e8ee")+`<path d="M0 96 L26 82 L50 92 L78 72 L120 90 V112 H0Z" fill="#8ea7c2"/><path d="M78 72 L88 76 L84 80 L78 77 L72 80Z" fill="#f4f7fa"/><path d="M0 106 Q40 96 80 104 Q100 98 120 102 V134 H0Z" fill="#5d8a5a"/><path d="M70 104 Q62 110 50 114 Q28 120 20 128 Q12 136 0 138 V150 Q24 146 36 136 Q48 126 70 120 Q86 114 92 104Z" fill="#4b80bd"/><path d="M64 108 Q50 116 36 120 M40 128 Q26 134 10 140" stroke="#e6f1fb" stroke-width="1" fill="none" opacity=".7" class="lf-shim"/>`+wGround("#5d9a45","#4a8438")+`<path d="M0 134 Q18 136 30 132 L28 140 Q12 144 0 142Z" fill="#4b80bd"/>`+wTufts("#3a6a2c",[[40,140],[100,136],[70,156],[16,160]])+`<g transform="translate(104 136)"><path d="M0 0 V-26" stroke="#6b4a30" stroke-width="2.4"/>${Array.from({length:9},(_,i)=>`<path d="M0 ${-26+i*1.4} Q${-8+i%3*3} ${-14+i*1.6} ${-10+i*2.4} ${-2+i%2*2}" stroke="#7aa35a" stroke-width="1.2" fill="none"/>`).join("")}</g>`,
  ...W_PETS, ...W_BG
 };
 ITEMS.forEach(it=>{ if(W_ART[it.id]) it.svg=W_ART[it.id]; });
@@ -3578,12 +3718,12 @@ function palin(msg){
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("kim"))}</div>`}
     <div class="bar-top">${purse()}<span class="purse">🏆 ${palinWins}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     ${palinField(0,team,null)}
-    <div class="rule">${L2(`Cada respuesta correcta empuja la <b>pali</b> hacia la meta rival; cada error la acerca a la tuya. Llega a la meta para anotar. Cada <b>palife</b> de tu equipo salva un error por partido. Ganar paga 25 ngülliw más 2 por respuesta correcta.`,
-      `Each right answer pushes the <b>pali</b> toward the rival goal; each mistake brings it toward yours. Reach the goal to score. Each <b>palife</b> on your team saves one mistake per match. A win pays 25 ngülliw plus 2 per right answer.`)}</div>
+    <div class="rule">${L2(`Cada respuesta correcta empuja la <b>pali</b> hacia la meta rival. Si te equivocas, el rival la devuelve hacia la tuya. Llega a la meta para anotar. Cada <b>palife</b> de tu equipo ataja un gol rival por partido. Ganar paga 25 ngülliw más 2 por respuesta correcta.`,
+      `Each right answer pushes the <b>pali</b> toward the rival goal. If you get one wrong, the rival hits it back toward yours. Reach the goal to score. Each <b>palife</b> on your team blocks one rival goal per match. A win pays 25 ngülliw plus 2 per right answer.`)}</div>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
     <div class="row"><button class="btn" id="play" ${open?"":"disabled"}>${L2("Jugar un partido","Play a match")}</button>
       <button class="btn ghost" id="recruit" ${!open||team>=TEAM_MAX||nuts<TEAM_PRICE?"disabled":""}>${team>=TEAM_MAX?L2("Equipo completo","Team full"):`${NUT}${TEAM_PRICE} · ${L2("Sumar un palife","Add a palife")}`}</button></div>
-    <p class="muted">${L2(`Tu equipo: ${team} palife (${team} salvada${team>1?"s":""} por partido).`,`Your team: ${team} palife (${team} save${team>1?"s":""} per match).`)}</p>`;
+    <p class="muted">${L2(`Tu equipo: ${team} palife (ataja${team>1?"n":""} ${team} gol${team>1?"es":""} por partido).`,`Your team: ${team} palife (block${team>1?"":"s"} ${team} goal${team>1?"s":""} per match).`)}</p>`;
   bindLang(()=>palin());
   document.getElementById("bk").onclick=menu;
   document.getElementById("recruit").onclick=()=>{ if(nuts<TEAM_PRICE||team>=TEAM_MAX) return; nuts-=TEAM_PRICE; team++; save("nuts",nuts); save("team",team); palin(L2("Nuevo palife en tu equipo.","A new palife joins your team.")); };
@@ -3635,12 +3775,23 @@ function palinField(ball,mine,flash,from){
     <path d="M${PAL_X(-3)} 50 l9 3 -9 3Z M${PAL_X(-3)-18} 122 l11 3.6 -11 3.6Z" fill="#c8322f"/>
     <path d="M${PAL_X(3)} 50 l-9 3 9 3Z M${PAL_X(3)+18} 122 l-11 3.6 11 3.6Z" fill="#2f5fd0"/>
     ${flash==="goal"?`<ellipse cx="${PAL_X(3)+8}" cy="106" rx="34" ry="30" fill="url(#pGoal)"/>`:""}
-    ${figs}
+    ${flash==="lost"?`<ellipse cx="${PAL_X(-3)-8}" cy="106" rx="34" ry="30" fill="#c8322f" opacity=".18"/>`:""}
+    ${figs}${palHit(flash,from)}
     <g class="pali-g" style="transform:translateX(${sx}px)" data-to="${PAL_X(ball)}">
       <ellipse cx="0" cy="110" rx="5" ry="1.4" fill="#1c3315" opacity=".45"/>
       <g class="pali-b"><circle class="pali${flash?" "+flash:""}" cx="0" cy="104" r="4.4" fill="#f3efe6" stroke="#8a6a3a" stroke-width="1"/><path d="M-3 102.4 Q0 104.6 3 102.4" stroke="#8a6a3a" stroke-width=".7" fill="none"/></g></g>
     <rect width="360" height="150" fill="url(#pVig)" pointer-events="none"/>
   </svg>`;
+}
+/* who struck the pali this turn: one of yours after a right answer, a rival after a mistake */
+function palHit(flash,from){
+  if(!flash||from==null) return "";
+  const fx=PAL_X(Math.max(-2.6,Math.min(2.6,from)));
+  const rival=flash==="back"||flash==="lost"||flash==="saved";
+  const fig=rival?palFig(fx+15,112,"#2f5fd0","#1b3a85",-1,1.08,1):palFig(fx-15,112,"#c8322f","#7a1c1a",1,1.08,1);
+  const burst=`<g transform="translate(${fx} 104)" class="pal-burst"><path d="M0 -9 L2 -3 L8 -5 L3.6 0 L8 5 L2 3 L0 9 L-2 3 L-8 5 L-3.6 0 L-8 -5 L-2 -3Z" fill="#ffe7a0" opacity=".85"/></g>`;
+  const label=flash==="saved"?L2("¡Tu palife ataja!","Your palife blocks it!"):rival?L2("¡El rival devuelve la pali!","The rival hits it back!"):flash==="goal"?L2("¡Tripalin!","Goal!"):"";
+  return `${burst}${fig}${label?`<g class="pal-lbl"><rect x="${rival?118:126}" y="66" width="${rival?124:108}" height="17" rx="8.5" fill="${rival?"#1b3a85":"#7a1c1a"}" opacity=".9"/><text x="180" y="78" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" font-family="inherit">${label}</text></g>`:""}`;
 }
 const palAnim=()=>{ const g=app.querySelector(".pali-g"); if(!g) return; requestAnimationFrame(()=>requestAnimationFrame(()=>{ g.style.transform=`translateX(${g.dataset.to}px)`; })); };
 let P=null;
@@ -3649,7 +3800,7 @@ function palinRound(fb){
   const q=P.qs[P.i], showForm=P.i%2===0;
   const opts=shuffle([q,...q.dist]);
   app.innerHTML=`<div class="hud"><button class="btn ghost" id="bk" style="padding:6px 12px;font-size:.9rem">Palin</button>
-      <span class="score">${L2("Tú","You")} ${P.us} – ${P.them} ${L2("Rival","Rival")}</span><span class="muted">${P.i+1}/${P.qs.length} · ${L2("salvadas","saves")} ${P.saves}</span></div>
+      <span class="score">${L2("Tú","You")} ${P.us} – ${P.them} ${L2("Rival","Rival")}</span><span class="muted">${P.i+1}/${P.qs.length} · ${L2("atajadas","blocks")} ${P.saves}</span></div>
     ${palinField(P.ball,team,fb||null,P.from)}
     <div class="prompt"><span class="ask">${showForm?t().whichPic:t().which}</span>
       ${showForm?`<span class="big" style="font-size:1.9rem">${esc(G(q.m))}</span>`:`<div class="scene">${esc(gl(q))}</div>`}</div>
@@ -3659,8 +3810,8 @@ function palinRound(fb){
     P.from=P.ball;
     const ok=opts[+b.dataset.i]===q; let flash=ok?"fwd":"back";
     if(ok){ P.right++; P.ball++; if(P.ball>=3){ P.us++; P.ball=0; P.from=3; flash="goal"; } }
-    else if(P.saves>0){ P.saves--; flash="saved"; }
-    else { P.ball--; if(P.ball<=-3){ P.them++; P.ball=0; P.from=-3; flash="lost"; } }
+    else { P.ball--;                       /* a mistake: the rival hits the pali back toward your goal */
+      if(P.ball<=-3){ if(P.saves>0){ P.saves--; P.ball=-2; flash="saved"; } else { P.them++; P.ball=0; P.from=-3; flash="lost"; } } }
     app.querySelectorAll(".opt").forEach((x,i)=>{ x.disabled=true; if(opts[i]===q) x.classList.add("ok"); else if(x===b) x.classList.add("bad"); });
     P.i++; setTimeout(()=>palinRound(flash), ok?650:1300);
   });
@@ -3679,6 +3830,11 @@ function palinEnd(){
 }
 
 /* --- epew chapters: a serial story bought one chapter at a time --- */
+const EPEW_STORIES=[{t:"Ngürü ka ngülliw",es:"El zorro y los piñones",en:"The fox and the pine nuts"},{t:"Ngürü ka wakag",es:"El zorro y la rana",en:"The fox and the frog"}];
+const epS=c=>c.s||0;
+/* chapters unlock in order within each story; the first chapter of every story is open */
+const epewPrev=i=>{ for(let k=i-1;k>=0;k--) if(epS(EPEW[k])===epS(EPEW[i])) return k; return -1; };
+const epewNext=i=>{ for(let k=i+1;k<EPEW.length;k++) if(epS(EPEW[k])===epS(EPEW[i])) return k; return -1; };
 const EPEW=[
  {t:"Ngürü ka ngülliw",price:20,lines:[
   ["Kiñe antü, ngürü amuy mawida mew.","Un día, el zorro fue al monte.","One day, the fox went to the woods."],
@@ -3729,7 +3885,48 @@ const EPEW=[
   gloss:[["pepafi","vino a verlo","came to see him"],["koylatuen","me mentiste","you lied to me"],["koylatufe","mentiroso","liar"],["kom pu kulliñ","todos los animales","all the animals"],["iyael","comida","food"],["rüf","verdad, verdadero","truth, true"],["pipaymi","viniste a decir","you came to say"],["femwelayan","no lo haré más","I won't do it again"],["koylatuwelayan","no mentiré más","I won't lie anymore"],["umawtuyngu","durmieron (los dos)","the two slept"]],
   qs:[{es:"¿Qué admitió el zorro?",en:"What did the fox admit?",o:{es:["Que mintió","Que tenía hambre","Que su madre estaba enferma"],en:["That he lied","That he was hungry","That his mother was sick"]}},
       {es:"¿Qué enseña el cóndor?",en:"What does the condor teach?",o:{es:["Que los piñones son de todos los animales","Que los zorros no comen piñones","Que hay que guardar los piñones"],en:["That pine nuts belong to all the animals","That foxes don't eat pine nuts","That pine nuts must be hoarded"]}},
-      {es:"«Umawtuyngu»: ¿cuántos durmieron?",en:"«Umawtuyngu»: how many slept?",o:{es:["Dos","Uno","Tres o más"],en:["Two","One","Three or more"]}}]}
+      {es:"«Umawtuyngu»: ¿cuántos durmieron?",en:"«Umawtuyngu»: how many slept?",o:{es:["Dos","Uno","Tres o más"],en:["Two","One","Three or more"]}}]},
+ /* ---- second epew: Ngürü ka wakag (s:1) ---- */
+ {s:1,t:"Ngürü ka wakag",price:20,lines:[
+  ["Kiñe antü, ngürü amuy lafken mew.","Un día, el zorro fue al lago.","One day, the fox went to the lake."],
+  ["Fey pefi kiñe pichi wakag.","Vio una rana pequeña.","He saw a little frog."],
+  ["Ngürü pi: «Inche matu lefken. Eymi lefkelaymi.»","El zorro dijo: «Yo corro rápido. Tú no corres.»","The fox said: «I run fast. You don't run.»"],
+  ["Wakag pi: «Wüle lefayu.»","La rana dijo: «Mañana correremos los dos.»","The frog said: «Tomorrow the two of us will race.»"],
+  ["Ngürü ayey.","El zorro se rió.","The fox laughed."]],
+  gloss:[["matu","rápido","fast"],["lefken","corro (siempre)","I run (usually)"],["lefkelaymi","no corres","you don't run"],["wüle","mañana","tomorrow"],["lefayu","correremos (los dos)","we two will run"],["ayey","se rió","laughed"]],
+  qs:[{es:"¿Qué dijo el zorro?",en:"What did the fox say?",o:{es:["Que él corre rápido","Que tenía hambre","Que la rana es grande"],en:["That he runs fast","That he was hungry","That the frog is big"]}},
+      {es:"¿Cuándo van a correr?",en:"When will they race?",o:{es:["Mañana","Hoy","En invierno"],en:["Tomorrow","Today","In winter"]}},
+      {es:"En «lefayu», ¿qué marca -yu?",en:"In «lefayu», what does -yu mark?",o:{es:["Nosotros dos","Yo solo","Ustedes"],en:["We two","I alone","You all"]}}]},
+ {s:1,t:"Wakag ñi kimün",price:25,lines:[
+  ["Pun mew, wakag amuy ñi pu wenüy mew.","En la noche, la rana fue donde sus amigas.","At night, the frog went to her friends."],
+  ["Wakag pi: «Ngürü matu lefkey.»","La rana dijo: «El zorro corre rápido.»","The frog said: «The fox runs fast.»"],
+  ["«Welu inche kimün nien.»","«Pero yo tengo sabiduría.»","«But I have wisdom.»"],
+  ["«Eymün rüpü mew müleaymün.»","«Ustedes estarán en el camino.»","«You will be along the road.»"],
+  ["Pu wakag pi: «May.»","Las ranas dijeron: «Sí.»","The frogs said: «Yes.»"]],
+  gloss:[["pun mew","en la noche","at night"],["wenüy","amigo, amiga","friend"],["lefkey","corre (siempre)","runs (usually)"],["kimün","sabiduría, conocimiento","wisdom, knowledge"],["nien","tengo","I have"],["rüpü","camino","road, path"],["müleaymün","ustedes estarán","you all will be"]],
+  qs:[{es:"¿Adónde fue la rana?",en:"Where did the frog go?",o:{es:["Donde sus amigas","Al monte","A la casa del zorro"],en:["To her friends","To the woods","To the fox's house"]}},
+      {es:"¿Qué tiene la rana?",en:"What does the frog have?",o:{es:["Sabiduría","Piernas largas","Un caballo"],en:["Wisdom","Long legs","A horse"]}}]},
+ {s:1,t:"Lefün",price:30,lines:[
+  ["Liwen mew, ngürü ka wakag engu akuyngu rüpü mew.","En la mañana, el zorro y la rana llegaron al camino.","In the morning, the fox and the frog came to the road."],
+  ["Ngürü matu lefi.","El zorro corrió rápido.","The fox ran fast."],
+  ["Ngürü pi: «Wakag, chew müleymi?»","El zorro dijo: «Rana, ¿dónde estás?»","The fox said: «Frog, where are you?»"],
+  ["Kiñe wakag pi: «Fau mülen!»","Una rana dijo: «¡Aquí estoy!»","A frog said: «Here I am!»"],
+  ["Ngürü ka lefi.","El zorro corrió otra vez.","The fox ran again."],
+  ["Ka kiñe wakag pi: «Fau mülen!»","Otra rana dijo: «¡Aquí estoy!»","Another frog said: «Here I am!»"]],
+  gloss:[["lefün","correr, la carrera","running, the race"],["akuyngu","llegaron (los dos)","the two arrived"],["lefi","corrió","ran"],["chew","dónde","where"],["müleymi","estás","you are"],["fau","aquí","here"],["ka kiñe","otro, otra","another"]],
+  qs:[{es:"¿Qué preguntó el zorro?",en:"What did the fox ask?",o:{es:["Dónde estaba la rana","Qué hora era","Quién tenía piñones"],en:["Where the frog was","What time it was","Who had pine nuts"]}},
+      {es:"¿Quién respondió la segunda vez?",en:"Who answered the second time?",o:{es:["Otra rana","La misma rana","El cóndor"],en:["Another frog","The same frog","The condor"]}}]},
+ {s:1,t:"Lafken mew",price:35,lines:[
+  ["Ngürü akuy lafken mew.","El zorro llegó al lago.","The fox reached the lake."],
+  ["Wakag lafken mew mülerkey.","Resulta que la rana ya estaba en el lago.","It turned out the frog was already at the lake."],
+  ["Wakag pi: «Inche wünelu akun.»","La rana dijo: «Yo llegué primero.»","The frog said: «I got here first.»"],
+  ["Ngürü pi: «Chumngechi?»","El zorro dijo: «¿Cómo?»","The fox said: «How?»"],
+  ["Wakag pi: «Matu lefkelan, welu kimün nien. Kom pu wakag kellueneu.»","La rana dijo: «No corro rápido, pero tengo sabiduría. Todas las ranas me ayudaron.»","The frog said: «I don't run fast, but I have wisdom. All the frogs helped me.»"],
+  ["Fey mew, ngürü ayewelay wakag mew.","Desde entonces, el zorro ya no se ríe de la rana.","From then on, the fox no longer laughs at the frog."]],
+  gloss:[["mülerkey","resulta que estaba","it turned out (she) was"],["wünelu","primero","first"],["akun","llegué","I arrived"],["chumngechi?","¿cómo?","how?"],["lefkelan","no corro","I don't run"],["kellueneu","me ayudó, me ayudaron","helped me"],["fey mew","entonces, desde entonces","then, from then on"],["ayewelay","ya no se ríe","no longer laughs"]],
+  qs:[{es:"¿Quién llegó primero?",en:"Who got there first?",o:{es:["La rana","El zorro","Llegaron juntos"],en:["The frog","The fox","They arrived together"]}},
+      {es:"¿Cómo ganó la rana?",en:"How did the frog win?",o:{es:["Sus amigas la ayudaron","Corrió más rápido","El zorro se durmió"],en:["Her friends helped her","She ran faster","The fox fell asleep"]}},
+      {es:"En «ayewelay», ¿qué agrega -we-?",en:"In «ayewelay», what does -we- add?",o:{es:["«Ya no»","«Mañana»","«Los dos»"],en:["«No longer»","«Tomorrow»","«The two»"]}}]}
 ];
 function epew(msg){
   S=null; clearInterval(vidTimer);
@@ -3737,12 +3934,13 @@ function epew(msg){
   app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Un relato por capítulos","A story in chapters")}</p><h2>Epew</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("kim"))}</div>`}
     <div class="bar-top">${purse()}<button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
-    <p class="muted">${L2("Compra cada capítulo con ngülliw. Las preguntas al final pagan 3 ngülliw por respuesta correcta.","Buy each chapter with ngülliw. The questions at the end pay 3 ngülliw per right answer.")}</p>
+    <p class="muted">${L2("Hay dos epew. Compra cada capítulo con ngülliw; el siguiente se abre al comprar el anterior. Las preguntas al final pagan 3 ngülliw por respuesta correcta.","There are two epew. Buy each chapter with ngülliw; the next one opens once you buy the one before. The questions at the end pay 3 ngülliw per right answer.")}</p>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
-    <div class="readlist">${EPEW.map((c,i)=>{ const own=epewOwned.includes(i), next=i===0||epewOwned.includes(i-1);
-      return `<div class="item${own?" on":""}"><span class="gl">${L2("Capítulo","Chapter")} ${i+1}</span><span class="nm">${esc(G(c.t))}</span>
+    ${EPEW_STORIES.map((st,si)=>{ const chs=EPEW.map((c,i)=>[c,i]).filter(([c])=>epS(c)===si);
+      return `<h3 class="epst">${esc(G(st.t))} <span class="muted">${esc(gl(st))}</span></h3><div class="readlist">${chs.map(([c,i],n)=>{ const own=epewOwned.includes(i), pv=epewPrev(i), next=pv<0||epewOwned.includes(pv);
+      return `<div class="item${own?" on":""}"><span class="gl">${L2("Capítulo","Chapter")} ${n+1}</span><span class="nm">${esc(G(c.t))}</span>
         ${own?`<button class="btn" data-read="${i}">${L2("Leer","Read")}${epewDone[i]?" ✓":""}</button>`
-             :`<button class="btn" data-ebuy="${i}" ${!open||!next||nuts<c.price?"disabled":""}>${next?`${NUT}${c.price} · ${t().buy}`:"🔒"}</button>`}</div>`}).join("")}</div>`;
+             :`<button class="btn" data-ebuy="${i}" ${!open||!next||nuts<c.price?"disabled":""}>${next?`${NUT}${c.price} · ${t().buy}`:"🔒"}</button>`}</div>`}).join("")}</div>`}).join("")}`;
   bindLang(()=>epew());
   document.getElementById("bk").onclick=menu;
   app.querySelectorAll("[data-ebuy]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.ebuy, c=EPEW[i]; if(nuts<c.price) return epew(t().need(c.price-nuts));
@@ -3752,7 +3950,8 @@ function epew(msg){
 function epewRead(i,st){
   const c=EPEW[i]; st=st||{show:{},pick:c.qs.map(()=>null),order:c.qs.map(q=>shuffle(q.o.es.map((_,k)=>k))),checked:false};
   const score=st.checked?st.pick.filter(x=>x===0).length:0;
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">Epew · ${L2("Capítulo","Chapter")} ${i+1}</p><h2>${esc(G(c.t))}</h2></div>${langToggle()}</div>
+  const chN=EPEW.slice(0,i+1).filter(x=>epS(x)===epS(c)).length, nx=epewNext(i);
+  app.innerHTML=`<div class="top"><div><p class="eyebrow">${esc(G(EPEW_STORIES[epS(c)].t))} · ${L2("Capítulo","Chapter")} ${chN}</p><h2>${esc(G(c.t))}</h2></div>${langToggle()}</div>
     <p class="muted">${L2("Toca una línea para ver la traducción.","Tap a line to see its translation.")}</p>
     <div class="passage">${c.lines.map((l,k)=>`<p class="line" data-k="${k}" style="cursor:pointer"><span class="mz">${esc(G(l[0]))}</span>${st.show[k]||st.checked?`<span class="tr">${esc(lang==="es"?l[1]:l[2])}</span>`:""}</p>`).join("")}</div>
     <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${c.gloss.map(g=>`<span><b>${esc(G(g[0]))}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
@@ -3760,7 +3959,7 @@ function epewRead(i,st){
       const sel=st.pick[qi]===oi, cls=st.checked?(oi===0?" ok":sel?" bad":""):"";
       return `<button class="choice${cls}" data-q="${qi}" data-o="${oi}" aria-pressed="${sel}" ${st.checked?"disabled":""}>${esc(q.o[lang][oi])}</button>`}).join("")}</div></fieldset>`).join("")}</div>
     <div id="efb"></div>
-    <div class="row">${st.checked?`<button class="btn" id="enext">${i+1<EPEW.length?L2("Siguiente capítulo","Next chapter"):L2("Capítulos","Chapters")}</button>`
+    <div class="row">${st.checked?`<button class="btn" id="enext">${nx>=0?L2("Siguiente capítulo","Next chapter"):L2("Capítulos","Chapters")}</button>`
       :`<button class="btn" id="echeck" ${st.pick.includes(null)?"disabled":""}>${t().check}</button>`}<button class="btn ghost" id="eback">${L2("Capítulos","Chapters")}</button></div>`;
   bindLang(()=>epewRead(i,st));
   app.querySelectorAll(".line").forEach(l=>l.onclick=()=>{ st.show[l.dataset.k]=!st.show[l.dataset.k]; epewRead(i,st); });
@@ -3770,7 +3969,7 @@ function epewRead(i,st){
     const k=st.pick.filter(x=>x===0).length; let gain=0; if(!epewDone[i]){ gain=3*k; nuts+=gain; save("nuts",nuts); epewDone[i]=k; save("epewDone",epewDone); }
     st.gain=gain; epewRead(i,st); };
   if(st.checked){ document.getElementById("efb").innerHTML=`<div class="result"><p>${t().score(score,c.qs.length)}</p>${st.gain?`<span class="gain">+${st.gain} ${NUT}</span>`:""}</div>`;
-    document.getElementById("enext").onclick=()=>{ if(i+1<EPEW.length && epewOwned.includes(i+1)) epewRead(i+1); else epew(); }; }
+    document.getElementById("enext").onclick=()=>{ if(nx>=0 && epewOwned.includes(nx)) epewRead(nx); else epew(); }; }
 }
 
 // ===== Pronunciation (Grafemario Unificado) =====
