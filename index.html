@@ -2032,7 +2032,7 @@ const T = {
 // ===== State =====
 const app = document.getElementById("app");
 function load(k){try{return JSON.parse(localStorage.getItem("mpk_"+k))}catch(e){return null}}
-function save(k,v){try{localStorage.setItem("mpk_"+k,JSON.stringify(v))}catch(e){}}
+function save(k,v){try{localStorage.setItem("mpk_"+k,JSON.stringify(v))}catch(e){} if(window.syncSoon) syncSoon();}
 let lang = load("lang") || "es";
 let best = load("best") || {};
 let nuts = load("nuts") ?? 0;
@@ -2127,7 +2127,7 @@ function menu(){
       ["graf",L2("Grafemarios","Writing systems"),L2(`Ahora: ${GRAF_INFO[graf].name}`,`Now: ${GRAF_INFO[graf].name}`)],
       ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
       ["vocab",L2("Mis palabras","My words"),L2(`${vocabWords().length} palabras aprendidas`,`${vocabWords().length} words learned`)],
-      ["prog",L2("Tu progreso","Your progress"),load("lastBackup")?L2(`Última copia: ${load("lastBackup")}`,`Last backup: ${load("lastBackup")}`):L2("Guarda una copia: aún no tienes","Save a backup: you have none yet")],
+      ["prog",L2("Tu progreso","Your progress"),(SYNC_URL&&syncSt())?L2("Se guarda en línea","Saved online"):load("lastBackup")?L2(`Última copia: ${load("lastBackup")}`,`Last backup: ${load("lastBackup")}`):L2("Guarda una copia: aún no tienes","Save a backup: you have none yet")],
       ["repaso",L2("Repaso","Review"),repasoItems().length?L2(`${repasoItems().length} para repasar`,`${repasoItems().length} to review`):L2("Nada que repasar por ahora","Nothing to review yet")],
       ["dicc",L2("Diccionario","Dictionary"),L2("Tañi Nemülkawe: busca y juega","Tañi Nemülkawe: look up and play")],
       ["about",L2("Acerca del juego","About the game"),L2("Qué es y cómo se hizo","What it is and how it was made")]
@@ -2822,6 +2822,7 @@ function progress(){
     <p>${L2("Tu progreso (niveles, nueces, ropa, palabras) se guarda solo en este teléfono o navegador. Si desinstalas la app o borras los datos de Chrome para el sitio, se pierde. Guarda una copia de vez en cuando; también sirve para pasar tu progreso a otro teléfono.","Your progress (levels, nuts, clothes, words) is stored only on this phone or browser. Uninstalling the app or clearing Chrome's data for the site erases it. Save a copy now and then; it also moves your progress to another phone.")}</p>
     <div class="row"><button class="btn" id="pg-file">💾 ${L2("Guardar copia (archivo)","Save a copy (file)")}</button><button class="btn ghost" id="pg-copy">📋 ${L2("Copiar código","Copy code")}</button></div>
     <p class="hint" id="pg-msg" aria-live="polite"></p>
+    ${syncSection()}
     <h3>${L2("Restaurar una copia","Restore a copy")}</h3>
     <p class="hint">${L2("Elige el archivo de copia o pega el código. Reemplaza el progreso que hay ahora en este teléfono.","Choose the backup file or paste the code. It replaces the progress currently on this phone.")}</p>
     <div class="row"><label class="btn ghost" for="pg-in">📂 ${L2("Elegir archivo","Choose file")}</label><input type="file" id="pg-in" accept=".json,.txt,application/json,text/plain" hidden></div>
@@ -2829,7 +2830,7 @@ function progress(){
     <div class="row"><button class="btn ghost" id="pg-use">${L2("Restaurar desde el código","Restore from the code")}</button></div>
     <div id="pg-confirm"></div>
     <div class="row"><button class="btn" id="hs">${L2("Volver","Back")}</button></div>`;
-  bindLang(progress);
+  bindLang(progress); bindSync();
   const msg=t=>{ document.getElementById("pg-msg").textContent=t; };
   document.getElementById("hs").onclick=menu;
   document.getElementById("pg-file").onclick=()=>{ try{ const b=new Blob([progCode()],{type:"text/plain"}), a=document.createElement("a");
@@ -2849,6 +2850,71 @@ function progress(){
   document.getElementById("pg-use").onclick=()=>ask(document.getElementById("pg-code").value);
   document.getElementById("pg-in").onchange=ev=>{ const f=ev.target.files&&ev.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>ask(rd.result); rd.readAsText(f); };
   if(!n) msg(L2("Todavía no hay progreso guardado en este teléfono.","There is no saved progress on this phone yet."));
+}
+
+/* ===== Online copy (sync code). The game sends its save data to a small service under a random code (no name or
+   email); the same code on another phone brings the progress back. SYNC_URL empty = feature off. ===== */
+var SYNC_URL="";
+var syncSt=()=>{ try{ return JSON.parse(localStorage.getItem("mpksync"))||null; }catch(e){ return null; } };
+const syncSet=v=>{ try{ v?localStorage.setItem("mpksync",JSON.stringify(v)):localStorage.removeItem("mpksync"); }catch(e){} };
+function progHash(d){ const j=JSON.stringify(Object.keys(d).sort().map(k=>[k,d[k]])); let h=5381; for(let i=0;i<j.length;i++) h=((h<<5)+h+j.charCodeAt(i))|0; return String(h); }
+async function syncApi(path,opt){ const r=await fetch(SYNC_URL.replace(/\/$/,"")+path,Object.assign({headers:{"Content-Type":"application/json"}},opt||{})); let b=null; try{ b=await r.json(); }catch(e){} return {status:r.status,body:b}; }
+function progApply(d){ Object.keys(progData()).forEach(k=>localStorage.removeItem(k)); for(const [k,v] of Object.entries(d)) if(/^mpk_/.test(k)&&typeof v==="string") localStorage.setItem(k,v); }
+let syncTimer=null, syncBusy=false;
+async function syncPush(force){
+  const st=syncSt(); if(!SYNC_URL||!st||!st.code||syncBusy) return;
+  const d=progData(), h=progHash(d); if(!force&&h===st.hash) return;
+  syncBusy=true;
+  try{
+    let r=await syncApi("/p/"+encodeURIComponent(st.code),{method:"PUT",body:JSON.stringify({data:d,base:force?"force":st.base}),keepalive:true});
+    if(r.status===409){ /* changed on another phone too: the latest play wins */ r=await syncApi("/p/"+encodeURIComponent(st.code),{method:"PUT",body:JSON.stringify({data:d,base:"force"}),keepalive:true}); }
+    if(r.status===200&&r.body){ syncSet({code:st.code,base:r.body.updated,hash:h,at:Date.now()}); }
+  }catch(e){} finally{ syncBusy=false; }
+}
+window.syncSoon=()=>{ if(!SYNC_URL||!syncSt()) return; clearTimeout(syncTimer); syncTimer=setTimeout(()=>syncPush(false),4000); };
+async function syncPull(){ /* at start: take the online copy if it is newer and this phone has not changed since the last sync */
+  const st=syncSt(); if(!SYNC_URL||!st||!st.code) return;
+  try{ const r=await syncApi("/p/"+encodeURIComponent(st.code)); if(r.status!==200||!r.body) return;
+    const d=r.body.data||{}, local=progData();
+    if(r.body.updated>st.base){
+      if(progHash(local)===st.hash||!Object.keys(local).length){ progApply(d); syncSet({code:st.code,base:r.body.updated,hash:progHash(d),at:Date.now()}); location.reload(); }
+      else syncPush(true);
+    } else syncPush(false);
+  }catch(e){} }
+if(SYNC_URL){ document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") syncPush(false); }); setTimeout(syncPull,1500); }
+function syncSection(){
+  if(!SYNC_URL) return "";
+  const st=syncSt();
+  if(st&&st.code) return `<h3>${L2("Copia en línea","Online copy")}</h3>
+    <p>${L2("Tu progreso se guarda en línea con este código. Anótalo: en otro teléfono, o si desinstalas la app, lo recuperas con él.","Your progress is saved online under this code. Write it down: on another phone, or if you uninstall the app, it brings your progress back.")}</p>
+    <p class="synccode" style="font:700 1.3rem ui-monospace,monospace;letter-spacing:.04em;user-select:all">${esc(st.code)}</p>
+    <div class="row"><button class="btn ghost" id="sy-copy">📋 ${L2("Copiar código","Copy code")}</button><button class="btn ghost" id="sy-now">🔄 ${L2("Guardar ahora","Save now")}</button></div>
+    <p class="hint" id="sy-msg" aria-live="polite">${st.at?L2(`Última vez guardado: ${new Date(st.at).toLocaleString("es-CL",{hour12:false})}`,`Last saved: ${new Date(st.at).toLocaleString("en-US",{hour12:false})}`):""}</p>
+    <div class="row"><button class="btn ghost" id="sy-off">${L2("Dejar de guardar en línea en este teléfono","Stop saving online on this phone")}</button></div>`;
+  return `<h3>${L2("Copia en línea","Online copy")}</h3>
+    <p>${L2("Guarda tu progreso en línea con un código, sin nombre ni correo. Con el código lo recuperas en otro teléfono o si desinstalas la app.","Save your progress online under a code, with no name or email. The code brings it back on another phone or if you uninstall the app.")}</p>
+    <div class="row"><button class="btn" id="sy-on">☁️ ${L2("Guardar en línea","Save online")}</button></div>
+    <p class="hint">${L2("¿Ya tienes un código?","Already have a code?")}</p>
+    <div class="row"><input id="sy-code" placeholder="kawellu-xxxx-xxxx" autocapitalize="none" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font:inherit;padding:8px" aria-label="${L2("Código","Code")}"><button class="btn ghost" id="sy-get">${L2("Recuperar","Restore")}</button></div>
+    <p class="hint" id="sy-msg" aria-live="polite"></p><div id="sy-confirm"></div>`;
+}
+function bindSync(){
+  if(!SYNC_URL) return;
+  const msg=t=>{ const m=document.getElementById("sy-msg"); if(m) m.textContent=t; };
+  const off=L2("No hay conexión con el servicio. Prueba más tarde.","Can't reach the service. Try again later.");
+  const b=id=>document.getElementById(id);
+  if(b("sy-on")) b("sy-on").onclick=async()=>{ msg("…"); try{ const r=await syncApi("/new",{method:"POST"}); if(r.status!==201) throw 0;
+      syncSet({code:r.body.code,base:r.body.updated,hash:null}); await syncPush(false); track("progress/sync-on","Copia en línea"); progress(); }catch(e){ msg(off); } };
+  if(b("sy-get")) b("sy-get").onclick=async()=>{ const code=(b("sy-code").value||"").trim().toLowerCase(); if(!code) return; msg("…");
+    try{ const r=await syncApi("/p/"+encodeURIComponent(code)); if(r.status===404){ msg(L2("No encontré ese código. Revisa que esté bien escrito.","That code wasn't found. Check the spelling.")); return; } if(r.status!==200) throw 0;
+      const d=r.body.data||{}, when=new Date(r.body.updated).toLocaleString(lang==="es"?"es-CL":"en-US",{hour12:false});
+      msg(""); b("sy-confirm").innerHTML=`<p>${L2(`Progreso guardado el ${when}. ¿Reemplazar el de este teléfono con él?`,`Progress saved on ${when}. Replace the progress on this phone with it?`)}</p><div class="row"><button class="btn" id="sy-yes">${L2("Sí, recuperar","Yes, restore")}</button><button class="btn ghost" id="sy-no">${L2("Cancelar","Cancel")}</button></div>`;
+      b("sy-no").onclick=()=>{ b("sy-confirm").innerHTML=""; };
+      b("sy-yes").onclick=()=>{ progApply(d); syncSet({code,base:r.body.updated,hash:progHash(progData()),at:Date.now()}); track("progress/sync-restore","Recuperar en línea"); location.reload(); };
+    }catch(e){ msg(off); } };
+  if(b("sy-copy")) b("sy-copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(syncSt().code); msg(L2("Código copiado.","Code copied.")); }catch(e){ msg(L2("Anota el código de arriba.","Write down the code above.")); } };
+  if(b("sy-now")) b("sy-now").onclick=async()=>{ msg("…"); await syncPush(true); const st=syncSt(); msg(st&&st.at&&Date.now()-st.at<10000?L2("Guardado.","Saved."):off); };
+  if(b("sy-off")) b("sy-off").onclick=()=>{ syncSet(null); progress(); };
 }
 /* ask the browser to keep this site's data even when the phone is short of space */
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist().catch(()=>{}); }).catch(()=>{}); }catch(e){}

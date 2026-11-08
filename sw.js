@@ -2,7 +2,7 @@
    The game page is fetched from the network first, so updates arrive as soon as there is a connection,
    and served from the cache when offline. Icons and Google Fonts are served from the cache.
    Only caches named mapudungukeain-* are managed here; the dictionary keeps its own (nemulkawe-*). */
-const CACHE = 'mapudungukeain-v20261107201928';
+const CACHE = 'mapudungukeain-v20261107202512';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
