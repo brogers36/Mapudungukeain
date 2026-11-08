@@ -597,34 +597,54 @@ const POSE=(()=>{
 
 // ===== Kalül: a face close-up (or a large hand/foot) with the named part ringed and pointed at =====
 const KAL=(()=>{
-  const SK="#c98a5a", SKL="#d99a6a", SKD="#a96e44", OUT="#8a5a36", HAIR="#22160e", GOLD="#e8b53a", BG="#2c3150";
-  const W=inner=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="96" height="56" rx="6" fill="${BG}"/>${inner}</g></svg>`;
-  const point=(x,y,rx,ry,ty)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/><path d="M94 ${ty} H${x+rx+5}" stroke="${GOLD}" stroke-width="3"/><path d="M${x+rx+11} ${ty-5} L${x+rx+5} ${ty} L${x+rx+11} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/>`;
-  /* face centred at (42,32), radius 20 */
-  const face=(o={})=>{const X=42,Y=32,R=20;
-    let g=`<path d="M${X-R-2} ${Y-4} Q${X-R-6} ${Y+20} ${X-R+2} ${Y+26} M${X+R+2} ${Y-4} Q${X+R+6} ${Y+20} ${X+R-2} ${Y+26}" stroke="${HAIR}" stroke-width="7" fill="none"/>`;
-    g+=`<path d="M${X-14} 58 Q${X-14} ${Y+16} ${X} ${Y+16} Q${X+14} ${Y+16} ${X+14} 58Z" fill="#c8322f"/>`;
-    g+=`<ellipse cx="${X-R}" cy="${Y+2}" rx="4.4" ry="6.4" fill="${SK}" stroke="${OUT}" stroke-width="1"/><path d="M${X-R-1} ${Y-1} q-2 3 0 6" stroke="${SKD}" stroke-width="1.4" fill="none"/>`;
-    g+=`<ellipse cx="${X+R}" cy="${Y+2}" rx="4.4" ry="6.4" fill="${SK}" stroke="${OUT}" stroke-width="1"/>`;
-    g+=`<ellipse cx="${X}" cy="${Y}" rx="${R}" ry="${R+2}" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/>`;
-    g+=`<path d="M${X-R-1} ${Y-2} A${R+1} ${R+3} 0 0 1 ${X+R+1} ${Y-2} Q${X+R-2} ${Y-13} ${X} ${Y-13} Q${X-R+2} ${Y-13} ${X-R-1} ${Y-2}Z" fill="${HAIR}"/>`;
-    g+=`<path d="M${X-R+.5} ${Y-12.5} H${X+R-.5}" stroke="#ece7dc" stroke-width="4"/><path d="M${X-R+.5} ${Y-12.5} H${X+R-.5}" stroke="#c8322f" stroke-width="1" stroke-dasharray="1.6 2.2"/><circle cx="${X}" cy="${Y-12.5}" r="3" fill="#cfd3dc" stroke="#9aa0ad" stroke-width=".6"/>`;
-    for(const ex of [X-8,X+8]) g+=`<ellipse cx="${ex}" cy="${Y-2}" rx="4" ry="2.8" fill="#fbf8f2"/><circle cx="${ex}" cy="${Y-2}" r="2" fill="#4a2a14"/><circle cx="${ex}" cy="${Y-2}" r=".9" fill="#111"/><path d="M${ex-4.5} ${Y-6.6} Q${ex} ${Y-8.4} ${ex+4.5} ${Y-6.6}" stroke="${HAIR}" stroke-width="1.4" fill="none"/>`;
-    g+=`<path d="M${X} ${Y-1} L${X-3} ${Y+8} Q${X} ${Y+10} ${X+3} ${Y+8.4}" stroke="${SKD}" stroke-width="1.6" fill="none"/>`;
-    g+= o.teeth ? `<path d="M${X-8} ${Y+13} Q${X} ${Y+22} ${X+8} ${Y+13}Z" fill="#6a1a14"/><path d="M${X-7} ${Y+13.4} H${X+7} V${Y+16} Q${X} ${Y+17} ${X-7} ${Y+16}Z" fill="#fbf8f2"/><path d="M${X-3.5} ${Y+13.4} V${Y+16.4} M${X} ${Y+13.4} V${Y+16.8} M${X+3.5} ${Y+13.4} V${Y+16.4}" stroke="#d8d2c4" stroke-width=".7"/>`
-                 : `<path d="M${X-7} ${Y+13} Q${X} ${Y+18} ${X+7} ${Y+13} Q${X} ${Y+15} ${X-7} ${Y+13}Z" fill="#a8423a"/><path d="M${X-7} ${Y+13} Q${X} ${Y+11.6} ${X+7} ${Y+13}" stroke="#7a2a20" stroke-width="1" fill="none"/>`;
+  const SK="#c98a5a", SKL="#dda57a", SKD="#a96e44", OUT="#7a4c2c", HAIR="#22160e", GOLD="#e8b53a", BG="#2c3150", RED="#c8322f";
+  /* every picture is clipped to its rounded frame; outlines come from drawing the same shapes twice (dark and wider, then skin) */
+  const W=(id,inner)=>`<svg viewBox="0 0 100 60" width="2.3em" height="1.4em" aria-hidden="true"><defs><clipPath id="kc-${id}"><rect x="2" y="2" width="96" height="56" rx="6"/></clipPath></defs><g stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="96" height="56" rx="6" fill="${BG}"/><g clip-path="url(#kc-${id})">${inner}</g></g></svg>`;
+  const solid=(shapes,fill)=>`<g fill="${OUT}" stroke="${OUT}" stroke-width="2.4">${shapes}</g><g fill="${fill}">${shapes}</g>`;
+  const point=(x,y,rx,ry,ty)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/><path d="M95 ${ty} H${x+rx+5}" stroke="${GOLD}" stroke-width="3"/><path d="M${x+rx+11} ${ty-5} L${x+rx+5} ${ty} L${x+rx+11} ${ty+5}" stroke="${GOLD}" stroke-width="3" fill="none"/>`;
+  /* face: centre (40,30), head 16 x 19 */
+  const X=40, Y=30;
+  const face=(o={})=>{
+    let g=`<path d="M${X-24} 60 Q${X-22} ${Y+18} ${X} ${Y+17} Q${X+22} ${Y+18} ${X+24} 60Z" fill="${RED}"/><path d="M${X-24} 60 Q${X-22} ${Y+18} ${X} ${Y+17} Q${X+22} ${Y+18} ${X+24} 60" stroke="#9e2422" stroke-width="1.2" fill="none"/>`;
+    g+=`<path d="M${X-5} ${Y+17.5} L${X} ${Y+24} L${X+5} ${Y+17.5}" fill="${SKD}"/>`;
+    g+=solid(`<rect x="${X-5}" y="${Y+10}" width="10" height="9" rx="3"/>`,SKD);
+    /* braids behind the shoulders */
+    g+=`<path d="M${X-15} ${Y-6} Q${X-20} ${Y+8} ${X-17} ${Y+24} M${X+15} ${Y-6} Q${X+20} ${Y+8} ${X+17} ${Y+24}" stroke="${HAIR}" stroke-width="7" fill="none"/>`;
+    g+=[[X-17,Y+12],[X-17.6,Y+18],[X+17,Y+12],[X+17.6,Y+18]].map(([a,b])=>`<path d="M${a-3} ${b} q3 2 6 0" stroke="#3a2a1e" stroke-width="1" fill="none"/>`).join("");
+    /* ears, head */
+    g+=solid(`<ellipse cx="${X-16}" cy="${Y+1}" rx="3.6" ry="5.4"/><ellipse cx="${X+16}" cy="${Y+1}" rx="3.6" ry="5.4"/><ellipse cx="${X}" cy="${Y}" rx="16" ry="19"/>`,SK);
+    g+=`<path d="M${X-16.6} ${Y-1} q-1.6 2.4 0 4.8 M${X+16.6} ${Y-1} q1.6 2.4 0 4.8" stroke="${SKD}" stroke-width="1.2" fill="none"/>`;
+    /* hair cap with a centre parting, and the trarilonko */
+    g+=`<path d="M${X-16.4} ${Y-2} C${X-17} ${Y-16} ${X-8} ${Y-20} ${X} ${Y-20} C${X+8} ${Y-20} ${X+17} ${Y-16} ${X+16.4} ${Y-2} C${X+14} ${Y-10} ${X+7} ${Y-12} ${X} ${Y-11} C${X-7} ${Y-12} ${X-14} ${Y-10} ${X-16.4} ${Y-2}Z" fill="${HAIR}"/>`;
+    g+=`<path d="M${X-15.8} ${Y-9} Q${X} ${Y-12.4} ${X+15.8} ${Y-9}" stroke="#ece7dc" stroke-width="3.4" fill="none"/><path d="M${X-15.8} ${Y-9} Q${X} ${Y-12.4} ${X+15.8} ${Y-9}" stroke="${RED}" stroke-width=".9" stroke-dasharray="1.4 2" fill="none"/><circle cx="${X}" cy="${Y-10.8}" r="2.5" fill="#d6d9e0" stroke="#9aa0ad" stroke-width=".6"/>`;
+    /* brows, eyes, cheeks */
+    for(const sx of [-1,1]){ const ex=X+sx*6.4, ey=Y-1;
+      g+=`<path d="M${ex-3.6} ${ey-4.2} Q${ex} ${ey-6} ${ex+3.6} ${ey-4.4}" stroke="${HAIR}" stroke-width="1.3" fill="none"/>`;
+      g+=`<path d="M${ex-3.8} ${ey} Q${ex} ${ey-3.2} ${ex+3.8} ${ey} Q${ex} ${ey+2.6} ${ex-3.8} ${ey}Z" fill="#fbf8f2" stroke="${OUT}" stroke-width=".6"/><circle cx="${ex}" cy="${ey-.2}" r="1.9" fill="#5a3418"/><circle cx="${ex}" cy="${ey-.2}" r=".9" fill="#120a06"/><circle cx="${ex+.6}" cy="${ey-.9}" r=".45" fill="#fff"/>`;
+      g+=`<ellipse cx="${X+sx*9.4}" cy="${Y+6}" rx="3" ry="1.8" fill="#d97a6a" opacity=".45"/>`; }
+    /* nose */
+    g+=`<path d="M${X-.6} ${Y+1} Q${X-1.6} ${Y+5} ${X-2.4} ${Y+6.6}" stroke="${SKD}" stroke-width="1.1" fill="none"/><path d="M${X-3.4} ${Y+7.4} Q${X-2.4} ${Y+8.8} ${X-.8} ${Y+8} M${X+.8} ${Y+8} Q${X+2.4} ${Y+8.8} ${X+3.4} ${Y+7.4}" stroke="${SKD}" stroke-width="1" fill="none"/><path d="M${X-1.8} ${Y+5.2} Q${X} ${Y+7.6} ${X+1.8} ${Y+5.2}" fill="${SKL}" opacity=".6"/>`;
+    /* mouth */
+    g+= o.teeth
+      ? `<path d="M${X-6.4} ${Y+11.4} Q${X} ${Y+19} ${X+6.4} ${Y+11.4} Q${X} ${Y+12.6} ${X-6.4} ${Y+11.4}Z" fill="#6a1a14"/><path d="M${X-5.4} ${Y+12.1} Q${X} ${Y+13} ${X+5.4} ${Y+12.1} L${X+4.6} ${Y+14.2} Q${X} ${Y+15} ${X-4.6} ${Y+14.2}Z" fill="#fbf8f2"/><path d="M${X-2.7} ${Y+12.5} V${Y+14.6} M${X} ${Y+12.7} V${Y+14.9} M${X+2.7} ${Y+12.5} V${Y+14.6}" stroke="#d8d2c4" stroke-width=".6"/><path d="M${X-6.4} ${Y+11.4} Q${X} ${Y+12.6} ${X+6.4} ${Y+11.4}" stroke="#8a3a30" stroke-width=".9" fill="none"/>`
+      : `<path d="M${X-5.4} ${Y+12} Q${X-2} ${Y+10.6} ${X} ${Y+11.4} Q${X+2} ${Y+10.6} ${X+5.4} ${Y+12} Q${X} ${Y+13} ${X-5.4} ${Y+12}Z" fill="#a8423a"/><path d="M${X-5.4} ${Y+12} Q${X} ${Y+16.4} ${X+5.4} ${Y+12} Q${X} ${Y+13} ${X-5.4} ${Y+12}Z" fill="#b8564a"/><path d="M${X-5.4} ${Y+12} Q${X} ${Y+13} ${X+5.4} ${Y+12}" stroke="#7a2a20" stroke-width=".8" fill="none"/>`;
     return g; };
-  const hand=`<g transform="translate(46 37) scale(.82)"><path d="M-12 22 L-13 4 Q-16 -6 -18 -12 Q-19 -16 -15 -16 Q-12 -15 -10 -8 L-9 -2 L-9 -22 Q-9 -26 -5.6 -26 Q-2.6 -26 -2.6 -22 L-2.4 -6 L-2 -26 Q-2 -30 1.4 -30 Q4.6 -30 4.6 -26 L4.6 -6 L5.6 -24 Q5.8 -28 9 -27.6 Q12 -27 11.8 -23 L11 -5 L13 -18 Q13.6 -21 16.2 -20.4 Q18.6 -19.6 18 -16 L16 4 Q15 16 12 22Z" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/><path d="M-6 10 Q2 6 10 8 M-4 2 Q2 0 8 2" stroke="${SKD}" stroke-width="1.1" fill="none"/><path d="M-13 22 H12 V30 H-13Z" fill="#c8322f"/></g>`;
-  const foot=`<g transform="translate(46 38) scale(.9)"><path d="M-30 -24 H-14 V-8 Q-6 -8 6 -4 Q22 0 30 4 Q34 8 30 12 H-26 Q-32 10 -32 0Z" fill="${SK}" stroke="${OUT}" stroke-width="1.2"/>${[[18,1.6],[23,3],[27,5],[30.4,7.4],[32.6,9.6]].map(([x,y],i)=>`<ellipse cx="${x}" cy="${y-1}" rx="${3.2-i*.3}" ry="${2.4-i*.15}" fill="${SKL}" stroke="${OUT}" stroke-width=".8"/>`).join("")}<path d="M-32 -24 H-12 V-30 H-32Z" fill="#34405e"/><path d="M-30 12 H30" stroke="#8a7a5a" stroke-width="2"/></g>`;
-  const bone=`<g transform="translate(78 44) rotate(-30)"><path d="M-10 -1.6 H10 V1.6 H-10Z" fill="#efe8d6" stroke="#b8ae96" stroke-width=".8"/>${[[-10,-2.6],[-10,2.6],[10,-2.6],[10,2.6]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="#efe8d6" stroke="#b8ae96" stroke-width=".8"/>`).join("")}<path d="M-10 -1 H10 V1 H-10Z" fill="#efe8d6"/></g>`;
+  /* hand: palm and four fingers fanned, thumb to the side, nails, creases, a woven cuff at the wrist */
+  const fingers=[[-8.4,-27,5.2,24,-8],[-2.8,-30,5.4,27,-2.5],[2.8,-28.6,5.2,26,3],[8.2,-23,4.6,20,10]];
+  const handShapes=`<path d="M-12 14 C-14 6 -14 -2 -11 -6 L11 -6 C14 -2 14 6 12 14Z"/>${fingers.map(([x,y,w,h,r])=>`<rect x="${x-w/2}" y="${y}" width="${w}" height="${h}" rx="${w/2}" transform="rotate(${r} ${x} ${y+h})"/>`).join("")}<rect x="-3.4" y="-20" width="6.8" height="22" rx="3.4" transform="translate(-10.4 9) rotate(-42)"/>`;
+  const hand=`<g transform="translate(48 34) scale(.86)">${solid(handShapes,SK)}${fingers.map(([x,y,w,h,r])=>`<rect x="${x-w*.32}" y="${y+1}" width="${w*.64}" height="${w*.7}" rx="${w*.3}" fill="${SKL}" transform="rotate(${r} ${x} ${y+h})"/>`).join("")}<path d="M-8 2 Q0 -1 9 1 M-7 7 Q-1 4 6 5 M-2 12 Q-6 6 -6 -2" stroke="${SKD}" stroke-width="1" fill="none"/><path d="M-14 14 H14 V26 H-14Z" fill="${RED}"/><path d="M-14 17 H14" stroke="${GOLD}" stroke-width="2"/><path d="M-14 17 H14" stroke="${RED}" stroke-width=".8" stroke-dasharray="1.6 2"/></g>`;
+  /* foot, side view: ankle, heel, arch, toes */
+  const footShape=`<path d="M30 12 C30 24 28 36 25 44 C23 50 27 53 33 53 L78 53 C84 53 88 50 87 46 C86 42 81 40 75 39 C65 37 55 32 48 24 C45.4 20 44.4 16 44.4 12Z"/>`;
+  const foot=`<path d="M10 54 H94" stroke="#6f6a96" stroke-width="2"/><ellipse cx="56" cy="54.5" rx="34" ry="2" fill="#000" opacity=".2"/>${solid(footShape,SK)}<path d="M33 40 q3 -3 6 0" stroke="${SKD}" stroke-width="1.2" fill="none"/><path d="M40 50 Q54 47 68 50" stroke="${SKD}" stroke-width="1" fill="none" opacity=".7"/>${[[86.4,46.5,2.4],[82,47.6,2],[78.4,48.6,1.7],[75.2,49.4,1.5],[72.4,50,1.3]].map(([x,y,r])=>`<path d="M${x-r*1.4} ${y-r*1.6} Q${x} ${y-r*2.6} ${x+r*.6} ${y-r*.8}" stroke="${SKD}" stroke-width=".9" fill="none"/>`).join("")}<ellipse cx="85" cy="44.6" rx="2.2" ry="1.4" fill="${SKL}" stroke="${SKD}" stroke-width=".6"/><rect x="27" y="2" width="21" height="12" fill="#34405e"/><path d="M27 12 H48" stroke="#25304a" stroke-width="2"/>`;
+  const bone=`<g transform="translate(80 44) rotate(-28)"><g fill="#b8ae96" stroke="#b8ae96" stroke-width="1.6"><rect x="-10" y="-2" width="20" height="4"/>${[[-10,-2.8],[-10,2.8],[10,-2.8],[10,2.8]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.2"/>`).join("")}</g><g fill="#f3ecdc"><rect x="-10" y="-2" width="20" height="4"/>${[[-10,-2.8],[-10,2.8],[10,-2.8],[10,2.8]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.2"/>`).join("")}</g></g>`;
   return {
-    nge:W(face()+point(50,30,6.6,5,30)),
-    pilun:W(face()+point(62,34,6.6,9,34)),
-    yu:W(face()+point(42,37,6,6.6,37)),
-    wun:W(face()+point(42,46,10,5,46)),
-    kug:W(hand+point(48,30,19,24,30)),
-    namun:W(foot+point(46,37,33,16,24)),
-    foro:W(face({teeth:true})+point(42,47,9.6,4.6,40).replace(/<path d="M94 40[\s\S]*$/,"")+bone)
+    nge:W("nge",face()+point(X+6.4,Y-1,6,4.6,Y-1)),
+    pilun:W("pilun",face()+point(X+16,Y+1,5.2,7.4,Y+1)),
+    yu:W("yu",face()+point(X,Y+5,5,5.4,Y+5)),
+    wun:W("wun",face()+point(X,Y+12.4,8.4,4.4,Y+12.4)),
+    kug:W("kug",hand+`<ellipse cx="47" cy="30" rx="19" ry="25" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`),
+    namun:W("namun",foot+`<ellipse cx="56" cy="35" rx="37" ry="21" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`),
+    foro:W("foro",face({teeth:true})+`<ellipse cx="${X}" cy="${Y+13.6}" rx="8" ry="3.8" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="3.5 2.5"/>`+bone)
   };
 })();
 
