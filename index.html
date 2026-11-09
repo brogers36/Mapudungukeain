@@ -352,6 +352,7 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .bracket{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0;align-items:stretch}.bcol{display:flex;flex-direction:column;justify-content:space-around;gap:8px}.bcol .eyebrow{font-size:.66rem;margin:0}
 .bm{border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;font-size:.74rem;text-align:left}.bt{padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bt+.bt{border-top:1px solid rgba(255,255,255,.12)}.bt.me{font-weight:700;color:#f6d77a}.bt.out{opacity:.45}
 .trophy{display:flex;justify-content:center;animation:pop .6s ease-out}
+.copy{font-size:.75rem;opacity:.6;text-align:center;margin:18px 0 6px}
 .pali-g{transition:transform .6s cubic-bezier(.3,.8,.3,1)} .pali-b{animation:palbounce .6s ease-out}
 @keyframes palbounce{40%{transform:translateY(-7px)}70%{transform:translateY(0)}85%{transform:translateY(-2px)}}
 .pali.goal{fill:var(--gold);stroke:#fff} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:2.4}
@@ -2489,7 +2490,8 @@ function menu(){
             ${starsHTML(best[q.id]||0)}</button>
             ${(best[q.id]||0)>0?`<button class="vidbtn" data-vid="${st.id}">▶ ${t().watch}: ${esc(gl(VIDEOS[st.id].title))}</button>`:""}`})()}
         </section>`}).join("")}
-    <p class="note">${t().note}</p>`;
+    <p class="note">${t().note}</p>
+    <p class="copy">© 2026 Brandon M. A. Rogers. ${L2("Todos los derechos reservados.","All rights reserved.")}</p>`;
   bindLang(menu);
   document.getElementById("ward").onclick=wardrobe;
   document.getElementById("pron").onclick=()=>{track("open/pronunciation","Pronunciación");pronunciation();};

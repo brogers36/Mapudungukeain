@@ -382,7 +382,7 @@ function home(){
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
         <p class="hint">${L("Elige cómo ver las palabras. Es el mismo ajuste del juego.","Choose how words are shown. It is the same setting as the game.")}</p></div>
     </div>
-    <footer>${L(`${CORE.length} entradas del núcleo · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("en")} Augusta entries`)}</footer>`;
+    <footer>${L(`${CORE.length} entradas del núcleo · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("en")} Augusta entries`)}<br>© 2026 Brandon M. A. Rogers. ${L("Todos los derechos reservados; el analizador automático no se puede copiar ni reutilizar sin permiso.","All rights reserved; the automatic parser may not be copied or reused without permission.")}</footer>`;
   bindCommon(); bindInstall();
   if(/[?&]instalar/.test(location.search)){ const b=document.getElementById("instbox"); if(b) b.scrollIntoView({block:"center"}); }
   const q=document.getElementById("q"), clr=document.getElementById("clr");
