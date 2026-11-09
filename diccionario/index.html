@@ -283,7 +283,7 @@ const GLAB={NEG:["negación","negation"],NRLD:["futuro","future"],"SUBJ.FIN":["p
   DIR:["objeto (3.ª persona)","object (3rd person)"],OBJ:["objeto","object"],INV:["inverso (alguien a mí/ti)","inverse (someone to me/you)"],CF:["habitual","habitual"],
   IPD:["pasado interrumpido","interrupted past"],STAT:["estado, en curso","state, ongoing"],REST:["de nuevo","again"],RET:["regreso","return"],PERSIST:["persistencia (ya no, todavía)","persistive (no longer, still)"],
   PASS:["pasiva","passive"],HITHER:["hacia acá","hither"],THITHER:["hacia allá","thither"],TRANS:["transitivizador","transitivizer"],VBLZ:["verbalizador","verbalizer"],
-  REFL:["reflexivo, recíproco","reflexive, reciprocal"],CAUS:["causativo","causative"],REPORT:["dicen que","reportative"],PROX:["recién","just now"],
+  REFL:["reflexivo, recíproco","reflexive, reciprocal"],CAUS:["causativo","causative"],REPORT:["dicen que / resulta que","reportative / surprise"],PROX:["recién","just now"],
   "PROG.PERS":["continuativo","continuative"],FORCE:["obligación","obligation"],AFF:["de veras","really"],EXP:["experimentante","experiencer"],
   "MOOD/NMLZ":["forma no finita","non-finite form"],POSS:["posesivo","possessive"],PL:["plural","plural"],ROOT:["raíz","root"]};
 const lab=g=>GLAB[g]?L(GLAB[g][0],GLAB[g][1]):g;
@@ -488,18 +488,21 @@ function entriesForRoot(root,morphs){
   out.sort((x,y)=>(y.m!=null)-(x.m!=null));
   return out.slice(0,8); }
 /* short meaning of a root for the gloss line, in the reader's language */
-function rootMeaning(root,hop){
+function rootMeaning(root,hop,verbal){
   /* the dictionary's own core glosses come before Augusta's text, which is OCR and can pair a sense with the wrong headword */
-  const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(lang==="en"?(!!y.en)-(!!x.en):0)||(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
+  /* a word parsed as a verb takes the root's verb entry first (wew- 'ganar', not wew 'la ganancia'; ruling 2026-11-08) */
+  const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(verbal?isVerbEntry(y)-isVerbEntry(x):0)||(lang==="en"?(!!y.en)-(!!x.en):0)||(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
   const pickTxt=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:(e.s||""));
   for(const e of hs){ let t=pickTxt(e); if(!t) continue;
-    if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1):""; if(r) return r; continue; }
+    if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1,verbal):""; if(r) return r; continue; }
+    t=t.replace(/^(?:(?:n|tr|intr|ir|rec|refl)\.(?:\s*y\s*(?:n|tr|intr|ir)\.)?,?\s*)/i,"");   /* category labels (tr., n. y tr.) are not the sense */
     t=t.replace(/\s*\([^)]*\)/g,"").split(/[;:]/)[0].trim(); if(t.length>32) t=t.split(",")[0].trim(); if(t.length>32) t=t.slice(0,30).trim()+"…";
     return t; }
   return ""; }
-function interlinear(root,morphs,gl,rm){
+const isVerbEntry=e=>(e.p==="v"||e.t==="verb"||/^to /.test(e.en||""))?1:0;
+function interlinear(root,morphs,gl,rm,verbal){
   const cell=(f,g,cls)=>`<span class="mc${cls||""}"><span class="mf">${esc(G(f))}</span><span class="mg">${esc(g||"")}</span></span>`;
-  return `<div class="igl">${cell(root,rm===undefined?rootMeaning(root):rm," root")}${(morphs||[]).map((m,i)=>cell(m,lab(gl[i]||""))).join("")}</div>`; }
+  return `<div class="igl">${cell(root,rm===undefined?rootMeaning(root,0,verbal):rm," root")}${(morphs||[]).map((m,i)=>cell(m,lab(gl[i]||""))).join("")}</div>`; }
 /* English rendering of a parsed verb: subject, tense/aspect from the suffix glosses, the root's English gloss.
    Returns "" when the root has no English gloss (then the Spanish rendering is shown, marked as Spanish). */
 const EN_IRR={be:["was","been"],have:["had","had"],do:["did","done"],go:["went","gone"],come:["came","come"],see:["saw","seen"],
@@ -568,16 +571,17 @@ function enMeaning(r){
   let vp=mkVP(pastM);
   if(r.two&&!fut&&!pastM&&!cond){ const vq=mkVP(true); if(vq!==vp) vp+=" / "+vq; }
   let out=sub+" "+vp+tail;
-  if(cond) out="if "+out; if(report) out="they say "+out;
+  if(cond) out="if "+out; if(report) out="they say / it turns out "+out;
   return out[0].toUpperCase()+out.slice(1); }
 function anaHTML(r,q){
   if(!r||!r.root) return "";
   const parts=[r.root].concat(r.morphs||[]);
   if(parts.length<2&&!r.mean) return "";
   let hits=entriesForRoot(r.root,r.morphs), cp=null;
+  if(r.wclass==="verb") hits=hits.slice().sort((x,y)=>isVerbEntry(y)-isVerbEntry(x));
   if(!hits.length){ cp=compoundParts(r.root); if(!cp) return ""; hits=cp.ha.slice(0,3).concat(cp.hb.slice(0,2)); }
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
-    ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a),rootMeaning(cp.b)].filter(Boolean).join(" + "):undefined)}
+    ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,r.wclass==="verb"),rootMeaning(cp.b,0,r.wclass==="verb")].filter(Boolean).join(" + "):undefined,r.wclass==="verb")}
     ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
     ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`,`Compound root <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
