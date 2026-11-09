@@ -66,6 +66,7 @@ Se guarda aparte (por defecto en `/home/claude/privado_parser/`; `build_dict.py`
 derechos al comienzo:
 
 ```
-terser motor_legible.js --compress --mangle toplevel,reserved=['MOTOR'] --comments false -o motor_min.js
+# el motor público lleva cuatro raíces inventadas como marca de agua (lista en el archivo privado CANARIOS.txt)
+terser motor_publico_marcado.js --compress --mangle toplevel,reserved=['MOTOR'] --comments false -o motor_min.js
 # y anteponer el aviso de derechos de autor (ver el comienzo de diccionario/motor.js)
 ```

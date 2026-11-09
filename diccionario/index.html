@@ -11,6 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nemülkawe">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noai, noimageai">
 <title>Tañi Nemülkawe</title>
 <meta name="description" content="Diccionario interactivo mapudungun, español e inglés, con juegos de vocabulario. Compañero del juego Mapudungukeaiñ Fill Püle.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -382,7 +383,7 @@ function home(){
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
         <p class="hint">${L("Elige cómo ver las palabras. Es el mismo ajuste del juego.","Choose how words are shown. It is the same setting as the game.")}</p></div>
     </div>
-    <footer>${L(`${CORE.length} entradas del núcleo · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("en")} Augusta entries`)}<br>© 2026 Brandon M. A. Rogers. ${L("Todos los derechos reservados; el analizador automático no se puede copiar ni reutilizar sin permiso.","All rights reserved; the automatic parser may not be copied or reused without permission.")}</footer>`;
+    <footer>${L(`${CORE.length} entradas del núcleo · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("en")} Augusta entries`)}<br>© 2026 Brandon M. A. Rogers. ${L("Todos los derechos reservados; el analizador automático no se puede copiar ni reutilizar sin permiso.","All rights reserved; the automatic parser may not be copied or reused without permission.")} ${L("No se permite usar este sitio ni su contenido para entrenar ni alimentar sistemas de inteligencia artificial.","This site and its content may not be used to train or feed artificial intelligence systems.")}</footer>`;
   bindCommon(); bindInstall();
   if(/[?&]instalar/.test(location.search)){ const b=document.getElementById("instbox"); if(b) b.scrollIntoView({block:"center"}); }
   const q=document.getElementById("q"), clr=document.getElementById("clr");
