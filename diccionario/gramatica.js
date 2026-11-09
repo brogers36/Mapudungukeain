@@ -123,3 +123,44 @@ window.GRAM = {
     en: "A brief, simplified explanation; forms vary by region. Based on usage in the AVENUE corpus and on Augusta (1916). Examples are segmented with hyphens; the first piece is the root."
   }
 };
+
+/* Compound and reduplicated verb roots. Every example is an Augusta (1916) headword in its citation form, so tapping it
+   opens the dictionary entry; "+" marks the join of two roots and "~" the repeated part (both removed when searching). */
+window.RAICES = {
+  intro: {
+    es: "Muchos verbos tienen una raíz hecha de dos partes: dos raíces verbales juntas, un verbo con su objeto pegado, o una raíz repetida. Los sufijos van siempre después de la raíz entera: <b>leftripay</b> «huyó» es <b>lef</b> + <b>tripa</b> + <b>-y</b>. Toca un ejemplo para ver su entrada.",
+    en: "Many verbs have a root made of two parts: two verb roots together, a verb with its object attached, or a repeated root. Suffixes always come after the whole root: <b>leftripay</b> «he/she fled» is <b>lef</b> + <b>tripa</b> + <b>-y</b>. Tap an example to see its entry."
+  },
+  groups: [
+    { id: "vv", es: "Verbo + verbo", en: "Verb + verb",
+      note: { es: "Dos raíces verbales forman una sola raíz. A menudo una dice la acción y la otra la dirección o la manera. Las raíces de dirección más frecuentes son <b>püra-</b> «subir», <b>nag-</b> «bajar», <b>kon-</b> «entrar», <b>tripa-</b> «salir» y <b>wüño-</b> «volver».", en: "Two verb roots form a single root. Often one gives the action and the other the direction or the manner. The most frequent direction roots are <b>püra-</b> «go up», <b>nag-</b> «go down», <b>kon-</b> «go in», <b>tripa-</b> «go out» and <b>wüño-</b> «go back»." },
+      items: [
+        { m: "dirección + acción", en_m: "direction + action", es: "La primera raíz dice hacia dónde; la segunda, qué se hace. Aquí con <b>kintu-</b> «mirar, buscar».", en: "The first root says which way; the second, what is done. Here with <b>kintu-</b> «look, search».",
+          ex: [["püra+kintu-n", "mirar hacia arriba", "to look up"], ["nag+kintu-n", "mirar hacia abajo", "to look down"], ["wüño+kintu-n", "mirar hacia atrás", "to look back"], ["kon+kintu-n", "mirar adentro", "to look inside"]] },
+        { m: "manera + movimiento", en_m: "manner + movement", es: "La primera raíz dice cómo; la segunda, el movimiento.", en: "The first root says how; the second, the movement.",
+          ex: [["lef+tripa-n", "huir, salir corriendo (lef- «correr» + tripa- «salir»)", "to flee, run out (lef- «run» + tripa- «go out»)"], ["amu+yaw-ün", "andar sin rumbo (amu- «ir» + yaw- «andar»)", "to wander about (amu- «go» + yaw- «go around»)"], ["ina+kintu-n", "seguir con la vista al que se va (ina- «seguir»)", "to follow someone with one's eyes (ina- «follow»)"]] },
+        { m: "posición + dirección", en_m: "position + direction", es: "La primera raíz dice la posición; la segunda, desde dónde o hacia dónde se llega a ella.", en: "The first root gives the position; the second, where one comes into it from or goes into it.",
+          ex: [["anü+püra-n", "sentarse (el que está acostado)", "to sit up (from lying down)"], ["anü+kon-ün", "sentarse dentro de algo o entre otros", "to sit down inside something or among others"], ["witra+püra-n", "encabritarse (el caballo)", "to rear up (a horse)"]] }
+      ] },
+    { id: "vn", es: "Verbo + sustantivo", en: "Verb + noun",
+      note: { es: "El verbo lleva pegado su objeto, sin <b>pu</b> ni artículo. El conjunto nombra la actividad en general más que un objeto en particular: <b>ketramapun</b> es «arar la tierra», no «arar esta tierra».", en: "The verb carries its object attached, without <b>pu</b> or an article. The whole names the activity in general rather than a particular object: <b>ketramapun</b> is «to plough land», not «to plough this land»." },
+      items: [
+        { m: "verbo + objeto", en_m: "verb + object", es: "Con <b>mapu</b> «tierra» y <b>düngu</b> «asunto, palabra».", en: "With <b>mapu</b> «land» and <b>düngu</b> «matter, word».",
+          ex: [["ketra+mapu-n", "arar la tierra", "to plough land"], ["kintu+mapu-n", "buscar un terreno", "to look for land"], ["kintu+düngu-n", "buscar pleitos", "to look for trouble"], ["elu+düngu-n", "dar aviso", "to give notice"]] }
+      ] },
+    { id: "redup", es: "Raíces reduplicadas", en: "Reduplicated roots",
+      note: { es: "Se repite la raíz entera. Muchas de estas raíces solo existen dobles (no hay un verbo <b>pish-</b>, solo <b>pishpish-</b>).", en: "The whole root is repeated. Many of these roots only exist doubled (there is no verb <b>pish-</b>, only <b>pishpish-</b>)." },
+      items: [
+        { m: "sonidos", en_m: "sounds", es: "Imitan el sonido de un animal o de una cosa.", en: "They imitate the sound of an animal or a thing.",
+          ex: [["ngay~ngay-ün", "relinchar", "to neigh"], ["pish~pish-ün", "piar", "to chirp"], ["naw~naw-ün", "maullar", "to meow"]] },
+        { m: "muchos a la vez", en_m: "many at once", es: "La acción la hacen varios sujetos.", en: "Several subjects do the action.",
+          ex: [["anü~anü-n", "sentarse más de uno", "to sit (more than one)"], ["kudu~kudu-n", "acostarse muchos", "to lie down (many)"], ["witra~witra-n", "estar de pie varios", "to stand (several)"], ["püf~püf-ün", "saltar más de uno", "to jump (more than one)"]] },
+        { m: "intensidad o repetición", en_m: "intensity or repetition", es: "La acción es fuerte, completa o repetida.", en: "The action is strong, thorough or repeated.",
+          ex: [["far~far-ün", "sudar mucho", "to sweat a lot"], ["apo~apo-n", "llenarse mucho", "to fill right up"], ["lif~lif-ün", "limpiar bien", "to clean thoroughly"]] }
+      ] }
+  ],
+  source: {
+    es: "Explicación breve y simplificada. Los ejemplos son entradas de Augusta (1916) en su forma de diccionario; las traducciones resumen las suyas. «+» une dos raíces y «~» marca la parte repetida.",
+    en: "A brief, simplified explanation. The examples are Augusta (1916) entries in their dictionary form; the translations summarise his. «+» joins two roots and «~» marks the repeated part."
+  }
+};

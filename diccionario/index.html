@@ -344,6 +344,7 @@ function route(){
   if(p[0]==="jugar") return play(p[1],p[2]||"all",p[3]||"m");
   if(p[0]==="acerca") return about();
   if(p[0]==="gramatica") return grammar();
+  if(p[0]==="raices") return grammar("raices");
   return home();
 }
 function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
@@ -375,6 +376,7 @@ function home(){
         <button class="card" data-go="#/guardadas"><span class="ic">⭐</span><b>${L("Mis palabras","My words")}</b><small>${nSaved?L(`${nSaved} guardadas · ${due} para repasar`,`${nSaved} saved · ${due} to review`):L("Guarda palabras con ☆","Save words with ☆")}</small></button>
         <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>${GW("Mapudungukeaiñ Fill Püle")}</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
         <button class="card" data-go="#/gramatica"><span class="ic">🧩</span><b>${L("Morfemas","Morphemes")}</b><small>${L("Sufijos del verbo, pu, ke, -chi, -kechi","Verb suffixes, pu, ke, -chi, -kechi")}</small></button>
+        <button class="card" data-go="#/raices"><span class="ic">🌱</span><b>${L("Raíces compuestas","Compound roots")}</b><small>${L("Verbo + verbo, verbo + objeto, raíces dobles","Verb + verb, verb + object, doubled roots")}</small></button>
         <button class="card" data-go="#/acerca"><span class="ic">📖</span><b>${L("Acerca","About")}</b><small>${L("Fuentes y cómo usarlo","Sources and how to use it")}</small></button>
       </nav>
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
@@ -855,16 +857,18 @@ function build(){
 /* ===== About ===== */
 /* ===== Morphemes: short guide to the verbal suffixes and the noun particles (data in gramatica.js) ===== */
 function gramWord(seg){ /* "amu-la-y" -> root in bold, suffixes separated by thin hyphens, all in the chosen grafemario */
-  return `<span class="gw">${seg.split(" ").map(w=>{ const ps=w.split("-"); return `<b>${esc(G(ps[0]))}</b>${ps.slice(1).map(x=>`<span class="gs">-</span>${esc(G(x))}`).join("")}`; }).join(" ")}</span>`; }
-function grammar(){
-  const R=window.GRAM; if(!R){ app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div><p>${L("No se pudo cargar.","Could not load.")}</p>`; bindCommon(); return; }
+  /* a root may be two roots joined with "+" or a repeated root with "~" (Raíces compuestas) */
+  const rootHTML=r=>r.split(/([+~])/).map(x=>x==="+"||x==="~"?`<span class="gs">${x==="+"?"+":"·"}</span>`:`<b>${esc(G(x))}</b>`).join("");
+  return `<span class="gw">${seg.split(" ").map(w=>{ const ps=w.split("-"); return `${rootHTML(ps[0])}${ps.slice(1).map(x=>`<span class="gs">-</span>${esc(G(x))}`).join("")}`; }).join(" ")}</span>`; }
+function grammar(which){
+  const R=which==="raices"?window.RAICES:window.GRAM, TITLE=which==="raices"?L("Raíces compuestas y reduplicadas","Compound and reduplicated roots"):L("Morfemas","Morphemes"); if(!R){ app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div><p>${L("No se pudo cargar.","Could not load.")}</p>`; bindCommon(); return; }
   const T=o=>lang==="es"?o.es:o.en;
-  const exBtn=e=>`<button class="gex" data-q="${esc(e[0].replace(/-/g,""))}">${gramWord(e[0])}<span class="gtr">${esc(lang==="es"?e[1]:e[2])}</span></button>`;
+  const exBtn=e=>`<button class="gex" data-q="${esc(e[0].replace(/[-+~]/g,""))}">${gramWord(e[0])}<span class="gtr">${esc(lang==="es"?e[1]:e[2])}</span></button>`;
   const grp=g=>`<section class="box gram" id="g-${g.id}"><h3>${T(g)}</h3>${g.note?`<p class="hint">${T(g.note)}</p>`:""}
     ${g.table?`<div class="gtab">${g.table.map(r=>`<div class="gm">${esc(G(r[0]))}</div><div>${esc(lang==="es"?r[1]:r[2])}</div>${exBtn([r[3],"",""]).replace('<span class="gtr"></span>',"")}`).join("")}</div>`:""}
-    ${(g.items||[]).map(it=>`<div class="gitem"><div class="gm">${esc(G(it.m))}</div><p>${T(it)}</p><div class="gexs">${it.ex.map(exBtn).join("")}</div></div>`).join("")}</section>`;
+    ${(g.items||[]).map(it=>`<div class="gitem"><div class="gm">${esc(it.en_m?(lang==="es"?it.m:it.en_m):G(it.m))}</div><p>${T(it)}</p><div class="gexs">${it.ex.map(exBtn).join("")}</div></div>`).join("")}</section>`;
   app.innerHTML=`<div class="top"><button class="back" data-go="#/">← ${L("Inicio","Home")}</button>${topBar()}</div>
-    <h2>${L("Morfemas","Morphemes")}</h2><p>${T(R.intro)}</p>
+    <h2>${TITLE}</h2><p>${T(R.intro)}</p>
     <nav class="chips" aria-label="${L("Secciones","Sections")}">${R.groups.map(g=>`<a class="chip" href="#g-${g.id}" data-jump="g-${g.id}">${T(g)}</a>`).join("")}</nav>
     ${R.groups.map(grp).join("")}
     <p class="hint">${T(R.source)}</p>`;
