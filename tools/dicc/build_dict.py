@@ -9,7 +9,11 @@
   revisiones.json (optional) the reviewer's decisions exported from the master copy
 Usage: python3 build_dict.py OUT_datos.js"""
 import json, re, sys, os, time
-H = os.path.dirname(os.path.abspath(__file__)); P = lambda f: os.path.join(H, f)
+H = os.path.dirname(os.path.abspath(__file__))
+# parser-derived files (parser_extra.tsv, loan_stems.json, rootfreq.json) are kept out of the public repository;
+# they are read from the private folder MPK_PRIVADO (default /home/claude/privado_parser/dicc) when not found here
+PRIV = os.environ.get('MPK_PRIVADO', '/home/claude/privado_parser/dicc')
+P = lambda f: os.path.join(H, f) if os.path.exists(os.path.join(H, f)) or not os.path.exists(os.path.join(PRIV, f)) else os.path.join(PRIV, f)
 game = json.load(open(P('game_vocab.json')))
 aug = json.load(open(P('../aug1916/augusta1916_entries.json'), encoding='utf-8'))
 VER = set(json.load(open(P('../aug1916/augusta1916_verified.json'), encoding='utf-8')))

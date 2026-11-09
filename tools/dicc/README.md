@@ -56,3 +56,16 @@ python3 build_master.py ../../diccionario/datos.js copia_maestra.html PRIVADO/au
 La copia maestra es un solo archivo HTML con todas las entradas editables. Exporta `revisiones.json`, que es acumulativo
 (trae también las revisiones ya publicadas). Ponerlo en esta carpeta y volver a correr `build_dict.py` publica los
 cambios: los campos editados reemplazan a los originales y la marca «Revisado» aparece en la app.
+
+## Analizador: fuera del repositorio público
+
+El código del analizador (y lo que se deriva de él: `builder.json`, `parser_extra.tsv`, `loan_stems.json`, `rootfreq.json`,
+`extract.js`, `clean_motor.js`, `motor_patches.js`, `motor_edits.json`, `tools/parser/`) ya no está en este repositorio.
+Se guarda aparte (por defecto en `/home/claude/privado_parser/`; `build_dict.py` lo busca ahí con la variable
+`MPK_PRIVADO`). `diccionario/motor.js` se publica minificado y con los nombres internos cambiados, con el aviso de
+derechos al comienzo:
+
+```
+terser motor_legible.js --compress --mangle toplevel,reserved=['MOTOR'] --comments false -o motor_min.js
+# y anteponer el aviso de derechos de autor (ver el comienzo de diccionario/motor.js)
+```
