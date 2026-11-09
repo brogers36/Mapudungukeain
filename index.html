@@ -348,6 +348,10 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .envtabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.envtabs .btn{flex:1 1 0;min-width:96px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;line-height:1.15}.envtabs small{font-weight:400;font-size:.75rem;opacity:.85}
 .pal-burst{animation:palburst .5s ease-out forwards;transform-box:fill-box;transform-origin:center} @keyframes palburst{0%{opacity:0;transform:scale(.3)}30%{opacity:1}100%{opacity:0;transform:scale(1.5)}}
 .epst{margin:18px 0 6px;font-size:1.1rem} .epst .muted{font-size:.85rem;font-weight:400}
+.season .seasondots{display:flex;gap:10px;margin:6px 0}.season .seasondots span{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(255,255,255,.25);font-weight:700;opacity:.7}.season .seasondots span.on{background:#2f8a4f;border-color:#2f8a4f;color:#fff;opacity:1}
+.bracket{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0;align-items:stretch}.bcol{display:flex;flex-direction:column;justify-content:space-around;gap:8px}.bcol .eyebrow{font-size:.66rem;margin:0}
+.bm{border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;font-size:.74rem;text-align:left}.bt{padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bt+.bt{border-top:1px solid rgba(255,255,255,.12)}.bt.me{font-weight:700;color:#f6d77a}.bt.out{opacity:.45}
+.trophy{display:flex;justify-content:center;animation:pop .6s ease-out}
 .pali-g{transition:transform .6s cubic-bezier(.3,.8,.3,1)} .pali-b{animation:palbounce .6s ease-out}
 @keyframes palbounce{40%{transform:translateY(-7px)}70%{transform:translateY(0)}85%{transform:translateY(-2px)}}
 .pali.goal{fill:var(--gold);stroke:#fff} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:2.4}
@@ -3727,24 +3731,62 @@ CHARS.forEach(c=>{ if(CHAR_ART[c.name]) c.svg=CHAR_ART[c.name]; });
 
 /* --- palin: a match is 10 questions on Experto/Kimche forms; the pali moves one step per answer --- */
 const TEAM_MAX=4, TEAM_PRICE=25;
-function palinQs(){ return shuffle([...genFi(3),...genPl(2),...genAm(2),...genInv(2),...genCombo(1)]); }
+/* Season and tournament. Win SEASON_NEED regular matches to enter an eight-team playoff (cuartos, semifinal, final);
+   each playoff round has more questions and a heavier share of the hard types (inverse and combined forms). A tie in
+   the playoff goes to sudden death: extra questions until someone scores. */
+const SEASON_NEED=3, PAL_ROUNDS=[
+  {es:"Temporada",en:"Season",n:10},
+  {es:"Cuartos de final",en:"Quarterfinal",n:12,win:30},
+  {es:"Semifinal",en:"Semifinal",n:14,win:45},
+  {es:"Final",en:"Final",n:16,win:60}];
+const PAL_RIVALS=["Lafkenche","Pewenche","Wenteche","Williche","Nagche","Puelche","Pikunche"];
+let palSeason=load("palSeason")||0, palCup=load("palCup")||null, palTrophies=load("palTrophies")||0;
+function palinQs(lv){
+  lv=lv||0;
+  if(lv===1) return shuffle([...genFi(3),...genPl(2),...genAm(2),...genInv(3),...genCombo(2)]);
+  if(lv===2) return shuffle([...genFi(3),...genPl(2),...genAm(2),...genInv(4),...genCombo(3)]);
+  if(lv===3) return shuffle([...genFi(2),...genPl(2),...genAm(3),...genInv(5),...genCombo(4)]);
+  return shuffle([...genFi(3),...genPl(2),...genAm(2),...genInv(2),...genCombo(1)]);
+}
+const cupPlayers=(c,r)=>r===0?[0,1,2,3,4,5,6,7]:c.w[r-1];
+const cupPairs=(c,r)=>{ const a=cupPlayers(c,r), o=[]; for(let k=0;k<a.length;k+=2) o.push([a[k],a[k+1]]); return o; };
+const cupRival=c=>{ const pr=cupPairs(c,c.round).find(x=>x.includes(0)); return pr[0]===0?pr[1]:pr[0]; };
+const teamName=(c,i)=>i===0?L2("Tu lof","Your lof"):c.teams[i];
+function newCup(){ return {teams:["",...shuffle(PAL_RIVALS)],round:0,w:[[],[],[]],sc:{}}; }
+function palBracket(c){
+  const col=r=>{ const prs=r<=c.round?cupPairs(c,r):null;
+    return `<div class="bcol"><p class="eyebrow">${esc(L2(PAL_ROUNDS[r+1].es,PAL_ROUNDS[r+1].en))}</p>${prs?prs.map(([a,b])=>{ const done=c.w[r].includes(a)||c.w[r].includes(b), wn=done?(c.w[r].includes(a)?a:b):null, sc=c.sc[r+":"+wn]||"";
+      const row=x=>`<div class="bt${x===0?" me":""}${done&&x!==wn?" out":""}">${esc(teamName(c,x))}${done&&x===wn?` <b>${esc(sc)}</b>`:""}</div>`;
+      return `<div class="bm">${row(a)}${row(b)}</div>`; }).join(""):Array.from({length:4>>r},()=>`<div class="bm"><div class="bt out">?</div><div class="bt out">?</div></div>`).join("")}</div>`; };
+  return `<div class="bracket">${[0,1,2].map(col).join("")}</div>`;
+}
+function startPalin(lv){ P={qs:palinQs(lv),i:0,ball:0,us:0,them:0,saves:team,right:0,lv:lv||0,ot:0}; palinRound(); }
 function palin(msg){
   S=null; clearInterval(vidTimer);
   const open=totalStars()>=needOf("kim");
   app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Juego de equipo","Team game")}</p><h2>Palin</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("kim"))}</div>`}
-    <div class="bar-top">${purse()}<span class="purse">🏆 ${palinWins}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
+    <div class="bar-top">${purse()}<span class="purse" title="${L2("Trofeos","Trophies")}">🏆 ${palTrophies}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     ${palinField(0,team,null)}
     <div class="rule">${L2(`Cada respuesta correcta empuja la <b>pali</b> hacia la meta rival. Si te equivocas, el rival la devuelve hacia la tuya. Llega a la meta para anotar. Cada <b>palife</b> de tu equipo ataja un gol rival por partido. Ganar paga 25 ngülliw más 2 por respuesta correcta.`,
       `Each right answer pushes the <b>pali</b> toward the rival goal. If you get one wrong, the rival hits it back toward yours. Reach the goal to score. Each <b>palife</b> on your team blocks one rival goal per match. A win pays 25 ngülliw plus 2 per right answer.`)}</div>
     <div class="toast" aria-live="polite">${msg?esc(msg):""}</div>
-    <div class="row"><button class="btn" id="play" ${open?"":"disabled"}>${L2("Jugar un partido","Play a match")}</button>
+    <div class="box season">${palCup?`<p class="eyebrow">${L2("Torneo","Tournament")} · ${esc(L2(PAL_ROUNDS[palCup.round+1].es,PAL_ROUNDS[palCup.round+1].en))}</p>${palBracket(palCup)}
+        <p class="muted">${L2(`Próximo partido: contra <b>${esc(teamName(palCup,cupRival(palCup)))}</b>, ${PAL_ROUNDS[palCup.round+1].n} preguntas, más difíciles en cada ronda. Si empatan, se sigue hasta el primer gol.`,`Next match: against <b>${esc(teamName(palCup,cupRival(palCup)))}</b>, ${PAL_ROUNDS[palCup.round+1].n} questions, harder each round. A tie goes on until the first goal.`)}</p>`
+      :`<p class="eyebrow">${L2("Temporada","Season")}</p><div class="seasondots">${Array.from({length:SEASON_NEED},(_,k)=>`<span class="${k<palSeason?"on":""}">${k<palSeason?"✔":k+1}</span>`).join("")}</div>
+        <p class="muted">${palSeason>=SEASON_NEED?L2("¡Clasificaste! Ocho equipos juegan el torneo: cuartos de final, semifinal y final.","You qualified! Eight teams play the tournament: quarterfinal, semifinal and final."):L2(`Gana ${SEASON_NEED} partidos de la temporada para jugar el torneo de ocho equipos y ganar un trofeo.`,`Win ${SEASON_NEED} season matches to play the eight-team tournament and win a trophy.`)}</p>`}
+      ${palinWins?`<p class="muted">${L2(`Partidos ganados en total: ${palinWins}`,`Matches won in all: ${palinWins}`)}</p>`:""}</div>
+    <div class="row">${palCup?`<button class="btn" id="cup" ${open?"":"disabled"}>${esc(L2(`Jugar: ${PAL_ROUNDS[palCup.round+1].es}`,`Play: ${PAL_ROUNDS[palCup.round+1].en}`))}</button>`
+      :palSeason>=SEASON_NEED?`<button class="btn" id="cupgo" ${open?"":"disabled"}>${L2("Empezar el torneo","Start the tournament")}</button>`:""}
+      <button class="btn${palCup||palSeason>=SEASON_NEED?" ghost":""}" id="play" ${open?"":"disabled"}>${palCup||palSeason>=SEASON_NEED?L2("Partido amistoso","Friendly match"):L2("Jugar un partido","Play a match")}</button>
       <button class="btn ghost" id="recruit" ${!open||team>=TEAM_MAX||nuts<TEAM_PRICE?"disabled":""}>${team>=TEAM_MAX?L2("Equipo completo","Team full"):`${NUT}${TEAM_PRICE} · ${L2("Sumar un palife","Add a palife")}`}</button></div>
     <p class="muted">${L2(`Tu equipo: ${team} palife (ataja${team>1?"n":""} ${team} gol${team>1?"es":""} por partido).`,`Your team: ${team} palife (block${team>1?"":"s"} ${team} goal${team>1?"s":""} per match).`)}</p>`;
   bindLang(()=>palin());
   document.getElementById("bk").onclick=menu;
   document.getElementById("recruit").onclick=()=>{ if(nuts<TEAM_PRICE||team>=TEAM_MAX) return; nuts-=TEAM_PRICE; team++; save("nuts",nuts); save("team",team); palin(L2("Nuevo palife en tu equipo.","A new palife joins your team.")); };
-  document.getElementById("play").onclick=()=>{ P={qs:palinQs(),i:0,ball:0,us:0,them:0,saves:team,right:0}; palinRound(); };
+  document.getElementById("play").onclick=()=>startPalin(0);
+  const cg=document.getElementById("cupgo"); if(cg) cg.onclick=()=>{ palCup=newCup(); save("palCup",palCup); palin(L2("¡Empieza el torneo! Mira el cuadro.","The tournament begins! Check the bracket.")); };
+  const cb=document.getElementById("cup"); if(cb) cb.onclick=()=>startPalin(palCup.round+1);
 }
 const PAL_X=b=>180+b*44;
 /* A palife: drawn standing on y=0, facing right (f=1) or left (f=-1), holding a wiño. */
@@ -3813,11 +3855,15 @@ function palHit(flash,from){
 const palAnim=()=>{ const g=app.querySelector(".pali-g"); if(!g) return; requestAnimationFrame(()=>requestAnimationFrame(()=>{ g.style.transform=`translateX(${g.dataset.to}px)`; })); };
 let P=null;
 function palinRound(fb){
-  if(P.i>=P.qs.length) return palinEnd();
+  if(P.i>=P.qs.length){
+    if(P.lv && P.us===P.them && P.ot<8){ P.ot++; P.qs.push(...(P.ot%2?genInv(1):genCombo(1))); }   /* sudden death */
+    else return palinEnd();
+  }
   const q=P.qs[P.i], showForm=P.i%2===0;
   const opts=shuffle([q,...q.dist]);
   app.innerHTML=`<div class="hud"><button class="btn ghost" id="bk" style="padding:6px 12px;font-size:.9rem">Palin</button>
-      <span class="score">${L2("Tú","You")} ${P.us} – ${P.them} ${L2("Rival","Rival")}</span><span class="muted">${P.i+1}/${P.qs.length} · ${L2("atajadas","blocks")} ${P.saves}</span></div>
+      <span class="score">${L2("Tú","You")} ${P.us} – ${P.them} ${L2("Rival","Rival")}</span><span class="muted">${P.ot?`<b>${L2("Alargue","Sudden death")}</b>`:`${P.i+1}/${P.qs.length}`} · ${L2("atajadas","blocks")} ${P.saves}</span></div>
+    ${P.lv?`<p class="eyebrow" style="text-align:center;margin:2px 0">${esc(L2(PAL_ROUNDS[P.lv].es,PAL_ROUNDS[P.lv].en))} · ${L2("contra","vs")} ${esc(palCup?teamName(palCup,cupRival(palCup)):"")}</p>`:""}
     ${palinField(P.ball,team,fb||null,P.from)}
     <div class="prompt"><span class="ask">${showForm?t().whichPic:t().which}</span>
       ${showForm?`<span class="big" style="font-size:1.9rem">${esc(G(q.m))}</span>`:`<div class="scene">${esc(gl(q))}</div>`}</div>
@@ -3830,21 +3876,56 @@ function palinRound(fb){
     else { P.ball--;                       /* a mistake: the rival hits the pali back toward your goal */
       if(P.ball<=-3){ if(P.saves>0){ P.saves--; P.ball=-2; flash="saved"; } else { P.them++; P.ball=0; P.from=-3; flash="lost"; } } }
     app.querySelectorAll(".opt").forEach((x,i)=>{ x.disabled=true; if(opts[i]===q) x.classList.add("ok"); else if(x===b) x.classList.add("bad"); });
-    P.i++; setTimeout(()=>palinRound(flash), ok?650:1300);
+    P.i++; if(P.ot && P.us!==P.them) P.i=P.qs.length;   /* the first goal in sudden death ends the match */
+    setTimeout(()=>palinRound(flash), ok?650:1300);
   });
 }
 function palinEnd(){
-  const win=P.us>P.them, draw=P.us===P.them;
-  const earned=(win?25:draw?10:0)+2*P.right; nuts+=earned; save("nuts",nuts);
+  const cup=P.lv>0;
+  let win=P.us>P.them, draw=P.us===P.them;
+  if(cup&&draw){ win=P.ball>0; draw=false; }          /* still tied after sudden death: the side in the rival's half wins */
+  const earned=(win?(cup?PAL_ROUNDS[P.lv].win:25):draw?10:0)+2*P.right;
   if(win){ palinWins++; save("palinWins",palinWins); }
-  app.innerHTML=`<div class="result pop"><p class="eyebrow">Palin</p><h2>${win?L2("¡Ganaste el partido!","You won the match!"):draw?L2("Empate","Draw"):L2("Ganó el rival","The rival won")}</h2>
-    <p class="score">${P.us} – ${P.them}</p><p>${t().score(P.right,P.qs.length)}</p>
-    <span class="gain">+${earned} ${NUT}</span>
+  let doneCup=null, title=win?L2("¡Ganaste el partido!","You won the match!"):draw?L2("Empate","Draw"):L2("Ganó el rival","The rival won"), note="", champ=false, bonus=0;
+  if(!cup){
+    if(win && !palCup && palSeason<SEASON_NEED){ palSeason++; save("palSeason",palSeason);
+      note=palSeason>=SEASON_NEED?L2("¡Clasificaste al torneo!","You qualified for the tournament!"):L2(`Temporada: ${palSeason} de ${SEASON_NEED} victorias.`,`Season: ${palSeason} of ${SEASON_NEED} wins.`); }
+  } else {
+    const c=palCup, r=c.round, riv=cupRival(c); doneCup=c;
+    /* this round's other matches are decided now */
+    cupPairs(c,r).forEach(([a,b])=>{ let wn, sc;
+      if(a===0||b===0){ wn=win?0:riv; sc=`${Math.max(P.us,P.them)}–${Math.min(P.us,P.them)}`; }
+      else { wn=Math.random()<.5?a:b; const hi=1+Math.floor(Math.random()*3); sc=`${hi}–${Math.floor(Math.random()*hi)}`; }
+      c.w[r].push(wn); c.sc[r+":"+wn]=sc; });
+    if(!win){ title=L2(`Quedaste fuera en ${PAL_ROUNDS[P.lv].es==="Final"?"la final":PAL_ROUNDS[P.lv].es.toLowerCase()}`,`Knocked out in the ${PAL_ROUNDS[P.lv].en.toLowerCase()}`);
+      note=L2("La próxima temporada empieza de nuevo: gana 3 partidos para volver al torneo.","The next season starts over: win 3 matches to get back into the tournament.");
+      palCup=null; palSeason=0; }
+    else if(r===2){ champ=true; bonus=100; palTrophies++; save("palTrophies",palTrophies);
+      title=L2("¡Campeones del torneo!","Tournament champions!"); note=L2("Ganaste el trofeo. Empieza una temporada nueva.","You won the trophy. A new season begins."); palCup=null; palSeason=0; }
+    else { c.round++; note=L2(`Pasas a ${c.round===2?"la final":"la semifinal"} contra ${teamName(c,cupRival(c))}.`,`On to the ${PAL_ROUNDS[c.round+1].en.toLowerCase()} against ${teamName(c,cupRival(c))}.`); }
+    save("palCup",palCup); save("palSeason",palSeason);
+  }
+  nuts+=earned+bonus; save("nuts",nuts);
+  const lastCup=cup&&!champ&&win?palCup:null, showCup=lastCup||doneCup;
+  app.innerHTML=`<div class="result pop"><p class="eyebrow">Palin${cup?" · "+esc(L2(PAL_ROUNDS[P.lv].es,PAL_ROUNDS[P.lv].en)):""}</p>
+    ${champ?`<div class="trophy" aria-hidden="true">${PAL_TROPHY}</div>`:""}
+    <h2>${title}</h2>
+    <p class="score">${P.us} – ${P.them}${P.ot?` <small>(${L2("alargue","sudden death")})</small>`:""}</p><p>${t().score(P.right,P.qs.length)}</p>
+    <span class="gain">+${earned+bonus} ${NUT}</span>
+    ${note?`<p class="rule">${esc(note)}</p>`:""}
+    ${showCup?palBracket(showCup):""}
     ${coach(win?`<b>¡${G(PRAISE[praiseIdx++ % PRAISE.length])}!</b>`:`<b>${t().keepB}</b>`, win)}</div>
-    <div class="row"><button class="btn" id="ag">${L2("Otro partido","Another match")}</button><button class="btn ghost" id="pb">Palin</button></div>`;
-  document.getElementById("ag").onclick=()=>{ P={qs:palinQs(),i:0,ball:0,us:0,them:0,saves:team,right:0}; palinRound(); };
+    <div class="row">${lastCup?`<button class="btn" id="nx">${esc(L2(`Jugar: ${PAL_ROUNDS[lastCup.round+1].es}`,`Play: ${PAL_ROUNDS[lastCup.round+1].en}`))}</button>`
+      :`<button class="btn" id="ag">${cup?L2("Volver a la temporada","Back to the season"):L2("Otro partido","Another match")}</button>`}<button class="btn ghost" id="pb">Palin</button></div>`;
+  const ag=document.getElementById("ag"); if(ag) ag.onclick=()=>cup?palin():startPalin(0);
+  const nx=document.getElementById("nx"); if(nx) nx.onclick=()=>startPalin(palCup.round+1);
   document.getElementById("pb").onclick=()=>palin();
 }
+const PAL_TROPHY=`<svg viewBox="0 0 120 120" width="140" height="140"><defs><linearGradient id="trG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8862a"/><stop offset=".45" stop-color="#f6d77a"/><stop offset="1" stop-color="#a8741e"/></linearGradient></defs>
+  <path d="M36 22 Q14 22 16 40 Q18 56 40 58" stroke="url(#trG)" stroke-width="6" fill="none"/><path d="M84 22 Q106 22 104 40 Q102 56 80 58" stroke="url(#trG)" stroke-width="6" fill="none"/>
+  <path d="M32 16 H88 Q88 62 60 70 Q32 62 32 16Z" fill="url(#trG)"/><path d="M40 20 Q42 52 56 62" stroke="#fff6d0" stroke-width="3" fill="none" opacity=".6"/>
+  <rect x="54" y="68" width="12" height="16" fill="url(#trG)"/><path d="M40 84 H80 L84 98 H36Z" fill="url(#trG)"/><rect x="32" y="98" width="56" height="10" rx="2" fill="#5a3a22"/>
+  <g transform="translate(60 38)"><circle r="11" fill="#c8322f"/><circle r="8" fill="none" stroke="#f6d77a" stroke-width="1.4"/><path d="M-5 5 L5 -5 M-3 -6 q5 1 6 6" stroke="#f3efe6" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="4" cy="4" r="2" fill="#f3efe6"/></g></svg>`;
 
 /* --- epew chapters: a serial story bought one chapter at a time --- */
 const EPEW_STORIES=[{t:"Ngürü ka ngülliw",es:"El zorro y los piñones",en:"The fox and the pine nuts"},{t:"Ngürü ka wakag",es:"El zorro y la rana",en:"The fox and the frog"}];
