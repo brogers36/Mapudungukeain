@@ -29,11 +29,10 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 
 ## Analizador
 
-El diccionario usa el analizador **build 139** (2026-11-09). Los dictámenes viven en el propio analizador, con una
-excepción: «presente o pasado» para las formas sin marca de tiempo (dictamen del 2026-11-07: *ilay* «no come / no
-comió») existe solo en la copia del diccionario. Después de `clean_motor.js`, aplicarlo con
-`git apply tools/dicc/motor_twotense.patch` (desde la raíz del repositorio). `motor_patches.js` y `motor_edits.json` quedan
-vacíos; úsalos solo para un dictamen que todavía no esté en el analizador.
+El diccionario usa el analizador **build 140** (2026-11-09) sin cambios: todos los dictámenes viven en el propio
+analizador, incluidos «presente o pasado» para las formas sin marca de tiempo (2026-11-07) y *la-lu* «el muerto, el que
+murió» (2026-11-09). `motor_patches.js` y `motor_edits.json` quedan vacíos; úsalos solo para un dictamen que todavía no
+esté en el analizador.
 
 ## Ejemplos
 
@@ -43,9 +42,8 @@ español, sin nombres propios, de 3 a 12 palabras) y escribe `diccionario/ejempl
 ## Reconstruir
 
 ```
-node extract.js ../../index.html "Mapudungun Verb Parser 139.html" GOLD.csv .   # game_vocab.json, builder.json, motor.js
+node extract.js ../../index.html "Mapudungun Verb Parser 140.html" GOLD.csv .   # game_vocab.json, builder.json, motor.js
 python3 build_dict.py ../../diccionario/datos.js && node clean_motor.js motor.js ../aug1916/augusta1916_entries.json ../../diccionario/motor.js ../../diccionario/datos.js   # sin texto con derechos
-(cd ../.. && git apply tools/dicc/motor_twotense.patch)   # presente o pasado (ver arriba)
 python3 builder_en.py builder.json builder_en.json
 python3 build_dict.py ../../diccionario/datos.js            # también escribe datos_es.js (vacío por ahora)
 node build_examples.js CORPUS_DIR ../../diccionario/motor.js ../../diccionario/datos.js ../../diccionario/ejemplos.js

@@ -544,6 +544,7 @@ const EN_SUBJ={"1sg":"I","2sg":"you","3":"he/she","1du":"we two","2du":"you two"
 const EN_OBJ={"1sg":"me","2sg":"you","3":"him/her","1du":"us two","2du":"you two","3du":"them two","1pl":"us","2pl":"you all","3pl":"them"};
 const EN_REFL={"1sg":"myself","2sg":"yourself","3":"himself/herself","1du":"ourselves","2du":"yourselves","3du":"themselves","1pl":"ourselves","2pl":"yourselves","3pl":"themselves"};
 function enMeaning(r){
+  if(r.en) return r.en;   /* a lexicalized form carries its own English (la-lu) */
   if(!r||!r.who||!r.who.person) return ""; const pn=r.who.person, sub=EN_SUBJ[pn]; if(!sub) return "";
   const sp=String(r.mean||""); if(/^¿/.test(sp)) return "";   /* questions: the Spanish rendering is shown */
   const base=enVerbGloss(r.root); if(!base) return "";
