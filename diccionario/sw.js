@@ -1,6 +1,6 @@
 /* Tañi Nemülkawe: offline support. The page and data are fetched from the network first, so updates arrive as soon as
-   there is a connection, and served from the cache when offline. The parser engine (motor.js) is cached after first use. */
-const CACHE = 'nemulkawe-20261108192633';
+   there is a connection, and served from the cache when offline. The parser engine (motor.js) is cached too and revalidated on each load. */
+const CACHE = 'nemulkawe-20261108193028';
 const CORE = ['./', './index.html', './datos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './gramatica.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -23,8 +23,10 @@ self.addEventListener('fetch', e => {
   }
   /* the manifest and the icons too: Android's installer re-reads them from the site, and a stale cached copy makes the
      install fall back to a Chrome shortcut */
-  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub|gramatica)\.js$|\/manifest\.webmanifest$|\/(icon-\d+|icon-maskable-\d+|apple-touch-icon)\.png$/.test(url.pathname)) {
-    e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; })
+  /* the parser engine (motor.js) too, and all of these revalidated with the server (no-cache): GitHub Pages lets browsers
+     reuse a copy for ten minutes, and a cache-first engine kept the old parser after an update while the page was new */
+  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub|gramatica|motor)\.js$|\/manifest\.webmanifest$|\/(icon-\d+|icon-maskable-\d+|apple-touch-icon)\.png$/.test(url.pathname)) {
+    e.respondWith(fetch(req, {cache: 'no-cache'}).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; })
       .catch(() => caches.match(req)));
     return;
   }
