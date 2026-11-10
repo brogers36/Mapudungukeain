@@ -69,6 +69,11 @@ for w in game:
     a = None if phrase else find_aug(kl)
     core.append({'id': 'c:' + k, 'm': k, 'es': w['es'], 'en': w['en'], 't': t, 'p': '', 'a': a, 'pic': w.get('pic'),
                  'o': 'juego', 'src': w['src'], 'ph': 1 if phrase else 0, 'f': fq(root_of(kl, 'v'))})
+# corrections to game words, by analyst ruling: the noun yu 'nariz' also yüw (2026-11-10); it linked to Augusta's
+# possessive yu 'nuestro (de dos)' and now links to his yüw 'la nariz'
+CORE_FIX = {'yu': {'es': 'nariz (también yüw)', 'en': 'nose (also yüw)', 'a': 'yüw'}}
+for c in core:
+    if c['m'] in CORE_FIX: c.update(CORE_FIX[c['m']])
 for line in open(P('core_extra.tsv'), encoding='utf-8'):
     if not line.strip(): continue
     m, a, p, es, en, t = line.rstrip('\n').split('\t')

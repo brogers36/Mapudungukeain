@@ -281,7 +281,7 @@ const statusChip=e=>e.st===1?`<span class="status ok">${L("Revisado","Reviewed")
 
 /* Learner-facing names for the parser's morpheme glosses */
 const GLAB={NEG:["negación","negation"],NRLD:["futuro","future"],"SUBJ.FIN":["persona","person"],SUBJ:["persona","person"],NUM:["número","number"],
-  DIR:["objeto (3.ª persona)","object (3rd person)"],OBJ:["objeto","object"],INV:["inverso (alguien a mí/ti)","inverse (someone to me/you)"],CF:["habitual","habitual"],
+  DIR:["objeto (3.ª persona)","object (3rd person)"],OBJ:["objeto","object"],INV:["inverso (alguien a mí/ti)","inverse (someone to me/you)"],CF:["habitual","habitual"],CF5:["rasgo constante","constant feature"],FORMER:["dolor, ternura; ya no existe","pain, tenderness; no longer existing"],NMLZ:["nominalizador","nominaliser"],
   IPD:["pasado interrumpido","interrupted past"],STAT:["estado, en curso","state, ongoing"],REST:["de nuevo","again"],RET:["regreso","return"],PERSIST:["persistencia (ya no, todavía)","persistive (no longer, still)"],
   PASS:["pasiva","passive"],HITHER:["hacia acá","hither"],THITHER:["hacia allá","thither"],TRANS:["transitivizador","transitivizer"],VBLZ:["verbalizador","verbalizer"],
   REFL:["reflexivo, recíproco","reflexive, reciprocal"],CAUS:["causativo","causative"],REPORT:["dicen que / resulta que","reportative / surprise"],PROX:["recién","just now"],
@@ -291,9 +291,9 @@ const lab=g=>GLAB[g]?L(GLAB[g][0],GLAB[g][1]):g;
 
 /* ===== Parser in a Web Worker, loaded only when a search needs it (the engine is about 2 MB) ===== */
 let worker=null, wseq=0; const wwait=new Map();
-function analyse(word,sys){ return new Promise(res=>{
+function analyse(word,sys,prev){ return new Promise(res=>{
   try{ if(!worker){ worker=new Worker("worker.js"); worker.onmessage=ev=>{const f=wwait.get(ev.data.id); if(f){wwait.delete(ev.data.id); f(ev.data.r);}}; worker.onerror=()=>{ wwait.forEach(f=>f(null)); wwait.clear(); }; }
-    const id=++wseq; wwait.set(id,res); worker.postMessage({id,word,sys}); setTimeout(()=>{ if(wwait.has(id)){wwait.delete(id);res(null);} },20000);
+    const id=++wseq; wwait.set(id,res); worker.postMessage({id,word,sys,prev:prev||''}); setTimeout(()=>{ if(wwait.has(id)){wwait.delete(id);res(null);} },20000);
   }catch(e){ res(null); } }); }
 
 /* ===== Spanish -> Mapudungun (Augusta), loaded on the first search in Spanish (about 1.5 MB) ===== */
@@ -429,7 +429,7 @@ function search(q){
       return `<div class="wbw"><p class="hint"><b>${esc(w)}</b></p>${hits.length?`<div class="list">${hits.map(resRow).join("")}</div>`:`<div id="wbw${i}"><p class="hint">${L("Analizando…","Analysing…")}</p></div>`}</div>`; }).join("")+html; }
   out.innerHTML=html; bindRes(out);
   if(wbw) words.forEach((w,i)=>{ const box=document.getElementById("wbw"+i); if(!box) return;
-    analyse(w.toLowerCase(),guessSys(w)).then(r=>{ if(my!==searchSeq) return; box.innerHTML=anaHTML(r,w)||`<p class="hint">${L("Sin entrada.","No entry.")}</p>`; bindRes(box); }); });
+    analyse(w.toLowerCase(),guessSys(w),i?words[i-1]:'').then(r=>{ if(my!==searchSeq) return; box.innerHTML=anaHTML(r,w)||`<p class="hint">${L("Sin entrada.","No entry.")}</p>`; bindRes(box); }); });
   if(lang==="es"&&pq.length>1&&(D.n&&D.n.es)) loadES().then(ES=>{ if(my!==searchSeq||!ES) return;
     const hits=ES.map(e=>[e._h===pq?3:(e._h.startsWith(pq)?2-Math.min(1,(e._h.length-pq.length)/10):0),e]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,12).map(x=>x[1]);
     if(!hits.length) return;
@@ -596,6 +596,7 @@ function anaHTML(r,q){
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
     ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,r.wclass==="verb"),rootMeaning(cp.b,0,r.wclass==="verb")].filter(Boolean).join(" + "):undefined,r.wclass==="verb")}
     ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
+    ${r.ctx&&/nominalised verb/.test(r.ctx)?`<p class="hint">${L("Por la palabra anterior (un posesivo o determinante), la forma en -n/-ün es un verbo nominalizado: «el …-r, la acción de …».","After the previous word (a possessive or determiner), the -n/-ün form is a nominalised verb: “the …-ing”.")}</p>`:""}
     ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`,`Compound root <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
     <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
