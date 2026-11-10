@@ -23,6 +23,8 @@ window.GRAM = {
           ex: [["amu-fu-n", "fui (pero volví) / iba a ir", "I went (but came back) / I was going to go"], ["kim-a-fu-y", "sabría", "he/she would know"]] },
         { m: "-ke-", es: "Habitual: lo que se hace siempre o de costumbre.", en: "Habitual: what one always or usually does.",
           ex: [["amu-ke-y", "suele / solía ir, va / iba siempre", "he/she usually goes / used to go"], ["pi-ke-n", "digo / decía siempre", "I always say / always said"]] },
+        { m: "-ye-m, -yü-m", es: "Rasgo constante (<b>-ye-</b> o <b>-yü-</b>) seguido de la persona <b>-m</b>. En el verbo se separa así: <b>aku-a-ye-m</b>. (Después de un sustantivo, <b>-yem</b> es otro sufijo; ver abajo.)", en: "Constant feature (<b>-ye-</b> or <b>-yü-</b>) followed by the person marker <b>-m</b>. On a verb it is split this way: <b>aku-a-ye-m</b>. (After a noun, <b>-yem</b> is a different suffix; see below.)",
+          ex: [["aku-a-ye-m", "cuando va a llegar", "when it is going to arrive"]] },
         { m: "-la-", es: "Negación del verbo conjugado.", en: "Negation of the conjugated verb.",
           ex: [["amu-la-n", "no voy / no fui", "I don't go / I didn't go"], ["kim-la-y-mi", "no sabes / no sabías", "you don't / didn't know"]] },
         { m: "-no-", es: "Negación en las formas no conjugadas (con <b>-lu</b>, <b>-el</b>, <b>-n</b>…).", en: "Negation in non-conjugated forms (with <b>-lu</b>, <b>-el</b>, <b>-n</b>…).",
@@ -106,7 +108,7 @@ window.GRAM = {
         { m: "-(ü)n", es: "Sustantivo de acción: el hecho de hacer algo.", en: "Action noun: the fact of doing something.",
           ex: [["kim-ün", "conocimiento, saber", "knowledge"], ["monge-n", "vida", "life"]] }
       ] },
-    { id: "nominal", es: "Partículas del nombre: pu, ke, -chi, -kechi", en: "Noun particles: pu, ke, -chi, -kechi",
+    { id: "nominal", es: "Partículas del nombre: pu, ke, -chi, -kechi, -yem", en: "Noun particles: pu, ke, -chi, -kechi, -yem",
       items: [
         { m: "pu", es: "Plural de personas, animales y algunas cosas. Va antes del sustantivo.", en: "Plural of people, animals and some things. It goes before the noun.",
           ex: [["pu wentru", "los hombres", "the men"], ["pu che", "la gente", "the people"]] },
@@ -115,7 +117,9 @@ window.GRAM = {
         { m: "-chi", es: "Hace adjetivo de lo que va delante de un sustantivo. Con la raíz de un verbo, forma un participio adjetivo.", en: "Makes an adjective of what precedes a noun. With a verb root, it forms an adjectival participle.",
           ex: [["tüfa-chi ruka", "esta casa", "this house"], ["küme-chi wentru", "un hombre bueno", "a good man"]] },
         { m: "-kechi", es: "Hace adverbios de modo, como «-mente».", en: "Makes adverbs of manner, like «-ly».",
-          ex: [["küme-kechi", "bien, buenamente", "well, nicely"]] }
+          ex: [["küme-kechi", "bien, buenamente", "well, nicely"]] },
+        { m: "-yem, -em", es: "Con un sustantivo: dolor, recuerdo doloroso, compasión, ternura o admiración, o que alguien o algo ya no existe. (En el verbo, <b>-ye-m</b> es otra cosa; ver arriba.)", en: "With a noun: pain, painful remembrance, compassion, tenderness or admiration, or that someone or something no longer exists. (On a verb, <b>-ye-m</b> is something else; see above.)",
+          ex: [["ñuke-yem", "la querida madre; la madre que ya no está", "dear mother; the mother who is gone"], ["chaw-em", "el padre que ya no está", "the father who is gone"]] }
       ] }
   ],
   source: {
