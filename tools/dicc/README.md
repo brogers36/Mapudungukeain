@@ -29,7 +29,7 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 
 ## Analizador
 
-El diccionario usa el analizador **build 140** (2026-11-09) sin cambios: todos los dictámenes viven en el propio
+El diccionario usa el analizador **build 141** (2026-11-09) sin cambios: todos los dictámenes viven en el propio
 analizador, incluidos «presente o pasado» para las formas sin marca de tiempo (2026-11-07) y *la-lu* «el muerto, el que
 murió» (2026-11-09). `motor_patches.js` y `motor_edits.json` quedan vacíos; úsalos solo para un dictamen que todavía no
 esté en el analizador.
