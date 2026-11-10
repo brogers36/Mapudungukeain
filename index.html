@@ -354,6 +354,7 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .bm{border:1px solid rgba(255,255,255,.18);border-radius:8px;overflow:hidden;font-size:.74rem;text-align:left}.bt{padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bt+.bt{border-top:1px solid rgba(255,255,255,.12)}.bt.me{font-weight:700;color:#f6d77a}.bt.out{opacity:.45}
 .trophy{display:flex;justify-content:center;animation:pop .6s ease-out}
 .copy{font-size:.75rem;opacity:.6;text-align:center;margin:18px 0 6px}
+.backlink{display:inline-flex;align-items:center;gap:4px;background:none;border:0;color:var(--muted,#b9b4cc);font:inherit;font-size:.95rem;font-weight:600;padding:6px 0;margin:0 0 4px;cursor:pointer}.backlink:hover,.backlink:focus-visible{color:#f6d77a;text-decoration:underline}
 .pali-g{transition:transform .6s cubic-bezier(.3,.8,.3,1)} .pali-b{animation:palbounce .6s ease-out}
 @keyframes palbounce{40%{transform:translateY(-7px)}70%{transform:translateY(0)}85%{transform:translateY(-2px)}}
 .pali.goal{fill:var(--gold);stroke:#fff} .pali.lost{fill:var(--red)} .pali.saved{stroke:var(--gold);stroke-width:2.4}
@@ -2367,6 +2368,12 @@ const T = {
 
 // ===== State =====
 const app = document.getElementById("app");
+/* a back link at the top of the level and shop screens; __back is set by each screen before it renders */
+let __back=null, __menuY=0;
+const backLink=()=>{ app.dataset.scr=""; return `<button class="backlink" data-back type="button" aria-label="${L2("Volver","Go back")}">← ${L2("Volver","Back")}</button>`; };
+/* remember where the menu was scrolled when a level or section was opened, and go back to that spot */
+app.addEventListener("click",()=>{ if(app.dataset.scr==="menu") __menuY=window.scrollY; },true);
+app.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-back]"); if(b && __back){ e.preventDefault(); const y=__menuY; __back(); if(app.dataset.scr==="menu") window.scrollTo(0,y); } });
 function load(k){try{return JSON.parse(localStorage.getItem("mpk_"+k))}catch(e){return null}}
 function save(k,v){try{localStorage.setItem("mpk_"+k,JSON.stringify(v))}catch(e){} if(window.syncSoon) syncSoon();}
 let lang = load("lang") || "es";
@@ -2442,6 +2449,7 @@ function bindLang(rerender){
 // ===== Menu =====
 let helpSeen=false;   // in memory, so the start button works even when browser storage is blocked
 function menu(){
+  app.dataset.scr="menu";
   S=null; clearInterval(vidTimer);
   if(!helpSeen && !load("seenHelp")) return help();
   const ts=totalStars();
@@ -2562,7 +2570,7 @@ function intro(lvl){
       <div class="fc-pron" id="fcPron"></div>
     </section>` : "";
   body = deckHTML + body;
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">${esc(gl(lvl))}</p><h2>${esc(titleM(lvl))}</h2></div>${langToggle()}</div>
     <p class="howline">${t().how(lvl)}</p>
     ${body}
@@ -3072,7 +3080,7 @@ const readOpen = r => totalStars() >= STAGES.find(st=>st.id===r.stage).need;
 
 function readingList(){
   S=null; clearInterval(vidTimer);
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">Mapudungun</p><h2>${t().reading}</h2></div>${langToggle()}</div>
     <p>${t().readSub}</p>
     <div class="bar-top">${purse()}<button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
@@ -3090,7 +3098,7 @@ function reading(r, state){
   const st = state || {order:r.qs.map(q=>shuffle(q.o.es.map((_,i)=>i))), pick:r.qs.map(()=>null), checked:false};
   const done=st.checked;
   const score = done ? st.pick.filter(x=>x===0).length : 0;
-  app.innerHTML=`
+  __back=()=>readingList(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">${esc(gl(r.sub))}</p><h2>${esc(G(r.title))}</h2></div>${langToggle()}</div>
     <div class="passage">${r.lines.map(l=>`<p class="line">${l.who?`<span class="who">${esc(G(l.who))}:</span> `:""}<span class="mz">${esc(G(l.m))}</span>${done?`<span class="tr">${esc(gl(l))}</span>`:""}</p>`).join("")}</div>
     <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${r.gloss.map(g=>`<span><b>${esc(G(g[0]))}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
@@ -3156,7 +3164,7 @@ function progParse(txt){ txt=String(txt||"").trim(); let j=null;
 function progress(){
   S=null; clearInterval(vidTimer);
   const n=Object.keys(progData()).length, day=new Date().toISOString().slice(0,10);
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">Mapudungukeaiñ Fill Püle</p><h2>${L2("Tu progreso","Your progress")}</h2></div>${langToggle()}</div>
     <p>${L2("Tu progreso (niveles, nueces, ropa, palabras) se guarda solo en este teléfono o navegador. Si desinstalas la app o borras los datos de Chrome para el sitio, se pierde. Guarda una copia de vez en cuando; también sirve para pasar tu progreso a otro teléfono.","Your progress (levels, nuts, clothes, words) is stored only on this phone or browser. Uninstalling the app or clearing Chrome's data for the site erases it. Save a copy now and then; it also moves your progress to another phone.")}</p>
     <div class="row"><button class="btn" id="pg-file">💾 ${L2("Guardar copia (archivo)","Save a copy (file)")}</button><button class="btn ghost" id="pg-copy">📋 ${L2("Copiar código","Copy code")}</button></div>
@@ -3260,7 +3268,7 @@ try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persiste
 
 function help(){
   S=null; clearInterval(vidTimer); helpSeen=true; save("seenHelp",1);
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">Mapudungukeaiñ Fill Püle</p><h2>${t().howTitle}</h2></div>${langToggle()}</div>
     <ol class="steps">${HELP[lang].map(([h,d])=>`<li><b>${esc(h)}</b><span>${esc(d)}</span></li>`).join("")}</ol>
     ${coach(`<b>¡Mari mari!</b><small>${t().howHi}</small>`, true)}
@@ -3501,7 +3509,7 @@ function lof(sel,msg){
   if(p&&lofEnvs.includes(envOf(p))) lofEnv=envOf(p);
   if(!lofEnvs.includes(lofEnv)) lofEnv="lelfun";
   const E=LOF_ENVS.find(e=>e.id===lofEnv), here=LOF.filter(x=>envOf(x)===lofEnv), ownHere=here.filter(x=>lofOwned.includes(x.id)).length;
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Construye tu comunidad","Build your community")}</p><h2>Lof</h2></div>${langToggle()}</div>
+  __back=()=>menu(); app.innerHTML=`${backLink()}<div class="top"><div><p class="eyebrow">${L2("Construye tu comunidad","Build your community")}</p><h2>Lof</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("int"))}</div>`}
     <div class="bar-top">${purse()}<span class="purse">${ownHere} / ${here.length}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     <div class="envtabs" role="tablist">${LOF_ENVS.map(e=>{ const own=lofEnvs.includes(e.id);
@@ -3767,7 +3775,7 @@ function startPalin(lv){ P={qs:palinQs(lv),i:0,ball:0,us:0,them:0,saves:team,rig
 function palin(msg){
   S=null; clearInterval(vidTimer);
   const open=totalStars()>=needOf("kim");
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Juego de equipo","Team game")}</p><h2>Palin</h2></div>${langToggle()}</div>
+  __back=()=>menu(); app.innerHTML=`${backLink()}<div class="top"><div><p class="eyebrow">${L2("Juego de equipo","Team game")}</p><h2>Palin</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("kim"))}</div>`}
     <div class="bar-top">${purse()}<span class="purse" title="${L2("Trofeos","Trophies")}">🏆 ${palTrophies}</span><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     ${palinField(0,team,null)}
@@ -4032,7 +4040,7 @@ const EPEW=[
 function epew(msg){
   S=null; clearInterval(vidTimer);
   const open=totalStars()>=needOf("kim");
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">${L2("Un relato por capítulos","A story in chapters")}</p><h2>Epew</h2></div>${langToggle()}</div>
+  __back=()=>menu(); app.innerHTML=`${backLink()}<div class="top"><div><p class="eyebrow">${L2("Un relato por capítulos","A story in chapters")}</p><h2>Epew</h2></div>${langToggle()}</div>
     ${open?"":`<div class="rule">🔒 ${t().locked(needOf("kim"))}</div>`}
     <div class="bar-top">${purse()}<button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
     <p class="muted">${L2("Hay dos epew. Compra cada capítulo con ngülliw; el siguiente se abre al comprar el anterior. Las preguntas al final pagan 3 ngülliw por respuesta correcta.","There are two epew. Buy each chapter with ngülliw; the next one opens once you buy the one before. The questions at the end pay 3 ngülliw per right answer.")}</p>
@@ -4052,7 +4060,7 @@ function epewRead(i,st){
   const c=EPEW[i]; st=st||{show:{},pick:c.qs.map(()=>null),order:c.qs.map(q=>shuffle(q.o.es.map((_,k)=>k))),checked:false};
   const score=st.checked?st.pick.filter(x=>x===0).length:0;
   const chN=EPEW.slice(0,i+1).filter(x=>epS(x)===epS(c)).length, nx=epewNext(i);
-  app.innerHTML=`<div class="top"><div><p class="eyebrow">${esc(G(EPEW_STORIES[epS(c)].t))} · ${L2("Capítulo","Chapter")} ${chN}</p><h2>${esc(G(c.t))}</h2></div>${langToggle()}</div>
+  __back=()=>epew(); app.innerHTML=`${backLink()}<div class="top"><div><p class="eyebrow">${esc(G(EPEW_STORIES[epS(c)].t))} · ${L2("Capítulo","Chapter")} ${chN}</p><h2>${esc(G(c.t))}</h2></div>${langToggle()}</div>
     <p class="muted">${L2("Toca una línea para ver la traducción.","Tap a line to see its translation.")}</p>
     <div class="passage">${c.lines.map((l,k)=>`<p class="line" data-k="${k}" style="cursor:pointer"><span class="mz">${esc(G(l[0]))}</span>${st.show[k]||st.checked?`<span class="tr">${esc(lang==="es"?l[1]:l[2])}</span>`:""}</p>`).join("")}</div>
     <details class="gloss"><summary>${t().glossary}</summary><div class="chips">${c.gloss.map(g=>`<span><b>${esc(G(g[0]))}</b> ${esc(lang==="es"?g[1]:g[2])}</span>`).join("")}</div></details>
@@ -4223,7 +4231,7 @@ const PRON_LVL = { id:"quiz-fon", mt:"", es:"Pronunciación", en:"Pronunciation"
 
 function pronunciation(){
   S=null;
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">Grafemario ${GRAF_INFO[graf].name}</p><h2>${t().pron}</h2></div>${langToggle()}</div>
     <p>${t().pronSub}</p>
     <div class="bar-top"><button class="btn" id="pq" style="padding:10px 16px">${t().pronQuiz}</button>
@@ -4260,7 +4268,7 @@ const GRAF_EX = ["mapudungun","trewa","ngürü","kawellu","chod","kug","dungun"]
 function grafemarios(){
   S=null;
   const inG=(k,s)=>{ const o=graf; graf=k; const r=G(s); graf=o; return r; };
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">Mapudungun</p><h2>${L2("Grafemarios","Writing systems (grafemarios)")}</h2></div>${langToggle()}</div>
     <p>${L2("El mapudungun se escribe con varios grafemarios, y cada uno tiene su historia y sus usuarios. Elige el que prefieras: todo el juego cambia de inmediato y tu progreso se mantiene.","Mapudungun is written in several grafemarios, each with its own history and users. Choose the one you prefer: the whole game switches at once, and your progress is kept.")}</p>
     <div class="bar-top"><button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
@@ -4396,7 +4404,7 @@ function vocab(){
   else if(vocabSort==="az") body=`<div class="vlist">${list.slice().sort((a,b)=>G(a.m).localeCompare(G(b.m),"es")).map(row).join("")}</div>`;
   else { const groups=[]; list.forEach(w=>{ let g=groups.find(x=>x.src===w.src); if(!g){g={src:w.src,ws:[]};groups.push(g)} g.ws.push(w); });
     body=groups.map(g=>`<p class="eyebrow vgrp">${esc(g.src)} · ${g.ws.length}</p><div class="vlist">${g.ws.map(row).join("")}</div>`).join(""); }
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">${L2("Tu vocabulario","Your vocabulary")}</p><h2>${L2("Mis palabras","My words")}</h2></div>${langToggle()}</div>
     <p>${L2(`Llevas <b>${all.length}</b> palabras y frases. La lista crece con cada nivel que completas, cada lectura que lees y cada capítulo de epew.`,`You have <b>${all.length}</b> words and phrases. The list grows with every level you finish, every reading you complete and every epew chapter.`)}</p>
     <div class="bar-top vbar-top"><input id="vq" type="search" value="${esc(vocabQ)}" placeholder="${L2("Buscar…","Search…")}" aria-label="${L2("Buscar","Search")}">
@@ -4419,7 +4427,7 @@ function wardrobe(msg){
   const of=outfits[p.id]||{};
   const ORD=["body","cloak","belt","neck","chest","pin","head","ears","hand","pet","bg"];
   const list=ITEMS.filter(it=>fits(it,p)).sort((a,b)=>ORD.indexOf(a.slot)-ORD.indexOf(b.slot));
-  app.innerHTML=`
+  __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">ngülliw</p><h2>${t().wardrobe}</h2></div>${langToggle()}</div>
     <p>${t().wardSub}</p>
     <div class="bar-top">${purse()}<button class="btn ghost" id="bk" style="padding:8px 14px">${t().menu}</button></div>
