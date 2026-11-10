@@ -34,6 +34,8 @@ def pos_of(t):
         if re.search(r'(^|\s|/)' + re.escape(k), t[:40]): return v
     return ''
 def short(t):
+    t = re.sub(r'\bpüron(?=[.,]?\s*(?:pers|poses|dem|interr|indef|indeterm|rel)\w*)', 'pron', t)
+    t = re.sub(r'^pron,\s*poses,\s*', 'pron. poses. ', t.strip())
     t = re.sub(r'^\((?:Panguipulli|Huapi)[^)]*\)\s*', '', t.strip())
     t = re.sub(r'^((?:(?:s|n|tr|r|a|adj|adv|partíc|interj|rec|ger|num|pron|conj|c|v|ant|t)\.\s*,?\s*(?:y\s+)?)+)', lambda m: m.group(1).replace(',', ' '), t)
     t = re.sub(r'^=\s*([^\s.,;]+)[.,]?\s*$', r'▹ \1', t)
@@ -148,6 +150,8 @@ def ocrfix(t):
     # Augusta's label tr. is often read "ir." (he never uses "ir." as a label); "2.ª" read "2.2"
     t = re.sub(r'(?:(?<=\()|(?<=, )|(?<=\| )|(?<=\by )|^)ir\.(?=[\s,);:]|$)', 'tr.', t)
     t = re.sub(r'\b((?:tr|n|r)\. [12]\.)2(?=[\s,);])', r'\1ª', t)
+    # the label pron. is often read "püron" (a real word, 'nudo', so only before pers./poses. etc.)
+    t = re.sub(r'\bpüron(?=[.,]?\s*(?:pers|poses|dem|interr|indef|indeterm|rel)\w*)', 'pron', t)
     if not OCRFIX: return t
     return re.sub(r'[A-Za-zÁÉÍÓÚÑÜáéíóúñüḻṉṯ]+', lambda m: OCRFIX.get(m.group(0).lower(), m.group(0)) if m.group(0).lower() in OCRFIX else m.group(0), t)
 for e in A:
