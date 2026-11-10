@@ -1,6 +1,6 @@
 /* Tañi Nemülkawe: offline support. The page and data are fetched from the network first, so updates arrive as soon as
    there is a connection, and served from the cache when offline. The parser engine (motor.js) is cached too and revalidated on each load. */
-const CACHE = 'nemulkawe-20261110145509';
+const CACHE = 'nemulkawe-20261110155546';
 const CORE = ['./', './index.html', './datos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './gramatica.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
