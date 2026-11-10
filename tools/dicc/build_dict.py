@@ -74,9 +74,10 @@ for line in open(P('core_extra.tsv'), encoding='utf-8'):
     m, a, p, es, en, t = line.rstrip('\n').split('\t')
     if m.lower() in seen: continue
     seen.add(m.lower())
+    m, _, hom = m.partition('#')   # a homophone is written word#2 (tamu#2 'aquí' beside tamu 'su, de ustedes dos')
     if a == '-': a = None
     elif not a or a not in aug: a = find_aug(m.lower())
-    core.append({'id': 'c:' + m, 'm': m, 'es': es, 'en': en, 't': t, 'p': p, 'a': a, 'pic': None, 'o': 'frecuente', 'src': '', 'ph': 0,
+    core.append({'id': 'c:' + m + ('~' + hom if hom else ''), 'm': m, 'es': es, 'en': en, 't': t, 'p': p, 'a': a, 'pic': None, 'o': 'frecuente', 'src': '', 'ph': 0,
                  'f': fq(root_of(m.lower(), p))})
 STOP = set('de la el los las con por en mi mis su sus un una a que no me se lo le como para todo todas todos y o al del muy más mucho'.split())
 LABEL0 = r'(?:s|tr|intr|unitr|refl|rec|expr|adj|adv|y|v|n|pron|pers|partíc|part|interj|num|loc|comp|dem|interr|posp|suf|pref|conj|neg|fig|impers|poses|apóc|contracc|expr|t)\.'

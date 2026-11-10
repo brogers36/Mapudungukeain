@@ -367,7 +367,7 @@ function home(){
     <div class="search" role="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false"
       placeholder="${L("Mapudungun o español","Mapudungun or English")}" aria-label="${L("Buscar","Search")}" value="${esc(lastQ)}">
       <button class="clr" id="clr" aria-label="${L("Borrar","Clear")}" ${lastQ?"":"hidden"}>×</button></div>
-    <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios. Para buscar en inglés, cambia a <b>EN</b> arriba.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work. To search in Spanish, switch to <b>ES</b> above.")}</p>
+    <p class="hint">${L("Escribe cualquier forma: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>, <b>taiñ ruka</b>. Una frase se busca palabra por palabra. Si no está en el diccionario, el analizador busca su raíz. Acepta los tres grafemarios. Para buscar en inglés, cambia a <b>EN</b> arriba.","Type any form: <b>pifiñ</b>, <b>amulayay</b>, <b>ruka mew</b>, <b>taiñ ruka</b>. A phrase is looked up word by word. If it isn't in the dictionary, the analyser looks for its root. All three grafemarios work. To search in Spanish, switch to <b>ES</b> above.")}</p>
     <div id="out"></div>
     <div id="hubwrap">
       ${installBox()}
@@ -419,8 +419,17 @@ function search(q){
   if(loanR.length) html+=`<p class="eyebrow sect">${L("Préstamos del español (corpus AVENUE)","Loans from Spanish (AVENUE corpus)")}</p><div class="list">${loanR.map(resRow).join("")}</div>`;
   const none=`<div class="empty">${L("No hay entradas que coincidan.","No matching entries.")}</div>`;
   const oneWord=/^[^\s\d]{3,}$/.test(q)&&!/[áéíóú]/.test(q);
-  if(!top.length&&!oneWord) html+=none;
+  if(!top.length&&!oneWord&&!/\s/.test(q)) html+=none;
+  /* a phrase with no entry of its own (taiñ ruka, tañi chaw ñi ruka) is looked up word by word; a word with no entry
+     goes to the analyser */
+  const words=q.split(/\s+/).filter(Boolean), wbw=words.length>1&&!exact;
+  if(wbw){ html=html.replace(`<div id="ana"></div>`,"");
+    html=`<p class="eyebrow sect">${L("Palabra por palabra","Word by word")}</p>`+words.map((w,i)=>{ const kw=keyQuery(w);
+      const hits=CORE.filter(e=>!e.ph&&e._k===kw).concat(AUG.filter(e=>e.o!=="L"&&(e._k===kw||e._r===kw)).sort((a,b)=>(b.f||0)-(a.f||0))).slice(0,3);
+      return `<div class="wbw"><p class="hint"><b>${esc(w)}</b></p>${hits.length?`<div class="list">${hits.map(resRow).join("")}</div>`:`<div id="wbw${i}"><p class="hint">${L("Analizando…","Analysing…")}</p></div>`}</div>`; }).join("")+html; }
   out.innerHTML=html; bindRes(out);
+  if(wbw) words.forEach((w,i)=>{ const box=document.getElementById("wbw"+i); if(!box) return;
+    analyse(w.toLowerCase(),guessSys(w)).then(r=>{ if(my!==searchSeq) return; box.innerHTML=anaHTML(r,w)||`<p class="hint">${L("Sin entrada.","No entry.")}</p>`; bindRes(box); }); });
   if(lang==="es"&&pq.length>1&&(D.n&&D.n.es)) loadES().then(ES=>{ if(my!==searchSeq||!ES) return;
     const hits=ES.map(e=>[e._h===pq?3:(e._h.startsWith(pq)?2-Math.min(1,(e._h.length-pq.length)/10):0),e]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,12).map(x=>x[1]);
     if(!hits.length) return;
