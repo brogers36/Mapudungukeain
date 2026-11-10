@@ -40,7 +40,8 @@ def short(t):
     t = re.sub(r'^\((?:del esp\.|de |ger\. de|rz\.|probabl\.|lit\.|pl\.)[^)]*\)\s*', '', t.strip())
     m = re.match(r'^▹\s*([^.;]+)', LABS.sub('', t))
     if m and len(LABS.sub('', t)) < 60: return 'Véase ' + m.group(1).strip()
-    t = LABS.sub('', t).strip()
+    t = re.sub(r'^[\s:;,.·]+', '', LABS.sub('', t))   # no stray punctuation left by a stripped label
+    t = re.sub(r'(?<=\w),?\s*v\.\s*g\..*$', '.', t) if re.search(r'\w.{3,},?\s*v\.\s*g\.', t) else t   # stop the gloss before the example
     m = re.match(r"(.+?(?<!\bp)(?<!\bej)(?<!\betc)(?<!\bprobabl)(?<!\blit)[.;])(?:\s|$)", t)
     s = (m.group(1) if m else t).rstrip('.;').strip()
     s = s.rstrip(' ,;:')
@@ -92,9 +93,22 @@ linked = {c['a'] for c in core if c['a']}
 A = []; skipped = 0
 for hw, texts in aug.items():
     if hw not in VER and junk(hw, texts) and hw not in linked: skipped += 1; continue
-    text = ' ‖ '.join(t.strip() for t in texts if t.strip())
-    p = pos_of(text); s = short(texts[0])
-    A.append({'id': 'a:' + hw, 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p)), 'u': 0 if hw in VER else 1})
+    # a headword whose senses carry different parts of speech (me partíc. / me s. 'excrementos') becomes one entry per part of speech
+    groups = []
+    for t in (t.strip() for t in texts if t.strip()):
+        c = re.sub(r'^\s*(\[[^\]]*\]\s*|\((?:Panguipulli|Huapi)[^)]*\)\s*)+', '', t)
+        q = pos_of(c) if re.match('^' + LABEL0, c) else ''
+        if groups and q and q not in {g[0] for g in groups} and groups[0][0] != '':
+            groups.append([q, [t], c])
+        elif groups:
+            g = next((g for g in groups if g[0] == q), groups[-1]) if q else groups[-1]
+            g[1].append(t)
+        else:
+            groups.append([pos_of(t), [t], t])
+    for i, (q, ts, first) in enumerate(groups):
+        text = ' ‖ '.join(ts)
+        p = (pos_of(text) if i == 0 else q); s = short(first)
+        A.append({'id': 'a:' + hw + ('' if i == 0 else '~' + str(i + 1)), 'h': hw, 'r': root_of(hw, p), 'p': p, 's': s, 'd': text, 'en': '', 'f': fq(root_of(hw, p)), 'u': 0 if hw in VER else 1})
 # entries from the parser's lexicon (parser_extra.tsv) and the Spanish loan roots it knows (loan_stems.json + loan_en.tsv)
 have = {e['h'] for e in A}
 for line in open(P('parser_extra.tsv'), encoding='utf-8'):
@@ -121,7 +135,7 @@ for fp in sorted(glob.glob(P('en/*.tsv'))):
         if len(c) >= 2 and c[0]: ENX[c[0]] = c[1:]
 nen = 0
 for e in A:
-    x = ENX.get(e['h'])
+    x = ENX.get(e['id'][2:]) if '~' in e['id'] else (ENX.get(e['h'] + '~1') or ENX.get(e['h']))   # split senses: keys headword~1, headword~2
     if x and e.get('o') is None:
         e['en'] = x[0]; nen += 1
     elif e['s'].startswith('Véase '):
