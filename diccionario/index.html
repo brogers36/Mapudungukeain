@@ -394,7 +394,8 @@ function home(){
 let searchSeq=0;
 function search(q){
   const out=document.getElementById("out"), hub=document.getElementById("hubwrap"); const my=++searchSeq;
-  q=q.trim(); if(!q){ out.innerHTML=""; hub.hidden=false; return; }
+  q=q.trim(); if(/^-+\S/.test(q)||/\S-+$/.test(q)) q=q.replace(/^-+|-+$/g,"");   /* a suffix typed with its hyphen: -yüm, -ke- */
+  if(!q){ out.innerHTML=""; hub.hidden=false; return; }
   hub.hidden=true;
   const k=keyQuery(q), pq=plain(q), score=[];
   const wordRe=new RegExp("(^|[^a-z])"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
