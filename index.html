@@ -742,7 +742,10 @@ const SUF = {pres:v=>v?["n","ymi","y"]:["ün","imi","i"], neg:()=>["lan","laymi"
 // v:2 marks the root i- 'eat' (vowel stem, per the parser lexicon); it conjugates like a vowel stem
 // Without -a- (future) the form is present or past, so pres and neg show both (analyst ruling 2026-11-07: amun 'voy / fui')
 function vform(vb,tense,p){
-  const m = vb.s + SUF[tense](vb.v)[p];
+  /* future after an a-final root: an epenthetic y often comes between the two a (küpa-ya-n); it is not categorical,
+     so both forms are shown (analyst, 2026-11-10) */
+  const sf = SUF[tense](vb.v)[p];
+  const m = (tense==="fut" && /a$/.test(vb.s)) ? `${vb.s}${sf} ~ ${vb.s}y${sf}` : vb.s + sf;
   const pe = PERS.es[p], pn = PERS.en[p];
   const es = tense==="fut" ? `${pe} ${vb.es.f[p]}` : tense==="neg" ? `${pe} no ${vb.es.p[p]} / no ${vb.es.pt[p]}` : `${pe} ${vb.es.p[p]} / ${vb.es.pt[p]}`;
   const en = tense==="fut" ? `${pn} will ${vb.en[0]}` :
@@ -1876,8 +1879,8 @@ const STAGES = [
           en:"<b>-la-</b> negates a statement: <b>amulay</b> “she/he doesn't / didn't go”. To forbid, use <b>-kil-</b> with the command endings: <b>amu-kil-nge</b> “don't go!”, <b>fem-kil-nge</b> “don't do it!”, <b>amu-kil-pe</b> “may she/he not go!”. In forms that are not the main verb (the one who…, if…, what…) use <b>-no-</b> (sometimes <b>-nu-</b>): <b>kim-no-lu</b> “the one who doesn't know” (183 times in AVENUE), <b>kim-no-le</b> “if she/he doesn't know”, <b>kim-no-fiel</b> “what she/he didn't know”. Compare <b>kimlu</b> “the one who knows”, <b>kimle</b> “if she/he knows”, <b>kimlay</b> “she/he doesn't / didn't know”."}},
   { id:"fut", mt:"-a-", es:"Futuro", en:"Future", kind:"verb", tenses:["fut"],
     gen:()=>genVerbs(["fut"],8),
-    rule:{es:"Para el futuro, se agrega <b>-a-</b> después de la raíz: <b>amu-a-n</b> “iré”.",
-          en:"For the future, add <b>-a-</b> after the stem: <b>amu-a-n</b> “I will go”."}},
+    rule:{es:"Para el futuro, se agrega <b>-a-</b> después de la raíz: <b>amu-a-n</b> “iré”. Si la raíz termina en <b>a</b>, entre las dos <b>a</b> suele aparecer una <b>y</b>: <b>küpa-ya-n</b> “vendré”. No pasa siempre, así que <b>küpa-a-n</b> también es posible.",
+          en:"For the future, add <b>-a-</b> after the stem: <b>amu-a-n</b> “I will go”. If the stem ends in <b>a</b>, a <b>y</b> often comes between the two <b>a</b>: <b>küpa-ya-n</b> “I will come”. It doesn't always happen, so <b>küpa-a-n</b> is also possible."}},
   { id:"kom", mt:"Kom", es:"Todo junto", en:"All together", kind:"verb", tenses:["pres","neg","fut"],
     gen:()=>genVerbs(["pres","neg","fut"],10),
     rule:{es:"Presente, negación y futuro mezclados. Fíjate en la raíz, luego en <b>-la-</b> o <b>-a-</b>, y al final en la persona.",

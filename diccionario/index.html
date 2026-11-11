@@ -485,6 +485,11 @@ function compoundParts(root){
   for(const b of COMPOUND_HEADS){ if(!root.endsWith(b)||root.length-b.length<3) continue;
     const a=root.slice(0,-b.length), ha=hit(a), hb=hit(b); if(ha.length&&hb.length) return {a,b,ha,hb}; }
   return null; }
+/* build150: the parser marks a compound root (verb + verb, verb + incorporated noun) with its parts */
+function cmpPartsOf(parts){
+  const idx=kindex(), hit=x=>{ const k=keyUni(x); return (idx.get(k)||idx.get(k+"n")||idx.get(k+"ün")||idx.get(k+"vn")||[]).filter(e=>e.o!=="L"&&!/^(part|suf)$/.test(e.p||"")); };
+  const a=parts[0], b=parts[1];
+  return {a,b,ha:hit(a),hb:hit(b),parts}; }
 function entriesForRoot(root,morphs){
   const idx=kindex(), stems=[]; root=String(root).replace(/[()]/g,"").replace(/v/g,"f");   /* AVENUE writes v for f */
   let st=root; (morphs||[]).slice(0,3).forEach(m=>{ st+=String(m).replace(/[()]/g,"").replace(/v/g,"f"); stems.unshift(st); });
@@ -593,14 +598,15 @@ function anaHTML(r,q){
   if(parts.length<2&&!r.mean) return "";
   let hits=entriesForRoot(r.root,r.morphs), cp=null;
   if(r.wclass==="verb") hits=hits.slice().sort((x,y)=>isVerbEntry(y)-isVerbEntry(x));
-  if(!hits.length){ cp=compoundParts(r.root);
+  if(r.cmp&&r.cmp.length>1){ cp=cmpPartsOf(r.cmp); hits=hits.slice(0,2).concat(cp.ha.slice(0,2),cp.hb.slice(0,2)); }
+  if(!hits.length && !cp){ cp=compoundParts(r.root);
     if(cp) hits=cp.ha.slice(0,3).concat(cp.hb.slice(0,2));
     else if(!r.mean) return "";   /* a root with no entry still shows its analysis when it has a meaning (lawentuchefe-nge-n) */ }
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
     ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,r.wclass==="verb"),rootMeaning(cp.b,0,r.wclass==="verb")].filter(Boolean).join(" + "):undefined,r.wclass==="verb")}
     ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
     ${r.ctx&&/nominalised verb/.test(r.ctx)?`<p class="hint">${L("Por la palabra anterior (un posesivo o determinante), la forma en -n/-ün es un verbo nominalizado: «el …-r, la acción de …».","After the previous word (a possessive or determiner), the -n/-ün form is a nominalised verb: “the …-ing”.")}</p>`:""}
-    ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`,`Compound root <b>${esc(G(cp.a))}</b> + <b>${esc(G(cp.b))}</b>:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
+    ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`,`Compound root ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
     <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
 
