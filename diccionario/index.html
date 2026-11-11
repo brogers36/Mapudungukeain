@@ -605,6 +605,8 @@ function anaHTML(r,q){
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
     ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,r.wclass==="verb"),rootMeaning(cp.b,0,r.wclass==="verb")].filter(Boolean).join(" + "):undefined,r.wclass==="verb")}
     ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
+    ${r.ctx&&/3rd person acting on you/.test(r.ctx)?`<p class="hint">${L("Por «eymi» al lado, -ymu se lee como «te» (él/ella a ti), no como «ustedes dos».","With «eymi» next to it, -ymu reads as «you» (he/she to you), not «you two».")}</p>`:""}
+    ${r.ctx&&/2nd person dual/.test(r.ctx)?`<p class="hint">${L("Por «eymu» al lado, -ymu es «ustedes dos».","With «eymu» next to it, -ymu is «you two».")}</p>`:""}
     ${r.ctx&&/nominalised verb/.test(r.ctx)?`<p class="hint">${L("Por la palabra anterior (un posesivo o determinante), la forma en -n/-ün es un verbo nominalizado: «el …-r, la acción de …».","After the previous word (a possessive or determiner), the -n/-ün form is a nominalised verb: “the …-ing”.")}</p>`:""}
     ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`,`Compound root ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
