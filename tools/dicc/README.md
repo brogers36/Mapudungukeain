@@ -29,7 +29,7 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 
 ## Analizador
 
-El diccionario usa el analizador **build 160** (2026-11-09) sin cambios: todos los dictámenes viven en el propio
+El diccionario usa el analizador **build 161** (2026-11-09) sin cambios: todos los dictámenes viven en el propio
 analizador, incluidos «presente o pasado» para las formas sin marca de tiempo (2026-11-07) y *la-lu* «el muerto, el que
 murió» (2026-11-09). `motor_patches.js` y `motor_edits.json` quedan vacíos; úsalos solo para un dictamen que todavía no
 esté en el analizador.
@@ -72,7 +72,7 @@ terser motor_publico_marcado.js --compress --mangle toplevel,reserved=['MOTOR'] 
 ```
 
 
-## Engine source (build 160 on)
+## Engine source (build 161 on)
 
 The engine is no longer patched in place. The private source tree (`privado_parser/src153`: core, patch layer, UI and
 meaning region, page, and the list of differences between the app and the dictionary engine) rebuilds the parser app,
