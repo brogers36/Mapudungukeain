@@ -878,7 +878,8 @@ const ASP_VERBS=[
 function aspForm(vb,a,p){
   const m=vb.s+a+["n","ymi","y"][p];
   if(a==="ke") return {m,es:`${["suelo / solía","sueles / solías","suele / solía"][p]} ${vb.es[0]}`,en:`${["I usually","you usually","she/he usually"][p]} ${vb.en[0]} / used to ${vb.en[0]}`};
-  return {m,es:`${["estoy / estaba","estás / estabas","está / estaba"][p]} ${vb.es[1]}`,en:`${["I am / was","you are / were","she/he is / was"][p]} ${vb.en[1]}`};
+  /* -le- alone is the present progressive only; the past needs -fu- (dungu-le-fu-n 'estaba hablando'): analyst, 2026-11-10 */
+  return {m,es:`${["estoy","estás","está"][p]} ${vb.es[1]}`,en:`${["I am","you are","she/he is"][p]} ${vb.en[1]}`};
 }
 function genAsp(a,n){
   const out=[],seen=new Set(), other=a==="ke"?"le":"ke";
@@ -1157,7 +1158,7 @@ Object.assign(GRAM,{
    "yerpay":["pasa / pasó a buscar (de camino hacia acá)","she/he stops / stopped by to pick up (on the way here)"],"yepay":["viene / vino a buscar","she/he comes / came to fetch"],"yemey":["va / fue a buscar","she/he goes / went to fetch"],
    "elürpay":["viene / vino a dejar de paso","she/he drops / dropped it off on the way here"],"elpay":["viene / vino a dejar","she/he comes / came to leave it"],"elürpuy":["lo deja / lo dejó de paso (yendo)","she/he leaves / left it on the way there"],
    "felerpuy":["resulta / resultó así, queda / quedó así","it turns / turned out that way"],"feley":["así es / era","that's how it is / was"],
-   "amulerpuy":["sigue / siguió avanzando","it keeps / kept advancing"],"amuley":["va / iba, avanza / avanzaba","it is / was going, advancing"],
+   "amulerpuy":["sigue avanzando","it keeps advancing"],"amuley":["está yendo, va avanzando","it is going, advancing"],
    "machingerpun":["llego / llegué a ser machi","I end / ended up becoming a machi"],"machingen":["soy machi / era machi","I am / was a machi"],
    "chumlerpual":["cómo irá a quedar","how it would turn out"]},
   L:[["yerpay",["yepay","yemey","elürpay"]],["yepay",["yerpay","yemey","elpay"]],["elürpay",["elpay","elürpuy","yerpay"]],
@@ -1893,8 +1894,8 @@ const STAGES = [
   { id:"le", mt:"-le-", es:"Lo que está pasando", en:"Ongoing actions", kind:"verb",
     gen:()=>genAsp("le",8),
     examples:()=>[0,1,2].map(p=>aspForm(ASP_VERBS[2],"le",p)).concat([0,1,2].map(p=>aspForm(ASP_VERBS[1],"le",p))),
-    rule:{es:"<b>-le-</b> presenta la acción en curso o como un estado: <b>dungu-le-n</b> “estoy / estaba hablando”. Compara con <b>-ke-</b>: <b>dungu-ke-n</b> “suelo / solía hablar”.",
-          en:"<b>-le-</b> presents the action as ongoing or as a state: <b>dungu-le-n</b> “I am / was speaking”. Compare <b>-ke-</b>: <b>dungu-ke-n</b> “I usually speak / used to speak”."}},
+    rule:{es:"<b>-le-</b> presenta la acción en curso o como un estado: <b>dungu-le-n</b> “estoy hablando”. Solo, <b>-le-</b> es presente; para el pasado se agrega <b>-fu-</b>: <b>dungu-le-fu-n</b> “estaba hablando”. Compara con <b>-ke-</b>: <b>dungu-ke-n</b> “suelo / solía hablar”.",
+          en:"<b>-le-</b> presents the action as ongoing or as a state: <b>dungu-le-n</b> “I am speaking”. On its own <b>-le-</b> is present; for the past add <b>-fu-</b>: <b>dungu-le-fu-n</b> “I was speaking”. Compare <b>-ke-</b>: <b>dungu-ke-n</b> “I usually speak / used to speak”."}},
   { id:"imp", mt:"-nge, -chi, -pe", es:"Imperativo", en:"Commands", kind:"verb",
     gen:()=>genImp(8),
     examples:()=>[0,1,2].map(k=>impForm(IMP_VERBS[0],k)).concat([0,1,2].map(k=>impForm(IMP_VERBS[1],k))),
