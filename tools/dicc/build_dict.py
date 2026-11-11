@@ -36,6 +36,7 @@ def pos_of(t):
 def short(t):
     t = re.sub(r'\bpüron(?=[.,]?\s*(?:pers|poses|dem|interr|indef|indeterm|rel)\w*)', 'pron', t)
     t = re.sub(r'^pron,\s*poses,\s*', 'pron. poses. ', t.strip())
+    t = re.sub(r'^[^|]{0,30}[^|]\|\.\s*\|\s+', '', t)   # a scanned fragment of the previous entry before the sense (ḻaweṉtun: 'ir ḻaweṉman|. | n., tomar remedios')
     t = re.sub(r'^\((?:Panguipulli|Huapi)[^)]*\)\s*', '', t.strip())
     t = re.sub(r'^((?:(?:s|n|tr|r|a|adj|adv|partíc|interj|rec|ger|num|pron|conj|c|v|ant|t)\.\s*,?\s*(?:y\s+)?)+)', lambda m: m.group(1).replace(',', ' '), t)
     t = re.sub(r'^=\s*([^\s.,;]+)[.,]?\s*$', r'▹ \1', t)
