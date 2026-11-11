@@ -286,7 +286,7 @@ const GLAB={NEG:["negación","negation"],NRLD:["futuro","future"],"SUBJ.FIN":["p
   PASS:["pasiva","passive"],HITHER:["hacia acá","hither"],THITHER:["hacia allá","thither"],TRANS:["transitivizador","transitivizer"],VBLZ:["verbalizador","verbalizer"],
   REFL:["reflexivo, recíproco","reflexive, reciprocal"],CAUS:["causativo","causative"],REPORT:["dicen que / resulta que","reportative / surprise"],PROX:["recién","just now"],
   "PROG.PERS":["continuativo","continuative"],FORCE:["obligación","obligation"],AFF:["de veras","really"],EXP:["experimentante","experiencer"],
-  "MOOD/NMLZ":["forma no finita","non-finite form"],POSS:["posesivo","possessive"],PL:["plural","plural"],ROOT:["raíz","root"]};
+  "MOOD/NMLZ":["forma no finita","non-finite form"],"PLACE/INSTR":["-we: sustantivo de lugar o instrumento","-we: noun of place or instrument"],"3>2SG":["él/ella a ti (portmanteau)","he/she to you (portmanteau)"],PORT:["terminación portmanteau","portmanteau ending"],ATTR:["atributivo","attributive"],PROH:["prohibición","prohibition"],POSS:["posesivo","possessive"],PL:["plural","plural"],ROOT:["raíz","root"]};
 const lab=g=>GLAB[g]?L(GLAB[g][0],GLAB[g][1]):g;
 
 /* ===== Parser in a Web Worker, loaded only when a search needs it (the engine is about 2 MB) ===== */
@@ -594,16 +594,26 @@ function enMeaning(r){
   return out[0].toUpperCase()+out.slice(1); }
 function anaHTML(r,q){
   if(!r||!r.root) return "";
+  /* the parser reads it as two words (wentru yem, pilun mu, püta chaw): each one is looked up on its own */
+  if(r.words&&r.words.length>1){
+    const rows=r.words.map(w=>{ const kw=keyQuery(String(w).replace(/[()-]/g,""));
+      const hits=CORE.filter(e=>!e.ph&&e._k===kw).concat(AUG.filter(e=>e.o!=="L"&&(e._k===kw||e._r===kw)).sort((a,b)=>(b.f||0)-(a.f||0))).slice(0,3);
+      return `<div class="wbw"><p class="hint"><b>${esc(G(w))}</b></p>${hits.length?`<div class="list">${hits.map(resRow).join("")}</div>`:`<p class="hint">${L("Sin entrada.","No entry.")}</p>`}</div>`; }).join("");
+    return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
+      <p>${L("Son dos palabras escritas juntas:","Two words written together:")} <b>${r.words.map(w=>esc(G(w))).join(" ")}</b></p>${rows}
+      <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
   const parts=[r.root].concat(r.morphs||[]);
   if(parts.length<2&&!r.mean) return "";
   let hits=entriesForRoot(r.root,r.morphs), cp=null;
-  if(r.wclass==="verb") hits=hits.slice().sort((x,y)=>isVerbEntry(y)-isVerbEntry(x));
+  const vroot=r.wclass==="verb"&&!((r.gl||[])[0]==="VBLZ");   /* -nge-/-tu- 36 on a noun: the root is the noun (chaw 'padre') */
+  if(vroot) hits=hits.slice().sort((x,y)=>isVerbEntry(y)-isVerbEntry(x));
+  else if(r.wclass==="verb") hits=hits.slice().sort((x,y)=>isVerbEntry(x)-isVerbEntry(y));
   if(r.cmp&&r.cmp.length>1){ cp=cmpPartsOf(r.cmp); hits=hits.slice(0,2).concat(cp.ha.slice(0,2),cp.hb.slice(0,2)); }
   if(!hits.length && !cp){ cp=compoundParts(r.root);
     if(cp) hits=cp.ha.slice(0,3).concat(cp.hb.slice(0,2));
     else if(!r.mean) return "";   /* a root with no entry still shows its analysis when it has a meaning (lawentuchefe-nge-n) */ }
   return `<div class="ana"><p class="eyebrow">${L("Análisis automático","Automatic analysis")}</p>
-    ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,r.wclass==="verb"),rootMeaning(cp.b,0,r.wclass==="verb")].filter(Boolean).join(" + "):undefined,r.wclass==="verb")}
+    ${interlinear(r.root,r.morphs,r.gl,cp?[rootMeaning(cp.a,0,vroot),rootMeaning(cp.b,0,vroot)].filter(Boolean).join(" + "):undefined,vroot)}
     ${r.mean?(lang==="en"&&enMeaning(r)?`<p>Approximate meaning: “${esc(enMeaning(r))}”</p>`:`<p>${L("Significado aproximado: ","Approximate meaning (in Spanish; no English gloss for this root yet): ")}«${esc(r.mean)}»</p>`):""}
     ${r.ctx&&/3rd person acting on you/.test(r.ctx)?`<p class="hint">${L("Por «eymi» al lado, -ymu se lee como «te» (él/ella a ti), no como «ustedes dos».","With «eymi» next to it, -ymu reads as «you» (he/she to you), not «you two».")}</p>`:""}
     ${r.ctx&&/2nd person dual/.test(r.ctx)?`<p class="hint">${L("Por «eymu» al lado, -ymu es «ustedes dos».","With «eymu» next to it, -ymu is «you two».")}</p>`:""}
