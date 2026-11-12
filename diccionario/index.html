@@ -946,7 +946,10 @@ document.documentElement.lang=lang;
 route();
 </script>
 <script>
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{});
+  /* also install the game's offline copy (which includes Trawün), so the game opens without internet even if it was
+     never opened online; a few seconds after load so the dictionary itself is not slowed */
+  setTimeout(()=>{ navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{}); },5000); }); }
 /* Inside an installed app, a link to the other app (game <-> dictionary) would open in an in-app browser window, where
    Android cannot install it properly (it makes a Chrome shortcut, with the Chrome badge, that opens in the browser).
    Open such links outside instead: Android hands them to the other installed app, or to Chrome, where it can be installed. */

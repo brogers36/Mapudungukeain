@@ -14,7 +14,10 @@ head = '''<meta name="theme-color" content="#14122a">
 '''
 tail = '''<button id="pwaInstall" hidden style="position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:#c8322f;color:#f3efe6;border:0;border-radius:999px;padding:12px 18px;font:700 1rem 'Atkinson Hyperlegible',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer">Instalar la app</button>
 <script>
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
+if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{});
+  /* also install the dictionary's offline copy, so the dictionary opens without internet even if it was never opened
+     online; done a few seconds after load so the game itself is not slowed */
+  setTimeout(() => { navigator.serviceWorker.register('diccionario/sw.js', { scope: 'diccionario/' }).catch(()=>{}); }, 5000); }); }
 (function(){ let ev=null; const b=document.getElementById('pwaInstall');
   try{ if((localStorage.getItem('mpk_lang')||'').indexOf('en')>=0) b.textContent='Install the app'; }catch(e){}
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); ev=e; b.hidden=false; });
