@@ -3218,7 +3218,7 @@ function progress(){
 
 /* ===== Online copy (sync code). The game sends its save data to a small service under a random code (no name or
    email); the same code on another phone brings the progress back. SYNC_URL empty = feature off. ===== */
-var SYNC_URL="";
+var SYNC_URL="https://mapudungukeain-sync.mapupeyumfe.workers.dev";
 var syncSt=()=>{ try{ return JSON.parse(localStorage.getItem("mpksync"))||null; }catch(e){ return null; } };
 const syncSet=v=>{ try{ v?localStorage.setItem("mpksync",JSON.stringify(v)):localStorage.removeItem("mpksync"); }catch(e){} };
 function progHash(d){ const j=JSON.stringify(Object.keys(d).sort().map(k=>[k,d[k]])); let h=5381; for(let i=0;i<j.length;i++) h=((h<<5)+h+j.charCodeAt(i))|0; return String(h); }

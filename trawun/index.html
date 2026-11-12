@@ -121,7 +121,7 @@ textarea{resize:vertical;min-height:44px}
    progress posts carry only game data (character, item ids, numbers) and are drawn here, so they post straight away.
    Anyone can report a message or a post; three reports hide it until the moderator decides.
    ====================================================================================================================== */
-var TRAWUN_API = "";
+var TRAWUN_API = "https://mapudungukeain-trawun.mapupeyumfe.workers.dev";
 
 const $ = s => document.querySelector(s), app = $("#app");
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
