@@ -70,19 +70,31 @@ const postRow = r => ({ id: r.id, uid: r.uid, nick: r.nick, kind: r.kind, cat: r
    private channel; the moderator's phone subscribes to it in the ntfy app. Only a short generic text is sent (never a
    nickname, a message or a photo), at most one per kind every 15 minutes, counting what came in meanwhile. Without
    NTFY_TOPIC nothing is sent. */
+async function ntfySend(env, txt, tags) {
+  const r = await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt,
+    headers: { "Title": "Trawün", "Tags": tags, "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" } });
+  return { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 300) };
+}
 async function notify(env, DB, kind) {
   if (!env.NTFY_TOPIC) return;
+  const now = Date.now(), k = "notify:" + kind;
   try {
-    const now = Date.now(), k = "notify:" + kind;
     const row = await DB.prepare("SELECT v, n FROM meta WHERE k = ?").bind(k).first();
     const last = row ? Number(row.v) : 0, pend = (row ? Number(row.n) : 0) + 1;
     if (now - last < 15 * 60000) { await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, ?) ON CONFLICT(k) DO UPDATE SET n = ?").bind(k, String(last), pend, pend).run(); return; }
-    await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, 0) ON CONFLICT(k) DO UPDATE SET v = ?, n = 0").bind(k, String(now), String(now)).run();
     const txt = kind === "photo" ? (pend > 1 ? `${pend} fotos nuevas esperan tu revisión.` : "Una foto nueva espera tu revisión.")
       : (pend > 1 ? `${pend} avisos nuevos (⚑) para revisar.` : "Alguien avisó (⚑) sobre un mensaje o una publicación.");
-    await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt,
-      headers: { "Title": "Trawün", "Tags": kind === "photo" ? "camera" : "triangular_flag_on_post", "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" } });
-  } catch (e) { /* a failed notification never blocks the post */ }
+    const r = await ntfySend(env, txt, kind === "photo" ? "camera" : "triangular_flag_on_post");
+    if (r.ok) {   /* the 15-minute window starts only after a notification really went out */
+      await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, 0) ON CONFLICT(k) DO UPDATE SET v = ?, n = 0").bind(k, String(now), String(now)).run();
+      await DB.prepare("DELETE FROM meta WHERE k = 'notify:error'").run();
+    } else {
+      await DB.prepare("INSERT INTO meta (k, v, n) VALUES ('notify:error', ?, ?) ON CONFLICT(k) DO UPDATE SET v = ?, n = ?").bind(`ntfy ${r.status}: ${r.body}`, now, `ntfy ${r.status}: ${r.body}`, now).run();
+      await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, ?) ON CONFLICT(k) DO UPDATE SET n = ?").bind(k, String(last), pend, pend).run();
+    }
+  } catch (e) {
+    try { await DB.prepare("INSERT INTO meta (k, v, n) VALUES ('notify:error', ?, ?) ON CONFLICT(k) DO UPDATE SET v = ?, n = ?").bind(String(e && e.message || e).slice(0, 300), now, String(e && e.message || e).slice(0, 300), now).run(); } catch (e2) {}
+  }
 }
 
 export default {
@@ -180,7 +192,14 @@ export default {
           const msgs = await DB.prepare("SELECT id, ch, uid, nick, text, ts, hidden FROM msgs WHERE hidden = 1 OR id IN (SELECT item FROM reports WHERE type = 'msg') ORDER BY ts DESC LIMIT 300").all();
           const reps = await DB.prepare("SELECT type, item, uid FROM reports").all(); const reports = {};
           for (const r of reps.results) (reports[r.type + ":" + r.item] = reports[r.type + ":" + r.item] || []).push(r.uid);
-          return json({ posts: posts.results.map(postRow), msgs: msgs.results.map(x => ({ ...x, hidden: !!x.hidden })), reports }, 200, h);
+          let nerr = null; try { nerr = await DB.prepare("SELECT v, n FROM meta WHERE k = 'notify:error'").first(); } catch (e) { nerr = { v: "meta table missing: run schema.sql", n: 0 }; }
+          return json({ posts: posts.results.map(postRow), msgs: msgs.results.map(x => ({ ...x, hidden: !!x.hidden })), reports,
+            notify: { configured: !!env.NTFY_TOPIC, error: nerr ? nerr.v : null, errorAt: nerr ? nerr.n : null } }, 200, h);
+        }
+        if (P === "/admin/notify-test" && req.method === "POST") {   /* the moderation page's "test notification" button */
+          if (!env.NTFY_TOPIC) return json({ configured: false }, 200, h);
+          let r; try { r = await ntfySend(env, "Prueba: los avisos de Trawün funcionan.", "white_check_mark"); } catch (e) { r = { ok: false, status: 0, body: String(e && e.message || e) }; }
+          return json({ configured: true, ...r }, 200, h);
         }
         if (P === "/admin/act" && req.method === "POST") {
           const { type, id, action } = body; const T = type === "msg" ? "msgs" : type === "post" ? "posts" : null;

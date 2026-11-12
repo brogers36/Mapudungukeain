@@ -198,6 +198,7 @@ const Remote = {
   report(me,type,id){ return this._f("/report",{method:"POST",body:JSON.stringify({key:me.key,type,id})}); },
   queue(){ return this._f("/admin/queue",{headers:this._adm()}); },
   act(type,id,action){ return this._f("/admin/act",{method:"POST",headers:this._adm(),body:JSON.stringify({type,id,action})}); },
+  notifyTest(){ return this._f("/admin/notify-test",{method:"POST",headers:this._adm(),body:"{}"}); },
   async adminImg(id){ const r=await fetch(TRAWUN_API.replace(/\/$/,"")+"/admin/img/"+id,{headers:this._adm()}); return r.ok?URL.createObjectURL(await r.blob()):null; }
 };
 const Store = TRAWUN_API ? Remote : Local;
@@ -437,12 +438,20 @@ async function adminView(){
   const ak=$("#ak"); if(ak) $("#aks").onclick=()=>{ sessionStorage.setItem("trawun_admin",ak.value.trim()); adminView(); };
   let q; try{ q=await Store.queue(); }catch(e){ $("#q").innerHTML=`<p class="note warn">${e.status===401?L("Clave incorrecta.","Wrong key."):L("No se pudo cargar.","Couldn't load.")}</p>`; return; }
   const rc=(t,id)=>((q.reports||{})[t+":"+id]||[]).length||0;
-  $("#q").innerHTML=`<section class="panel"><h2>${L("Fotos y publicaciones","Photos and posts")} (${q.posts.length})</h2>${q.posts.length?`<div class="grid">${q.posts.map(p=>`<article class="card"><div class="pic" data-aimg="${p.kind==="photo"?esc(p.id):""}">${p.kind==="outfit"?outfitSVG(p.outfit):p.kind==="progress"?progressHTML(p.progress||{}):""}</div>
+  const nt=q.notify;
+  $("#q").innerHTML=`${nt?`<section class="panel"><h2>${L("Avisos en el teléfono","Phone notifications")}</h2>
+      <p>${nt.configured?L("Activados (app ntfy).","On (ntfy app)."):L("No activados: falta el canal de avisos. Corre de nuevo tools/trawun/deploy.mjs.","Off: no notification channel. Run tools/trawun/deploy.mjs again.")}</p>
+      ${nt.error?`<p class="note warn">${L("Último error al avisar","Last notification error")} (${esc(new Date(+nt.errorAt).toLocaleString())}): <code>${esc(nt.error)}</code></p>`:""}
+      ${nt.configured?`<div class="row"><button class="btn small" id="ntest">${L("Enviar aviso de prueba","Send a test notification")}</button><span class="hint" id="nres" aria-live="polite"></span></div>`:""}</section>`:""}
+    `+`<section class="panel"><h2>${L("Fotos y publicaciones","Photos and posts")} (${q.posts.length})</h2>${q.posts.length?`<div class="grid">${q.posts.map(p=>`<article class="card"><div class="pic" data-aimg="${p.kind==="photo"?esc(p.id):""}">${p.kind==="outfit"?outfitSVG(p.outfit):p.kind==="progress"?progressHTML(p.progress||{}):""}</div>
       <div class="body"><span class="tag ${p.status==="pending"?"pend":""}">${p.status==="pending"?L("pendiente","pending"):p.hidden?L("oculta","hidden"):L("con avisos","reported")}${rc("post",p.id)?" · ⚑"+rc("post",p.id):""}</span>
       ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}<p class="hint"><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</p>
       <div class="row"><button class="btn small" data-act="approve" data-t="post" data-id="${esc(p.id)}">✓ ${L("Aprobar","Approve")}</button><button class="btn small ghost" data-act="hide" data-t="post" data-id="${esc(p.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="post" data-id="${esc(p.id)}">${L("Borrar","Delete")}</button></div></div></article>`).join("")}</div>`:`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>
     <section class="panel"><h2>${L("Mensajes con avisos","Reported messages")} (${q.msgs.length})</h2>${q.msgs.length?q.msgs.map(m=>`<div class="msg"><div class="who"><span>${esc(m.nick)} · ${esc(m.ch)}</span><time>${esc(ago(m.ts))}${rc("msg",m.id)?" · ⚑"+rc("msg",m.id):""}${m.hidden?" · "+L("oculto","hidden"):""}</time></div><div class="txt">${esc(m.text)}</div>
       <div class="row"><button class="btn small" data-act="approve" data-t="msg" data-id="${esc(m.id)}">✓ ${L("Mostrar","Show")}</button><button class="btn small ghost" data-act="hide" data-t="msg" data-id="${esc(m.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="msg" data-id="${esc(m.id)}">${L("Borrar","Delete")}</button>${Store.mode==="remote"?`<button class="btn small ghost" data-act="ban" data-t="msg" data-id="${esc(m.id)}">${L("Bloquear apodo","Block nickname")}</button>`:""}</div></div>`).join(""):`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>`;
+  const nb=$("#ntest"); if(nb) nb.onclick=async()=>{ const o=$("#nres"); o.textContent=L("Enviando…","Sending…");
+    try{ const r=await Remote.notifyTest(); o.textContent=r.ok?L("Enviado. Debería llegarte en unos segundos.","Sent. It should arrive in a few seconds."):(L("ntfy respondió ","ntfy answered ")+r.status+": "+(r.body||"")); }
+    catch(e){ o.textContent=L("No se pudo probar: ","Couldn't test: ")+(e.message||""); } };
   app.querySelectorAll("[data-aimg]").forEach(async d=>{ if(!d.dataset.aimg) return; const u=Store.mode==="remote"?await Remote.adminImg(d.dataset.aimg):await Store.imgURL(d.dataset.aimg); if(u) d.innerHTML=`<img src="${esc(u)}" alt="">`; });
   app.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{ if(b.dataset.act!=="approve" && !confirmBox(L("¿Seguro?","Are you sure?"))) return;
     try{ await Store.act(b.dataset.t,b.dataset.id,b.dataset.act); adminView(); }catch(e){ toast(L("No se pudo.","Couldn't do it.")); } });
