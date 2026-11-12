@@ -38,6 +38,17 @@ Abrir `https://brogers36.github.io/Mapudungukeain/trawun/?admin` y pegar la clav
 
 Acciones: aprobar o mostrar, ocultar, borrar, y bloquear un apodo (oculta todo lo suyo y no puede volver a escribir).
 
+## Avisos en el teléfono
+
+El servicio avisa al teléfono del moderador cuando llega una foto para revisar o alguien usa ⚑, con la app gratuita
+**ntfy** (sin cuenta). `deploy.mjs` crea un canal privado al azar la primera vez y lo muestra una sola vez: en la app,
+tocar «+» y suscribirse a ese canal (servidor ntfy.sh). El aviso dice solo «Una foto nueva espera tu revisión» o
+«Alguien avisó (⚑)…», nunca apodos, mensajes ni fotos, y como máximo uno de cada tipo cada 15 minutos (con la cuenta de
+lo que llegó entretanto). Tocar el aviso abre la página de moderación.
+
+Volver a correr `deploy.mjs` actualiza el servicio y **mantiene** la clave y el canal. Para cambiarlos a propósito:
+`node tools/trawun/deploy.mjs --nueva-clave` o `--nuevo-aviso`.
+
 ## Qué guarda y cómo protege a menores
 
 - Solo un apodo (2 a 20 letras o números). Ni nombre, ni correo, ni contraseña: el teléfono guarda una clave al azar

@@ -17,7 +17,7 @@
    GET  /admin/queue        (X-Admin)      -> {posts, msgs, reports}
    POST /admin/act {type,id,action}        approve | hide | delete | ban  (X-Admin)
    GET  /admin/img/ID       (X-Admin)      -> image/jpeg
-   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secret: ADMIN_KEY. */
+   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secrets: ADMIN_KEY, NTFY_TOPIC (optional). */
 
 const MAX_TEXT = 500, MAX_CAP = 140, MAX_IMG = 700 * 1024;
 const CHANNELS = ["mapu", "ramtun"], CATS = ["vestuario", "progreso", "otra"];
@@ -66,8 +66,28 @@ function validProgress(g) {
 const postRow = r => ({ id: r.id, uid: r.uid, nick: r.nick, kind: r.kind, cat: r.cat, caption: r.caption, status: r.status, hidden: !!r.hidden, ts: r.ts,
   outfit: r.outfit ? JSON.parse(r.outfit) : null, progress: r.progress ? JSON.parse(r.progress) : null });
 
+/* Moderator notifications through ntfy (https://ntfy.sh, a free app with no account). The secret NTFY_TOPIC names a
+   private channel; the moderator's phone subscribes to it in the ntfy app. Only a short generic text is sent (never a
+   nickname, a message or a photo), at most one per kind every 15 minutes, counting what came in meanwhile. Without
+   NTFY_TOPIC nothing is sent. */
+async function notify(env, DB, kind) {
+  if (!env.NTFY_TOPIC) return;
+  try {
+    const now = Date.now(), k = "notify:" + kind;
+    const row = await DB.prepare("SELECT v, n FROM meta WHERE k = ?").bind(k).first();
+    const last = row ? Number(row.v) : 0, pend = (row ? Number(row.n) : 0) + 1;
+    if (now - last < 15 * 60000) { await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, ?) ON CONFLICT(k) DO UPDATE SET n = ?").bind(k, String(last), pend, pend).run(); return; }
+    await DB.prepare("INSERT INTO meta (k, v, n) VALUES (?, ?, 0) ON CONFLICT(k) DO UPDATE SET v = ?, n = 0").bind(k, String(now), String(now)).run();
+    const txt = kind === "photo" ? (pend > 1 ? `${pend} fotos nuevas esperan tu revisión.` : "Una foto nueva espera tu revisión.")
+      : (pend > 1 ? `${pend} avisos nuevos (⚑) para revisar.` : "Alguien avisó (⚑) sobre un mensaje o una publicación.");
+    await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt,
+      headers: { "Title": "Trawün", "Tags": kind === "photo" ? "camera" : "triangular_flag_on_post", "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" } });
+  } catch (e) { /* a failed notification never blocks the post */ }
+}
+
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
+    const later = p => { if (ctx && ctx.waitUntil) ctx.waitUntil(p); };
     const h = cors(req, env), url = new URL(req.url), P = url.pathname;
     const DB = env.DB || Object.values(env).find(v => v && typeof v.prepare === "function" && typeof v.batch === "function");
     if (!DB) return json({ error: "no database bound" }, 500, h);
@@ -126,6 +146,7 @@ export default {
           if (bytes.length > MAX_IMG || bytes[0] !== 0xff || bytes[1] !== 0xd8) return json({ error: "bad image" }, 400, h);   // JPEG only, as the page makes them
           await DB.prepare("INSERT INTO imgs (id, data) VALUES (?, ?)").bind(id, bytes).run();
           status = "pending";
+          later(notify(env, DB, "photo"));
         } else return json({ error: "bad kind" }, 400, h);
         await DB.prepare("INSERT INTO posts (id, uid, nick, kind, cat, caption, outfit, progress, status, hidden, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)")
           .bind(id, u.id, u.nick, kind, cat, caption, outfit && JSON.stringify(outfit), progress && JSON.stringify(progress), status, now).run();
@@ -145,7 +166,8 @@ export default {
       if (P === "/report" && req.method === "POST") {
         const u = await who(DB, body.key); if (!u) return json({ error: "unknown" }, 401, h);
         const type = body.type, id = String(body.id || ""); if (!["msg", "post"].includes(type) || !/^[mp][a-z0-9]{12}$/.test(id)) return json({ error: "bad report" }, 400, h);
-        await DB.prepare("INSERT OR IGNORE INTO reports (type, item, uid, ts) VALUES (?, ?, ?, ?)").bind(type, id, u.id, now).run();
+        const ins = await DB.prepare("INSERT OR IGNORE INTO reports (type, item, uid, ts) VALUES (?, ?, ?, ?)").bind(type, id, u.id, now).run();
+        if (ins.meta.changes) later(notify(env, DB, "report"));
         const n = (await DB.prepare("SELECT COUNT(*) AS n FROM reports WHERE type = ? AND item = ?").bind(type, id).first()).n;
         if (n >= 3) await DB.prepare(`UPDATE ${type === "msg" ? "msgs" : "posts"} SET hidden = 1 WHERE id = ?`).bind(id).run();
         return json({ ok: true }, 200, h);

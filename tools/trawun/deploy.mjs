@@ -47,17 +47,26 @@ const out = run(`${W} deploy`, { cwd: tmp, quiet: true });
 process.stdout.write(out);
 const url = (out.match(/https:\/\/[\w.-]+\.workers\.dev/) || [])[0];
 
-console.log("\n5/6  Clave de moderación…");
-// a random moderator key, made and stored here on your computer: it is set as a Cloudflare secret and shown once below
+console.log("\n5/6  Clave de moderación y avisos…");
+// Secrets already set on Cloudflare are kept, so running this again (to update the service) never changes your key.
+// The moderator key is made here at random, set as a Cloudflare secret and shown once. So is the private ntfy channel
+// for notifications. "--nueva-clave" or "--nuevo-aviso" replace them on purpose.
 const { randomBytes } = await import("node:crypto");
-const ADMIN = randomBytes(18).toString("base64url");
-execSync(`${W} secret put ADMIN_KEY`, { cwd: tmp, input: ADMIN, stdio: ["pipe", "inherit", "inherit"], env: { ...process.env, WRANGLER_SEND_METRICS: "false" } });
+let have = [];
+try { have = JSON.parse(run(`${W} secret list --format json`, { cwd: tmp, quiet: true })).map(x => x.name); } catch { have = []; }
+const putSecret = (name, value) => execSync(`${W} secret put ${name}`, { cwd: tmp, input: value, stdio: ["pipe", "inherit", "inherit"], env: { ...process.env, WRANGLER_SEND_METRICS: "false" } });
+let ADMIN = null, TOPIC = null;
+if (!have.includes("ADMIN_KEY") || process.argv.includes("--nueva-clave")) { ADMIN = randomBytes(18).toString("base64url"); putSecret("ADMIN_KEY", ADMIN); }
+else console.log("     la clave de moderación ya existe: se mantiene la misma");
+if (!have.includes("NTFY_TOPIC") || process.argv.includes("--nuevo-aviso")) { TOPIC = "trawun-" + randomBytes(12).toString("hex"); putSecret("NTFY_TOPIC", TOPIC); }
+else console.log("     el canal de avisos ya existe: se mantiene el mismo");
 
 console.log("\n6/6  Comprobando…");
 if (url) {
   try { const r = await fetch(url + "/msgs?ch=mapu"); console.log("     respuesta:", await r.text()); } catch (e) { console.log("     (no pude comprobarlo desde aquí:", e.message + ")"); }
   console.log("\nListo. Dirección del servicio:\n\n     " + url + "\n\nMándame esa dirección (solo la dirección).");
-  console.log("\nTu clave de moderación (guárdala; no la mandes a nadie, tampoco a mí):\n\n     " + ADMIN + "\n");
+  if (ADMIN) console.log("\nTu clave de moderación (guárdala; no la mandes a nadie, tampoco a mí):\n\n     " + ADMIN + "\n");
+  if (TOPIC) console.log("\nAvisos en el teléfono: instala la app «ntfy» (Android o iPhone), toca «+» y suscríbete a este canal\n(servidor ntfy.sh). Guárdalo; es privado como la clave:\n\n     " + TOPIC + "\n");
   console.log("Para moderar: abre https://brogers36.github.io/Mapudungukeain/trawun/?admin y pega la clave.");
 } else {
   console.log("\nPublicado, pero no encontré la dirección en la salida de arriba. Búscala (termina en .workers.dev) y mándamela.");
