@@ -17,7 +17,7 @@
    GET  /admin/queue        (X-Admin)      -> {posts, msgs, reports}
    POST /admin/act {type,id,action}        approve | hide | delete | ban  (X-Admin)
    GET  /admin/img/ID       (X-Admin)      -> image/jpeg
-   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secrets: ADMIN_KEY, NTFY_TOPIC and NTFY_TOKEN (optional). */
+   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secrets: ADMIN_KEY; for notifications TG_TOKEN + TG_CHAT (Telegram), or NTFY_TOPIC (+ NTFY_TOKEN). */
 
 const MAX_TEXT = 500, MAX_CAP = 140, MAX_IMG = 700 * 1024;
 const CHANNELS = ["mapu", "ramtun"], CATS = ["vestuario", "progreso", "otra"];
@@ -70,17 +70,27 @@ const postRow = r => ({ id: r.id, uid: r.uid, nick: r.nick, kind: r.kind, cat: r
    private channel; the moderator's phone subscribes to it in the ntfy app. Only a short generic text is sent (never a
    nickname, a message or a photo), at most one per kind every 15 minutes, counting what came in meanwhile. Without
    NTFY_TOPIC nothing is sent. */
+/* Where notifications go. Telegram (TG_TOKEN + TG_CHAT: a bot made with @BotFather, and the moderator's chat with it)
+   is preferred: api.telegram.org answers Cloudflare Workers reliably. ntfy.sh (NTFY_TOPIC, optional NTFY_TOKEN) is
+   kept as a fallback, but from Workers it often fails: its anonymous quota is per sending address, which Cloudflare
+   shares (429), and connections can time out (522). */
+const notifyOn = env => !!((env.TG_TOKEN && env.TG_CHAT) || env.NTFY_TOPIC);
+const notifyVia = env => (env.TG_TOKEN && env.TG_CHAT) ? "telegram" : env.NTFY_TOPIC ? "ntfy" : null;
 async function ntfySend(env, txt, tags) {
-  /* With NTFY_TOKEN (an access token from a free ntfy.sh account) the message counts against that account's own daily
-     allowance. Without it, ntfy.sh counts per sending address, and Cloudflare's addresses are shared with many other
-     services, so the anonymous daily quota is often already used up ("429 daily message quota reached"). */
-  const hd = { "Title": "Trawün", "Tags": tags, "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" };
+  const ADMIN_URL = "https://brogers36.github.io/Mapudungukeain/trawun/?admin";
+  if (env.TG_TOKEN && env.TG_CHAT) {
+    const r = await fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: env.TG_CHAT, text: "Trawün: " + txt, disable_web_page_preview: true,
+        reply_markup: { inline_keyboard: [[{ text: "Abrir moderación", url: ADMIN_URL }]] } }) });
+    return { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 300), via: "telegram" };
+  }
+  const hd = { "Title": "Trawün", "Tags": tags, "Click": ADMIN_URL };
   if (env.NTFY_TOKEN) hd["Authorization"] = "Bearer " + env.NTFY_TOKEN;
   const r = await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt, headers: hd });
-  return { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 300) };
+  return { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 300), via: "ntfy" };
 }
 async function notify(env, DB, kind) {
-  if (!env.NTFY_TOPIC) return;
+  if (!notifyOn(env)) return;
   const now = Date.now(), k = "notify:" + kind;
   try {
     const row = await DB.prepare("SELECT v, n FROM meta WHERE k = ?").bind(k).first();
@@ -198,10 +208,10 @@ export default {
           for (const r of reps.results) (reports[r.type + ":" + r.item] = reports[r.type + ":" + r.item] || []).push(r.uid);
           let nerr = null; try { nerr = await DB.prepare("SELECT v, n FROM meta WHERE k = 'notify:error'").first(); } catch (e) { nerr = { v: "meta table missing: run schema.sql", n: 0 }; }
           return json({ posts: posts.results.map(postRow), msgs: msgs.results.map(x => ({ ...x, hidden: !!x.hidden })), reports,
-            notify: { configured: !!env.NTFY_TOPIC, error: nerr ? nerr.v : null, errorAt: nerr ? nerr.n : null } }, 200, h);
+            notify: { configured: notifyOn(env), via: notifyVia(env), error: nerr ? nerr.v : null, errorAt: nerr ? nerr.n : null } }, 200, h);
         }
         if (P === "/admin/notify-test" && req.method === "POST") {   /* the moderation page's "test notification" button */
-          if (!env.NTFY_TOPIC) return json({ configured: false }, 200, h);
+          if (!notifyOn(env)) return json({ configured: false }, 200, h);
           let r; try { r = await ntfySend(env, "Prueba: los avisos de Trawün funcionan.", "white_check_mark"); } catch (e) { r = { ok: false, status: 0, body: String(e && e.message || e) }; }
           return json({ configured: true, ...r }, 200, h);
         }

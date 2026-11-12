@@ -40,6 +40,13 @@ Acciones: aprobar o mostrar, ocultar, borrar, y bloquear un apodo (oculta todo l
 
 ## Avisos en el teléfono
 
+**Recomendado: Telegram.** 1) En Telegram, abre @BotFather, escribe `/newbot` y sigue los pasos; te da un token.
+2) Abre tu bot nuevo y mándale «hola». 3) Corre `node tools/trawun/deploy.mjs --telegram` y pega el token. El script
+encuentra tu conversación, guarda todo en Cloudflare y te manda un mensaje de prueba. Desde ahí, los avisos llegan
+como mensajes del bot, con un botón «Abrir moderación».
+
+La opción de abajo (ntfy) queda como alternativa, pero desde Cloudflare falla a menudo (errores 429 y 522).
+
 El servicio avisa al teléfono del moderador cuando llega una foto para revisar o alguien usa ⚑, con la app gratuita
 **ntfy** (sin cuenta). `deploy.mjs` crea un canal privado al azar la primera vez y lo muestra una sola vez: en la app,
 tocar «+» y suscribirse a ese canal (servidor ntfy.sh). El aviso dice solo «Una foto nueva espera tu revisión» o

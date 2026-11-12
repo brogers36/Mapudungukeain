@@ -58,6 +58,27 @@ const putSecret = (name, value) => execSync(`${W} secret put ${name}`, { cwd: tm
 let ADMIN = null, TOPIC = null;
 if (!have.includes("ADMIN_KEY") || process.argv.includes("--nueva-clave")) { ADMIN = randomBytes(18).toString("base64url"); putSecret("ADMIN_KEY", ADMIN); }
 else console.log("     la clave de moderación ya existe: se mantiene la misma");
+// --telegram: notifications through a Telegram bot. Make the bot in Telegram with @BotFather (/newbot), send your bot
+// any message (for example "hola"), then run this with --telegram and paste the bot's token. The script finds your chat
+// with the bot by itself, stores both on Cloudflare as secrets and sends a test message.
+if (process.argv.includes("--telegram")) {
+  const askRaw = q => new Promise(res => { const rl = createInterface({ input: process.stdin, output: process.stdout }); rl.question(q, a => { rl.close(); res(a); }); });
+  const tok = (await askRaw("\nPega aquí el token del bot que te dio @BotFather (algo como 123456789:AAE…) y presiona Enter: ")).trim();
+  if (!/^\d{5,}:[\w-]{20,}$/.test(tok)) console.log("     eso no parece un token de bot de Telegram; no se guardó nada");
+  else {
+    let chat = null;
+    try { const u = await (await fetch(`https://api.telegram.org/bot${tok}/getUpdates`)).json();
+      const ms = (u.result || []).map(x => x.message || x.edited_message).filter(Boolean);
+      if (ms.length) chat = ms[ms.length - 1].chat.id; } catch (e) { console.log("     no pude conectarme con Telegram:", e.message); }
+    if (!chat) console.log("     No encontré tu conversación con el bot. Abre el bot en Telegram, mándale «hola» y vuelve a correr esto con --telegram.");
+    else {
+      putSecret("TG_TOKEN", tok); putSecret("TG_CHAT", String(chat));
+      try { await fetch(`https://api.telegram.org/bot${tok}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chat, text: "Trawün: los avisos de moderación llegarán aquí." }) }); } catch (e) {}
+      console.log("     Telegram conectado: te llegó un mensaje de prueba del bot.");
+    }
+  }
+}
 // --token-aviso: paste the access token of a free ntfy.sh account (Account → Access tokens), so the notifications use
 // that account's own daily allowance instead of the shared, often exhausted, anonymous one.
 if (process.argv.includes("--token-aviso")) {
