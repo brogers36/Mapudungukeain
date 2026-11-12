@@ -88,8 +88,8 @@ textarea{resize:vertical;min-height:44px}
 .card .meta{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:6px;align-items:center}
 .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ground);background:var(--gold);border-radius:999px;padding:2px 8px;align-self:flex-start}
 .tag.pend{background:var(--muted)}
-.prog{padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center;height:100%;width:100%;background:linear-gradient(160deg,#2a2652,#14122a)}
-.prog .big{font-family:var(--display);font-size:2.4rem;color:var(--gold);line-height:1}
+.prog{padding:14px;display:flex;flex-direction:column;gap:6px;justify-content:safe center;height:100%;width:100%;background:linear-gradient(160deg,#2a2652,#14122a)}
+.prog .big{font-family:var(--display);font-size:2rem;color:var(--gold);line-height:1}
 .prog .row{display:flex;justify-content:space-between;border-bottom:1px solid #3a3566;padding-bottom:4px;font-size:.92rem}
 .who-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
 .who-pick button{background:var(--panel);border:2px solid var(--panel-2);border-radius:8px;padding:4px;cursor:pointer;color:var(--ink);font-size:.8rem}
@@ -355,7 +355,7 @@ function photosPane(me){
 function outfitSVG(o){ if(!window.FIG||!o) return ""; const p=FIG.PEOPLE.find(x=>x.id===o.p); if(!p) return "";
   const ok={}; for(const [s,id] of Object.entries(o.o||{})){ const it=FIG.ITEMS.find(i=>i.id===id&&i.slot===s); if(it&&FIG.fits(it,p)) ok[s]=id; }
   return FIG.figureSVG(p,ok); }
-function progressHTML(g){ return `<div class="prog"><p class="eyebrow" style="letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L("Mi progreso","My progress")}</p><div class="big">★ ${+g.stars||0}</div>
+function progressHTML(g){ return `<div class="prog"><p class="eyebrow" style="letter-spacing:.06em;line-height:1.5;padding-block:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L("Mi progreso","My progress")}</p><div class="big">★ ${+g.stars||0}</div>
   <div class="row"><span>${L("Niveles","Levels")}</span><b>${+g.levels||0}</b></div>
   <div class="row"><span>ngülliw</span><b>${+g.nuts||0}</b></div>
   <div class="row"><span>${L("Prendas","Items")}</span><b>${+g.items||0}</b></div></div>`; }
