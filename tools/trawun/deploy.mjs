@@ -58,6 +58,14 @@ const putSecret = (name, value) => execSync(`${W} secret put ${name}`, { cwd: tm
 let ADMIN = null, TOPIC = null;
 if (!have.includes("ADMIN_KEY") || process.argv.includes("--nueva-clave")) { ADMIN = randomBytes(18).toString("base64url"); putSecret("ADMIN_KEY", ADMIN); }
 else console.log("     la clave de moderación ya existe: se mantiene la misma");
+// --token-aviso: paste the access token of a free ntfy.sh account (Account → Access tokens), so the notifications use
+// that account's own daily allowance instead of the shared, often exhausted, anonymous one.
+if (process.argv.includes("--token-aviso")) {
+  const askRaw = q => new Promise(res => { const rl = createInterface({ input: process.stdin, output: process.stdout }); rl.question(q, a => { rl.close(); res(a); }); });   // tokens are case-sensitive
+  const tok = await askRaw("\nPega aquí el token de acceso de ntfy (empieza con tk_) y presiona Enter: ");
+  if (/^tk_[A-Za-z0-9]{10,}$/.test(tok.trim())) { putSecret("NTFY_TOKEN", tok.trim()); console.log("     token guardado en Cloudflare"); }
+  else console.log("     eso no parece un token de ntfy (empieza con tk_); no se guardó nada");
+}
 if (!have.includes("NTFY_TOPIC") || process.argv.includes("--nuevo-aviso")) { TOPIC = "trawun-" + randomBytes(12).toString("hex"); putSecret("NTFY_TOPIC", TOPIC); }
 else console.log("     el canal de avisos ya existe: se mantiene el mismo");
 

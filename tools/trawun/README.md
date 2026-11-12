@@ -46,6 +46,11 @@ tocar «+» y suscribirse a ese canal (servidor ntfy.sh). El aviso dice solo «U
 «Alguien avisó (⚑)…», nunca apodos, mensajes ni fotos, y como máximo uno de cada tipo cada 15 minutos (con la cuenta de
 lo que llegó entretanto). Tocar el aviso abre la página de moderación.
 
+**Importante:** sin cuenta, ntfy.sh cuenta los mensajes por dirección de internet, y Cloudflare comparte sus
+direcciones con muchos otros servicios, así que el cupo diario gratuito suele estar agotado (error 429 en la página de
+moderación). Solución: crear una cuenta gratis en https://ntfy.sh/signup, crear un token en *Account → Access tokens* y
+correr `node tools/trawun/deploy.mjs --token-aviso` (pide pegar el token). Los avisos usan entonces el cupo de esa cuenta.
+
 Volver a correr `deploy.mjs` actualiza el servicio y **mantiene** la clave y el canal. Para cambiarlos a propósito:
 `node tools/trawun/deploy.mjs --nueva-clave` o `--nuevo-aviso`.
 

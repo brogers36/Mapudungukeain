@@ -17,7 +17,7 @@
    GET  /admin/queue        (X-Admin)      -> {posts, msgs, reports}
    POST /admin/act {type,id,action}        approve | hide | delete | ban  (X-Admin)
    GET  /admin/img/ID       (X-Admin)      -> image/jpeg
-   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secrets: ADMIN_KEY, NTFY_TOPIC (optional). */
+   Binding: a D1 database (DB). Variables: ORIGINS (comma-separated allowed origins). Secrets: ADMIN_KEY, NTFY_TOPIC and NTFY_TOKEN (optional). */
 
 const MAX_TEXT = 500, MAX_CAP = 140, MAX_IMG = 700 * 1024;
 const CHANNELS = ["mapu", "ramtun"], CATS = ["vestuario", "progreso", "otra"];
@@ -71,8 +71,12 @@ const postRow = r => ({ id: r.id, uid: r.uid, nick: r.nick, kind: r.kind, cat: r
    nickname, a message or a photo), at most one per kind every 15 minutes, counting what came in meanwhile. Without
    NTFY_TOPIC nothing is sent. */
 async function ntfySend(env, txt, tags) {
-  const r = await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt,
-    headers: { "Title": "Trawün", "Tags": tags, "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" } });
+  /* With NTFY_TOKEN (an access token from a free ntfy.sh account) the message counts against that account's own daily
+     allowance. Without it, ntfy.sh counts per sending address, and Cloudflare's addresses are shared with many other
+     services, so the anonymous daily quota is often already used up ("429 daily message quota reached"). */
+  const hd = { "Title": "Trawün", "Tags": tags, "Click": "https://brogers36.github.io/Mapudungukeain/trawun/?admin" };
+  if (env.NTFY_TOKEN) hd["Authorization"] = "Bearer " + env.NTFY_TOKEN;
+  const r = await fetch("https://ntfy.sh/" + encodeURIComponent(env.NTFY_TOPIC), { method: "POST", body: txt, headers: hd });
   return { ok: r.ok, status: r.status, body: (await r.text()).slice(0, 300) };
 }
 async function notify(env, DB, kind) {
