@@ -135,6 +135,10 @@ a.mw{color:var(--ink);text-decoration:underline;text-decoration-color:var(--teal
 .card b{font-family:var(--display);font-weight:400;font-size:1.08rem;line-height:1.15}
 .card small{color:var(--muted);font-size:.8rem}
 .card .ic{font-size:1.5rem;line-height:1}
+/* Trawün, the community page: a wide card, meant to be seen */
+.card.tw{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px;border-color:var(--gold);background:linear-gradient(120deg,#3a1f3f,var(--panel) 60%);position:relative}
+.card.tw .ic{font-size:1.9rem}
+.card.tw .new{position:absolute;top:-9px;right:12px;background:var(--red);color:var(--ink);font:700 .7rem var(--body);letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:3px 8px}
 .themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 /* games */
 .hud{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -198,6 +202,7 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const pick=(a,n)=>shuffle(a).slice(0,n);
 const NUT=`<svg class="nut" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.5C14.5 6 14.5 14 10 18.5C5.5 14 5.5 6 10 1.5Z" fill="#9a5b2e"/><path d="M10 1.5C11.6 3.5 11.6 5.6 10 7C8.4 5.6 8.4 3.5 10 1.5Z" fill="#e8d6a0"/><path d="M10 8V17" stroke="#7a4522" stroke-width=".8"/></svg>`;
 const GAME_URL="../index.html";
+const TRAWUN_URL="../trawun/";   /* Trawün, the community page of the game (chat in Mapudungun, shared outfits and photos) */
 /* ===== Installing: Android/desktop Chrome hand us an install prompt; iPhone/iPad need Safari's Share menu ===== */
 let installEv=null;
 /* The box hides once the dictionary runs as an installed app (any app-like display mode), after the browser reports
@@ -350,7 +355,7 @@ function route(){
   return home();
 }
 function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" aria-pressed="${lang==="es"}">ES</button><button data-l="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
-function topBar(){ return `<div class="ctl"><a class="purse" href="${GAME_URL}" style="text-decoration:none;color:inherit" title="${GW("Mapudungukeaiñ Fill Püle")}">🎮 ${L("Juego","Game")}</a><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
+function topBar(){ return `<div class="ctl"><a class="purse" href="${GAME_URL}" style="text-decoration:none;color:inherit" title="${GW("Mapudungukeaiñ Fill Püle")}">🎮 ${L("Juego","Game")}</a><a class="purse" href="${TRAWUN_URL}" style="text-decoration:none;color:inherit" title="${L("Comunidad del juego","The game's community")}">🗣️ Trawün</a><span class="purse" title="${L("Ngülliw compartidos con el juego","Ngülliw shared with the game")}">${NUT}<span>${nuts()}</span></span>${langToggle()}</div>`; }
 function bindCommon(){
   app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{ lang=b.dataset.l; sv("mpk_lang",lang); document.documentElement.lang=lang; route(); });
   app.querySelectorAll("[data-go]").forEach(b=>b.onclick=ev=>{ ev.preventDefault(); go(b.dataset.go); });
@@ -373,6 +378,7 @@ function home(){
     <div id="hubwrap">
       ${installBox()}
       <nav class="hub" aria-label="${L("Secciones","Sections")}">
+        <a class="card tw" href="${TRAWUN_URL}" id="tw-card"><span class="ic" aria-hidden="true">🗣️</span><span style="display:flex;flex-direction:column;gap:3px;min-width:0"><b>Trawün</b><small>${L("Conversa en mapudungun con otras personas que aprenden, y comparte tu progreso","Chat in Mapudungun with other learners, and share your progress")} ↗</small></span>${ld("mpk_trawunSeen")?"":`<span class="new">${L("Nuevo","New")}</span>`}</a>
         <button class="card" data-go="#/juegos"><span class="ic">🎲</span><b>${L("Juegos","Games")}</b><small>${L("Practica el vocabulario y gana ngülliw","Practise vocabulary and earn ngülliw")}</small></button>
         <button class="card" data-go="#/temas"><span class="ic">🗂</span><b>${L("Temas","Topics")}</b><small>${L(`${CORE.length} palabras y frases`,`${CORE.length} words and phrases`)}</small></button>
         <button class="card" data-go="#/guardadas"><span class="ic">⭐</span><b>${L("Mis palabras","My words")}</b><small>${nSaved?L(`${nSaved} guardadas · ${due} para repasar`,`${nSaved} saved · ${due} to review`):L("Guarda palabras con ☆","Save words with ☆")}</small></button>
@@ -386,6 +392,7 @@ function home(){
     </div>
     <footer>${L(`${CORE.length} entradas del núcleo · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("es")} entradas de Augusta`,`${CORE.length} core entries · ${((D.n&&D.n.aug)||AUG.length).toLocaleString("en")} Augusta entries`)}<br>© 2026 Brandon M. A. Rogers. ${L("Todos los derechos reservados; el analizador automático no se puede copiar ni reutilizar sin permiso.","All rights reserved; the automatic parser may not be copied or reused without permission.")} ${L("No se permite usar este sitio ni su contenido para entrenar ni alimentar sistemas de inteligencia artificial.","This site and its content may not be used to train or feed artificial intelligence systems.")}</footer>`;
   bindCommon(); bindInstall();
+  { const tw=document.getElementById("tw-card"); if(tw) tw.addEventListener("click",()=>sv("mpk_trawunSeen",1)); }
   if(/[?&]instalar/.test(location.search)){ const b=document.getElementById("instbox"); if(b) b.scrollIntoView({block:"center"}); }
   const q=document.getElementById("q"), clr=document.getElementById("clr");
   let t=null; q.oninput=()=>{ clr.hidden=!q.value; clearTimeout(t); t=setTimeout(()=>{ lastQ=q.value; search(q.value); },140); };
