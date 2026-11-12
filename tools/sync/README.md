@@ -8,6 +8,8 @@ Archivos: `worker.js` (el servicio), `schema.sql` (la tabla), `wrangler.toml` (p
 
 ## Lo más simple: un solo comando desde tu computadora
 
+Para publicar este servicio y Trawün juntos: `node tools/publicar_servicios.mjs` (pregunta qué cuenta de Cloudflare usar).
+
 Con Node.js instalado y una copia del repositorio: `node tools/sync/deploy.mjs`. Abre el navegador una vez para
 autorizar tu cuenta de Cloudflare; después crea la base, la tabla y el servicio ya conectados, y muestra la dirección.
 

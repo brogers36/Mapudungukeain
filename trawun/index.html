@@ -184,9 +184,14 @@ const Remote = {
     let b=null; try{ b=await r.json(); }catch(e){} if(!r.ok) throw Object.assign(new Error((b&&b.error)||("HTTP "+r.status)),{status:r.status,body:b}); return b; },
   _adm(){ return {"Content-Type":"application/json","X-Admin":sessionStorage.getItem("trawun_admin")||""}; },
   join(nick){ return this._f("/join",{method:"POST",body:JSON.stringify({nick})}); },
-  async msgs(ch,since){ return (await this._f("/msgs?ch="+encodeURIComponent(ch)+(since?"&since="+since:""))).msgs; },
+  /* the last lists seen are kept on the phone, so Trawün still shows them without internet */
+  async msgs(ch){ const k="trawun_cache_msgs_"+ch;
+    try{ const l=(await this._f("/msgs?ch="+encodeURIComponent(ch))).msgs; LS.set(k,l); setOffline(false); return l; }
+    catch(e){ if(e.status) throw e; const c=LS.get(k,null); setOffline(true); if(c) return c; throw e; } },
   send(me,ch,text){ return this._f("/msgs",{method:"POST",body:JSON.stringify({key:me.key,ch,text})}); },
-  async posts(){ const me=Me.get(); return (await this._f("/posts"+(me?"?key="+encodeURIComponent(me.key):""))).posts; },
+  async posts(){ const me=Me.get();
+    try{ const l=(await this._f("/posts"+(me?"?key="+encodeURIComponent(me.key):""))).posts; LS.set("trawun_cache_posts",l); setOffline(false); return l; }
+    catch(e){ if(e.status) throw e; const c=LS.get("trawun_cache_posts",null); setOffline(true); if(c) return c; throw e; } },
   async post(me,p){ const body={key:me.key,kind:p.kind,cat:p.cat,caption:p.caption,outfit:p.outfit,progress:p.progress};
     if(p.image) body.image=await blobToB64(p.image); return this._f("/posts",{method:"POST",body:JSON.stringify(body)}); },
   async imgURL(id){ const me=Me.get(); return TRAWUN_API.replace(/\/$/,"")+"/img/"+id+(me?"?key="+encodeURIComponent(me.key):""); },
@@ -209,6 +214,12 @@ const Game = {
   levels(){ return Object.values(this.best()).filter(v=>(+v||0)>0).length; }
 };
 
+/* ---------- offline: the page opens from the game's cache; reading shows the last copy, writing waits for internet ---------- */
+let OFFLINE=!navigator.onLine;
+function setOffline(v){ OFFLINE=v; const n=document.getElementById("offnote"); if(n) n.hidden=!v; }
+window.addEventListener("online",()=>{ setOffline(false); if(Me.get()&&!ADMIN) render(); });
+window.addEventListener("offline",()=>setOffline(true));
+const offText=()=>L("Sin conexión: ves lo último que se guardó en este teléfono. Para escribir o compartir hace falta internet.","Offline: you see the last copy saved on this phone. Writing and sharing need internet.");
 /* ---------- small UI helpers ---------- */
 function toast(t){ document.querySelectorAll(".toast").forEach(x=>x.remove()); const d=document.createElement("div"); d.className="toast"; d.setAttribute("role","status"); d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),2600); }
 function ago(ts){ const s=Math.max(1,Math.round((Date.now()-ts)/1000));
@@ -238,6 +249,7 @@ function render(){
     <div class="top"><div><p class="eyebrow">Mapudungukeaiñ Fill Püle · ${L("comunidad","community")}</p><h1>Trawün</h1>
       <p class="muted">${L("Conversa en mapudungun y comparte tu vestuario y tu progreso.","Chat in Mapudungun and share your outfits and your progress.")}</p></div>${langToggle()}</div>
     ${Store.mode==="local"?`<p class="note warn"><b>${L("Vista previa.","Preview.")}</b> ${L("Todavía no hay servidor: lo que publiques se queda en este teléfono y nadie más lo ve.","There is no server yet: what you post stays on this phone and nobody else sees it.")}</p>`:""}
+    ${Store.mode==="remote"?`<p class="note" id="offnote" ${OFFLINE?"":"hidden"}>📴 ${offText()}</p>`:""}
     ${me?mainHTML(me):joinHTML()}`;
   bindLang();
   if(me) bindMain(me); else bindJoin();
@@ -266,7 +278,7 @@ function bindJoin(){
   b.onclick=async()=>{ const nick=n.value.trim(); const pp=privacyProblem(nick); if(pp){ m.textContent=pp; return; }
     b.disabled=true; m.textContent=L("Entrando…","Joining…");
     try{ const me=await Store.join(nick); Me.set(me); render(); }
-    catch(e){ m.textContent=e.status===409?L("Ese apodo ya está en uso.","That nickname is taken."):L("No se pudo entrar. Intenta de nuevo.","Couldn't join. Try again."); b.disabled=false; } };
+    catch(e){ m.textContent=e.status===409?L("Ese apodo ya está en uso.","That nickname is taken."):!e.status?L("Para entrar la primera vez hace falta internet.","Joining the first time needs internet."):L("No se pudo entrar. Intenta de nuevo.","Couldn't join. Try again."); b.disabled=false; } };
 }
 
 /* ---------- main: chat and photos ---------- */
@@ -302,7 +314,7 @@ function chatPane(me){
   s.onclick=async()=>{ const v=t.value.trim(); if(!v) return; const pp=privacyProblem(v); if(pp){ cm.textContent=pp; return; }
     s.disabled=true; cm.textContent="";
     try{ await Store.send(me,ch,v); t.value=""; await loadMsgs(me,true); }
-    catch(e){ cm.textContent=e.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):(e.body&&e.body.error==="blocked")?L("Tu apodo está bloqueado.","Your nickname is blocked."):L("No se pudo enviar.","Couldn't send."); }
+    catch(e){ cm.textContent=!e.status?L("Sin conexión: el mensaje no se envió. Inténtalo cuando tengas internet.","Offline: the message wasn't sent. Try again when you have internet."):e.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):(e.body&&e.body.error==="blocked")?L("Tu apodo está bloqueado.","Your nickname is blocked."):L("No se pudo enviar.","Couldn't send."); }
     s.disabled=false; t.focus(); };
   $("#msgs").onclick=e=>{ const w=e.target.closest(".w"); if(w){ window.open(dictLink(w.dataset.w),"_blank","noopener"); return; }
     const r=e.target.closest("[data-rep]"); if(r) report(me,"msg",r.dataset.rep); };
@@ -370,7 +382,7 @@ function shareDialog(me,step,person){
   const send=async(p)=>{ const cap=(m.querySelector("#cap")||{}).value||""; const pp=privacyProblem(cap); const sm=m.querySelector("#smsg"); if(pp){ sm.textContent=pp; return; }
     const go=m.querySelector("#go"); go.disabled=true; sm.textContent=L("Publicando…","Posting…");
     try{ const row=await Store.post(me,Object.assign(p,{caption:cap.trim()})); close(); toast(row.status==="pending"?L("Enviada. Se verá cuando el moderador la apruebe.","Sent. It will show once the moderator approves it."):L("¡Publicado!","Posted!")); tab="fotos"; render(); }
-    catch(e){ sm.textContent=e.status===429?L("Has publicado mucho hoy. Vuelve mañana.","You've posted a lot today. Come back tomorrow."):L("No se pudo publicar.","Couldn't post."); go.disabled=false; } };
+    catch(e){ sm.textContent=!e.status?L("Sin conexión: no se publicó. Inténtalo cuando tengas internet.","Offline: nothing was posted. Try again when you have internet."):e.status===429?L("Has publicado mucho hoy. Vuelve mañana.","You've posted a lot today. Come back tomorrow."):L("No se pudo publicar.","Couldn't post."); go.disabled=false; } };
   if(step==="choose") return draw(`<h2>${L("¿Qué quieres compartir?","What would you like to share?")}</h2>
     <div class="row"><button class="btn" id="o">👘 ${L("Mi vestuario","My outfit")}</button><button class="btn" id="g">★ ${L("Mi progreso","My progress")}</button><button class="btn" id="f">📷 ${L("Una foto","A photo")}</button></div>
     <div class="row"><button class="btn ghost" id="cancel">${L("Cancelar","Cancel")}</button></div>`), m.querySelector("#o").onclick=()=>{close();shareDialog(me,"outfit")}, m.querySelector("#g").onclick=()=>{close();shareDialog(me,"progress")}, m.querySelector("#f").onclick=()=>{close();shareDialog(me,"photo")};

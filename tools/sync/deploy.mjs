@@ -3,6 +3,7 @@
 // It opens the browser once so you can authorize Wrangler with your Cloudflare account, then it creates the database
 // (if it doesn't exist), creates the table, publishes the Worker with the database connected, and prints its address.
 import { execSync } from "node:child_process";
+import { createInterface } from "node:readline";
 import { readFileSync, writeFileSync, mkdtempSync, copyFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
@@ -13,8 +14,17 @@ const W = "npx --yes wrangler@4";
 const NAME = "mapudungukeain-sync";
 const run = (cmd, opts = {}) => execSync(cmd, { stdio: opts.quiet ? "pipe" : "inherit", encoding: "utf8", cwd: opts.cwd, env: { ...process.env, WRANGLER_SEND_METRICS: "false" } });
 
-console.log("\n1/5  Iniciando sesión en Cloudflare (se abre el navegador; acepta y vuelve aquí)…");
-try { run(`${W} whoami`, { quiet: true }).includes("You are logged in") || run(`${W} login`); } catch { run(`${W} login`); }
+console.log("\n1/5  Cuenta de Cloudflare…");
+/* Uses the Cloudflare account you sign in to in the browser. If this computer is already signed in, it shows which
+   account that is and asks before using it; answer "n" to sign out and sign in to another one (for example a new account).
+   MPK_CF_OK=1 skips the question (publicar_servicios.mjs sets it after asking once). */
+const ask = q => new Promise(res => { const rl = createInterface({ input: process.stdin, output: process.stdout }); rl.question(q, a => { rl.close(); res(a.trim().toLowerCase()); }); });
+let who = ""; try { who = run(`${W} whoami`, { quiet: true }); } catch { who = ""; }
+if (!/You are logged in/i.test(who)) run(`${W} login`);
+else if (process.env.MPK_CF_OK !== "1") {
+  console.log(who.split("\n").filter(l => /logged in|@|Account Name|│/.test(l)).join("\n"));
+  if (!/^s/.test(await ask("\n¿Usar esta cuenta? (s/n) "))) { run(`${W} logout`); run(`${W} login`); }
+}
 
 console.log("\n2/5  Base de datos…");
 const findDb = () => { try { return JSON.parse(run(`${W} d1 list --json`, { quiet: true })).find(d => d.name === NAME); } catch { return null; } };

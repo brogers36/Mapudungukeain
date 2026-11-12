@@ -10,7 +10,19 @@ Archivos: `worker.js` (el servicio), `schema.sql` (las tablas), `wrangler.toml`,
 `build_figura.py` (copia el dibujo de los personajes del juego a `trawun/figura.js`; volver a correrlo si cambia el
 Vestuario).
 
+## Sin internet
+
+El juego y el diccionario siguen en GitHub Pages y funcionan completos sin internet; Cloudflare solo guarda lo que
+Trawün comparte. La página de Trawün también abre sin conexión (el juego la guarda al instalarse) y muestra los últimos
+mensajes y publicaciones que vio; para escribir, compartir o entrar por primera vez hace falta internet.
+
 ## Publicarlo: un solo comando desde tu computadora
+
+Para publicar Trawün y la copia en línea del progreso juntos: `node tools/publicar_servicios.mjs`. Si la computadora
+ya tiene una sesión de Cloudflare, el comando muestra qué cuenta es y pregunta si usarla; responde «n» para cerrarla y
+entrar con otra (por ejemplo, una cuenta nueva creada en https://dash.cloudflare.com/sign-up).
+
+Solo Trawün:
 
 Con Node.js 18 o más nuevo y una copia del repositorio: `node tools/trawun/deploy.mjs`. Abre el navegador una vez
 para autorizar tu cuenta de Cloudflare (la misma que la copia en línea del progreso). Crea la base y las tablas,
