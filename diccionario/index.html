@@ -339,6 +339,7 @@ function route(){
   window.scrollTo(0,0);
   if(!p.length) return home();
   if(p[0]==="e") return entry(p.slice(1).join("/"));
+  if(p[0]==="buscar"){ lastQ=p.slice(1).join("/"); return home(); }   /* #/buscar/<word>: opened from Trawün, a tapped chat word */
   if(p[0]==="temas") return p[1]?themeList(p[1]):themes();
   if(p[0]==="guardadas") return savedList();
   if(p[0]==="juegos") return games();

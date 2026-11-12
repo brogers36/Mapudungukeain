@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trawün · Mapudungukeaiñ</title>
+<meta name="description" content="Trawün: la comunidad del juego Mapudungukeaiñ Fill Püle. Conversa en mapudungun y comparte tu vestuario y tu progreso.">
+<meta name="theme-color" content="#14122a">
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Same wool palette as the game. */
+:root{
+  --ground:#14122a; --panel:#1f1c3d; --panel-2:#2a2652; --ink:#f3efe6; --muted:#a9a3c8;
+  --red:#c8322f; --red-soft:#e05a4f; --good:#3fa86b; --gold:#e8b53a;
+  --display:"Alfa Slab One", Rockwell, "Roboto Slab", Georgia, serif;
+  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+.band{height:22px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));
+  background-color:var(--red);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' shape-rendering='crispEdges'%3E%3Cg fill='%2314122a'%3E%3Crect x='20' y='2' width='4' height='2'/%3E%3Crect x='16' y='4' width='12' height='2'/%3E%3Crect x='12' y='6' width='8' height='2'/%3E%3Crect x='24' y='6' width='8' height='2'/%3E%3Crect x='8' y='8' width='8' height='2'/%3E%3Crect x='28' y='8' width='8' height='2'/%3E%3Crect x='4' y='10' width='8' height='2'/%3E%3Crect x='32' y='10' width='8' height='2'/%3E%3Crect x='8' y='12' width='8' height='2'/%3E%3Crect x='28' y='12' width='8' height='2'/%3E%3Crect x='12' y='14' width='8' height='2'/%3E%3Crect x='24' y='14' width='8' height='2'/%3E%3Crect x='16' y='16' width='12' height='2'/%3E%3Crect x='20' y='18' width='4' height='2'/%3E%3C/g%3E%3Cg fill='%23f3efe6'%3E%3Crect x='20' y='10' width='4' height='2'/%3E%3Crect x='0' y='0' width='2' height='2'/%3E%3Crect x='42' y='20' width='2' height='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:repeat-x;background-position:center}
+.wrap{max-width:640px;margin:0 auto;padding-block:20px 40px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;letter-spacing:.01em;text-wrap:balance}
+h1{font-size:clamp(2.2rem,9vw,3rem);line-height:1.02}
+h2{font-size:1.4rem;line-height:1.1}
+h3{font-size:1.1rem}
+p{margin:0}
+a{color:var(--gold)}
+.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)} .hint{color:var(--muted);font-size:.9rem}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.lang{display:flex;border:1.5px solid var(--panel-2);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--muted);font:700 .85rem var(--body);padding:6px 12px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+button,input,textarea,select{font-family:var(--body);font-size:1rem}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn{background:var(--red);color:var(--ink);border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--red-soft)} .btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1.5px solid var(--panel-2);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--gold)}
+.btn.small{padding:6px 12px;font-size:.9rem}
+.back{color:var(--muted);text-decoration:none;font-weight:700}
+.back:hover{color:var(--ink)}
+.panel{background:var(--panel);border:2px solid var(--panel-2);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.note{border-left:4px solid var(--gold);background:#2a2440;padding:10px 12px;border-radius:6px;font-size:.92rem}
+.note.warn{border-color:var(--red-soft)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{background:var(--panel);border:2px solid var(--panel-2);color:var(--muted);border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--panel-2);border:0;color:var(--ink);border-radius:999px;padding:5px 11px;font-size:.88rem;cursor:pointer}
+.chip:hover{outline:2px solid var(--gold)}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--ground)}
+label{font-weight:700;font-size:.92rem}
+input[type=text],textarea,select{width:100%;background:#15132b;color:var(--ink);border:1.5px solid var(--panel-2);border-radius:8px;padding:10px 12px}
+textarea{resize:vertical;min-height:44px}
+/* chat */
+.msgs{display:flex;flex-direction:column;gap:8px;max-height:52vh;min-height:180px;overflow-y:auto;padding:4px 2px;overscroll-behavior:contain}
+.msg{background:#191736;border:1px solid var(--panel-2);border-radius:10px;padding:8px 12px;max-width:88%}
+.msg.me{align-self:flex-end;background:#2b2350;border-color:#3d3470}
+.msg .who{font-size:.8rem;color:var(--gold);font-weight:700;display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.msg .who time{color:var(--muted);font-weight:400}
+.msg .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.msg .txt .w{cursor:pointer;border-bottom:1px dotted transparent}
+.msg .txt .w:hover{border-bottom-color:var(--gold)}
+.tools{display:flex;gap:4px;justify-content:flex-end;margin-top:2px}
+.ic{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;border-radius:4px}
+.ic:hover{color:var(--ink);background:var(--panel-2)}
+.compose{display:flex;gap:8px;align-items:flex-end}
+.compose textarea{flex:1}
+.empty{color:var(--muted);text-align:center;padding:24px 8px}
+/* gallery */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.card{background:var(--panel);border:2px solid var(--panel-2);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.card .pic{aspect-ratio:3/4;background:#0f0d22;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.card .pic svg{width:100%;height:100%}
+.card .body{padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.card .cap{overflow-wrap:anywhere}
+.card .meta{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:6px;align-items:center}
+.tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ground);background:var(--gold);border-radius:999px;padding:2px 8px;align-self:flex-start}
+.tag.pend{background:var(--muted)}
+.prog{padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center;height:100%;width:100%;background:linear-gradient(160deg,#2a2652,#14122a)}
+.prog .big{font-family:var(--display);font-size:2.4rem;color:var(--gold);line-height:1}
+.prog .row{display:flex;justify-content:space-between;border-bottom:1px solid #3a3566;padding-bottom:4px;font-size:.92rem}
+.who-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.who-pick button{background:var(--panel);border:2px solid var(--panel-2);border-radius:8px;padding:4px;cursor:pointer;color:var(--ink);font-size:.8rem}
+.who-pick button[aria-pressed="true"]{border-color:var(--gold)}
+.who-pick svg{width:100%;height:auto;display:block}
+.preview{max-width:260px;border-radius:8px;border:2px solid var(--panel-2)}
+.modal{position:fixed;inset:0;background:rgba(10,8,24,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal .panel{max-width:520px;width:100%;max-height:90vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:10px 16px;border-radius:999px;font-weight:700;z-index:60;max-width:90vw;text-align:center}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media (max-width:420px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} .msg{max-width:94%} }
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<main class="wrap" id="app"><p class="muted">Cargando…</p></main>
+<div class="band" aria-hidden="true"></div>
+<script src="figura.js"></script>
+<script>
+/* ======================================================================================================================
+   Trawün: the game's community page. People chat (one channel in Mapudungun only, one for questions in any language),
+   and share photos of their progress, their Vestuario characters and progress cards from the game.
+
+   STORAGE. TRAWUN_API empty = preview mode: everything stays on this device (localStorage, photos in IndexedDB) and
+   nobody else sees it. Set TRAWUN_API to the address of the Cloudflare Worker in tools/trawun/ to make it shared.
+   SAFETY (learners may be under 18). Nicknames only; no names, emails, phone numbers, links or @handles in messages or
+   captions (blocked before sending, and again on the server); uploaded photos are re-drawn on a canvas (which drops
+   EXIF data such as GPS position) and wait for the moderator's approval before anyone else sees them. Vestuario and
+   progress posts carry only game data (character, item ids, numbers) and are drawn here, so they post straight away.
+   Anyone can report a message or a post; three reports hide it until the moderator decides.
+   ====================================================================================================================== */
+var TRAWUN_API = "";
+
+const $ = s => document.querySelector(s), app = $("#app");
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS = { get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+             set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+/* language: shared with the game (mpk_lang) */
+let lang = (LS.get("mpk_lang","es")||"es").indexOf("en")>=0 ? "en" : "es";
+const L = (es,en) => lang==="en" ? en : es;
+const params = new URLSearchParams(location.search);
+const ADMIN = params.has("admin");
+
+/* ---------- personal-information filter (client side; the server repeats it) ---------- */
+function privacyProblem(t){
+  const s=String(t||"");
+  if(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(s)) return L("No compartas correos electrónicos.","Don't share email addresses.");
+  if(/(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|cl|net|org|io|me|ly|gg|app|xyz)\b)/i.test(s)) return L("No se permiten enlaces.","Links aren't allowed.");
+  if(/(\+?\d[\d\s().-]{6,}\d)/.test(s) && (s.match(/\d/g)||[]).length>=7) return L("No compartas números de teléfono.","Don't share phone numbers.");
+  if(/(^|\s)@[a-z0-9_.]{3,}/i.test(s)) return L("No compartas usuarios de redes sociales.","Don't share social media handles.");
+  if(/\b(whats ?app|instagram|insta|tiktok|snap(chat)?|discord|telegram|facebook)\b/i.test(s)) return L("Mantén la conversación aquí: no pidas ni des otras redes.","Keep the conversation here: don't ask for or give other apps.");
+  return null;
+}
+const NICK_RE = /^[\p{L}\p{N}_ -]{2,20}$/u;
+
+/* ---------- store: preview (this device) ---------- */
+const Local = {
+  mode:"local",
+  _k:"trawun_local", _d(){ return LS.get(this._k,{msgs:[],posts:[],reports:{}}); }, _s(d){ LS.set(this._k,d); },
+  async join(nick){ const id="u"+Math.random().toString(36).slice(2,10); return {id,nick,key:"local-"+id}; },
+  async msgs(ch){ return this._d().msgs.filter(m=>m.ch===ch && !m.hidden).slice(-200); },
+  async send(me,ch,text){ const d=this._d(); const m={id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),ch,uid:me.id,nick:me.nick,text,ts:Date.now()}; d.msgs.push(m); d.msgs=d.msgs.slice(-1000); this._s(d); return m; },
+  async posts(){ const d=this._d(), me=Me.get(); return d.posts.filter(p=>!p.hidden && (p.status==="ok" || (me&&p.uid===me.id) || ADMIN)).sort((a,b)=>b.ts-a.ts); },
+  async post(me,p){ const d=this._d(); const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    if(p.image){ await Img.put(id,p.image); }
+    const row={id,uid:me.id,nick:me.nick,kind:p.kind,cat:p.cat,caption:p.caption||"",outfit:p.outfit||null,progress:p.progress||null,
+      status:p.kind==="photo"?"pending":"ok",ts:Date.now()};
+    d.posts.push(row); this._s(d); return row; },
+  async imgURL(id){ return Img.url(id); },
+  async report(me,type,id){ const d=this._d(); const k=type+":"+id; d.reports[k]=(d.reports[k]||[]); if(!d.reports[k].includes(me.id)) d.reports[k].push(me.id);
+    const list=type==="msg"?d.msgs:d.posts; const it=list.find(x=>x.id===id); if(it && d.reports[k].length>=3) it.hidden=true; this._s(d); },
+  async queue(){ const d=this._d(); return {posts:d.posts.filter(p=>p.status==="pending"||p.hidden||d.reports["post:"+p.id]),
+    msgs:d.msgs.filter(m=>m.hidden||d.reports["msg:"+m.id]), reports:d.reports}; },
+  async act(type,id,action){ const d=this._d(); const list=type==="msg"?d.msgs:d.posts; const i=list.findIndex(x=>x.id===id); if(i<0) return;
+    if(action==="approve"){ list[i].status="ok"; list[i].hidden=false; delete d.reports[type+":"+id]; }
+    else if(action==="hide") list[i].hidden=true;
+    else if(action==="delete"){ list.splice(i,1); if(type==="post") Img.del(id); }
+    this._s(d); }
+};
+/* photos for preview mode, in IndexedDB (localStorage is too small for images) */
+const Img = (()=>{ let dbp=null; const open=()=>dbp||(dbp=new Promise((res,rej)=>{ const r=indexedDB.open("trawun",1);
+    r.onupgradeneeded=()=>r.result.createObjectStore("img"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }));
+  const tx=async(mode,fn)=>{ const db=await open(); return new Promise((res,rej)=>{ const t=db.transaction("img",mode); const q=fn(t.objectStore("img")); t.oncomplete=()=>res(q&&q.result); t.onerror=()=>rej(t.error); }); };
+  const urls={};
+  return { put:(id,blob)=>tx("readwrite",s=>s.put(blob,id)), del:id=>tx("readwrite",s=>s.delete(id)).catch(()=>{}),
+    async url(id){ if(urls[id]) return urls[id]; try{ const b=await tx("readonly",s=>s.get(id)); return b?(urls[id]=URL.createObjectURL(b)):null; }catch(e){ return null; } } }; })();
+
+/* ---------- store: shared (Cloudflare Worker, see tools/trawun/README.md) ---------- */
+const Remote = {
+  mode:"remote",
+  async _f(path,opt){ const r=await fetch(TRAWUN_API.replace(/\/$/,"")+path,Object.assign({headers:{"Content-Type":"application/json"}},opt||{}));
+    let b=null; try{ b=await r.json(); }catch(e){} if(!r.ok) throw Object.assign(new Error((b&&b.error)||("HTTP "+r.status)),{status:r.status,body:b}); return b; },
+  _adm(){ return {"Content-Type":"application/json","X-Admin":sessionStorage.getItem("trawun_admin")||""}; },
+  join(nick){ return this._f("/join",{method:"POST",body:JSON.stringify({nick})}); },
+  async msgs(ch,since){ return (await this._f("/msgs?ch="+encodeURIComponent(ch)+(since?"&since="+since:""))).msgs; },
+  send(me,ch,text){ return this._f("/msgs",{method:"POST",body:JSON.stringify({key:me.key,ch,text})}); },
+  async posts(){ const me=Me.get(); return (await this._f("/posts"+(me?"?key="+encodeURIComponent(me.key):""))).posts; },
+  async post(me,p){ const body={key:me.key,kind:p.kind,cat:p.cat,caption:p.caption,outfit:p.outfit,progress:p.progress};
+    if(p.image) body.image=await blobToB64(p.image); return this._f("/posts",{method:"POST",body:JSON.stringify(body)}); },
+  async imgURL(id){ const me=Me.get(); return TRAWUN_API.replace(/\/$/,"")+"/img/"+id+(me?"?key="+encodeURIComponent(me.key):""); },
+  report(me,type,id){ return this._f("/report",{method:"POST",body:JSON.stringify({key:me.key,type,id})}); },
+  queue(){ return this._f("/admin/queue",{headers:this._adm()}); },
+  act(type,id,action){ return this._f("/admin/act",{method:"POST",headers:this._adm(),body:JSON.stringify({type,id,action})}); },
+  async adminImg(id){ const r=await fetch(TRAWUN_API.replace(/\/$/,"")+"/admin/img/"+id,{headers:this._adm()}); return r.ok?URL.createObjectURL(await r.blob()):null; }
+};
+const Store = TRAWUN_API ? Remote : Local;
+function blobToB64(b){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(b); }); }
+
+/* ---------- me (nickname + private key, this device only) ---------- */
+const Me = { get(){ return LS.get("trawun_me",null); }, set(v){ LS.set("trawun_me",v); }, clear(){ try{ localStorage.removeItem("trawun_me"); }catch(e){} } };
+
+/* ---------- game data (same site, so the game's save is readable here) ---------- */
+const Game = {
+  best:()=>LS.get("mpk_best",{})||{}, nuts:()=>LS.get("mpk_nuts",0)||0, owned:()=>LS.get("mpk_owned",[])||[],
+  outfits:()=>LS.get("mpk_outfits",{})||{}, sel:()=>LS.get("mpk_selPerson",null),
+  stars(){ return Object.values(this.best()).reduce((a,b)=>a+(+b||0),0); },
+  levels(){ return Object.values(this.best()).filter(v=>(+v||0)>0).length; }
+};
+
+/* ---------- small UI helpers ---------- */
+function toast(t){ document.querySelectorAll(".toast").forEach(x=>x.remove()); const d=document.createElement("div"); d.className="toast"; d.setAttribute("role","status"); d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),2600); }
+function ago(ts){ const s=Math.max(1,Math.round((Date.now()-ts)/1000));
+  if(s<60) return L("ahora","now"); const m=Math.round(s/60); if(m<60) return m+" min"; const h=Math.round(m/60); if(h<24) return h+" h";
+  return new Date(ts).toLocaleDateString(lang==="en"?"en":"es",{day:"numeric",month:"short"}); }
+function langToggle(){ return `<div class="lang" role="group" aria-label="Idioma / Language"><button data-lang="es" aria-pressed="${lang==="es"}">ES</button><button data-lang="en" aria-pressed="${lang==="en"}">EN</button></div>`; }
+function bindLang(){ app.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>{ lang=b.dataset.lang; LS.set("mpk_lang",lang); render(); }); }
+function dictLink(w){ return "../diccionario/#/buscar/"+encodeURIComponent(w); }
+/* words of a message are tappable: each opens the dictionary search for that word */
+function wordsHTML(t){ return esc(t).replace(/[\p{L}ñüÑÜ'’]+/gu, w=>`<span class="w" data-w="${w}" title="${L("Buscar en el diccionario","Look up in the dictionary")}">${w}</span>`); }
+
+/* ---------- app state ---------- */
+let tab = params.get("share") ? "fotos" : (LS.get("trawun_tab","chat")||"chat");
+let ch = LS.get("trawun_ch","mapu")||"mapu";
+let pollT=null, lastSeen=0;
+const CHANNELS = { mapu:{n:"Mapudungun mew", d:()=>L("Solo en mapudungun. Equivocarse es parte de aprender: ¡anímate!","Mapudungun only. Mistakes are part of learning: go for it!")},
+                   ramtun:{n:"Ramtun", d:()=>L("Preguntas sobre la lengua o el juego, en cualquier idioma.","Questions about the language or the game, in any language.")} };
+const PHRASES = [["Mari mari","hola","hello"],["¿Chumleymi?","¿cómo estás?","how are you?"],["Kümelen","estoy bien","I'm fine"],
+  ["Chaltu may","gracias","thank you"],["Feley","así es","that's right"],["Kimlan","no sé","I don't know"],["Pewkayal","nos vemos","see you"]];
+
+function render(){
+  clearInterval(pollT);
+  const me=Me.get();
+  if(ADMIN) return adminView();
+  app.innerHTML=`
+    <a class="back" href="../">← ${L("Volver al juego","Back to the game")}</a>
+    <div class="top"><div><p class="eyebrow">Mapudungukeaiñ Fill Püle · ${L("comunidad","community")}</p><h1>Trawün</h1>
+      <p class="muted">${L("Conversa en mapudungun y comparte tu vestuario y tu progreso.","Chat in Mapudungun and share your outfits and your progress.")}</p></div>${langToggle()}</div>
+    ${Store.mode==="local"?`<p class="note warn"><b>${L("Vista previa.","Preview.")}</b> ${L("Todavía no hay servidor: lo que publiques se queda en este teléfono y nadie más lo ve.","There is no server yet: what you post stays on this phone and nobody else sees it.")}</p>`:""}
+    ${me?mainHTML(me):joinHTML()}`;
+  bindLang();
+  if(me) bindMain(me); else bindJoin();
+}
+
+/* ---------- joining: a nickname and the rules ---------- */
+function rulesHTML(){ return `<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px">
+  <li>${L("Usa un apodo, no tu nombre real.","Use a nickname, not your real name.")}</li>
+  <li>${L("No compartas datos personales: dirección, escuela, teléfono, correo, redes sociales.","Don't share personal details: address, school, phone, email, social media.")}</li>
+  <li>${L("No subas fotos de caras (sobre todo de niñas y niños) ni de documentos.","Don't upload photos of faces (especially children's) or of documents.")}</li>
+  <li>${L("Respeto: aquí todos estamos aprendiendo. Nada de burlas ni insultos.","Respect: everyone here is learning. No mocking or insults.")}</li>
+  <li>${L("Las fotos se revisan antes de mostrarse. Si algo te incomoda, usa ⚑ para avisar.","Photos are checked before they're shown. If something bothers you, use ⚑ to report it.")}</li></ul>`; }
+function joinHTML(){ return `<section class="panel">
+    <h2>${L("Entra al trawün","Join the trawün")}</h2>
+    <p>${L("Trawün es una reunión. Elige un apodo para conversar y compartir.","A trawün is a gathering. Choose a nickname to chat and share.")}</p>
+    <label for="nick">${L("Tu apodo","Your nickname")}</label>
+    <input type="text" id="nick" maxlength="20" autocomplete="off" placeholder="${L("por ejemplo: Pewen22","for example: Pewen22")}">
+    <h3>${L("Normas","Rules")}</h3>${rulesHTML()}
+    <label class="row" style="font-weight:400"><input type="checkbox" id="agree"> ${L("Acepto las normas.","I accept the rules.")}</label>
+    <p class="hint" id="jmsg" aria-live="polite"></p>
+    <div class="row"><button class="btn" id="join" disabled>${L("Entrar","Join")}</button></div></section>`; }
+function bindJoin(){
+  const n=$("#nick"), a=$("#agree"), b=$("#join"), m=$("#jmsg");
+  const ok=()=>{ b.disabled=!(a.checked && NICK_RE.test(n.value.trim())); };
+  n.oninput=ok; a.onchange=ok;
+  b.onclick=async()=>{ const nick=n.value.trim(); const pp=privacyProblem(nick); if(pp){ m.textContent=pp; return; }
+    b.disabled=true; m.textContent=L("Entrando…","Joining…");
+    try{ const me=await Store.join(nick); Me.set(me); render(); }
+    catch(e){ m.textContent=e.status===409?L("Ese apodo ya está en uso.","That nickname is taken."):L("No se pudo entrar. Intenta de nuevo.","Couldn't join. Try again."); b.disabled=false; } };
+}
+
+/* ---------- main: chat and photos ---------- */
+function mainHTML(me){ return `
+  <div class="row" style="justify-content:space-between"><div class="tabs" role="tablist">
+    <button role="tab" data-tab="chat" aria-selected="${tab==="chat"}">💬 Nütram</button>
+    <button role="tab" data-tab="fotos" aria-selected="${tab==="fotos"}">📷 Adkintun</button>
+    <button role="tab" data-tab="normas" aria-selected="${tab==="normas"}">${L("Normas","Rules")}</button></div>
+    <span class="hint">${L("Apodo","Nickname")}: <b>${esc(me.nick)}</b> · <button class="ic" id="leave">${L("salir","leave")}</button></span></div>
+  <div id="pane"></div>`; }
+function bindMain(me){
+  app.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; LS.set("trawun_tab",tab); render(); });
+  $("#leave").onclick=()=>{ if(confirmBox(L("¿Salir? En este teléfono se olvida tu apodo.","Leave? This phone forgets your nickname."))){ Me.clear(); render(); } };
+  if(tab==="chat") chatPane(me); else if(tab==="fotos") photosPane(me); else { $("#pane").innerHTML=`<section class="panel"><h2>${L("Normas","Rules")}</h2>${rulesHTML()}</section>`; }
+}
+function confirmBox(t){ return window.confirm(t); }
+
+/* chat */
+function chatPane(me){
+  const c=CHANNELS[ch];
+  $("#pane").innerHTML=`<section class="panel">
+    <div class="chips" role="group" aria-label="${L("Canal","Channel")}">${Object.entries(CHANNELS).map(([k,v])=>`<button class="chip" data-ch="${k}" aria-pressed="${k===ch}">${esc(v.n)}</button>`).join("")}</div>
+    <p class="hint">${esc(c.d())} ${L("Toca una palabra para buscarla en el diccionario.","Tap a word to look it up in the dictionary.")}</p>
+    <div class="msgs" id="msgs" aria-live="polite"><p class="empty">${L("Cargando…","Loading…")}</p></div>
+    <div class="chips" aria-label="${L("Frases","Phrases")}">${PHRASES.map(([m,es,en])=>`<button class="chip" data-ph="${esc(m)}" title="${esc(L(es,en))}">${esc(m)}</button>`).join("")}</div>
+    <div class="compose"><textarea id="txt" rows="2" maxlength="500" placeholder="${ch==="mapu"?"Mari mari…":L("Escribe tu pregunta…","Write your question…")}" aria-label="${L("Mensaje","Message")}"></textarea>
+      <button class="btn" id="send" aria-label="${L("Enviar","Send")}">➤</button></div>
+    <p class="hint" id="cmsg" aria-live="polite"></p></section>`;
+  app.querySelectorAll("[data-ch]").forEach(b=>b.onclick=()=>{ ch=b.dataset.ch; LS.set("trawun_ch",ch); chatPane(me); });
+  app.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{ const t=$("#txt"); t.value=(t.value?t.value.replace(/\s*$/," "):"")+b.dataset.ph; t.focus(); });
+  const t=$("#txt"), s=$("#send"), cm=$("#cmsg");
+  t.onkeydown=e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); s.click(); } };
+  s.onclick=async()=>{ const v=t.value.trim(); if(!v) return; const pp=privacyProblem(v); if(pp){ cm.textContent=pp; return; }
+    s.disabled=true; cm.textContent="";
+    try{ await Store.send(me,ch,v); t.value=""; await loadMsgs(me,true); }
+    catch(e){ cm.textContent=e.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):(e.body&&e.body.error==="blocked")?L("Tu apodo está bloqueado.","Your nickname is blocked."):L("No se pudo enviar.","Couldn't send."); }
+    s.disabled=false; t.focus(); };
+  $("#msgs").onclick=e=>{ const w=e.target.closest(".w"); if(w){ window.open(dictLink(w.dataset.w),"_blank","noopener"); return; }
+    const r=e.target.closest("[data-rep]"); if(r) report(me,"msg",r.dataset.rep); };
+  loadMsgs(me,true);
+  pollT=setInterval(()=>loadMsgs(me,false), Store.mode==="remote"?8000:4000);
+}
+let msgCache=[];
+async function loadMsgs(me,scroll){
+  const box=$("#msgs"); if(!box) return;
+  let list; try{ list=await Store.msgs(ch); }catch(e){ if(!msgCache.length) box.innerHTML=`<p class="empty">${L("No se pudo cargar la conversación.","Couldn't load the conversation.")}</p>`; return; }
+  const sig=list.map(m=>m.id).join(","); if(!scroll && sig===msgCache.sig) return; msgCache=list; msgCache.sig=sig;
+  const atBottom=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
+  box.innerHTML=list.length?list.map(m=>`<div class="msg${m.uid===me.id?" me":""}"><div class="who"><span>${esc(m.nick)}</span><time>${esc(ago(m.ts))}</time></div>
+      <div class="txt" lang="${ch==="mapu"?"arn":""}">${wordsHTML(m.text)}</div>
+      ${m.uid!==me.id?`<div class="tools"><button class="ic" data-rep="${esc(m.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button></div>`:""}</div>`).join("")
+    :`<p class="empty">${ch==="mapu"?L("Nadie ha escrito todavía. Empieza con «Mari mari».","Nobody has written yet. Start with «Mari mari».") : L("Todavía no hay preguntas.","No questions yet.")}</p>`;
+  if(scroll||atBottom) box.scrollTop=box.scrollHeight;
+}
+async function report(me,type,id){
+  if(!confirmBox(L("¿Avisar al moderador sobre esto?","Report this to the moderator?"))) return;
+  try{ await Store.report(me,type,id); toast(L("Gracias. El moderador lo revisará.","Thanks. The moderator will check it.")); }catch(e){ toast(L("No se pudo enviar el aviso.","Couldn't send the report.")); }
+}
+
+/* photos */
+let cat=LS.get("trawun_cat","all")||"all";
+const CATS=()=>({all:L("Todo","All"),vestuario:"Vestuario",progreso:L("Progreso","Progress"),otra:L("Otra","Other")});
+function photosPane(me){
+  $("#pane").innerHTML=`<section class="panel">
+    <div class="row" style="justify-content:space-between"><div class="chips" role="group">${Object.entries(CATS()).map(([k,v])=>`<button class="chip" data-cat="${k}" aria-pressed="${k===cat}">${esc(v)}</button>`).join("")}</div>
+      <button class="btn small" id="share">＋ ${L("Compartir","Share")}</button></div>
+    <div class="grid" id="grid"><p class="empty">${L("Cargando…","Loading…")}</p></div></section>`;
+  app.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; LS.set("trawun_cat",cat); photosPane(me); });
+  $("#share").onclick=()=>shareDialog(me,"choose");
+  $("#grid").onclick=e=>{ const r=e.target.closest("[data-rep]"); if(r) report(me,"post",r.dataset.rep); };
+  loadPosts(me);
+  const sh=params.get("share"); if(sh){ history.replaceState(null,"",location.pathname); shareDialog(me, sh==="progress"?"progress":"outfit", params.get("p")); }
+}
+function outfitSVG(o){ if(!window.FIG||!o) return ""; const p=FIG.PEOPLE.find(x=>x.id===o.p); if(!p) return "";
+  const ok={}; for(const [s,id] of Object.entries(o.o||{})){ const it=FIG.ITEMS.find(i=>i.id===id&&i.slot===s); if(it&&FIG.fits(it,p)) ok[s]=id; }
+  return FIG.figureSVG(p,ok); }
+function progressHTML(g){ return `<div class="prog"><p class="eyebrow" style="letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${L("Mi progreso","My progress")}</p><div class="big">★ ${+g.stars||0}</div>
+  <div class="row"><span>${L("Niveles","Levels")}</span><b>${+g.levels||0}</b></div>
+  <div class="row"><span>ngülliw</span><b>${+g.nuts||0}</b></div>
+  <div class="row"><span>${L("Prendas","Items")}</span><b>${+g.items||0}</b></div></div>`; }
+async function loadPosts(me){
+  const grid=$("#grid"); if(!grid) return;
+  let list; try{ list=await Store.posts(); }catch(e){ grid.innerHTML=`<p class="empty">${L("No se pudieron cargar las publicaciones.","Couldn't load the posts.")}</p>`; return; }
+  if(cat!=="all") list=list.filter(p=>p.cat===cat);
+  if(!list.length){ grid.innerHTML=`<p class="empty" style="grid-column:1/-1">${L("Todavía no hay nada aquí. ¡Comparte tu vestuario!","Nothing here yet. Share your outfit!")}</p>`; return; }
+  grid.innerHTML=list.map(p=>`<article class="card"><div class="pic" data-img="${p.kind==="photo"?esc(p.id):""}">${p.kind==="outfit"?outfitSVG(p.outfit):p.kind==="progress"?progressHTML(p.progress||{}):""}</div>
+    <div class="body">${p.status==="pending"?`<span class="tag pend">${L("Esperando revisión","Waiting for review")}</span>`:`<span class="tag">${esc(CATS()[p.cat]||p.cat)}</span>`}
+      ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}
+      <div class="meta"><span><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</span>${p.uid!==me.id?`<button class="ic" data-rep="${esc(p.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button>`:""}</div></div></article>`).join("");
+  grid.querySelectorAll("[data-img]").forEach(async d=>{ if(!d.dataset.img) return; const u=await Store.imgURL(d.dataset.img); if(u) d.innerHTML=`<img src="${esc(u)}" alt="${esc(L("Foto compartida","Shared photo"))}" loading="lazy">`; });
+}
+
+/* share dialog: choose what, then compose */
+function shareDialog(me,step,person){
+  const m=document.createElement("div"); m.className="modal"; m.setAttribute("role","dialog"); m.setAttribute("aria-modal","true");
+  const close=()=>m.remove(); m.onclick=e=>{ if(e.target===m) close(); };
+  document.body.appendChild(m);
+  const caption=`<label for="cap">${L("Comentario (opcional)","Caption (optional)")}</label><input type="text" id="cap" maxlength="140">`;
+  const foot=`<p class="hint" id="smsg" aria-live="polite"></p><div class="row"><button class="btn" id="go">${L("Publicar","Post")}</button><button class="btn ghost" id="cancel">${L("Cancelar","Cancel")}</button></div>`;
+  const draw=html=>{ m.innerHTML=`<div class="panel">${html}</div>`; const c=m.querySelector("#cancel"); if(c) c.onclick=close; };
+  const send=async(p)=>{ const cap=(m.querySelector("#cap")||{}).value||""; const pp=privacyProblem(cap); const sm=m.querySelector("#smsg"); if(pp){ sm.textContent=pp; return; }
+    const go=m.querySelector("#go"); go.disabled=true; sm.textContent=L("Publicando…","Posting…");
+    try{ const row=await Store.post(me,Object.assign(p,{caption:cap.trim()})); close(); toast(row.status==="pending"?L("Enviada. Se verá cuando el moderador la apruebe.","Sent. It will show once the moderator approves it."):L("¡Publicado!","Posted!")); tab="fotos"; render(); }
+    catch(e){ sm.textContent=e.status===429?L("Has publicado mucho hoy. Vuelve mañana.","You've posted a lot today. Come back tomorrow."):L("No se pudo publicar.","Couldn't post."); go.disabled=false; } };
+  if(step==="choose") return draw(`<h2>${L("¿Qué quieres compartir?","What would you like to share?")}</h2>
+    <div class="row"><button class="btn" id="o">👘 ${L("Mi vestuario","My outfit")}</button><button class="btn" id="g">★ ${L("Mi progreso","My progress")}</button><button class="btn" id="f">📷 ${L("Una foto","A photo")}</button></div>
+    <div class="row"><button class="btn ghost" id="cancel">${L("Cancelar","Cancel")}</button></div>`), m.querySelector("#o").onclick=()=>{close();shareDialog(me,"outfit")}, m.querySelector("#g").onclick=()=>{close();shareDialog(me,"progress")}, m.querySelector("#f").onclick=()=>{close();shareDialog(me,"photo")};
+  if(step==="outfit"){
+    const outs=Game.outfits(); const people=(window.FIG?FIG.PEOPLE:[]);
+    const dressed=people.filter(p=>Object.keys(outs[p.id]||{}).length);
+    if(!dressed.length) return draw(`<h2>Vestuario</h2><p>${L("Todavía no has vestido a ningún personaje en el juego. Gana ngülliw en los niveles y compra ropa en «Vestuario».","You haven't dressed any character in the game yet. Earn ngülliw in the levels and buy clothes in «Vestuario».")}</p><div class="row"><a class="btn" href="../">${L("Ir al juego","Go to the game")}</a><button class="btn ghost" id="cancel">${L("Cerrar","Close")}</button></div>`);
+    let sel=dressed.find(p=>p.id===(person||Game.sel()))||dressed[0];
+    const paint=()=>{ draw(`<h2>${L("Comparte tu vestuario","Share your outfit")}</h2>
+      <div class="who-pick">${dressed.map(p=>`<button data-p="${esc(p.id)}" aria-pressed="${p.id===sel.id}">${FIG.figureSVG(p,outs[p.id])}<span>${esc(p.id)}</span></button>`).join("")}</div>
+      ${caption}${foot}`);
+      m.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{ sel=dressed.find(p=>p.id===b.dataset.p); paint(); });
+      m.querySelector("#go").onclick=()=>send({kind:"outfit",cat:"vestuario",outfit:{p:sel.id,o:outs[sel.id]}}); };
+    return paint();
+  }
+  if(step==="progress"){
+    const g={stars:Game.stars(),levels:Game.levels(),nuts:Game.nuts(),items:Game.owned().length};
+    draw(`<h2>${L("Comparte tu progreso","Share your progress")}</h2><div style="max-width:220px">${progressHTML(g)}</div>${caption}${foot}`);
+    m.querySelector("#go").onclick=()=>send({kind:"progress",cat:"progreso",progress:g}); return;
+  }
+  if(step==="photo"){
+    draw(`<h2>${L("Comparte una foto","Share a photo")}</h2>
+      <p class="note">${L("Por ejemplo, tu cuaderno, una tarea o algo que hiciste. Sin caras ni datos personales. El moderador la revisa antes de mostrarla.","For example, your notebook, homework or something you made. No faces or personal details. The moderator checks it before it's shown.")}</p>
+      <label for="pf">${L("Foto","Photo")}</label><input type="file" id="pf" accept="image/*">
+      <img id="pv" class="preview" alt="" hidden>
+      <label for="pc">${L("Tipo","Type")}</label><select id="pc"><option value="progreso">${L("Progreso","Progress")}</option><option value="vestuario">Vestuario</option><option value="otra">${L("Otra","Other")}</option></select>
+      ${caption}${foot}`);
+    let blob=null; const go=m.querySelector("#go"); go.disabled=true;
+    m.querySelector("#pf").onchange=async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const sm=m.querySelector("#smsg");
+      try{ blob=await shrink(f); const pv=m.querySelector("#pv"); pv.src=URL.createObjectURL(blob); pv.hidden=false; go.disabled=false; sm.textContent=""; }
+      catch(err){ sm.textContent=L("No se pudo leer esa imagen.","Couldn't read that image."); } };
+    go.onclick=()=>blob&&send({kind:"photo",cat:m.querySelector("#pc").value,image:blob});
+  }
+}
+/* re-draw the photo on a canvas: at most 1280 px, JPEG. This also drops EXIF data (camera, GPS position). */
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+  const k=Math.min(1,1280/Math.max(img.naturalWidth,img.naturalHeight)); const c=document.createElement("canvas");
+  c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k); c.getContext("2d").drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+  let q=.85, b; do{ b=await new Promise(r=>c.toBlob(r,"image/jpeg",q)); q-=.15; }while(b && b.size>600*1024 && q>.3);
+  if(!b) throw new Error("encode"); return b;
+}
+
+/* ---------- moderator view: ?admin ---------- */
+async function adminView(){
+  app.innerHTML=`<a class="back" href="./">← Trawün</a><div class="top"><div><p class="eyebrow">Trawün</p><h1>${L("Moderación","Moderation")}</h1></div>${langToggle()}</div>
+    ${Store.mode==="remote"?`<section class="panel"><label for="ak">${L("Clave de moderación","Moderator key")}</label><div class="compose"><input type="text" id="ak" autocomplete="off" value="${esc(sessionStorage.getItem("trawun_admin")||"")}"><button class="btn small" id="aks">${L("Usar","Use")}</button></div></section>`
+      :`<p class="note warn">${L("Vista previa: solo ves lo publicado en este teléfono.","Preview: you only see what was posted on this phone.")}</p>`}
+    <div id="q"><p class="muted">${L("Cargando…","Loading…")}</p></div>`;
+  bindLang();
+  const ak=$("#ak"); if(ak) $("#aks").onclick=()=>{ sessionStorage.setItem("trawun_admin",ak.value.trim()); adminView(); };
+  let q; try{ q=await Store.queue(); }catch(e){ $("#q").innerHTML=`<p class="note warn">${e.status===401?L("Clave incorrecta.","Wrong key."):L("No se pudo cargar.","Couldn't load.")}</p>`; return; }
+  const rc=(t,id)=>((q.reports||{})[t+":"+id]||[]).length||0;
+  $("#q").innerHTML=`<section class="panel"><h2>${L("Fotos y publicaciones","Photos and posts")} (${q.posts.length})</h2>${q.posts.length?`<div class="grid">${q.posts.map(p=>`<article class="card"><div class="pic" data-aimg="${p.kind==="photo"?esc(p.id):""}">${p.kind==="outfit"?outfitSVG(p.outfit):p.kind==="progress"?progressHTML(p.progress||{}):""}</div>
+      <div class="body"><span class="tag ${p.status==="pending"?"pend":""}">${p.status==="pending"?L("pendiente","pending"):p.hidden?L("oculta","hidden"):L("con avisos","reported")}${rc("post",p.id)?" · ⚑"+rc("post",p.id):""}</span>
+      ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}<p class="hint"><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</p>
+      <div class="row"><button class="btn small" data-act="approve" data-t="post" data-id="${esc(p.id)}">✓ ${L("Aprobar","Approve")}</button><button class="btn small ghost" data-act="hide" data-t="post" data-id="${esc(p.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="post" data-id="${esc(p.id)}">${L("Borrar","Delete")}</button></div></div></article>`).join("")}</div>`:`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>
+    <section class="panel"><h2>${L("Mensajes con avisos","Reported messages")} (${q.msgs.length})</h2>${q.msgs.length?q.msgs.map(m=>`<div class="msg"><div class="who"><span>${esc(m.nick)} · ${esc(m.ch)}</span><time>${esc(ago(m.ts))}${rc("msg",m.id)?" · ⚑"+rc("msg",m.id):""}${m.hidden?" · "+L("oculto","hidden"):""}</time></div><div class="txt">${esc(m.text)}</div>
+      <div class="row"><button class="btn small" data-act="approve" data-t="msg" data-id="${esc(m.id)}">✓ ${L("Mostrar","Show")}</button><button class="btn small ghost" data-act="hide" data-t="msg" data-id="${esc(m.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="msg" data-id="${esc(m.id)}">${L("Borrar","Delete")}</button>${Store.mode==="remote"?`<button class="btn small ghost" data-act="ban" data-t="msg" data-id="${esc(m.id)}">${L("Bloquear apodo","Block nickname")}</button>`:""}</div></div>`).join(""):`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>`;
+  app.querySelectorAll("[data-aimg]").forEach(async d=>{ if(!d.dataset.aimg) return; const u=Store.mode==="remote"?await Remote.adminImg(d.dataset.aimg):await Store.imgURL(d.dataset.aimg); if(u) d.innerHTML=`<img src="${esc(u)}" alt="">`; });
+  app.querySelectorAll("[data-act]").forEach(b=>b.onclick=async()=>{ if(b.dataset.act!=="approve" && !confirmBox(L("¿Seguro?","Are you sure?"))) return;
+    try{ await Store.act(b.dataset.t,b.dataset.id,b.dataset.act); adminView(); }catch(e){ toast(L("No se pudo.","Couldn't do it.")); } });
+}
+
+render();
+</script>
+</body>
+</html>
