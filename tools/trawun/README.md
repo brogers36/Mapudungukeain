@@ -78,3 +78,16 @@ Volver a correr `deploy.mjs` actualiza el servicio y **mantiene** la clave y el 
 - Límites: un mensaje cada 3 segundos y 40 cada 10 minutos; 20 publicaciones y 5 fotos al día por apodo. Los mensajes
   de más de seis meses se borran solos.
 - Solo se aceptan peticiones desde `https://brogers36.github.io` (variable `ORIGINS`).
+
+## Palin entre dos personas
+
+En Trawün, la pestaña «🏑 Palin» es la sala de espera: alguien crea un partido y espera con la página abierta; otra
+persona lo toma desde la lista. Las dos pasan al juego (`?palin=…`), que hace las mismas diez preguntas a las dos (con
+la semilla del partido). El servicio decide cada ronda con su propio reloj: si acierta una sola, esa empuja la pali un
+paso; si aciertan las dos, empuja la que respondió primero; tres pasos desde el centro son un gol. Cada pregunta dura 20
+segundos. Quien abandona pierde. Los ngülliw se pagan como en un partido amistoso, una vez por partido. Los partidos se
+borran después de un día. Solo se guardan los apodos, si cada respuesta fue correcta y la hora; no hay chat dentro del
+partido.
+
+El servicio confía en lo que el teléfono dice («correcta» o no): alguien con conocimientos técnicos podría hacer trampa.
+Para un juego entre estudiantes parece aceptable; si hace falta, se puede pasar la revisión al servicio.

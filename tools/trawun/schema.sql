@@ -49,3 +49,25 @@ CREATE TABLE IF NOT EXISTS meta (
   v TEXT NOT NULL,
   n INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS palin (
+  id      TEXT PRIMARY KEY,
+  host    TEXT NOT NULL,
+  hnick   TEXT NOT NULL,
+  guest   TEXT,
+  gnick   TEXT,
+  seed    INTEGER NOT NULL,
+  status  TEXT NOT NULL,
+  created INTEGER NOT NULL,
+  started INTEGER,
+  leaver  TEXT,
+  hseen   INTEGER
+);
+CREATE INDEX IF NOT EXISTS palin_status ON palin (status, created);
+CREATE TABLE IF NOT EXISTS palin_ans (
+  match TEXT NOT NULL,
+  round INTEGER NOT NULL,
+  uid   TEXT NOT NULL,
+  ok    INTEGER NOT NULL,
+  ts    INTEGER NOT NULL,
+  PRIMARY KEY (match, round, uid)
+);

@@ -241,7 +241,7 @@ function dictLink(w){ return "../diccionario/#/buscar/"+encodeURIComponent(w); }
 function wordsHTML(t){ return esc(t).replace(/[\p{L}ñüÑÜ'’]+/gu, w=>`<span class="w" data-w="${w}" title="${L("Buscar en el diccionario","Look up in the dictionary")}">${w}</span>`); }
 
 /* ---------- app state ---------- */
-let tab = params.get("share") ? "fotos" : (LS.get("trawun_tab","chat")||"chat");
+let tab = params.get("share") ? "fotos" : params.get("tab")==="palin" ? "palin" : (LS.get("trawun_tab","chat")||"chat");
 let ch = LS.get("trawun_ch","mapu")||"mapu";
 let pollT=null, lastSeen=0;
 const CHANNELS = { mapu:{n:"Mapudungun mew", d:()=>L("Solo en mapudungun. Equivocarse es parte de aprender: ¡anímate!","Mapudungun only. Mistakes are part of learning: go for it!")},
@@ -295,15 +295,58 @@ function mainHTML(me){ return `
   <div class="row" style="justify-content:space-between"><div class="tabs" role="tablist">
     <button role="tab" data-tab="chat" aria-selected="${tab==="chat"}">💬 Nütram</button>
     <button role="tab" data-tab="fotos" aria-selected="${tab==="fotos"}">📷 Adkintun</button>
+    <button role="tab" data-tab="palin" aria-selected="${tab==="palin"}">🏑 Palin</button>
     <button role="tab" data-tab="normas" aria-selected="${tab==="normas"}">${L("Normas","Rules")}</button></div>
     <span class="hint">${L("Apodo","Nickname")}: <b>${esc(me.nick)}</b> · <button class="ic" id="leave">${L("salir","leave")}</button></span></div>
   <div id="pane"></div>`; }
 function bindMain(me){
   app.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; LS.set("trawun_tab",tab); render(); });
   $("#leave").onclick=()=>{ if(confirmBox(L("¿Salir? En este teléfono se olvida tu apodo.","Leave? This phone forgets your nickname."))){ Me.clear(); render(); } };
-  if(tab==="chat") chatPane(me); else if(tab==="fotos") photosPane(me); else { $("#pane").innerHTML=`<section class="panel"><h2>${L("Normas","Rules")}</h2>${rulesHTML()}</section>`; }
+  if(tab==="chat") chatPane(me); else if(tab==="fotos") photosPane(me); else if(tab==="palin") palinPane(me); else { $("#pane").innerHTML=`<section class="panel"><h2>${L("Normas","Rules")}</h2>${rulesHTML()}</section>`; }
 }
 function confirmBox(t){ return window.confirm(t); }
+
+/* palin between two people: the lobby is here; the match itself is played in the game (../?palin=ID), which has the
+   questions and the field. One person creates a match and waits; anyone else in the list can take it. */
+const palApi=async(path,body)=>{ const r=await fetch(TRAWUN_API.replace(/\/$/,"")+path,body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{});
+  let b=null; try{ b=await r.json(); }catch(e){} if(!r.ok) throw Object.assign(new Error((b&&b.error)||r.status),{status:r.status,body:b}); return b; };
+const palGo=id=>{ location.href="../?palin="+encodeURIComponent(id); };
+function palinPane(me){
+  const pane=$("#pane");
+  if(Store.mode!=="remote"){ pane.innerHTML=`<section class="panel"><h2>Palin</h2><p>${L("Jugar palin con otra persona necesita el servicio en línea de Trawün.","Playing palin with another person needs Trawün's online service.")}</p></section>`; return; }
+  pane.innerHTML=`<section class="panel"><h2>${L("Palin entre dos personas","Palin for two people")}</h2>
+    <p class="hint">${L("Las dos personas responden las mismas preguntas al mismo tiempo. Quien acierta empuja la <b>pali</b> hacia la meta rival; si las dos aciertan, la empuja quien respondió primero. Cuando la pali llega a una meta (tres pasos desde el centro) es gol. Diez preguntas de 20 segundos por partido.","Both players answer the same questions at the same time. Whoever gets it right pushes the <b>pali</b> toward the rival goal; if both are right, whoever answered first pushes it. When the pali reaches a goal (three steps from the centre) it is a goal. Ten 20-second questions per match.")}</p>
+    <div id="palmine"></div>
+    <h3>${L("Partidos esperando rival","Matches waiting for a rival")}</h3>
+    <div id="palopen"><p class="empty">${L("Cargando…","Loading…")}</p></div>
+    <p class="hint" id="palmsg" aria-live="polite"></p></section>`;
+  const msg=$("#palmsg");
+  const mine=()=>LS.get("trawun_palin_open",null);
+  const showMine=()=>{ const id=mine(); $("#palmine").innerHTML=id
+      ?`<div class="row" style="justify-content:space-between;background:#191736;border:1px solid var(--gold);border-radius:10px;padding:10px 12px"><span>⏳ ${L("Tu partido espera un rival. Deja esta página abierta: el juego empieza solo cuando alguien entre.","Your match is waiting for a rival. Keep this page open: the game starts by itself when someone joins.")}</span><button class="btn small" id="palcancel">${L("Cancelar","Cancel")}</button></div>`
+      :`<div class="row"><button class="btn" id="palnew">＋ ${L("Crear un partido","Create a match")}</button></div>`;
+    const nb=$("#palnew"); if(nb) nb.onclick=async()=>{ nb.disabled=true; msg.textContent="";
+      try{ const r=await palApi("/palin/new",{key:me.key}); LS.set("trawun_palin_open",r.id); showMine(); refresh(); }
+      catch(e){ nb.disabled=false; msg.textContent=!e.status?L("Sin conexión.","Offline."):e.status===404?L("Palin todavía no está activo en el servicio: hay que volver a publicarlo (node tools/publicar_servicios.mjs).","Palin isn't active on the service yet: it needs to be published again (node tools/publicar_servicios.mjs)."):e.status===403?L("Tu apodo está bloqueado.","Your nickname is blocked."):L("No se pudo crear el partido.","Couldn't create the match."); } };
+    const cb=$("#palcancel"); if(cb) cb.onclick=async()=>{ const id=mine(); LS.set("trawun_palin_open",null); try{ await palApi("/palin/cancel",{key:me.key,id}); }catch(e){} showMine(); refresh(); }; };
+  async function refresh(){
+    const box=$("#palopen"); if(!box){ clearInterval(pollT); return; }
+    const id=mine();
+    if(id){ try{ const st=await palApi("/palin/state?id="+encodeURIComponent(id)+"&key="+encodeURIComponent(me.key));
+        if(st.status==="playing"){ LS.set("trawun_palin_open",null); palGo(id); return; }
+        if(st.status!=="open"){ LS.set("trawun_palin_open",null); showMine(); } }
+      catch(e){ if(e.status===404){ LS.set("trawun_palin_open",null); showMine(); } } }
+    let list; try{ list=(await palApi("/palin/list")).open; setOffline(false); }
+    catch(e){ if(!e.status) setOffline(true); box.innerHTML=`<p class="empty">${e.status===404?L("Palin todavía no está activo en el servicio.","Palin isn't active on the service yet."):L("No se pudo cargar la lista.","Couldn't load the list.")}</p>`; return; }
+    const others=list.filter(x=>x.id!==mine());
+    box.innerHTML=others.length?`<div style="display:flex;flex-direction:column;gap:6px">${others.map(x=>`<div class="row" style="justify-content:space-between;background:#191736;border:1px solid var(--panel-2);border-radius:10px;padding:8px 12px"><span><b>${esc(x.hnick)}</b> <span class="hint">· ${esc(ago(x.created))}</span></span><button class="btn small" data-join="${esc(x.id)}">${L("Jugar","Play")}</button></div>`).join("")}</div>`
+      :`<p class="empty">${L("Nadie espera ahora. Crea un partido y avisa en Nütram.","Nobody is waiting right now. Create a match and say so in Nütram.")}</p>`;
+    box.querySelectorAll("[data-join]").forEach(b=>b.onclick=async()=>{ b.disabled=true; msg.textContent="";
+      try{ await palApi("/palin/join",{key:me.key,id:b.dataset.join}); palGo(b.dataset.join); }
+      catch(e){ b.disabled=false; msg.textContent=e.status===409?L("Alguien más tomó ese partido.","Someone else took that match."):L("No se pudo entrar al partido.","Couldn't join the match."); refresh(); } });
+  }
+  showMine(); refresh(); pollT=setInterval(refresh,3000);
+}
 
 /* chat */
 function chatPane(me){

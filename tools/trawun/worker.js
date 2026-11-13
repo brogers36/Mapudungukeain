@@ -16,6 +16,15 @@
    POST /posts {key, kind, cat, caption, outfit|progress|image}  -> {id, status}
    GET  /img/ID[?key=]                     -> image/jpeg                 approved photos, or the author's own
    POST /report {key, type: msg|post, id}  -> {ok}
+   Palin, two players (2026-11-12): both answer the same questions in the game; per round, whoever is right (or right
+   first) pushes the pali one step toward the other's goal; three steps is a goal. The game (index.html?palin=ID) plays it.
+   GET  /palin/list                        -> {open:[{id,hnick,created}]}  matches waiting for a rival (10 minutes)
+   POST /palin/new {key}                   -> {id}                       one open match per person
+   POST /palin/join {key, id}              -> {ok}
+   POST /palin/cancel {key, id}            -> {ok}                       an open match: removed; a match in play: the
+                                                                         one who leaves loses
+   GET  /palin/state?id=&key=              -> the match as the server sees it now (see palinState)
+   POST /palin/answer {key, id, round, ok} -> {ok}                       counted only inside the round's time
    GET  /admin/queue        (X-Admin)      -> {posts, msgs, reports}
    POST /admin/act {type,id,action}        approve | hide | delete | ban  (X-Admin)
    GET  /admin/img/ID       (X-Admin)      -> image/jpeg
@@ -54,6 +63,45 @@ async function ensureMsgCols(DB) {
   msgCols = true;
 }
 const EDIT_WINDOW = 24 * 3600000;
+
+/* ---------- palin between two players ---------- */
+const PAL_N = 10, PAL_ROUND_MS = 20000, PAL_GAP = 3000, PAL_OPEN_MS = 10 * 60000, PAL_START = 7000;
+let palTables = false;
+async function ensurePalin(DB) {
+  if (palTables) return;
+  await DB.batch([
+    DB.prepare("CREATE TABLE IF NOT EXISTS palin (id TEXT PRIMARY KEY, host TEXT NOT NULL, hnick TEXT NOT NULL, guest TEXT, gnick TEXT, seed INTEGER NOT NULL, status TEXT NOT NULL, created INTEGER NOT NULL, started INTEGER, leaver TEXT, hseen INTEGER)"),
+    DB.prepare("CREATE INDEX IF NOT EXISTS palin_status ON palin (status, created)"),
+    DB.prepare("CREATE TABLE IF NOT EXISTS palin_ans (match TEXT NOT NULL, round INTEGER NOT NULL, uid TEXT NOT NULL, ok INTEGER NOT NULL, ts INTEGER NOT NULL, PRIMARY KEY (match, round, uid))")]);
+  palTables = true;
+}
+/* The whole match is replayed from the stored answers, with server times only. Round r opens when the previous one
+   was decided (plus a short pause to show what happened) and closes when both have answered or after PAL_ROUND_MS.
+   One right and one wrong (or no answer): the right one pushes. Both right: the first. Both wrong: the pali stays.
+   ball > 0 is toward the guest's goal (good for the host). */
+function palinState(m, answers, now) {
+  const A = {}; for (const a of answers) (A[a.round] = A[a.round] || {})[a.uid] = a;
+  let t = (m.started || 0) + PAL_START, ball = 0, hs = 0, gs = 0, last = null, hr = 0, gr = 0;
+  const base = { id: m.id, hnick: m.hnick, gnick: m.gnick, host: m.host, guest: m.guest, seed: m.seed, n: PAL_N, now, status: m.status };
+  if (m.status === "open") return base;
+  for (let r = 0; r < PAL_N; r++) {
+    const ah = (A[r] || {})[m.host], ag = (A[r] || {})[m.guest], deadline = t + PAL_ROUND_MS;
+    let end;
+    if (ah && ag) end = Math.max(ah.ts, ag.ts);
+    else if (m.status === "left") break;
+    else if (now >= deadline) end = deadline;
+    else return { ...base, round: r, start: t, deadline, ball, hs, gs, hr, gr, last, answered: { host: !!ah, guest: !!ag }, done: false };
+    const ho = !!(ah && ah.ok), go = !!(ag && ag.ok); if (ho) hr++; if (go) gr++;
+    const push = ho && !go ? 1 : go && !ho ? -1 : ho && go ? (ah.ts <= ag.ts ? 1 : -1) : 0, from = ball;
+    ball += push; let goal = null;
+    if (ball >= 3) { hs++; ball = 0; goal = "host"; } else if (ball <= -3) { gs++; ball = 0; goal = "guest"; }
+    last = { r, ho, go, push, goal, from };
+    t = end + PAL_GAP;
+  }
+  let winner = hs > gs ? "host" : gs > hs ? "guest" : null;
+  if (m.status === "left") winner = m.leaver === m.host ? "guest" : "host";
+  return { ...base, round: PAL_N, ball, hs, gs, hr, gr, last, done: true, winner, left: m.status === "left" ? (m.leaver === m.host ? "host" : "guest") : null, nextAt: t };
+}
 
 async function who(DB, key) {
   if (!key || typeof key !== "string" || key.length > 80) return null;
@@ -176,6 +224,62 @@ export default {
         if (text === m0.text) return json({ ok: true, edited: m0.edited || null }, 200, h);
         await DB.prepare("UPDATE msgs SET text = ?, edited = ?, orig = COALESCE(orig, ?) WHERE id = ?").bind(text, now, m0.text, id).run();
         return json({ ok: true, edited: now }, 200, h);
+      }
+
+      if (P.startsWith("/palin/")) {
+        await ensurePalin(DB);
+        if (P === "/palin/list" && req.method === "GET") {
+          const rs = await DB.prepare("SELECT id, hnick, created FROM palin WHERE status = 'open' AND created > ? AND hseen > ? ORDER BY created DESC LIMIT 30").bind(now - PAL_OPEN_MS, now - 15000).all();
+          return json({ open: rs.results }, 200, h);
+        }
+        if (P === "/palin/state" && req.method === "GET") {
+          const id = url.searchParams.get("id") || ""; if (!/^g[a-z0-9]{10}$/.test(id)) return json({ error: "bad id" }, 400, h);
+          const m = await DB.prepare("SELECT * FROM palin WHERE id = ?").bind(id).first(); if (!m) return json({ error: "not found" }, 404, h);
+          const ans = (await DB.prepare("SELECT round, uid, ok, ts FROM palin_ans WHERE match = ?").bind(id).all()).results;
+          const st = palinState(m, ans, now);
+          if (st.status === "open" && now - m.created > PAL_OPEN_MS) st.status = "expired";
+          /* an open match is listed only while its creator's page keeps asking (so nobody joins an empty match) */
+          if (st.status === "open") { const u = await who(DB, url.searchParams.get("key")); if (u && u.id === m.host) await DB.prepare("UPDATE palin SET hseen = ? WHERE id = ?").bind(now, id).run(); }
+          return json(st, 200, h);
+        }
+        const u = await who(DB, body && body.key); if (!u) return json({ error: "unknown" }, 401, h); if (u.banned) return json({ error: "blocked" }, 403, h);
+        if (P === "/palin/new") {
+          await DB.prepare("DELETE FROM palin WHERE host = ? AND status = 'open'").bind(u.id).run();
+          if (Math.random() < 0.05) await DB.batch([DB.prepare("DELETE FROM palin_ans WHERE match IN (SELECT id FROM palin WHERE created < ?)").bind(now - 86400000),
+            DB.prepare("DELETE FROM palin WHERE created < ?").bind(now - 86400000)]);   // matches are kept one day
+          const rec = await DB.prepare("SELECT COUNT(*) AS n FROM palin WHERE host = ? AND created > ?").bind(u.id, now - 3600000).first();
+          if (rec.n >= 30) return json({ error: "too many" }, 429, h);
+          const id = "g" + rid(10), seed = Math.floor(Math.random() * 2147483647);
+          await DB.prepare("INSERT INTO palin (id, host, hnick, seed, status, created, hseen) VALUES (?, ?, ?, ?, 'open', ?, ?)").bind(id, u.id, u.nick, seed, now, now).run();
+          return json({ id }, 201, h);
+        }
+        const id = String(body.id || ""); if (!/^g[a-z0-9]{10}$/.test(id)) return json({ error: "bad id" }, 400, h);
+        const m = await DB.prepare("SELECT * FROM palin WHERE id = ?").bind(id).first(); if (!m) return json({ error: "not found" }, 404, h);
+        if (P === "/palin/join") {
+          if (m.host === u.id) return json({ error: "own match" }, 400, h);
+          if (m.status !== "open" || now - m.created > PAL_OPEN_MS) return json({ error: "taken" }, 409, h);
+          const r = await DB.prepare("UPDATE palin SET guest = ?, gnick = ?, status = 'playing', started = ? WHERE id = ? AND status = 'open'").bind(u.id, u.nick, now, id).run();
+          if (!r.meta.changes) return json({ error: "taken" }, 409, h);
+          return json({ ok: true }, 200, h);
+        }
+        if (P === "/palin/cancel") {
+          if (m.status === "open" && m.host === u.id) { await DB.prepare("DELETE FROM palin WHERE id = ?").bind(id).run(); return json({ ok: true }, 200, h); }
+          if (m.status === "playing" && (m.host === u.id || m.guest === u.id)) {
+            const ans = (await DB.prepare("SELECT round, uid, ok, ts FROM palin_ans WHERE match = ?").bind(id).all()).results;
+            if (!palinState(m, ans, now).done) await DB.prepare("UPDATE palin SET status = 'left', leaver = ? WHERE id = ? AND status = 'playing'").bind(u.id, id).run();
+            return json({ ok: true }, 200, h);
+          }
+          return json({ error: "bad request" }, 400, h);
+        }
+        if (P === "/palin/answer") {
+          if (m.status !== "playing" || (m.host !== u.id && m.guest !== u.id)) return json({ error: "not playing" }, 400, h);
+          const ans = (await DB.prepare("SELECT round, uid, ok, ts FROM palin_ans WHERE match = ?").bind(id).all()).results;
+          const st = palinState(m, ans, now);
+          if (st.done || Number(body.round) !== st.round || now < st.start) return json({ error: "late" }, 409, h);
+          await DB.prepare("INSERT OR IGNORE INTO palin_ans (match, round, uid, ok, ts) VALUES (?, ?, ?, ?, ?)").bind(id, st.round, u.id, body.ok ? 1 : 0, now).run();
+          return json({ ok: true }, 200, h);
+        }
+        return json({ error: "not found" }, 404, h);
       }
 
       if (P === "/posts" && req.method === "GET") {

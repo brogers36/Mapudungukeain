@@ -2,7 +2,7 @@
    The game page is fetched from the network first, so updates arrive as soon as there is a connection,
    and served from the cache when offline. Icons and Google Fonts are served from the cache.
    Only caches named mapudungukeain-* are managed here; the dictionary keeps its own (nemulkawe-*). */
-const CACHE = 'mapudungukeain-v20261113014505__VERSION__';
+const CACHE = 'mapudungukeain-v20261113024553__VERSION__';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png',
   './trawun/', './trawun/figura.js'];   /* Trawün opens offline too, showing the last messages and posts it saw */
 self.addEventListener('install', e => {

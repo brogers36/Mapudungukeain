@@ -3815,6 +3815,7 @@ function palin(msg){
     <div class="row">${palCup?`<button class="btn" id="cup" ${open?"":"disabled"}>${esc(L2(`Jugar: ${PAL_ROUNDS[palCup.round+1].es}`,`Play: ${PAL_ROUNDS[palCup.round+1].en}`))}</button>`
       :palSeason>=SEASON_NEED?`<button class="btn" id="cupgo" ${open?"":"disabled"}>${L2("Empezar el torneo","Start the tournament")}</button>`:""}
       <button class="btn${palCup||palSeason>=SEASON_NEED?" ghost":""}" id="play" ${open?"":"disabled"}>${palCup||palSeason>=SEASON_NEED?L2("Partido amistoso","Friendly match"):L2("Jugar un partido","Play a match")}</button>
+      <a class="btn ghost" href="trawun/?tab=palin">🏑 ${L2("Contra otra persona (Trawün)","Against another person (Trawün)")}</a>
       <button class="btn ghost" id="recruit" ${!open||team>=TEAM_MAX||nuts<TEAM_PRICE?"disabled":""}>${team>=TEAM_MAX?L2("Equipo completo","Team full"):`${NUT}${TEAM_PRICE} · ${L2("Sumar un palife","Add a palife")}`}</button></div>
     <p class="muted">${L2(`Tu equipo: ${team} palife (ataja${team>1?"n":""} ${team} gol${team>1?"es":""} por partido).`,`Your team: ${team} palife (block${team>1?"":"s"} ${team} goal${team>1?"s":""} per match).`)}</p>`;
   bindLang(()=>palin());
@@ -4492,7 +4493,107 @@ function wardrobe(msg){
   });
 }
 
-menu();
+/* ===== Palin against another person (2026-11-12). The lobby is in Trawün (trawun/, tab Palin); the match is played here,
+   at ?palin=ID, with the Trawün nickname kept on this phone. The service (tools/trawun/worker.js) decides every round
+   from server times: one right answer pushes the pali one step; both right, the first one pushes; three steps is a goal.
+   Both players get the same ten questions: they are made with the match's seed. ===== */
+var TRAWUN_API="https://mapudungukeain-trawun.mapupeyumfe.workers.dev";
+const trawunMe=()=>{ try{ return JSON.parse(localStorage.getItem("trawun_me")); }catch(e){ return null; } };
+async function twApi(path,body){ const r=await fetch(TRAWUN_API+path,body?{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{});
+  let b=null; try{ b=await r.json(); }catch(e){} if(!r.ok) throw Object.assign(new Error((b&&b.error)||r.status),{status:r.status,body:b}); return b; }
+function seededRandom(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)|0; let t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+function seededPalinQs(seed,n){ const R=Math.random; Math.random=seededRandom(seed); try{ let q=palinQs(0); while(q.length<n) q=q.concat(palinQs(0)); return q.slice(0,n); } finally{ Math.random=R; } }
+let OP=null;
+function palinOnline(id){
+  S=null; clearInterval(vidTimer); if(OP) clearInterval(OP.timer);
+  const me=trawunMe();
+  const shell=inner=>{ app.innerHTML=`<div id="pal-on">${inner}</div>`; };
+  if(!me){ shell(`<div class="result pop"><h2>Palin</h2><p>${L2("Para jugar contra otra persona, entra primero a Trawün con un apodo.","To play against another person, join Trawün with a nickname first.")}</p></div>
+    <div class="row"><a class="btn" href="trawun/?tab=palin">Trawün</a><button class="btn ghost" id="pm">${t().menu}</button></div>`);
+    document.getElementById("pm").onclick=menu; return; }
+  OP={id,me,side:null,qs:null,shown:-1,lastShown:-1,answered:{},off:0,st:null,ended:false,timer:null};
+  __back=()=>palinOnlineLeave();
+  shell(`<p class="muted" style="text-align:center">${L2("Conectando con el partido…","Connecting to the match…")}</p>`);
+  const tick=async()=>{ if(!document.getElementById("pal-on")){ clearInterval(OP.timer); return; }
+    let st; try{ st=await twApi("/palin/state?id="+encodeURIComponent(id)); }
+    catch(e){ const w=document.getElementById("pal-wait"); if(w) w.textContent=L2("Sin conexión: reintentando…","Offline: retrying…"); return; }
+    OP.off=st.now-Date.now(); OP.st=st; palinOnlineDraw(); };
+  tick(); OP.timer=setInterval(tick,1000);
+}
+function palinOnlineLeave(){
+  if(OP && OP.st && !OP.st.done && !OP.ended){ if(!confirm(L2("¿Abandonar el partido? Perderás.","Leave the match? You'll lose."))) return;
+    twApi("/palin/cancel",{key:OP.me.key,id:OP.id}).catch(()=>{}); }
+  if(OP) clearInterval(OP.timer); OP=null; try{ history.replaceState(null,"",location.pathname); }catch(e){} palin();
+}
+function palinOnlineDraw(){
+  const st=OP.st, now=Date.now()+OP.off;
+  if(st.status==="open"||st.status==="expired"){ app.innerHTML=`<div id="pal-on"><div class="result pop"><h2>Palin</h2><p>${st.status==="open"?L2("Este partido todavía espera un rival.","This match is still waiting for a rival."):L2("Este partido ya no está disponible.","This match is no longer available.")}</p></div>
+      <div class="row"><a class="btn" href="trawun/?tab=palin">Trawün</a><button class="btn ghost" id="pm">Palin</button></div></div>`;
+    clearInterval(OP.timer); document.getElementById("pm").onclick=()=>{ OP=null; palin(); }; return; }
+  if(!OP.side){ OP.side=st.host===OP.me.id?"host":st.guest===OP.me.id?"guest":"watch"; OP.qs=seededPalinQs(st.seed,st.n); }
+  if(OP.side==="watch"){ app.innerHTML=`<div id="pal-on"><div class="result pop"><h2>Palin</h2><p>${L2("Este partido es entre otras dos personas.","This match is between two other people.")}</p></div><div class="row"><button class="btn" id="pm">Palin</button></div></div>`; clearInterval(OP.timer); document.getElementById("pm").onclick=()=>{ OP=null; palin(); }; return; }
+  const sg=OP.side==="host"?1:-1, mine=OP.side, theirs=mine==="host"?"guest":"host";
+  const rival=mine==="host"?st.gnick:st.hnick, us=mine==="host"?st.hs:st.gs, them=mine==="host"?st.gs:st.hs;
+  const hud=extra=>`<div class="hud"><button class="btn ghost" id="bk" style="padding:6px 12px;font-size:.9rem">${L2("Abandonar","Leave")}</button>
+      <span class="score">${L2("Tú","You")} ${us} – ${them} ${esc(rival||"")}</span><span class="muted">${extra||""}</span></div>`;
+  const bindBk=()=>{ const b=document.getElementById("bk"); if(b) b.onclick=palinOnlineLeave; };
+  if(st.done) return palinOnlineEnd();
+  const L_=st.last, r=st.round;
+  /* the pause between rounds: show what happened (once), then count down */
+  if(now<st.start){
+    if(OP.lastShown!==(L_?L_.r:-1)){ OP.lastShown=L_?L_.r:-1;
+      let flash=null, from=null, line="";
+      if(L_){ const p=L_.push*sg, iOk=mine==="host"?L_.ho:L_.go, tOk=mine==="host"?L_.go:L_.ho;
+        from=L_.from*sg; flash=L_.goal?(L_.goal===mine?"goal":"lost"):p>0?"fwd":p<0?"back":null;
+        if(L_.goal) from=L_.goal===mine?3:-3;
+        line=iOk&&tOk?(p>0?L2("Los dos acertaron; tú fuiste más rápido.","Both were right; you were faster."):L2(`Los dos acertaron; ${rival} fue más rápido.`,`Both were right; ${rival} was faster.`))
+          :iOk?L2("¡Acertaste! Empujas la pali.","Right! You push the pali."):tOk?L2(`Fallaste; ${rival} acertó y empuja la pali.`,`Missed; ${rival} was right and pushes the pali.`)
+          :L2("Nadie acertó: la pali no se mueve.","Nobody was right: the pali stays."); }
+      app.innerHTML=`<div id="pal-on">${hud(`${Math.min(r+1,st.n)}/${st.n}`)}${palinField(st.ball*sg,4,flash,from)}
+        <p class="rule" style="text-align:center">${esc(line||L2(`Partido contra ${rival}. ¡Prepárate!`,`Match against ${rival}. Get ready!`))}</p>
+        <p class="muted" id="pal-wait" style="text-align:center"></p></div>`;
+      bindBk(); palAnim(); }
+    const w=document.getElementById("pal-wait"); if(w) w.textContent=L2(`Siguiente pregunta en ${Math.max(1,Math.ceil((st.start-now)/1000))} s`,`Next question in ${Math.max(1,Math.ceil((st.start-now)/1000))} s`);
+    return; }
+  /* a round is open */
+  if(OP.shown!==r){ OP.shown=r;
+    const q=OP.qs[r%OP.qs.length], showForm=r%2===0, opts=shuffle([q,...q.dist]);
+    app.innerHTML=`<div id="pal-on">${hud(`${r+1}/${st.n}`)}${palinField(st.ball*sg,4,null,null)}
+      <div style="height:6px;background:var(--panel-2,#2a2652);border-radius:3px;overflow:hidden;margin:6px 0"><div id="pal-bar" style="height:100%;background:var(--gold,#e8b53a);width:100%;transition:width .9s linear"></div></div>
+      <div class="prompt"><span class="ask">${showForm?t().whichPic:t().which}</span>
+        ${showForm?`<span class="big" style="font-size:1.9rem">${esc(G(q.m))}</span>`:`<div class="scene">${esc(gl(q))}</div>`}</div>
+      <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}" style="${showForm?"font-family:var(--body);font-weight:700;font-size:1rem":""}">${esc(showForm?gl(o):G(o.m))}</button>`).join("")}</div>
+      <p class="muted" id="pal-wait" style="text-align:center"></p></div>`;
+    bindBk();
+    app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(OP.answered[r]!=null) return;
+      const ok=opts[+b.dataset.i]===q; OP.answered[r]=ok;
+      app.querySelectorAll(".opt").forEach((x,i)=>{ x.disabled=true; if(opts[i]===q) x.classList.add("ok"); else if(x===b) x.classList.add("bad"); });
+      const w=document.getElementById("pal-wait"); if(w) w.textContent=L2(`Esperando a ${rival}…`,`Waiting for ${rival}…`);
+      twApi("/palin/answer",{key:OP.me.key,id:OP.id,round:r,ok}).catch(e=>{ const w2=document.getElementById("pal-wait"); if(w2) w2.textContent=e.status===409?L2("Se acabó el tiempo de esta pregunta.","Time ran out for this question."):L2("No se pudo enviar la respuesta.","Couldn't send the answer."); }); }); }
+  const bar=document.getElementById("pal-bar"); if(bar) bar.style.width=Math.max(0,Math.min(100,100*(st.deadline-now)/(st.deadline-st.start)))+"%";
+  if(OP.answered[r]==null && st.answered && st.answered[theirs]){ const w=document.getElementById("pal-wait"); if(w) w.textContent=L2(`${rival} ya respondió.`,`${rival} has answered.`); }
+}
+function palinOnlineEnd(){
+  const st=OP.st; clearInterval(OP.timer); if(OP.ended) return; OP.ended=true;
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  const mine=OP.side, us=mine==="host"?st.hs:st.gs, them=mine==="host"?st.gs:st.hs, right=mine==="host"?st.hr:st.gr, rival=mine==="host"?st.gnick:st.hnick;
+  const win=st.winner===mine, draw=!st.winner, iLeft=st.left===mine, theyLeft=st.left&&!iLeft;
+  /* ngülliw as in a friendly match, paid once per match on this phone; nothing for the one who left */
+  const paid=load("palOnPaid")||[]; let earned=0;
+  if(!iLeft && !paid.includes(st.id)){ earned=(win?25:draw?10:0)+2*right; nuts+=earned; save("nuts",nuts); if(win){ palinWins++; save("palinWins",palinWins); }
+    save("palOnPaid",paid.concat(st.id).slice(-60)); }
+  const title=iLeft?L2("Abandonaste el partido","You left the match"):theyLeft?L2(`${rival} abandonó: ¡ganaste!`,`${rival} left: you win!`)
+    :win?L2(`¡Le ganaste a ${rival}!`,`You beat ${rival}!`):draw?L2("Empate","Draw"):L2(`Ganó ${rival}`,`${rival} won`);
+  app.innerHTML=`<div id="pal-on"><div class="result pop"><p class="eyebrow">Palin · ${L2("contra","vs")} ${esc(rival||"")}</p><h2>${esc(title)}</h2>
+    <p class="score">${us} – ${them}</p><p>${t().score(right,st.n)}</p>
+    ${earned?`<span class="gain">+${earned} ${NUT}</span>`:""}
+    ${coach(win?`<b>¡${G(PRAISE[praiseIdx++ % PRAISE.length])}!</b>`:`<b>${t().keepB}</b>`, win)}</div>
+    <div class="row"><a class="btn" href="trawun/?tab=palin">${L2("Otro partido en Trawün","Another match in Trawün")}</a><button class="btn ghost" id="pm">Palin</button></div></div>`;
+  document.getElementById("pm").onclick=()=>{ OP=null; palin(); };
+}
+
+{ const pid=new URLSearchParams(location.search).get("palin");
+  if(pid && /^g[a-z0-9]{10}$/.test(pid)) palinOnline(pid); else menu(); }   /* ?palin= stays until the match ends, so a reload rejoins it */
 </script>
 <button id="pwaInstall" hidden style="position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:#c8322f;color:#f3efe6;border:0;border-radius:999px;padding:12px 18px;font:700 1rem 'Atkinson Hyperlegible',system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer">Instalar la app</button>
 <script>
