@@ -38,6 +38,10 @@ Abrir `https://brogers36.github.io/Mapudungukeain/trawun/?admin` y pegar la clav
 
 Acciones: aprobar o mostrar, ocultar, borrar, y bloquear un apodo (oculta todo lo suyo y no puede volver a escribir).
 
+Cada persona puede editar sus propios mensajes durante 24 horas (✎ Editar); el mensaje muestra «editado». Los cambios
+pasan por el mismo filtro de datos personales. El servicio guarda el texto original, y la página de moderación lo
+muestra bajo el mensaje si alguien lo cambió después de enviarlo.
+
 ## Avisos en el teléfono
 
 **Recomendado: Telegram.** 1) En Telegram, abre @BotFather, escribe `/newbot` y sigue los pasos; te da un token.

@@ -70,6 +70,8 @@ textarea{resize:vertical;min-height:44px}
 .msg .who{font-size:.8rem;color:var(--gold);font-weight:700;display:flex;gap:8px;align-items:baseline;justify-content:space-between}
 .msg .who time{color:var(--muted);font-weight:400}
 .msg .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.msg .etxt{width:100%;box-sizing:border-box;font:inherit;background:var(--ground,#100e22);color:var(--ink);border:1px solid var(--gold);border-radius:8px;padding:6px 8px;resize:vertical;margin-top:4px}
+.msg .tools .emsg{margin:0 auto 0 0;font-size:.8rem}
 .msg .txt .w{cursor:pointer;border-bottom:1px dotted transparent}
 .msg .txt .w:hover{border-bottom-color:var(--gold)}
 .tools{display:flex;gap:4px;justify-content:flex-end;margin-top:2px}
@@ -153,6 +155,9 @@ const Local = {
   async join(nick){ const id="u"+Math.random().toString(36).slice(2,10); return {id,nick,key:"local-"+id}; },
   async msgs(ch){ return this._d().msgs.filter(m=>m.ch===ch && !m.hidden).slice(-200); },
   async send(me,ch,text){ const d=this._d(); const m={id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),ch,uid:me.id,nick:me.nick,text,ts:Date.now()}; d.msgs.push(m); d.msgs=d.msgs.slice(-1000); this._s(d); return m; },
+  async edit(me,id,text){ const d=this._d(); const m=d.msgs.find(x=>x.id===id&&x.uid===me.id); if(!m) throw Object.assign(new Error("not found"),{status:404});
+    if(Date.now()-m.ts>EDIT_WINDOW) throw Object.assign(new Error("too old"),{status:403,body:{error:"too old"}});
+    if(m.text!==text){ if(m.orig==null) m.orig=m.text; m.text=text; m.edited=Date.now(); } this._s(d); return {ok:true,edited:m.edited||null}; },
   async posts(){ const d=this._d(), me=Me.get(); return d.posts.filter(p=>!p.hidden && (p.status==="ok" || (me&&p.uid===me.id) || ADMIN)).sort((a,b)=>b.ts-a.ts); },
   async post(me,p){ const d=this._d(); const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     if(p.image){ await Img.put(id,p.image); }
@@ -190,6 +195,7 @@ const Remote = {
     try{ const l=(await this._f("/msgs?ch="+encodeURIComponent(ch))).msgs; LS.set(k,l); setOffline(false); return l; }
     catch(e){ if(e.status) throw e; const c=LS.get(k,null); setOffline(true); if(c) return c; throw e; } },
   send(me,ch,text){ return this._f("/msgs",{method:"POST",body:JSON.stringify({key:me.key,ch,text})}); },
+  edit(me,id,text){ return this._f("/msgs/edit",{method:"POST",body:JSON.stringify({key:me.key,id,text})}); },
   async posts(){ const me=Me.get();
     try{ const l=(await this._f("/posts"+(me?"?key="+encodeURIComponent(me.key):""))).posts; LS.set("trawun_cache_posts",l); setOffline(false); return l; }
     catch(e){ if(e.status) throw e; const c=LS.get("trawun_cache_posts",null); setOffline(true); if(c) return c; throw e; } },
@@ -203,6 +209,7 @@ const Remote = {
   async adminImg(id){ const r=await fetch(TRAWUN_API.replace(/\/$/,"")+"/admin/img/"+id,{headers:this._adm()}); return r.ok?URL.createObjectURL(await r.blob()):null; }
 };
 const Store = TRAWUN_API ? Remote : Local;
+const EDIT_WINDOW = 24*3600000;   /* own messages can be edited for 24 hours after sending (the server checks too) */
 function blobToB64(b){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(b); }); }
 
 /* ---------- me (nickname + private key, this device only) ---------- */
@@ -319,21 +326,40 @@ function chatPane(me){
     catch(e){ cm.textContent=!e.status?L("Sin conexión: el mensaje no se envió. Inténtalo cuando tengas internet.","Offline: the message wasn't sent. Try again when you have internet."):e.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):(e.body&&e.body.error==="blocked")?L("Tu apodo está bloqueado.","Your nickname is blocked."):L("No se pudo enviar.","Couldn't send."); }
     s.disabled=false; t.focus(); };
   $("#msgs").onclick=e=>{ const w=e.target.closest(".w"); if(w){ window.open(dictLink(w.dataset.w),"_blank","noopener"); return; }
-    const r=e.target.closest("[data-rep]"); if(r) report(me,"msg",r.dataset.rep); };
+    const r=e.target.closest("[data-rep]"); if(r) report(me,"msg",r.dataset.rep);
+    const ed=e.target.closest("[data-edit]"); if(ed) editMsg(me,ed.dataset.edit); };
   loadMsgs(me,true);
   pollT=setInterval(()=>loadMsgs(me,false), Store.mode==="remote"?8000:4000);
 }
-let msgCache=[];
+let msgCache=[], editing=null;   /* id of the message being edited: the list is not redrawn meanwhile */
 async function loadMsgs(me,scroll){
-  const box=$("#msgs"); if(!box) return;
+  const box=$("#msgs"); if(!box || editing) return;
   let list; try{ list=await Store.msgs(ch); }catch(e){ if(!msgCache.length) box.innerHTML=`<p class="empty">${L("No se pudo cargar la conversación.","Couldn't load the conversation.")}</p>`; return; }
-  const sig=list.map(m=>m.id).join(","); if(!scroll && sig===msgCache.sig) return; msgCache=list; msgCache.sig=sig;
+  const sig=list.map(m=>m.id+":"+(m.edited||0)).join(","); if(!scroll && sig===msgCache.sig) return; msgCache=list; msgCache.sig=sig;
   const atBottom=box.scrollTop+box.clientHeight>=box.scrollHeight-40;
-  box.innerHTML=list.length?list.map(m=>`<div class="msg${m.uid===me.id?" me":""}"><div class="who"><span>${esc(m.nick)}</span><time>${esc(ago(m.ts))}</time></div>
+  box.innerHTML=list.length?list.map(m=>`<div class="msg${m.uid===me.id?" me":""}"><div class="who"><span>${esc(m.nick)}</span><time>${esc(ago(m.ts))}${m.edited?" · "+L("editado","edited"):""}</time></div>
       <div class="txt" lang="${ch==="mapu"?"arn":""}">${wordsHTML(m.text)}</div>
-      ${m.uid!==me.id?`<div class="tools"><button class="ic" data-rep="${esc(m.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button></div>`:""}</div>`).join("")
+      ${m.uid!==me.id?`<div class="tools"><button class="ic" data-rep="${esc(m.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button></div>`
+        :Date.now()-m.ts<EDIT_WINDOW?`<div class="tools"><button class="ic" data-edit="${esc(m.id)}" title="${L("Editar el mensaje","Edit the message")}" aria-label="${L("Editar el mensaje","Edit the message")}">✎ ${L("Editar","Edit")}</button></div>`:""}</div>`).join("")
     :`<p class="empty">${ch==="mapu"?L("Nadie ha escrito todavía. Empieza con «Mari mari».","Nobody has written yet. Start with «Mari mari».") : L("Todavía no hay preguntas.","No questions yet.")}</p>`;
   if(scroll||atBottom) box.scrollTop=box.scrollHeight;
+}
+/* edit one of my own messages in place: the bubble turns into a text box with Guardar / Cancelar */
+function editMsg(me,id){
+  const m=msgCache.find(x=>x.id===id); const btn=document.querySelector(`[data-edit="${CSS.escape(id)}"]`); if(!m||!btn) return;
+  const bub=btn.closest(".msg"); editing=id;
+  bub.querySelector(".txt").outerHTML=`<textarea class="etxt" rows="2" maxlength="500" aria-label="${L("Editar el mensaje","Edit the message")}"></textarea>`;
+  bub.querySelector(".tools").outerHTML=`<div class="tools"><span class="hint emsg" aria-live="polite"></span><button class="ic" data-ecancel>${L("Cancelar","Cancel")}</button><button class="btn small" data-esave>${L("Guardar","Save")}</button></div>`;
+  const ta=bub.querySelector(".etxt"), em=bub.querySelector(".emsg"), sv=bub.querySelector("[data-esave]"); ta.value=m.text; ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length);
+  const done=()=>{ editing=null; msgCache.sig=null; loadMsgs(me,false); };
+  bub.querySelector("[data-ecancel]").onclick=e=>{ e.stopPropagation(); done(); };
+  ta.onkeydown=e=>{ if(e.key==="Escape"){ e.preventDefault(); done(); } else if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sv.click(); } };
+  sv.onclick=async e=>{ e.stopPropagation(); const v=ta.value.trim(); if(!v){ em.textContent=L("El mensaje no puede quedar vacío.","The message can't be empty."); return; }
+    const pp=privacyProblem(v); if(pp){ em.textContent=pp; return; }
+    sv.disabled=true; em.textContent="";
+    try{ await Store.edit(me,id,v); done(); }
+    catch(err){ sv.disabled=false; const b=err.body&&err.body.error;
+      em.textContent=!err.status?L("Sin conexión: el cambio no se guardó.","Offline: the change wasn't saved."):b==="too old"?L("Ya pasaron 24 horas: este mensaje no se puede editar.","24 hours have passed: this message can't be edited."):err.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):b==="blocked"?L("Tu apodo está bloqueado.","Your nickname is blocked."):err.status===404&&!b?L("La edición todavía no está activa en el servicio.","Editing isn't active on the service yet."):L("No se pudo guardar.","Couldn't save."); } };
 }
 async function report(me,type,id){
   if(!confirmBox(L("¿Avisar al moderador sobre esto?","Report this to the moderator?"))) return;
@@ -448,7 +474,7 @@ async function adminView(){
       <div class="body"><span class="tag ${p.status==="pending"?"pend":""}">${p.status==="pending"?L("pendiente","pending"):p.hidden?L("oculta","hidden"):L("con avisos","reported")}${rc("post",p.id)?" · ⚑"+rc("post",p.id):""}</span>
       ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}<p class="hint"><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</p>
       <div class="row"><button class="btn small" data-act="approve" data-t="post" data-id="${esc(p.id)}">✓ ${L("Aprobar","Approve")}</button><button class="btn small ghost" data-act="hide" data-t="post" data-id="${esc(p.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="post" data-id="${esc(p.id)}">${L("Borrar","Delete")}</button></div></div></article>`).join("")}</div>`:`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>
-    <section class="panel"><h2>${L("Mensajes con avisos","Reported messages")} (${q.msgs.length})</h2>${q.msgs.length?q.msgs.map(m=>`<div class="msg"><div class="who"><span>${esc(m.nick)} · ${esc(m.ch)}</span><time>${esc(ago(m.ts))}${rc("msg",m.id)?" · ⚑"+rc("msg",m.id):""}${m.hidden?" · "+L("oculto","hidden"):""}</time></div><div class="txt">${esc(m.text)}</div>
+    <section class="panel"><h2>${L("Mensajes con avisos","Reported messages")} (${q.msgs.length})</h2>${q.msgs.length?q.msgs.map(m=>`<div class="msg"><div class="who"><span>${esc(m.nick)} · ${esc(m.ch)}</span><time>${esc(ago(m.ts))}${rc("msg",m.id)?" · ⚑"+rc("msg",m.id):""}${m.hidden?" · "+L("oculto","hidden"):""}${m.edited?" · "+L("editado","edited"):""}</time></div><div class="txt">${esc(m.text)}</div>${m.orig&&m.orig!==m.text?`<p class="hint">${L("Texto original","Original text")}: ${esc(m.orig)}</p>`:""}
       <div class="row"><button class="btn small" data-act="approve" data-t="msg" data-id="${esc(m.id)}">✓ ${L("Mostrar","Show")}</button><button class="btn small ghost" data-act="hide" data-t="msg" data-id="${esc(m.id)}">${L("Ocultar","Hide")}</button><button class="btn small ghost" data-act="delete" data-t="msg" data-id="${esc(m.id)}">${L("Borrar","Delete")}</button>${Store.mode==="remote"?`<button class="btn small ghost" data-act="ban" data-t="msg" data-id="${esc(m.id)}">${L("Bloquear apodo","Block nickname")}</button>`:""}</div></div>`).join(""):`<p class="muted">${L("Nada pendiente.","Nothing pending.")}</p>`}</section>`;
   const nb=$("#ntest"); if(nb) nb.onclick=async()=>{ const o=$("#nres"); o.textContent=L("Enviando…","Sending…");
     try{ const r=await Remote.notifyTest(); o.textContent=r.ok?L("Enviado. Debería llegarte en unos segundos.","Sent. It should arrive in a few seconds."):((r.via==="telegram"?"Telegram":"ntfy")+L(" respondió "," answered ")+r.status+": "+(r.body||"")); }

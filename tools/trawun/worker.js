@@ -10,6 +10,8 @@
    POST /join {nick}                       -> {id, nick, key}            409 if the nickname is taken
    GET  /msgs?ch=mapu|ramtun               -> {msgs:[{id,ch,uid,nick,text,ts}]}   newest 200, oldest first
    POST /msgs {key, ch, text}              -> {id}                       429 when too fast, 403 blocked
+   POST /msgs/edit {key, id, text}         -> {ok, edited}               own messages only, for 24 hours; the first
+                                                                         text is kept (orig) for the moderator
    GET  /posts[?key=]                      -> {posts:[…]}                approved ones, plus the caller's own pending ones
    POST /posts {key, kind, cat, caption, outfit|progress|image}  -> {id, status}
    GET  /img/ID[?key=]                     -> image/jpeg                 approved photos, or the author's own
@@ -42,6 +44,16 @@ function cors(req, env) {
 }
 const json = (obj, status, h) => new Response(JSON.stringify(obj), { status, headers: { ...h, "Content-Type": "application/json", "Cache-Control": "no-store" } });
 const clean = t => String(t || "").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").trim();
+
+/* Message editing (2026-11-12) adds two columns to msgs: edited (time of the last edit) and orig (the text as first
+   sent). Databases made before that get them here, once per Worker instance; schema.sql has them for new ones. */
+let msgCols = false;
+async function ensureMsgCols(DB) {
+  if (msgCols) return;
+  for (const c of ["edited INTEGER", "orig TEXT"]) { try { await DB.prepare("ALTER TABLE msgs ADD COLUMN " + c).run(); } catch (e) { /* already there */ } }
+  msgCols = true;
+}
+const EDIT_WINDOW = 24 * 3600000;
 
 async function who(DB, key) {
   if (!key || typeof key !== "string" || key.length > 80) return null;
@@ -135,7 +147,8 @@ export default {
 
       if (P === "/msgs" && req.method === "GET") {
         const ch = url.searchParams.get("ch"); if (!CHANNELS.includes(ch)) return json({ error: "bad channel" }, 400, h);
-        const rs = await DB.prepare("SELECT id, ch, uid, nick, text, ts FROM msgs WHERE ch = ? AND hidden = 0 ORDER BY ts DESC LIMIT 200").bind(ch).all();
+        await ensureMsgCols(DB);
+        const rs = await DB.prepare("SELECT id, ch, uid, nick, text, ts, edited FROM msgs WHERE ch = ? AND hidden = 0 ORDER BY ts DESC LIMIT 200").bind(ch).all();
         return json({ msgs: rs.results.reverse() }, 200, h);
       }
       if (P === "/msgs" && req.method === "POST") {
@@ -149,6 +162,20 @@ export default {
         await DB.prepare("INSERT INTO msgs (id, ch, uid, nick, text, ts, hidden) VALUES (?, ?, ?, ?, ?, ?, 0)").bind(id, ch, u.id, u.nick, text, now).run();
         if (Math.random() < 0.02) await DB.prepare("DELETE FROM msgs WHERE ts < ?").bind(now - 180 * 86400000).run();   // keep about six months
         return json({ id }, 201, h);
+      }
+      if (P === "/msgs/edit" && req.method === "POST") {
+        const u = await who(DB, body.key); if (!u) return json({ error: "unknown" }, 401, h); if (u.banned) return json({ error: "blocked" }, 403, h);
+        const id = String(body.id || ""), text = clean(body.text).slice(0, MAX_TEXT);
+        if (!/^m[a-z0-9]{12}$/.test(id) || !text) return json({ error: "bad message" }, 400, h);
+        if (privacyProblem(text)) return json({ error: "personal data" }, 400, h);
+        await ensureMsgCols(DB);
+        const m0 = await DB.prepare("SELECT uid, text, ts, hidden, edited FROM msgs WHERE id = ?").bind(id).first();
+        if (!m0 || m0.uid !== u.id || m0.hidden) return json({ error: "not found" }, 404, h);
+        if (now - m0.ts > EDIT_WINDOW) return json({ error: "too old" }, 403, h);
+        if (m0.edited && now - m0.edited < 3000) return json({ error: "slow down" }, 429, h);
+        if (text === m0.text) return json({ ok: true, edited: m0.edited || null }, 200, h);
+        await DB.prepare("UPDATE msgs SET text = ?, edited = ?, orig = COALESCE(orig, ?) WHERE id = ?").bind(text, now, m0.text, id).run();
+        return json({ ok: true, edited: now }, 200, h);
       }
 
       if (P === "/posts" && req.method === "GET") {
@@ -203,7 +230,8 @@ export default {
         if (!isAdmin(req, env)) return json({ error: "unauthorized" }, 401, h);
         if (P === "/admin/queue" && req.method === "GET") {
           const posts = await DB.prepare("SELECT * FROM posts WHERE status = 'pending' OR hidden = 1 OR id IN (SELECT item FROM reports WHERE type = 'post') ORDER BY ts DESC LIMIT 200").all();
-          const msgs = await DB.prepare("SELECT id, ch, uid, nick, text, ts, hidden FROM msgs WHERE hidden = 1 OR id IN (SELECT item FROM reports WHERE type = 'msg') ORDER BY ts DESC LIMIT 300").all();
+          await ensureMsgCols(DB);
+          const msgs = await DB.prepare("SELECT id, ch, uid, nick, text, ts, hidden, edited, orig FROM msgs WHERE hidden = 1 OR id IN (SELECT item FROM reports WHERE type = 'msg') ORDER BY ts DESC LIMIT 300").all();
           const reps = await DB.prepare("SELECT type, item, uid FROM reports").all(); const reports = {};
           for (const r of reps.results) (reports[r.type + ":" + r.item] = reports[r.type + ":" + r.item] || []).push(r.uid);
           let nerr = null; try { nerr = await DB.prepare("SELECT v, n FROM meta WHERE k = 'notify:error'").first(); } catch (e) { nerr = { v: "meta table missing: run schema.sql", n: 0 }; }

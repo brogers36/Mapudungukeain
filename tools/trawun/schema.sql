@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS msgs (
   nick   TEXT NOT NULL,
   text   TEXT NOT NULL,
   ts     INTEGER NOT NULL,
-  hidden INTEGER NOT NULL DEFAULT 0
+  hidden INTEGER NOT NULL DEFAULT 0,
+  edited INTEGER,
+  orig   TEXT
 );
 CREATE INDEX IF NOT EXISTS msgs_ch_ts ON msgs (ch, ts);
 CREATE INDEX IF NOT EXISTS msgs_uid_ts ON msgs (uid, ts);
