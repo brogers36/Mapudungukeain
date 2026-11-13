@@ -170,7 +170,7 @@ export default {
         if (privacyProblem(text)) return json({ error: "personal data" }, 400, h);
         await ensureMsgCols(DB);
         const m0 = await DB.prepare("SELECT uid, text, ts, hidden, edited FROM msgs WHERE id = ?").bind(id).first();
-        if (!m0 || m0.uid !== u.id || m0.hidden) return json({ error: "not found" }, 404, h);
+        if (!m0 || m0.uid !== u.id || m0.hidden) return json({ error: "not yours" }, 404, h);
         if (now - m0.ts > EDIT_WINDOW) return json({ error: "too old" }, 403, h);
         if (m0.edited && now - m0.edited < 3000) return json({ error: "slow down" }, 429, h);
         if (text === m0.text) return json({ ok: true, edited: m0.edited || null }, 200, h);

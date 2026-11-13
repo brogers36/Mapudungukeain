@@ -359,7 +359,7 @@ function editMsg(me,id){
     sv.disabled=true; em.textContent="";
     try{ await Store.edit(me,id,v); done(); }
     catch(err){ sv.disabled=false; const b=err.body&&err.body.error;
-      em.textContent=!err.status?L("Sin conexión: el cambio no se guardó.","Offline: the change wasn't saved."):b==="too old"?L("Ya pasaron 24 horas: este mensaje no se puede editar.","24 hours have passed: this message can't be edited."):err.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):b==="blocked"?L("Tu apodo está bloqueado.","Your nickname is blocked."):err.status===404&&!b?L("La edición todavía no está activa en el servicio.","Editing isn't active on the service yet."):L("No se pudo guardar.","Couldn't save."); } };
+      em.textContent=!err.status?L("Sin conexión: el cambio no se guardó.","Offline: the change wasn't saved."):b==="too old"?L("Ya pasaron 24 horas: este mensaje no se puede editar.","24 hours have passed: this message can't be edited."):err.status===429?L("Más despacio: espera unos segundos.","Slow down: wait a few seconds."):b==="blocked"?L("Tu apodo está bloqueado.","Your nickname is blocked."):err.status===404&&b!=="not yours"?L("La edición todavía no está activa en el servicio: hay que volver a publicarlo (node tools/publicar_servicios.mjs).","Editing isn't active on the service yet: it needs to be published again (node tools/publicar_servicios.mjs)."):b==="not yours"?L("Este mensaje ya no se puede editar.","This message can no longer be edited."):L("No se pudo guardar.","Couldn't save."); } };
 }
 async function report(me,type,id){
   if(!confirmBox(L("¿Avisar al moderador sobre esto?","Report this to the moderator?"))) return;
