@@ -1,6 +1,6 @@
 /* Tañi Nemülkawe: offline support. The page and data are fetched from the network first, so updates arrive as soon as
    there is a connection, and served from the cache when offline. The parser engine (motor.js) is cached too and revalidated on each load. */
-const CACHE = 'nemulkawe-20261113005334';
+const CACHE = 'nemulkawe-20261113010016';
 /* Everything the dictionary needs is stored at install, so it works fully offline from the first visit: the word
    analyser (worker.js, stub.js, motor.js) and the data loaded later on demand (datos_es.js for Spanish search,
    ejemplos.js for examples) included. Before, motor.js was only cached when fetched, and the analyser could miss it offline. */
