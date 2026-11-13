@@ -455,7 +455,7 @@ function search(q,from){
   if(lang==="es"&&pq.length>1&&(D.n&&D.n.es)) loadES().then(ES=>{ if(my!==searchSeq||!ES) return;
     const hits=ES.map(e=>[e._h===pq?3:(e._h.startsWith(pq)?2-Math.min(1,(e._h.length-pq.length)/10):0),e]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,12).map(x=>x[1]);
     if(!hits.length) return;
-    out.querySelector(".empty")?.remove();
+    { const em=out.querySelector(".empty"); if(em) em.remove(); }
     const sec=`<p class="eyebrow sect">${L("Español → mapudungun (Augusta)","Spanish → Mapudungun (Augusta)")}</p><div class="list" id="esl">${hits.map(esRow).join("")}</div>`;
     const first=out.querySelector(".eyebrow.sect"); if(first&&hits[0]._h===pq) first.insertAdjacentHTML("beforebegin",sec); else out.insertAdjacentHTML("beforeend",sec);
     bindRes(out.querySelector("#esl")); });

@@ -529,7 +529,7 @@ const POSE=(()=>{
   /* f = {h:[x,y] head, n:neck, hp:hip, e1,h1 back arm elbow/hand, e2,h2 front arm, k1,f1 back leg knee/foot, k2,f2 front leg,
           dir: 1 right / -1 left / 0 front, face, r head radius, fade, noLegs, shirt} */
   function fig(f){
-    const r=f.r||6.8, d=f.dir??1, [hx,hy]=f.h, op=f.fade?` opacity="${f.fade}"`:"", SH=f.shirt||SHIRT;
+    const r=f.r||6.8, d=f.dir!=null?f.dir:1, [hx,hy]=f.h, op=f.fade?` opacity="${f.fade}"`:"", SH=f.shirt||SHIRT;
     const [nx,ny]=f.n, [px,py]=f.hp;
     const sh1=d?[nx-d*1.2,ny+2]:[nx-5.6,ny+2.4], sh2=d?[nx+d*1.2,ny+2]:[nx+5.6,ny+2.4];
     const leg=(k,ft,back)=>{const c=back?shade(PANTS,.82):PANTS;return cap(f.hp,k,7,6,c)+cap(k,ft,6,4.8,c)+`<path d="M${ft[0]-3.2+(d||0)*.6} ${ft[1]+1.6} Q${ft[0]-3.4} ${ft[1]-2.2} ${ft[0]} ${ft[1]-2.2} Q${ft[0]+3.6+(d||0)*2} ${ft[1]-1.6} ${ft[0]+3.6+(d||0)*2.4} ${ft[1]+1.6}Z" fill="${SHOE}"/>`};
@@ -2466,7 +2466,7 @@ function load(k){try{return JSON.parse(localStorage.getItem("mpk_"+k))}catch(e){
 function save(k,v){try{localStorage.setItem("mpk_"+k,JSON.stringify(v))}catch(e){} if(window.syncSoon) syncSoon();}
 let lang = load("lang") || "es";
 let best = load("best") || {};
-let nuts = load("nuts") ?? 0;
+let nuts = load("nuts"); if(nuts==null) nuts=0;   /* no ?? : older phones (iOS < 13.4, Chrome < 80) stop at it */
 let owned = load("owned") || [];
 let outfits = load("outfits") || {};
 let selPerson = load("selPerson") || PEOPLE[0].id;
@@ -3588,7 +3588,7 @@ function lofScene(sel,env){
       <filter id="lfHaze"><feColorMatrix type="matrix" values=".82 0 0 0 .14  0 .82 0 0 .15  0 0 .82 0 .17  0 0 0 1 0"/></filter>
     </defs>
     ${lofBg(env)}
-    ${LOF.filter(p=>has(p.id)&&envOf(p)===env).sort((a,b)=>(a.z??a.y)-(b.z??b.y)).map(p=>lfPiece(p,sel)).join("")}
+    ${LOF.filter(p=>has(p.id)&&envOf(p)===env).sort((a,b)=>(a.z!=null?a.z:a.y)-(b.z!=null?b.z:b.y)).map(p=>lfPiece(p,sel)).join("")}
     <rect width="360" height="240" fill="url(#lfVig)" pointer-events="none"/>
   </svg>`;
 }
