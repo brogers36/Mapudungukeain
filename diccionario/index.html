@@ -400,11 +400,17 @@ function home(){
   if(lastQ) search(lastQ);
 }
 let searchSeq=0;
-function search(q){
+/* l and ll before a consonant are written both ways for the same word (Augusta elkan, Unificado ellkan): a word with no
+   entry of its own is looked up again with the other spelling */
+function llVariant(q){ if(/ll(?=[^aeiouüy\s]|$)/i.test(q)) return q.replace(/ll(?=[^aeiouüy\s]|$)/gi,"l");
+  if(/(^|[^l])l(?=[^aeiouüyl\s])/i.test(q)) return q.replace(/(^|[^l])l(?=[^aeiouüyl\s])/gi,"$1ll"); return null; }
+const hasEntry=q=>{ const k=keyQuery(q), i=kindex(); return !!(i.get(k)||i.get(k+"n")||i.get(k+"ün")); };
+function search(q,from){
   const out=document.getElementById("out"), hub=document.getElementById("hubwrap"); const my=++searchSeq;
   q=q.trim(); if(/^-+\S/.test(q)||/\S-+$/.test(q)) q=q.replace(/^-+|-+$/g,"");   /* a suffix typed with its hyphen: -yüm, -ke- */
   if(!q){ out.innerHTML=""; hub.hidden=false; return; }
   hub.hidden=true;
+  if(!from && !/\s/.test(q) && !hasEntry(q)){ const v=llVariant(q); if(v && hasEntry(v)) return search(v,q); }
   const k=keyQuery(q), pq=plain(q), score=[];
   const wordRe=new RegExp("(^|[^a-z])"+pq.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   for(const e of CORE){ let s=0;
@@ -421,7 +427,7 @@ function search(q){
   const exact=score.some(([s,e])=>s>=95);
   const top=score.slice(0,60).map(x=>x[1]);
   const coreR=top.filter(e=>e.m!=null), augR=top.filter(e=>e.m==null&&e.o!=="L"&&e.o!=="R"), parR=top.filter(e=>e.o==="R"), loanR=top.filter(e=>e.o==="L");
-  let html=`<div id="ana"></div>`;
+  let html=(from?`<p class="hint">${L(`Sin entrada para «${esc(from)}»; se muestra «${esc(G(q))}», la misma palabra con ${/ll/i.test(from)?"l":"ll"}.`,`No entry for “${esc(from)}”; showing “${esc(G(q))}”, the same word spelled with ${/ll/i.test(from)?"l":"ll"}.`)}</p>`:"")+`<div id="ana"></div>`;
   if(coreR.length) html+=`<p class="eyebrow sect">${L("Núcleo","Core")}</p><div class="list">${coreR.map(resRow).join("")}</div>`;
   if(augR.length) html+=`<p class="eyebrow sect">${L("Diccionario de Augusta (1916)","Augusta's dictionary (1916)")}</p><div class="list">${augR.map(resRow).join("")}</div>`;
   if(parR.length) html+=`<p class="eyebrow sect">${L("Del analizador","From the parser")}</p><div class="list">${parR.map(resRow).join("")}</div>`;
@@ -450,7 +456,11 @@ function search(q){
     /* the analysis is shown only when it leads to a root that is in the dictionary, so Spanish or English words typed
        into the box don't produce a spurious Mapudungun parse */
     const ana=document.getElementById("ana"); ana.innerHTML=`<p class="hint">${L("Analizando la palabra…","Analysing the word…")}</p>`;
-    analyse(q.toLowerCase(),guessSys(q)).then(r=>{ if(my!==searchSeq) return; const h=anaHTML(r,q); ana.innerHTML=h||(top.length?"":none); bindRes(ana); });
+    analyse(q.toLowerCase(),guessSys(q)).then(r=>{ if(my!==searchSeq) return; const h=anaHTML(r,q);
+      const v=!h&&!from?llVariant(q):null;
+      if(v) return analyse(v.toLowerCase(),guessSys(v)).then(r2=>{ if(my!==searchSeq) return; const h2=anaHTML(r2,v);
+        ana.innerHTML=h2?`<p class="hint">${L(`Analizado como «${esc(G(v))}», la misma palabra con ${/ll/i.test(q)?"l":"ll"}.`,`Analysed as “${esc(G(v))}”, the same word spelled with ${/ll/i.test(q)?"l":"ll"}.`)}</p>`+h2:(top.length?"":none); bindRes(ana); });
+      ana.innerHTML=h||(top.length?"":none); bindRes(ana); });
   }
 }
 function resRow(e){ const core=e.m!=null;
