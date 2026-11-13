@@ -1259,6 +1259,64 @@ function genInv(n){
   return shuffle(pool).slice(0,n);
 }
 
+// ===== Two Kimche lessons on the unreal condition: -fu-l- (fule) and -lle-fu-l- (llefule) =====
+// Every form is attested in AVENUE (counts from avtypes.json in the comments); none is built by rule.
+Object.assign(GRAM,{
+ fule:{G:{
+   "mülefule":["si estuviera / si hubiera estado (él/ella)","if she/he were / had been (there)"],          // 29
+   "niefule":["si tuviera / si hubiera tenido (él/ella)","if she/he had / had had"],                     // 10
+   "niefuli":["si (yo) tuviera / si hubiera tenido","if I had / had had"],                               // 9
+   "niefulmi":["si (tú) tuvieras / si hubieras tenido","if you had / had had"],                          // 3
+   "pifule":["si dijera / si hubiera dicho (él/ella)","if she/he said / had said"],                      // 7
+   "kimfuli":["si (yo) supiera / si hubiera sabido","if I knew / had known"],                            // 4
+   "pefuli":["si (yo) viera / si hubiera visto","if I saw / had seen"],                                  // 2
+   "femnofule":["si no hiciera / si no hubiera hecho así","if she/he didn't / hadn't done so"],           // 6
+   "kimnofuli":["si (yo) no supiera / si no hubiera sabido","if I didn't know / hadn't known"],           // 2
+   "machingefuli":["si (yo) fuera machi","if I were a machi"],                                           // 2
+   "domongefuli":["si (yo) fuera mujer","if I were a woman"],                                            // 2
+   "mülele":["si está / cuando esté (él/ella)","if / when she/he is (there)"],                          // 102
+   "niele":["si tiene / cuando tenga (él/ella)","if / when she/he has"],                                // 64
+   "nieli":["si (yo) tengo / cuando tenga","if / when I have"],                                          // 11
+   "nielmi":["si (tú) tienes / cuando tengas","if / when you have"],                                     // 27
+   "pile":["si dice / cuando diga (él/ella)","if / when she/he says"],                                   // 58
+   "kimli":["si (yo) sé / cuando sepa","if / when I know"],                                              // 7
+   "peli":["si (yo) veo / cuando vea","if / when I see"],                                                // 5
+   "femnole":["si no hace así (él/ella)","if she/he doesn't do so"],                                     // 7
+   "kimnoli":["si (yo) no sé","if I don't know"],                                                        // 4
+   "domongele":["si es mujer","if she is a woman"],                                                      // 7
+   "mülefuy":["estaba (y ya no está)","she/he was there (and no longer is)"],                           // 517
+   "niefuy":["tenía (y ya no tiene)","she/he had (and no longer has)"],                                  // 193
+   "niefun":["(yo) tenía (y ya no tengo)","I had (and no longer have)"],                                 // 54
+   "pifuy":["decía, dijo (pero…)","she/he said (but…)"],                                                 // 26
+   "kimfun":["(yo) sabía (pero…)","I knew (but…)"],                                                      // 9
+   "pefun":["(yo) vi, veía (pero…)","I saw (but…)"]},                                                    // 5
+  L:[["mülefule",["mülele","mülefuy","niefule"]],["niefule",["niele","niefuy","niefuli"]],["niefuli",["nieli","niefun","niefulmi"]],
+     ["niefulmi",["nielmi","niefuli","niefule"]],["pifule",["pile","pifuy","mülefule"]],["kimfuli",["kimli","kimfun","kimnofuli"]],
+     ["pefuli",["peli","pefun","kimfuli"]],["femnofule",["femnole","pifule","mülefule"]],["kimnofuli",["kimnoli","kimfuli","niefuli"]],
+     ["machingefuli",["domongefuli","domongele","kimfuli"]],["domongefuli",["domongele","machingefuli","niefuli"]]]},
+ llefule:{G:{
+   "mülellefulmi":["si de verdad estuvieras (aquí)","if you really were (here)"],                       // 3
+   "felellefule":["si de verdad fuera así","if it really were so"],                                       // 2
+   "mülekellefule":["si de verdad estuviera siempre","if she/he really were always there"],               // 1
+   "tukullefuli":["si de verdad (yo) lo hubiera puesto","if I had really put it"],                       // 1
+   "kulpallefuli":["si de verdad (yo) tuviera la culpa","if I were really to blame"],                    // 1
+   "mülellefuy":["de verdad estaba (y ya no)","she/he really was there (and no longer is)"],             // 8
+   "felellefuy":["de verdad era así (antes)","it really was like that (before)"],                         // 5
+   "femllefuy":["de verdad hizo así (pero…)","she/he really did so (but…)"],                              // 5
+   "mülellelay":["no estaba en absoluto, de verdad no estaba","she/he really wasn't there at all"],       // 5
+   "pillelay":["no dijo nada en absoluto","she/he didn't say anything at all"],                           // 8
+   "mülefule":["si estuviera / si hubiera estado (él/ella)","if she/he were / had been (there)"],        // 29
+   "niefulmi":["si (tú) tuvieras / si hubieras tenido","if you had / had had"],                          // 3
+   "felefule":["si fuera así","if it were so"],                                                           // 6
+   "mülefuy":["estaba (y ya no está)","she/he was there (and no longer is)"],                           // 517
+   "femfuy":["hizo así (pero…)","she/he did so (but…)"]},                                               // 49
+  L:[["mülellefulmi",["mülellefuy","niefulmi","mülellelay"]],["felellefule",["felefule","felellefuy","mülellefulmi"]],
+     ["mülekellefule",["mülefule","mülellefuy","felellefule"]],["tukullefuli",["kulpallefuli","felellefule","mülellefulmi"]],
+     ["kulpallefuli",["tukullefuli","mülellefulmi","felellefule"]],["mülellefuy",["mülefuy","mülellefulmi","mülellelay"]],
+     ["felellefuy",["felellefule","felefule","femllefuy"]],["femllefuy",["femfuy","felellefuy","mülellefuy"]],
+     ["mülellelay",["mülellefuy","pillelay","mülefuy"]],["pillelay",["mülellelay","femllefuy","felellefuy"]]]}
+});
+
 // ===== Kimche stage: suffix combinations (all forms parse cleanly in the user's parser) =====
 const COMBOS=[
   {seg:["pe","me","fi","ñ"],es:"voy / fui a verlo",en:"I go / went to see it"},
@@ -2011,6 +2069,14 @@ const STAGES = [
     gen:()=>genGram("redup",8), examples:()=>gramExamples("redup"),
     rule:{es:"Repetir la raíz del verbo dice que la acción se repite o sigue y sigue: <b>ngüma</b> “llorar” → <b>ngümangümangi</b> “llora y llora / lloraba y lloraba”; <b>tripa</b> “salir” → <b>tripatripangi</b> “sale y sale / salía y salía”; <b>amu</b> “ir” → <b>amuamungi</b> “sigue / seguía yendo”; <b>pi</b> “decir” → <b>pipiyefiñ</b> “le estoy / estuve diciendo y diciendo”; <b>dungudunguy</b> “es / era hablador”. En AVENUE la raíz doble a menudo lleva <b>-nge-</b> antes de la persona (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), y a veces se escribe separada: <b>ngüma ngümangi</b>. No es lo mismo que <b>-ke-</b>, que dice que algo se hace de costumbre: <b>ngümakefuy</b> “lloraba (de costumbre)”, <b>amukey</b> “va / iba (siempre)”. Algunos verbos solo se usan con la raíz doble: <b>trüntrünün</b> “tiritar”, <b>poypoyün</b> “hincharse”, <b>wedwedün</b> “ser travieso, loco”.",
           en:"Repeating the verb root says the action repeats or goes on and on: <b>ngüma</b> “cry” → <b>ngümangümangi</b> “she/he cries and cries / cried and cried”; <b>tripa</b> “go out” → <b>tripatripangi</b> “it keeps / kept coming out”; <b>amu</b> “go” → <b>amuamungi</b> “she/he keeps / kept going”; <b>pi</b> “say” → <b>pipiyefiñ</b> “I keep / kept telling her/him”; <b>dungudunguy</b> “she/he is / was a chatterbox”. In AVENUE the doubled root often takes <b>-nge-</b> before the person ending (<b>ngümangüma-nge-n</b>, <b>tripatripa-nge-y</b>), and is sometimes written as two words: <b>ngüma ngümangi</b>. This is not the same as <b>-ke-</b>, which says something is done habitually: <b>ngümakefuy</b> “she/he used to cry”, <b>amukey</b> “she/he goes / went (always)”. Some verbs are used only with the doubled root: <b>trüntrünün</b> “to shiver”, <b>poypoyün</b> “to swell up”, <b>wedwedün</b> “to be mischievous, crazy”."}},
+  { id:"fule", mt:"-fu-l-: niefule", es:"Si fuera, si hubiera: -fu-l-", en:"If it were, if it had been: -fu-l-", kind:"verb",
+    gen:()=>genGram("fule",8), examples:()=>gramExamples("fule").filter(x=>/fu(l|y|n)/.test(x.m)),
+    rule:{es:"El condicional <b>-l-</b> con las terminaciones <b>-i</b> (yo), <b>-mi</b> (tú) y <b>-e</b> (él/ella) dice una condición real: <b>nie-l-i</b> “si tengo, cuando tenga”, <b>müle-l-e</b> “si está”. Con <b>-fu-</b> delante, la condición se vuelve irreal o ya pasada: <b>nie-fu-l-i</b> “si tuviera, si hubiera tenido”, <b>müle-fu-l-e</b> “si estuviera, si hubiera estado”, <b>kim-no-fu-l-i</b> “si no supiera”. Es el mismo <b>-fu-</b> de <b>müle-fu-y</b> “estaba (y ya no)”: algo que no es o ya no es así. El orden es fijo: raíz, <b>-no-</b> (negación), <b>-fu-</b>, <b>-l-</b>, persona.",
+          en:"The conditional <b>-l-</b> with the endings <b>-i</b> (I), <b>-mi</b> (you) and <b>-e</b> (she/he) states a real condition: <b>nie-l-i</b> “if I have, when I have”, <b>müle-l-e</b> “if she/he is there”. With <b>-fu-</b> before it, the condition becomes unreal or past: <b>nie-fu-l-i</b> “if I had, if I had had”, <b>müle-fu-l-e</b> “if she/he were, if she/he had been there”, <b>kim-no-fu-l-i</b> “if I didn't know”. It is the same <b>-fu-</b> as in <b>müle-fu-y</b> “she/he was there (and no longer is)”: something that isn't, or is no longer, so. The order is fixed: root, <b>-no-</b> (negation), <b>-fu-</b>, <b>-l-</b>, person."}},
+  { id:"llefule", mt:"-lle-fu-l-: mülellefulmi", es:"Si de verdad…: -lle-fu-l-", en:"If really…: -lle-fu-l-", kind:"verb",
+    gen:()=>genGram("llefule",8), examples:()=>gramExamples("llefule").filter(x=>/lle/.test(x.m)),
+    rule:{es:"<b>-lle-</b> afirma con fuerza: “de verdad, sí que”. Va antes de <b>-fu-</b> y de <b>-la-</b>: <b>müle-lle-fu-y</b> “de verdad estaba (y ya no)”, <b>pi-lle-la-y</b> “no dijo nada en absoluto”. Con <b>-fu-l-</b> da una condición irreal con énfasis: <b>müle-lle-fu-l-mi</b> “si de verdad estuvieras (aquí)”, <b>fele-lle-fu-l-e</b> “si de verdad fuera así”. Compara <b>müle-fu-l-e</b> “si estuviera” con <b>müle-lle-fu-l-e</b>: lo mismo, dicho con más fuerza o más deseo.",
+          en:"<b>-lle-</b> asserts strongly: “really, indeed”. It goes before <b>-fu-</b> and <b>-la-</b>: <b>müle-lle-fu-y</b> “she/he really was there (and no longer is)”, <b>pi-lle-la-y</b> “she/he didn't say anything at all”. With <b>-fu-l-</b> it gives an emphatic unreal condition: <b>müle-lle-fu-l-mi</b> “if you really were (here)”, <b>fele-lle-fu-l-e</b> “if it really were so”. Compare <b>müle-fu-l-e</b> “if she/he were there” with <b>müle-lle-fu-l-e</b>: the same, said more strongly or with more longing."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
