@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#14122a"/>
+  <!-- three morpheme boxes: root, suffix, ending -->
+  <rect x="64" y="206" width="150" height="100" rx="16" fill="#e8b53a"/>
+  <rect x="232" y="206" width="96" height="100" rx="16" fill="#4fb3a9"/>
+  <rect x="346" y="206" width="102" height="100" rx="16" fill="#f3efe6"/>
+  <g stroke="#14122a" stroke-width="12" stroke-linecap="round">
+    <path d="M100 256 H178"/><path d="M262 256 H298"/><path d="M378 256 H416"/>
+  </g>
+  <!-- stepped diamond (trarikan motif) above, red dot below -->
+  <g fill="#4fb3a9" shape-rendering="crispEdges" transform="translate(256 122)">
+    <rect x="-6" y="-36" width="12" height="12"/><rect x="-18" y="-24" width="36" height="12"/><rect x="-30" y="-12" width="60" height="24"/><rect x="-18" y="12" width="36" height="12"/><rect x="-6" y="24" width="12" height="12"/>
+  </g>
+  <rect x="250" y="116" width="12" height="12" fill="#c8322f"/>
+  <g fill="#c8322f"><rect x="150" y="370" width="212" height="14" rx="7"/></g>
+</svg>

@@ -6,6 +6,8 @@ Juega en: https://brogers36.github.io/Mapudungukeain/
 
 Diccionario compañero, **Tañi Nemülkawe: Miawülkeafiel ñi Kewün Fill Püle** (mapudungun, español e inglés, con juegos de vocabulario): https://brogers36.github.io/Mapudungukeain/diccionario/ (página: https://brogers36.github.io/Mapudungukeain/diccionario/acerca/) · cómo se arma: `tools/dicc/README.md`.
 
+Constructor de verbos (arma y conjuga verbos, con la fuente de cada forma): https://brogers36.github.io/Mapudungukeain/verbos/ (página: https://brogers36.github.io/Mapudungukeain/verbos/acerca/) · cómo se actualiza: `tools/verbos/README.md`.
+
 Todo el juego está en un solo archivo, `index.html`. El progreso se guarda en el navegador de cada jugador.
 
 ## App
