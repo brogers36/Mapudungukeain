@@ -1,7 +1,7 @@
 /* Constructor de verbos: offline support. The page, the interface (app.js, app.css), the rules (reglas.js), the roots (raices.js) and the data (datos.js) are fetched from the
    network first and revalidated, so an edit pushed to GitHub arrives as soon as there is a connection, and are served
    from the cache when offline. Only caches named verbos-* are managed here; the game and the dictionary keep their own. */
-const CACHE = 'verbos-v3';
+const CACHE = 'verbos-v4';
 const CORE = ['./', './index.html', './app.js', './app.css', './reglas.js', './datos.js', './raices.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
