@@ -6,8 +6,10 @@ const fs=require('fs'),path=require('path');const [,,IDX,STATS,VALF]=process.arg
 const I=JSON.parse(fs.readFileSync(IDX,'utf8')),S=JSON.parse(fs.readFileSync(STATS,'utf8')),V=JSON.parse(fs.readFileSync(VALF,'utf8'));
 const norm=w=>w.toLowerCase().replace(/v/g,'f').replace(/'/g,'');const C=new Map();for(const w in I.types){const k=norm(w);C.set(k,(C.get(k)||0)+I.types[w][0])}
 const counts=[...C.entries()].sort((a,b)=>a[0]<b[0]?-1:1).map(e=>e[0]+'\t'+e[1]).join('\n');
-// Solo raíz y conteo. Las glosas NO se toman de las tablas del analizador (provienen de fuentes con derechos vigentes); las pone raices.js desde el diccionario público.
-const roots=S.roots.filter(r=>r.gloss&&/^[a-zñü]+$/.test(r.root)&&['A','L','S','R'].includes(r.src)).slice(0,400).map(r=>[r.root,r.n]);
+// Raíz y conteo. La glosa se incluye solo cuando es del propio autor (préstamos del español y entradas del analista: fuentes L, S, R).
+// Las glosas de la tabla A del analizador NO se copian (su redacción sigue la edición digital de 2019, con derechos vigentes);
+// para esas raíces la glosa la pone raices.js desde el diccionario público (núcleo revisado y Augusta 1916).
+const roots=S.roots.filter(r=>r.gloss&&/^[a-zñü]+$/.test(r.root)&&['A','L','S','R'].includes(r.src)).slice(0,400).map(r=>['L','S','R'].includes(r.src)?[r.root,r.n,r.gloss.replace(/\s+/g,' ').slice(0,60)]:[r.root,r.n]);
 const data={counts,roots,val:{roots:V.roots,total:V.total},build:{date:I.manifest.built.slice(0,10),parser:I.manifest.parser.file,parser_sha256:I.manifest.parser.sha256,corpus_sha256:I.manifest.corpus.sha256}};
 fs.writeFileSync(path.join(__dirname,'..','..','verbos','datos.js'),'/* Generado por tools/verbos/make_datos.js; no editar a mano. Conteos de formas en el corpus AVENUE (análisis automático), raíces verbales frecuentes con su conteo (sin glosas: las glosas vienen de raices.js) y resumen de validación. */\nconst VB_DATA='+JSON.stringify(data)+';\n');
 console.log('types',C.size,'roots',roots.length);
