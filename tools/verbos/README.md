@@ -8,11 +8,18 @@ analizador (`diccionario/motor.js`): solo tablas de terminaciones y reglas de al
 | archivo | qué es | ¿se edita a mano? |
 |---|---|---|
 | `verbos/reglas.js` | las tablas y reglas: `INTR` (intransitivo), `TR` (cuadros de J. Becker Peña), `SM` (Smeets 2008, apéndice), `NEGIMP` (imperativo negativo transitivo, Smeets), `SUF` (sufijos con su casilla) | **sí** |
-| `verbos/index.html` | la página: textos en español e inglés (objeto `T`), estilos y la tabla del paradigma | sí |
+| `verbos/app.js`, `verbos/app.css` | la interfaz: textos en español e inglés (objeto `T`), la tabla del paradigma y los estilos | sí |
+| `verbos/index.html` | la página de la app: solo carga los archivos de arriba | rara vez |
+| `diccionario/conjugar/index.html` | la página «Conjugar» del diccionario: carga **los mismos archivos** de `verbos/`, así que no tiene reglas ni raíces propias | rara vez |
 | `verbos/datos.js` | conteos de AVENUE por palabra, raíces frecuentes con glosa y resumen de validación | no: lo genera `make_datos.js` |
 | `verbos/raices.js` | inventario de raíces: núcleo revisado del diccionario y verbos de Augusta (1916), con glosa, marca de Augusta y frecuencia | no: lo genera `make_raices.js` |
 | `verbos/sw.js`, `manifest.webmanifest`, íconos | app instalable y uso sin conexión | rara vez |
 | `verbos/acerca/index.html` | la página que explica la app y cómo instalarla | sí |
+
+Hay una sola copia de las reglas, las raíces y la interfaz. Un cambio en `verbos/` llega a la app y a la página del
+diccionario a la vez. El service worker del diccionario guarda esos archivos para que «Conjugar» funcione sin conexión.
+
+Un enlace puede abrir cualquiera de las dos páginas con una raíz puesta: `verbos/#leli`, `diccionario/conjugar/#leli`.
 
 ## Actualizar una terminación
 
