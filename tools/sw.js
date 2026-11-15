@@ -15,7 +15,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  /* the dictionary (diccionario/) and the about page (acerca/) are separate pages: never cache them as the game page,
+  /* the dictionary (diccionario/), the verb builder (verbos/) and the about page (acerca/) are separate pages: never cache them as the game page,
      and leave the dictionary's files to its own service worker */
   const scope = new URL(self.registration.scope).pathname;
   const rel = url.pathname.slice(scope.length);
@@ -26,7 +26,7 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match(req.mode === 'navigate' ? './trawun/' : req, { ignoreSearch: true })));
     return;
   }
-  if (url.origin === location.origin && /^(diccionario|acerca)\//.test(rel)) return;
+  if (url.origin === location.origin && /^(diccionario|acerca|verbos)\//.test(rel)) return;
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); return r; })
       .catch(() => caches.match('./index.html')));

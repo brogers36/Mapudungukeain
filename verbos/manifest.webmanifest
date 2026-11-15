@@ -1,0 +1,18 @@
+{
+  "name": "Constructor de verbos del mapudungun",
+  "short_name": "Verbos",
+  "description": "Arma y conjuga verbos del mapudungun, con sus fuentes",
+  "lang": "es",
+  "id": "./?app=verbos",
+  "start_url": "./?app=verbos",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14122a",
+  "theme_color": "#14122a",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
