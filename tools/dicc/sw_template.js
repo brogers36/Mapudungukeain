@@ -4,7 +4,7 @@ const CACHE = 'nemulkawe-__VERSION__';
 /* Everything the dictionary needs is stored at install, so it works fully offline from the first visit: the word
    analyser (worker.js, stub.js, motor.js) and the data loaded later on demand (datos_es.js for Spanish search,
    ejemplos.js for examples) included. Before, motor.js was only cached when fetched, and the analyser could miss it offline. */
-const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './gramatica.js'];
+const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './gramatica.js', './conjugar/', './conjugar/index.html', './conjugar/formas.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

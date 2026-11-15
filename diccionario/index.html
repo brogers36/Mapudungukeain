@@ -392,6 +392,7 @@ function home(){
         <a class="card" href="${GAME_URL}"><span class="ic">🎮</span><b>${GW("Mapudungukeaiñ Fill Püle")}</b><small>${L("Volver al juego","Back to the game")} ↗</small></a>
         <button class="card" data-go="#/gramatica"><span class="ic">🧩</span><b>${L("Morfemas","Morphemes")}</b><small>${L("Sufijos del verbo, pu, ke, -chi, -kechi, -yem","Verb suffixes, pu, ke, -chi, -kechi, -yem")}</small></button>
         <button class="card" data-go="#/raices"><span class="ic">🌱</span><b>${L("Raíces compuestas","Compound roots")}</b><small>${L("Verbo + verbo, verbo + objeto, raíces dobles","Verb + verb, verb + object, doubled roots")}</small></button>
+        <a class="card" href="conjugar/"><span class="ic">🛠️</span><b>${L("Constructor de verbos","Verb builder")}</b><small>${L("Arma un verbo sufijo por sufijo y ve su paradigma","Build a verb suffix by suffix and see its paradigm")}</small></a>
         <button class="card" data-go="#/acerca"><span class="ic">📖</span><b>${L("Acerca","About")}</b><small>${L("Fuentes y cómo usarlo","Sources and how to use it")}</small></button>
       </nav>
       <div class="box"><p class="eyebrow">${L("Grafemario","Grafemario")}</p>${grafPicker()}
@@ -537,11 +538,13 @@ function rootMeaning(root,hop,verbal){
   const hs=entriesForRoot(root,[]).slice().sort((x,y)=>(verbal?isVerbEntry(y)-isVerbEntry(x):0)||(lang==="en"?(!!y.en)-(!!x.en):0)||(y.m!=null)-(x.m!=null)); if(!hs.length) return "";
   const pickTxt=e=>e.m!=null?(lang==="es"?e.es:(e.en||e.es)):(lang==="en"&&e.en?e.en:(e.s||""));
   for(const e of hs){ let t=pickTxt(e); if(!t) continue;
-    if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/(?<=[aeiouü])n$|ün$/,""),1,verbal):""; if(r) return r; continue; }
+    if(/^(Véase|See) /.test(t)){ if(hop) continue; const x=t.replace(/^(Véase|See) /,"").split(/[ ,(]/)[0]; const r=x&&x!==root?rootMeaning(x.replace(/ün$|([aeiouü])n$/,"$1"),1,verbal):""; if(r) return r; continue; }
     t=t.replace(/^(?:(?:n|tr|intr|ir|rec|refl)\.(?:\s*y\s*(?:n|tr|intr|ir)\.)?,?\s*)/i,"");   /* category labels (tr., n. y tr.) are not the sense */
     t=t.replace(/\s*\([^)]*\)/g,"").split(/[;:]/)[0].trim(); if(t.length>32) t=t.split(",")[0].trim(); if(t.length>32) t=t.slice(0,30).trim()+"…";
     return t; }
   return ""; }
+/* the verb root in Unificado for the verb builder (conjugar/#root): amun > amu, kimün > kim, Augusta r */
+const cjRoot=e=>{ const w=e.m!=null?(/n$/.test(e.m)?String(e.m).replace(/ün$|([aeiouü])n$/,"$1"):""):(e.r||"");   /* a core entry that is already a conjugated form (kintulefiñ) gets no link */ return /^[a-zñü]+$/.test(w)?w:""; };
 const isVerbEntry=e=>(e.p==="v"||e.t==="verb"||/^to /.test(e.en||""))?1:0;
 function interlinear(root,morphs,gl,rm,verbal){
   const cell=(f,g,cls)=>`<span class="mc${cls||""}"><span class="mf">${esc(G(f))}</span><span class="mg">${esc(g||"")}</span></span>`;
@@ -645,6 +648,7 @@ function anaHTML(r,q){
     ${r.ctx&&/nominalised verb/.test(r.ctx)?`<p class="hint">${L("Por la palabra anterior (un posesivo o determinante), la forma en -n/-ün es un verbo nominalizado: «el …-r, la acción de …».","After the previous word (a possessive or determiner), the -n/-ün form is a nominalised verb: “the …-ing”.")}</p>`:""}
     ${hits.length?`<p class="hint">${cp?L(`Raíz compuesta ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`,`Compound root ${(cp.parts||[cp.a,cp.b]).map(x=>`<b>${esc(G(x))}</b>`).join(" + ")}:`):`${L("Raíz","Root")} <b>${esc(G(r.root))}</b>:`}</p><div class="list">${hits.map(resRow).join("")}</div>`
       :`<p class="hint">${L(`No hay una entrada para la raíz «${esc(G(r.root))}».`,`No entry for the root “${esc(G(r.root))}”.`)}</p>`}
+    ${vroot&&!r.cmp?`<p><a href="conjugar/#${encodeURIComponent(r.root)}">🛠️ ${L(`Conjugar «${esc(G(r.root))}» en el constructor de verbos`,`Conjugate “${esc(G(r.root))}” in the verb builder`)}</a></p>`:""}
     <p class="hint">${L("El análisis lo hace un analizador automático; puede equivocarse.","The analysis is made by an automatic parser; it can be wrong.")}</p></div>`; }
 
 /* ===== Entry ===== */
@@ -665,7 +669,7 @@ function entry(id){
   const others=Object.keys(GRAF_NAME).filter(k=>k!==graf).map(k=>`${GRAF_NAME[k]}: <b>${esc(inG(k,hw))}</b>`).join(" · ");
   const a=core&&e.a?AUGBYH.get(e.a):(!core?e:null);
   const linkedCore=!core?CORE.filter(c=>c.a===e.h):[];
-  const rootK=keyUni(core?(e.p==="v"?hw.replace(/(?<=[aeiou])n$|ün$/,""):hw):e.r);
+  const rootK=keyUni(core?(e.p==="v"?hw.replace(/ün$|([aeiou])n$/,"$1"):hw):e.r);
   const forms=BUILD.filter(b=>keyUni(b.m[0])===rootK).slice(0,12);
   app.innerHTML=`
     <div class="top"><button class="back" data-go="#/">← ${L("Buscar","Search")}</button>${topBar()}</div>
@@ -689,7 +693,7 @@ function entry(id){
         :L("Texto de Augusta (1916), leído por reconocimiento óptico del original impreso y pasado a Unificado. Puede tener errores de lectura; el español es de hace un siglo.","Augusta's text (1916), read by OCR from the printed original and converted to Unificado. It may contain reading errors; the Spanish is a century old.")+(a.u?" "+L("La forma de esta palabra se leyó del escaneo y no se pudo confirmar.","This headword's spelling was read from the scan and could not be confirmed."):"")}</p></div>`:""}
     ${forms.length?`<div class="box"><h3>${L("Formas para armar","Forms to build")}</h3><div class="forms">${forms.map((b,i)=>`<button data-f="${i}">${esc(G(b.w))}</button>`).join("")}</div><div id="fout"></div></div>`:""}
     <div id="exbox" data-eid="${esc(e.id)}"></div>
-    <div class="row"><button class="btn" id="prac">${L("Practicar esta palabra","Practise this word")}</button></div>`;
+    <div class="row"><button class="btn" id="prac">${L("Practicar esta palabra","Practise this word")}</button>${isVerbEntry(e)&&cjRoot(e)?`<a class="btn ghost" href="conjugar/#${encodeURIComponent(cjRoot(e))}">🛠️ ${L("Conjugar","Conjugate")}</a>`:""}</div>`;
   bindCommon(); bindRes(app.querySelector(".box")||document.createElement("div"));
   app.querySelectorAll(".box .res").forEach(b=>b.onclick=()=>go("#/e/"+encodeURIComponent(b.dataset.id)));
   document.getElementById("star").onclick=()=>{ toggleSave(e.id); entry(id); };
