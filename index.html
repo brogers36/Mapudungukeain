@@ -1317,6 +1317,68 @@ Object.assign(GRAM,{
      ["mülellelay",["mülellefuy","pillelay","mülefuy"]],["pillelay",["mülellelay","femllefuy","felellefuy"]]]}
 });
 
+// ===== Two Kimche lessons: -fel (= -f(u)-el, as segmented in the gold corpus) and -fal- (slot 25) =====
+// Every form is attested in AVENUE (counts from avtypes.json in the comments). Left out on purpose: pefel and penofel,
+// which in context look like the particles pe + fel, and kuñifal, a lexicalized noun ('huérfano, solo').
+Object.assign(GRAM,{
+ fel:{G:{
+   "niefel":["lo que tenía","what she/he had"],                                                   // 14
+   "niekefel":["lo que solía tener","what she/he used to have"],                                  // 19
+   "kümefel":["lo que era bueno","what was good"],                                                // 12
+   "machifel":["la que era machi","the one who was a machi"],                                     // 9
+   "mapuchefel":["los que eran mapuche","those who were Mapuche"],                                // 7
+   "kimfel":["lo que conocíamos, lo conocido","what we knew, the known"],                         // 4
+   "kimkefel":["lo que se solía saber","what used to be known"],                                  // 7
+   "mülefel":["el que estaba, donde estaba","the one who was there, where it was"],               // 8
+   "mülekefel":["el que solía estar, donde solía estar","the one who used to be there, where it used to be"], // 12
+   "felekefel":["cómo era siempre, cómo lo hacían","how it always was, how they used to do it"],  // 11
+   "kutranfel":["la enfermedad que tenía, el que estaba enfermo","the illness she/he had, the one who was ill"], // 5
+   "erkefel":["que (resulta que) eran","which (it turns out) were"],                              // 6
+   "niel":["lo que tengo, lo que tiene","what I have, what she/he has"],                         // 64
+   "kimel":["lo que sé, lo que sabe","what I know, what she/he knows"],                          // 20
+   "nielu":["el que tiene","the one who has"],                                                     // 690
+   "mülelu":["el que está","the one who is there"],                                               // 614
+   "kümelu":["el que es bueno","the one who is good"],                                            // 29
+   "niefuy":["tenía (y ya no)","she/he had (and no longer has)"],                                 // 193
+   "kümefuy":["era bueno (y ya no)","it was good (and no longer is)"],                            // 251
+   "machingefuy":["era machi (y ya no)","she/he was a machi (and no longer is)"],                 // 15
+   "kimfuy":["sabía (pero…)","she/he knew (but…)"],                                               // 97
+   "mülefuy":["estaba (y ya no está)","she/he was there (and no longer is)"],                    // 517
+   "felekefuy":["siempre era así","it was always like that"],                                     // 40
+   "kutranfuy":["estaba enfermo","she/he was ill"]},                                              // 22
+  L:[["niefel",["niel","niefuy","nielu"]],["niekefel",["niefel","niefuy","nielu"]],["kümefel",["kümefuy","kümelu","machifel"]],
+     ["machifel",["machingefuy","mapuchefel","kümefel"]],["mapuchefel",["machifel","kümefel","niefel"]],["kimfel",["kimel","kimfuy","kimkefel"]],
+     ["kimkefel",["kimfel","kimel","kimfuy"]],["mülefel",["mülelu","mülefuy","mülekefel"]],["mülekefel",["mülefel","mülefuy","mülelu"]],
+     ["felekefel",["felekefuy","mülekefel","kimkefel"]],["kutranfel",["kutranfuy","kümefel","machifel"]],["erkefel",["kümefel","mülefel","niefel"]]]},
+ fal:{G:{
+   "kimfali":["se debe saber, se puede saber","it should be / can be known"],                     // 10
+   "kimfal":["conocible, que se puede conocer","knowable"],                                       // 5
+   "kimfalkelay":["nunca se puede saber","it can never be known"],                                 // 4
+   "kimfalwelay":["ya no se puede saber","it can no longer be known"],                             // 3
+   "pefal":["visible, que se puede ver","visible, that can be seen"],                              // 5
+   "pepifalay":["no se puede (hacer nada), no se puede detener","it can't be helped, it can't be stopped"], // 2
+   "ayüfali":["se hace querer, es digno de cariño","she/he is lovable"],                           // 4
+   "sakifali":["es digno de aprecio","she/he is worthy of esteem"],                                // 4
+   "femfal":["que se debe hacer así","that ought to be done so"],                                  // 2
+   "femfalnofel":["no se debió hacer así","it shouldn't have been done so"],                       // 9
+   "illañfalay":["no se debe despreciar","must not be scorned"],                                   // 1
+   "kimngey":["se sabe","it is known"],                                                            // 14
+   "kimngelay":["no se sabe","it isn't known"],                                                    // 173
+   "kimkelay":["no suele saber","she/he doesn't usually know"],                                    // 80
+   "kimwelay":["ya no sabe","she/he no longer knows"],                                             // 44
+   "kimfuy":["sabía (pero…)","she/he knew (but…)"],                                               // 97
+   "pengey":["se ve, es visto","it is seen"],                                                      // 20
+   "pengelay":["no se ve, no es visto","it isn't seen"],                                           // 50
+   "ayüy":["quiere, ama","she/he loves"],                                                          // 3
+   "femngey":["se hace así","it is done so"],                                                      // 32
+   "femngelay":["no se hace así","it isn't done so"],                                              // 49
+   "femfuy":["hizo así (pero…)","she/he did so (but…)"]},                                         // 49
+  L:[["kimfali",["kimngey","kimfuy","kimfal"]],["kimfal",["kimfali","kimngey","pefal"]],["kimfalkelay",["kimkelay","kimngelay","kimfalwelay"]],
+     ["kimfalwelay",["kimwelay","kimfalkelay","kimngelay"]],["pefal",["pengey","kimfal","pengelay"]],["pepifalay",["pengelay","kimngelay","illañfalay"]],
+     ["ayüfali",["ayüy","sakifali","kimfali"]],["sakifali",["ayüfali","kimfali","ayüy"]],["femfal",["femngey","femfuy","femfalnofel"]],
+     ["femfalnofel",["femngelay","femfal","femfuy"]],["illañfalay",["pepifalay","femngelay","kimngelay"]]]}
+});
+
 // ===== Kimche stage: suffix combinations (all forms parse cleanly in the user's parser) =====
 const COMBOS=[
   {seg:["pe","me","fi","ñ"],es:"voy / fui a verlo",en:"I go / went to see it"},
@@ -2077,6 +2139,14 @@ const STAGES = [
     gen:()=>genGram("llefule",8), examples:()=>gramExamples("llefule").filter(x=>/lle/.test(x.m)),
     rule:{es:"<b>-lle-</b> afirma con fuerza: “de verdad, sí que”. Va antes de <b>-fu-</b> y de <b>-la-</b>: <b>müle-lle-fu-y</b> “de verdad estaba (y ya no)”, <b>pi-lle-la-y</b> “no dijo nada en absoluto”. Con <b>-fu-l-</b> da una condición irreal con énfasis: <b>müle-lle-fu-l-mi</b> “si de verdad estuvieras (aquí)”, <b>fele-lle-fu-l-e</b> “si de verdad fuera así”. Compara <b>müle-fu-l-e</b> “si estuviera” con <b>müle-lle-fu-l-e</b>: lo mismo, dicho con más fuerza o más deseo.",
           en:"<b>-lle-</b> asserts strongly: “really, indeed”. It goes before <b>-fu-</b> and <b>-la-</b>: <b>müle-lle-fu-y</b> “she/he really was there (and no longer is)”, <b>pi-lle-la-y</b> “she/he didn't say anything at all”. With <b>-fu-l-</b> it gives an emphatic unreal condition: <b>müle-lle-fu-l-mi</b> “if you really were (here)”, <b>fele-lle-fu-l-e</b> “if it really were so”. Compare <b>müle-fu-l-e</b> “if she/he were there” with <b>müle-lle-fu-l-e</b>: the same, said more strongly or with more longing."}},
+  { id:"fel", mt:"-fel: niefel, machifel", es:"Lo que era, lo que fue: -fel", en:"What was, what used to be: -fel", kind:"verb",
+    gen:()=>genGram("fel",8), examples:()=>gramExamples("fel").filter(x=>/fel$/.test(x.m)),
+    rule:{es:"<b>-el</b> convierte un verbo en lo que se tiene, se sabe o se hace: <b>nie-l</b> “lo que tengo”, <b>kim-el</b> “lo que sé”. <b>-fel</b> es <b>-fu-</b> + <b>-el</b> (la u se pierde: <b>-f(u)-el</b>), y habla de algo que era o fue, y ya no: <b>nie-f(u)-el</b> “lo que tenía”, <b>küme-f(u)-el</b> “lo que era bueno”. Con sustantivos va directo a la raíz, sin -nge-: <b>machi-f(u)-el</b> “la que era machi”, <b>mapuche-f(u)-el</b> “los que eran mapuche”. Con <b>-ke-</b> dice lo que solía ser: <b>nie-ke-f(u)-el</b> “lo que solía tener”, <b>fele-ke-f(u)-el</b> “cómo lo hacían”. No lo confundas con <b>-lu</b> (“el que”: <b>nie-lu</b> “el que tiene”) ni con la forma conjugada <b>nie-fu-y</b> “tenía”.",
+          en:"<b>-el</b> turns a verb into what is had, known or done: <b>nie-l</b> “what I have”, <b>kim-el</b> “what I know”. <b>-fel</b> is <b>-fu-</b> + <b>-el</b> (the u drops: <b>-f(u)-el</b>), and speaks of something that was, and no longer is: <b>nie-f(u)-el</b> “what she/he had”, <b>küme-f(u)-el</b> “what was good”. With nouns it goes straight on the root, without -nge-: <b>machi-f(u)-el</b> “the one who was a machi”, <b>mapuche-f(u)-el</b> “those who were Mapuche”. With <b>-ke-</b> it says what used to be: <b>nie-ke-f(u)-el</b> “what she/he used to have”, <b>fele-ke-f(u)-el</b> “how they used to do it”. Don't confuse it with <b>-lu</b> (“the one who”: <b>nie-lu</b> “the one who has”) or with the conjugated form <b>nie-fu-y</b> “she/he had”."}},
+  { id:"fal", mt:"-fal-: kimfali, pefal", es:"Se debe, se puede: -fal-", en:"Ought to, can be: -fal-", kind:"verb",
+    gen:()=>genGram("fal",8), examples:()=>gramExamples("fal").filter(x=>/fal/.test(x.m)),
+    rule:{es:"<b>-fal-</b> va justo después de la raíz y dice que la acción se debe o se puede hacer, o que algo lo merece: <b>kim-fal-i</b> “se debe saber, se puede saber”, <b>ayü-fal-i</b> “se hace querer”, <b>saki-fal-i</b> “es digno de aprecio”. Sin terminación de persona describe la cosa: <b>pe-fal</b> “visible”, <b>kim-fal</b> “conocible”. Con negación dice que no se puede o no se debe: <b>kim-fal-ke-la-y</b> “nunca se puede saber”, <b>illañ-fal-(l)a-y</b> “no se debe despreciar”. Compara la pasiva <b>-nge-</b>, que dice lo que pasa: <b>kim-nge-y</b> “se sabe”, frente a <b>kim-fal-i</b> “se debe/puede saber”. Junto con <b>-fel</b>: <b>fem-fal-no-f(u)-el</b> “no se debió hacer así”. No es <b>-faluw-</b> “fingir” (lección -kantu-).",
+          en:"<b>-fal-</b> goes right after the root and says that the action ought to be or can be done, or that something deserves it: <b>kim-fal-i</b> “it should / can be known”, <b>ayü-fal-i</b> “she/he is lovable”, <b>saki-fal-i</b> “she/he is worthy of esteem”. Without a person ending it describes the thing: <b>pe-fal</b> “visible”, <b>kim-fal</b> “knowable”. With negation it says it can't or mustn't be: <b>kim-fal-ke-la-y</b> “it can never be known”, <b>illañ-fal-(l)a-y</b> “must not be scorned”. Compare the passive <b>-nge-</b>, which says what happens: <b>kim-nge-y</b> “it is known”, against <b>kim-fal-i</b> “it should/can be known”. Together with <b>-fel</b>: <b>fem-fal-no-f(u)-el</b> “it shouldn't have been done so”. It is not <b>-faluw-</b> “to pretend” (the -kantu- lesson)."}},
   { id:"orden", mt:"", es:"El orden de los sufijos", en:"Suffix order", kind:"derive",
     gen:()=>genOrder(8),
     examples:()=>COMBOS.filter(c=>c.seg.length>3).slice(0,6).map(c=>({m:c.seg.join("-"),es:c.es,en:c.en})),
