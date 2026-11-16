@@ -2,6 +2,8 @@
    prev is the word before it in a phrase (tañi tremoleken: after a possessive the -n form is the nominaliser);
    message out: {id, r:{root, morphs, gl, wclass, mean, who}} or r:null. */
 importScripts('stub.js', 'motor.js');
+/* conditional transitive endings (pe-e-l-i, pe-mu-l-i, pe-e-l-i-mew ...): a layer over the engine; the analyser still works without it */
+try { importScripts('motor_cond.js'); } catch (e) {}
 const SYS = {uni: 'unificado', azu: 'azumchefe', rag: 'ragileo'};
 onmessage = ev => {
   const {id, word, sys, prev} = ev.data; let r = null;

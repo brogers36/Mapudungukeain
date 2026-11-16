@@ -1,10 +1,10 @@
 /* Tañi Nemülkawe: offline support. The page and data are fetched from the network first, so updates arrive as soon as
    there is a connection, and served from the cache when offline. The parser engine (motor.js) is cached too and revalidated on each load. */
-const CACHE = 'nemulkawe-20261115174718';
+const CACHE = 'nemulkawe-20261116033509';
 /* Everything the dictionary needs is stored at install, so it works fully offline from the first visit: the word
    analyser (worker.js, stub.js, motor.js) and the data loaded later on demand (datos_es.js for Spanish search,
    ejemplos.js for examples) included. Before, motor.js was only cached when fetched, and the analyser could miss it offline. */
-const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './gramatica.js', './conjugar/', './conjugar/index.html',
+const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './motor_cond.js', './gramatica.js', './conjugar/', './conjugar/index.html',
   /* the verb builder page (conjugar/) has no rules of its own: it loads the verb app's files, one copy for both */
   '../verbos/app.js', '../verbos/app.css', '../verbos/reglas.js', '../verbos/raices.js', '../verbos/datos.js'];
 self.addEventListener('install', e => {
@@ -42,7 +42,7 @@ self.addEventListener('fetch', e => {
      install fall back to a Chrome shortcut */
   /* the parser engine (motor.js) too, and all of these revalidated with the server (no-cache): GitHub Pages lets browsers
      reuse a copy for ten minutes, and a cache-first engine kept the old parser after an update while the page was new */
-  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub|gramatica|motor)\.js$|\/manifest\.webmanifest$|\/(icon-\d+|icon-maskable-\d+|apple-touch-icon)\.png$/.test(url.pathname)) {
+  if (inScope && /\/(datos|datos_es|ejemplos|worker|stub|gramatica|motor|motor_cond)\.js$|\/manifest\.webmanifest$|\/(icon-\d+|icon-maskable-\d+|apple-touch-icon)\.png$/.test(url.pathname)) {
     e.respondWith(fetch(req, {cache: 'no-cache'}).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; })
       .catch(() => caches.match(req)));
     return;
