@@ -359,7 +359,10 @@ details.all summary{cursor:pointer;color:var(--muted);font-size:.9rem;margin-bot
 .lf-smk{transform-box:fill-box;transform-origin:50% 100%;animation:lfsmk 4.5s ease-in-out infinite} @keyframes lfsmk{0%{opacity:0;transform:translateY(3px) scaleX(.8)}35%{opacity:.6}100%{opacity:0;transform:translateY(-7px) scaleX(1.4)}}
 .lf-flame{transform-box:fill-box;transform-origin:50% 100%;animation:lfflick .55s ease-in-out infinite alternate} @keyframes lfflick{to{transform:scale(.93,1.13)}}
 .lf-glide{animation:lfglide 22s ease-in-out infinite alternate} @keyframes lfglide{50%{transform:translate(-40px,6px)}100%{transform:translate(-80px,-2px)}}
-.lf-shim{stroke-dasharray:4 6;animation:lfshim 3s linear infinite} @keyframes lfshim{to{stroke-dashoffset:-20}}
+.lf-shim{stroke-dasharray:4 6;animation:lfshim 3s linear infinite}
+.lf-rain{animation:lfrain .9s linear infinite}
+@keyframes lfrain{from{transform:translate(0,0)}to{transform:translate(-3px,8px)}}
+@media (prefers-reduced-motion:reduce){.lf-rain{animation:none}} @keyframes lfshim{to{stroke-dashoffset:-20}}
 @media (prefers-reduced-motion:reduce){.lofsvg *,.item .th *{animation:none!important}}
 .lofcard{background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:4px}
 .lofcard b{font-family:var(--display);font-weight:400;font-size:1.3rem}
@@ -2233,6 +2236,11 @@ const PEOPLE = [
   {id:"Pascual Koña", type:"wentru", role:"lonko", elder:true, skin:SKIN.b, hair:"#d6d1c8", hist:1, es:"Pascual Coña, lonko de la zona del lago Budi (c. 1848–1927). Ya anciano, dictó su vida en mapudungun al misionero Ernesto Wilhelm de Moesbach; el libro, publicado en 1930, es uno de los grandes textos de la lengua.", en:"Pascual Coña, lonko from the Lake Budi area (c. 1848–1927). As an old man he dictated his life story in Mapudungun to the missionary Ernesto Wilhelm de Moesbach; the book, published in 1930, is one of the great texts of the language."},
   {id:"Janequeo", type:"domo", role:"weychafe", skin:SKIN.a, hair:"#1a1410", hist:1, es:"Janequeo (Yanequén), lonko y weychafe pewenche (hacia 1587). Cuando los españoles mataron a su esposo Wepotaén, ella encabezó la resistencia.", en:"Janequeo (Yanequén), Pewenche lonko and weychafe (around 1587). When the Spanish killed her husband Wepotaén, she led the resistance."},
   {id:"Külapang", type:"wentru", role:"weychafe", skin:SKIN.c, hair:"#1a1410", hist:1, es:"José Santos Külapang (Quilapán), toqui wenteche (murió en 1875). Desde 1868 encabezó la resistencia contra la ocupación militar chilena de la Araucanía.", en:"José Santos Külapang (Quilapán), wenteche toqui (died 1875). From 1868 he led the resistance against the Chilean military occupation of the Araucanía."}
+,
+  {id:"rütrafe", type:"wentru", skin:SKIN.a, hair:"#1a1410", es:"platero, el que trabaja la plata", en:"silversmith"},
+  {id:"kimeltufe", type:"domo", skin:SKIN.b, hair:"#241a14", es:"profesora, la que enseña", en:"teacher"},
+  {id:"challwafe", type:"wentru", skin:SKIN.c, hair:"#241a14", es:"pescador", en:"fisherman"},
+  {id:"laku", type:"wentru", elder:true, skin:SKIN.a, hair:"#d6d1c8", es:"abuelo (padre del padre), persona mayor", en:"grandfather (father's father), elder"}
 ];
 const SILVER="#d7dbe2";
 const ITEMS = [
@@ -2360,7 +2368,15 @@ const ITEMS = [
   {id:"pet-pudu", m:"püdü", slot:"pet", for:["domo","wentru"], price:14, es:"compañero: pudú", en:"companion: pudu", vb:"0 128 40 42", svg:""},
   {id:"pet-choyke", m:"choyke", slot:"pet", for:["domo","wentru"], price:14, es:"compañero: ñandú", en:"companion: rhea", vb:"0 122 40 48", svg:""},
   {id:"bg-trayenko", m:"trayenko", slot:"bg", for:["domo","wentru"], price:20, es:"fondo: cascada", en:"background: waterfall", vb:"0 0 120 170", svg:""},
-  {id:"bg-lewfu", m:"lewfü", slot:"bg", for:["domo","wentru"], price:18, es:"fondo: el río", en:"background: the river", vb:"0 0 120 170", svg:""}
+  {id:"bg-lewfu", m:"lewfü", slot:"bg", for:["domo","wentru"], price:18, es:"fondo: el río", en:"background: the river", vb:"0 0 120 170", svg:""},
+  {id:"makun-kolu", m:"kolü makuñ", slot:"cloak", for:["wentru"], price:22, es:"poncho café", en:"brown poncho", vb:"18 46 84 72", svg:""},
+  {id:"ikulla-chod", m:"chod ikülla", slot:"cloak", for:["domo"], price:16, es:"rebozo amarillo", en:"yellow shawl", vb:"28 48 64 62", svg:""},
+  {id:"trariwe-chod", m:"chod trariwe", slot:"belt", for:["domo","wentru"], price:8, es:"faja amarilla", en:"yellow sash", vb:"36 92 48 20", svg:""},
+  {id:"pifilka", m:"pifilka", slot:"hand", for:["domo","wentru"], price:14, es:"flauta de madera", en:"wooden flute", vb:"82 86 26 36", svg:""},
+  {id:"challwa-hand", m:"challwa", slot:"hand", for:["challwafe"], price:12, es:"pescados", en:"fish on a string", vb:"82 96 28 40", svg:""},
+  {id:"pet-luan", m:"luan", slot:"pet", for:["domo","wentru"], price:14, es:"compañero: guanaco", en:"companion: guanaco", vb:"0 122 40 48", svg:""},
+  {id:"bg-puelmapu", m:"puelmapu", slot:"bg", for:["domo","wentru"], price:20, es:"fondo: Puelmapu", en:"background: Puelmapu", vb:"0 0 120 170", svg:""},
+  {id:"bg-willimapu", m:"willimapu", slot:"bg", for:["domo","wentru"], price:20, es:"fondo: Willimapu, con lluvia", en:"background: Willimapu, in the rain", vb:"0 0 120 170", svg:""}
 ];
 const SLOT_ORDER=["body","belt","cloak","neck","chest","pin","head","ears","hand","pet"];
 const fits=(it,p)=>!(p.blades&&it.slot==="hand") && (it.for.includes(p.type)||it.for.includes(p.id)||(p.role&&it.for.includes(p.role)));
@@ -3569,12 +3585,20 @@ const lfPudu=`<path d="M-6 -6 V0 M-3.4 -6 V0 M5 -6 V0 M7.6 -6 V0" stroke="#5a3a2
 const lfChoyke=`<path d="M-1 -14 L-4.6 0 M3 -14 L5.4 0" stroke="#8a7a64" stroke-width="1.7" stroke-linecap="round"/><path d="M-7.4 0 h4 M4.4 0 h4" stroke="#6e604c" stroke-width="1.2" stroke-linecap="round"/><path d="M-12 -18 Q-10 -27 2 -27 Q13 -26 13 -17 Q11 -10.6 0 -10.6 Q-10 -10.6 -12 -18Z" fill="#9a958a"/><path d="M-12 -18 Q-8 -13.6 0 -12.6 Q-10 -11 -12 -18Z" fill="#6e6a62"/><path d="M-3 -24 Q4 -21.6 11 -20" stroke="#bdb8ac" stroke-width="1.2" fill="none"/><path d="M6 -14 q4 2 6 -1" stroke="#7c776c" stroke-width="1" fill="none"/><path d="M-8 -22 Q-11.6 -30 -9.4 -36" stroke="#9a958a" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="-10" cy="-37.4" rx="3.2" ry="2.3" fill="#8a857a"/><path d="M-12.8 -37.8 L-16.4 -37 L-12.8 -36.2Z" fill="#5a5448"/><circle cx="-10.4" cy="-38" r=".75" fill="#1a1410"/>`;
 const lfPangi=`<path d="M-24 0 Q-26 -6 -18 -8 H20 Q27 -7 25 0Z" fill="#7d7a73"/><path d="M-20 -7 Q0 -9 20 -7.6 Q23 -6.4 22 -4.4 Q0 -5.4 -20 -4.6Z" fill="#a8a49b"/><path d="M14 -11 Q24 -10 26 -2 Q27 3 23 6" stroke="#b8894f" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M23 6 q-1 2 -3 1.4" stroke="#5a3a22" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M-10 -8 Q-12 -17 2 -17 Q14 -17 16 -10 Q15 -7.4 8 -7.4 H-8Z" fill="#c49a62"/><path d="M-6 -15 Q4 -17.4 13 -13" stroke="#dcb985" stroke-width="1.4" fill="none"/><path d="M-12 -9 L-20 -8.4 M-11 -7.8 L-19 -7.2" stroke="#b8894f" stroke-width="2.4" stroke-linecap="round"/><circle cx="-12" cy="-14" r="5" fill="#c49a62"/><path d="M-15.6 -17.6 l-.6 -3 l2.6 1.6Z M-10 -18.6 l1.4 -2.8 l1 3Z" fill="#a87a44"/><ellipse cx="-15" cy="-12.4" rx="2.4" ry="1.8" fill="#efe2c8"/><circle cx="-16.6" cy="-13" r=".8" fill="#3a2414"/><circle cx="-13.6" cy="-15" r=".8" fill="#1a1410"/><circle cx="-10.6" cy="-15" r=".8" fill="#1a1410"/>`;
 const lfNarki=`<path d="M4 -1 Q12 0 11 -8 Q10.4 -12 7.4 -11.6" stroke="#5a5450" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M-5 0 Q-7 -9 -1 -12 Q5 -12.6 6 -5 Q6.4 -1 4 0Z" fill="#6e6862"/><path d="M-1 -2 Q0 -9 3 -9.4 Q5 -5 4 0Z" fill="#8a847e"/><circle cx="-1" cy="-15" r="4.6" fill="#6e6862"/><path d="M-5 -17 l-.6 -4 l3 2Z M1.6 -18.6 l2 -3 l.4 3.6Z" fill="#6e6862"/><path d="M-4.4 -18 l-.2 -1.6 l1 .8Z" fill="#d9a094"/><circle cx="-2.8" cy="-15.4" r=".8" fill="#e8c440"/><circle cx=".8" cy="-15.4" r=".8" fill="#e8c440"/><path d="M-1.8 -13.4 l.8 .6 l.8 -.6" stroke="#2a2420" stroke-width=".5" fill="none"/><path d="M-6 -13.6 l-3 -.6 M-6 -12.6 l-3 .6 M3.6 -13.6 l3 -.6 M3.6 -12.6 l3 .6" stroke="#cfc8bc" stroke-width=".35"/>`;
+
+/* Puelmapu and Willimapu pieces, standing on y=0 */
+const lfLuan=`<path d="M-8 -12 L-9 0 M-5 -12 L-4.6 0 M7 -12 L7.6 0 M10 -12 L10.6 0" stroke="#8a5a34" stroke-width="1.8" stroke-linecap="round"/><path d="M-10.4 0 h2.6 M-5.6 0 h2.4 M6.6 0 h2.4 M9.6 0 h2.4" stroke="#3a2a1e" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="1" cy="-15" rx="12" ry="6" fill="#c08a52"/><path d="M-11 -15 Q1 -9 13 -15 Q12 -10 1 -9.4 Q-10 -10 -11 -15Z" fill="#f0e4cf"/><path d="M12 -18 q4.4 -.4 3 3.6" stroke="#a87444" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M-9 -18 Q-12.4 -26 -11 -34 L-6.4 -34.4 Q-6.6 -26 -3 -19Z" fill="#c08a52"/><path d="M-9 -18 Q-11 -24 -10.4 -30 Q-8.6 -24 -6 -19Z" fill="#a87444" opacity=".6"/><path d="M-6.4 -34.4 Q-13 -37 -17.4 -33 Q-17 -29.6 -11.4 -30 Q-7 -29.6 -6 -31.6Z" fill="#c08a52"/><path d="M-17.4 -33 Q-17 -29.6 -12.6 -29.8 Q-14 -32 -17.4 -33Z" fill="#5c5650"/><path d="M-9.4 -35.4 l-1 -4.2 l2.2 3.2Z M-7.4 -35.4 l.2 -4.2 l1.6 3.6Z" fill="#a87444"/><circle cx="-11.2" cy="-33.2" r=".85" fill="#1a1410"/>`;
+const lfLawal=`<path d="M-3.2 0 L-2 -74 H2 L3.2 0Z" fill="#7a3e26"/><path d="M1 -72 L2.4 0" stroke="#a65a38" stroke-width="1.1"/><path d="M-2 -20 h-1.6 M2 -34 h1.6 M-2 -48 h-1.6" stroke="#5a2c1a" stroke-width="1"/>${[[-78,8],[-68,12],[-57,15],[-46,18],[-35,20],[-24,21]].map(([y,w],k)=>`<path d="M0 ${y-9} Q${-w*.6} ${y-5} ${-w-2} ${y+4} Q${-w*.4} ${y+1} 0 ${y+2} Q${w*.4} ${y+1} ${w+2} ${y+4} Q${w*.6} ${y-5} 0 ${y-9}Z" fill="${k%2?"#2c5a3a":"#244d31"}"/><path d="M0 ${y-8} Q${w*.5} ${y-4} ${w+1} ${y+3}" stroke="#3f7a4e" stroke-width="1.2" fill="none" opacity=".8"/>`).join("")}`;
+const lfFoye=`<path d="M-2.4 0 L-1.4 -24 H1.4 L2.4 0Z" fill="#8a7a64"/><path d="M0 -16 L-6 -24 M.4 -19 L6 -27" stroke="#8a7a64" stroke-width="1.6" stroke-linecap="round"/>${[[-10,-30,10,"#5f9a52"],[9,-32,10,"#5f9a52"],[0,-40,11,"#6fae5e"],[-12,-38,7,"#6fae5e"],[12,-40,7,"#7dbb6a"],[0,-28,9,"#5f9a52"]].map(([x,y,r,c])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.8}" fill="${c}"/>`).join("")}<g fill="#fbf8ee">${[[-12,-34],[-4,-42],[6,-36],[12,-42],[-2,-30],[8,-28],[-14,-27],[3,-46]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3"/>`).join("")}</g>`;
+const lfRain=`<g fill="#8a96a8" opacity=".9"><ellipse cx="60" cy="18" rx="46" ry="12"/><ellipse cx="96" cy="12" rx="30" ry="12"/><ellipse cx="200" cy="16" rx="52" ry="13"/><ellipse cx="240" cy="10" rx="30" ry="11"/><ellipse cx="320" cy="20" rx="44" ry="12"/></g><g stroke="#dfe8f2" stroke-width=".9" stroke-linecap="round" opacity=".7" class="lf-rain">${Array.from({length:60},(_,k)=>{const x=(k*37)%360,y=26+((k*53)%190);return `<path d="M${x} ${y} l-3 8"/>`}).join("")}</g>`;
 const lfL=id=>LOF.find(q=>q.id===id).s;
 /* Lof environments: the first is free, the others are bought with ngülliw. A piece without env belongs to the valley. */
 const LOF_ENVS=[
  {id:"lelfun",m:"lelfün",es:"el valle",en:"the valley",price:0},
  {id:"lafkenmapu",m:"lafkenmapu",es:"la costa",en:"the coast",price:60},
- {id:"pewenmapu",m:"pewenmapu",es:"tierra del pewen",en:"pewen country",price:80}
+ {id:"pewenmapu",m:"pewenmapu",es:"tierra del pewen",en:"pewen country",price:80},
+ {id:"puelmapu",m:"puelmapu",es:"Puelmapu, al este de la cordillera",en:"Puelmapu, east of the Andes",price:100},
+ {id:"willimapu",m:"willimapu",es:"Willimapu, la tierra del sur",en:"Willimapu, the land of the south",price:120}
 ];
 const envOf=p=>p.env||"lelfun";
 LOF.push(
@@ -3625,7 +3649,36 @@ LOF.push(
  {id:"choyke",env:"pewenmapu",m:"choyke",es:"ñandú",en:"rhea",price:25,x:214,y:186,sh:14,vb:"-18 -42 34 44",s:lfChoyke,
   ma:"Kiñe choyke lefi.",ses:"Un ñandú corrió.",sen:"A rhea ran."},
  {id:"pw-ruka",env:"pewenmapu",m:"ruka",es:"casa",en:"house",price:30,x:170,y:150,sh:44,vb:"-46 -78 92 82",s:lfL("ruka"),
-  ma:"Pewenmapu mew müley ñi ruka.",ses:"Mi casa está en la tierra del pewen.",sen:"My house is in pewen country."}
+  ma:"Pewenmapu mew müley ñi ruka.",ses:"Mi casa está en la tierra del pewen.",sen:"My house is in pewen country."},
+ /* ---- puelmapu: the plains east of the Andes ---- */
+ {id:"luan",env:"puelmapu",m:"luan",es:"guanacos",en:"guanacos",price:30,x:96,y:162,sh:16,vb:"-20 -42 50 46",
+  s:`${lfLuan}<g transform="translate(16 2) scale(.82)">${lfLuan}</g>`,
+  ma:"Fentren luan müley Puelmapu mew.",ses:"Hay muchos guanacos en Puelmapu.",sen:"There are many guanacos in Puelmapu."},
+ {id:"pu-choyke",env:"puelmapu",m:"choyke",es:"ñandúes",en:"rheas",price:25,x:262,y:150,sh:16,vb:"-18 -42 46 44",
+  s:`${lfChoyke}<g transform="translate(16 2) scale(.8)">${lfChoyke}</g>`,
+  ma:"Epu choyke müley.",ses:"Hay dos ñandúes.",sen:"There are two rheas."},
+ {id:"pu-ruka",env:"puelmapu",m:"ruka",es:"casa",en:"house",price:30,x:178,y:150,sh:44,vb:"-46 -78 92 82",s:lfL("ruka"),
+  ma:"Puelmapu mew müley ñi ruka.",ses:"Mi casa está en Puelmapu.",sen:"My house is in Puelmapu."},
+ {id:"pu-kütral",env:"puelmapu",m:"kütral",es:"fuego",en:"fire",price:15,x:226,y:184,sh:0,vb:"-22 -34 44 38",s:lfL("kütral"),
+  ma:"Kütral mew afümkeiñ ilo.",ses:"En el fuego cocemos carne.",sen:"We cook meat on the fire."},
+ {id:"pu-kawellu",env:"puelmapu",m:"kawellu",es:"caballo",en:"horse",price:30,x:304,y:204,sh:16,vb:"-24 -40 50 44",s:lfL("kawellu"),
+  ma:"Ñi kawellu lefi.",ses:"Mi caballo corrió.",sen:"My horse ran."},
+ {id:"pu-ufisa",env:"puelmapu",m:"ufisa",es:"ovejas",en:"sheep",price:20,x:70,y:208,sh:20,vb:"-26 -22 52 24",s:lfL("ufisa"),
+  ma:"Fentren ufisa müley.",ses:"Hay muchas ovejas.",sen:"There are many sheep."},
+ /* ---- willimapu: the rainy south ---- */
+ {id:"lawal",env:"willimapu",m:"lawal",es:"alerce",en:"alerce (Patagonian cypress)",price:30,x:40,y:150,sh:0,hz:0,vb:"-26 -90 52 94",s:lfLawal,
+  ma:"Kiñe fücha lawal müley.",ses:"Hay un alerce grande.",sen:"There is a big alerce tree."},
+ {id:"foye",env:"willimapu",m:"foye",es:"canelo",en:"canelo tree",price:25,x:306,y:156,sh:0,hz:0,vb:"-22 -52 44 56",s:lfFoye,
+  ma:"Kiñe foye müley ruka mew.",ses:"Hay un canelo en la casa.",sen:"There is a canelo tree at the house."},
+ {id:"wi-ruka",env:"willimapu",m:"ruka",es:"casa",en:"house",price:30,x:186,y:156,sh:44,vb:"-46 -78 92 82",s:lfL("ruka"),
+  ma:"Willimapu mew müley ñi ruka.",ses:"Mi casa está en Willimapu.",sen:"My house is in Willimapu."},
+ {id:"wi-pudu",env:"willimapu",m:"püdü",es:"pudú",en:"pudu",price:25,x:112,y:198,sh:12,vb:"-14 -18 30 20",s:lfPudu,
+  ma:"Kiñe püdü müley mawida mew.",ses:"Hay un pudú en el monte.",sen:"There is a pudu in the woods."},
+ {id:"wi-wampo",env:"willimapu",m:"wampo",es:"bote, canoa",en:"canoe",price:25,x:262,y:124,k:.9,z:3,sh:0,vb:"-27 -10 54 15",
+  s:`<g transform="scale(1.7)">${lfL("wampo")}</g>`,
+  ma:"Ñi chaw niey kiñe wampo.",ses:"Mi padre tiene un bote.",sen:"My father has a canoe."},
+ {id:"mawün",env:"willimapu",m:"mawün",es:"lluvia",en:"rain",price:20,x:0,y:0,abs:1,z:999,vb:"0 0 360 120",s:lfRain,
+  ma:"Mawüy Willimapu mew.",ses:"Llovió en Willimapu.",sen:"It rained in Willimapu."}
 );
 const lfK=p=>p.k||Math.min(1.12,.56+.52*(p.y-118)/112);
 const lfPiece=(p,sel)=>`<g transform="translate(${p.x} ${p.y})${p.abs?"":` scale(${lfK(p).toFixed(3)})`}"${!p.abs&&p.y<146&&!p.k&&p.hz!==0?` filter="url(#lfHaze)"`:""}><g class="lp${sel===p.id?" on":""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(G(p.m))}">${p.sh?lfSh(p.sh):""}${p.s}</g></g>`;
@@ -3646,6 +3699,24 @@ function lofBg(env){
     <path d="M0 146 Q90 138 180 144 T360 144 V152 Q270 148 180 152 T0 151Z" fill="#c4ad7c" opacity=".55"/>
     <g fill="#d8c08a" opacity=".6"><ellipse cx="90" cy="206" rx="40" ry="5"/><ellipse cx="300" cy="222" rx="50" ry="6"/></g>
     ${lfTufts("#7a8a4a",[[320,170],[340,232],[16,220],[28,232],[350,190]])}`;
+  if(env==="puelmapu") return `<rect width="360" height="240" fill="url(#lfSky)"/>
+    <circle cx="300" cy="40" r="36" fill="url(#lfSun)"/><circle cx="300" cy="40" r="11" fill="#fff3c4"/>
+    <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="110" cy="30" rx="22" ry="5"/><ellipse cx="122" cy="26" rx="11" ry="6"/></g><g opacity=".7"><ellipse cx="220" cy="20" rx="16" ry="4"/></g></g>
+    <path d="M0 106 L16 94 L32 100 L50 86 L70 98 L92 92 L118 104 V118 H0Z" fill="#9aafc6"/><path d="M44 90 L50 86 L57 91 L52 93Z" fill="#f4f7fa"/>
+    <rect y="102" width="360" height="18" fill="url(#lfHazeG)"/>
+    <path d="M0 114 Q90 108 180 112 T360 110 V240 H0Z" fill="url(#lfPampa)"/>
+    <g fill="#c7ad62" opacity=".7"><ellipse cx="80" cy="140" rx="60" ry="5"/><ellipse cx="270" cy="170" rx="80" ry="6"/><ellipse cx="150" cy="222" rx="90" ry="7"/></g>
+    <g fill="#7f8a5a">${[[30,128,6],[140,124,5],[230,130,7],[330,138,8],[20,176,9],[340,196,9],[150,196,7],[250,232,10]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.55}"/><ellipse cx="${x+r*.3}" cy="${y-r*.3}" rx="${r*.6}" ry="${r*.4}" fill="#95a06a"/>`).join("")}</g>
+    ${lfTufts("#a88a42",tufts)}`;
+  if(env==="willimapu") return `<rect width="360" height="240" fill="url(#lfSkyR)"/>
+    <g fill="#9aa6b6" opacity=".8"><ellipse cx="90" cy="40" rx="50" ry="11"/><ellipse cx="260" cy="34" rx="60" ry="12"/></g>
+    <path d="M0 100 Q30 70 70 84 Q110 62 150 82 Q200 64 250 80 Q300 66 360 82 V112 H0Z" fill="#3f5f4a"/>
+    <g fill="#2f4d3a">${Array.from({length:30},(_,k)=>`<path d="M${4+k*12.4} ${92-Math.sin(k*1.1)*7} l4 -12 l4 12Z"/>`).join("")}</g>
+    <rect y="104" width="360" height="20" fill="#4f7896"/><path d="M0 104.5 H360" stroke="#c9d6e2" stroke-width=".8" opacity=".6"/>
+    <g stroke="#c9d6e2" stroke-linecap="round" fill="none" opacity=".45" class="lf-shim"><path d="M40 110 h18 M140 116 h22 M240 110 h16 M310 118 h20"/></g>
+    <path d="M0 122 Q90 114 180 120 T360 118 V240 H0Z" fill="url(#lfMeadow)"/>
+    <g fill="#4c7a36" opacity=".6"><ellipse cx="80" cy="170" rx="50" ry="8"/><ellipse cx="270" cy="210" rx="70" ry="9"/></g>
+    ${lfTufts("#3f6a2d",tufts)}`;
   if(env==="pewenmapu") return `<rect width="360" height="240" fill="url(#lfSky)"/>
     <circle cx="300" cy="34" r="34" fill="url(#lfSun)"/><circle cx="300" cy="34" r="10" fill="#fff3c4"/>
     <g fill="#fff" class="lf-cloud" opacity=".85"><g><ellipse cx="62" cy="34" rx="22" ry="6"/><ellipse cx="74" cy="29" rx="12" ry="7"/><ellipse cx="54" cy="30" rx="9" ry="5"/></g><g opacity=".7"><ellipse cx="186" cy="22" rx="16" ry="4"/><ellipse cx="194" cy="18" rx="8" ry="5"/></g></g>
@@ -3688,6 +3759,8 @@ function lofScene(sel,env){
       <linearGradient id="lfHazeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfeaf0" stop-opacity="0"/><stop offset=".5" stop-color="#dfeaf0" stop-opacity=".55"/><stop offset="1" stop-color="#dfeaf0" stop-opacity="0"/></linearGradient>
       <linearGradient id="lfSand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6d3a2"/><stop offset="1" stop-color="#cdb27a"/></linearGradient>
       <linearGradient id="lfSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb0dc"/><stop offset="1" stop-color="#2f63a8"/></linearGradient>
+      <linearGradient id="lfPampa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c27c"/><stop offset=".5" stop-color="#cbb066"/><stop offset="1" stop-color="#b3964e"/></linearGradient>
+      <linearGradient id="lfSkyR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d8ea4"/><stop offset="1" stop-color="#c9d3dc"/></linearGradient>
       <linearGradient id="lfAlp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93a86a"/><stop offset=".4" stop-color="#7f9a58"/><stop offset="1" stop-color="#5f7a3e"/></linearGradient>
       <filter id="lfblur" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="1.3"/></filter>
       <filter id="lfHaze"><feColorMatrix type="matrix" values=".82 0 0 0 .14  0 .82 0 0 .15  0 0 .82 0 .17  0 0 0 1 0"/></filter>
@@ -3851,6 +3924,14 @@ const W_ART={
  "pet-choyke":wPet(`<g transform="translate(22 163) scale(.92)">${lfChoyke}</g>`),
  "bg-trayenko":wSky("wgF","#4f86c6","#cfe1ec")+`<g fill="#fff" opacity=".85"><ellipse cx="92" cy="20" rx="12" ry="3.4"/><ellipse cx="97" cy="17.6" rx="6" ry="3.6"/></g><path d="M0 36 L22 28 L42 40 L44 132 H0Z" fill="#6e7480"/><path d="M120 42 L96 32 L76 44 L74 132 H120Z" fill="#5e6470"/><path d="M0 36 L22 28 L30 32 L16 40 L8 132 H0Z" fill="#808692"/><path d="M42 40 Q59 34 76 44 L76 124 H42Z" fill="#cfe6f4"/>${[46,51,56,61,66,71].map((x,i)=>`<path d="M${x} ${40-(i%2)} V${122}" stroke="#fff" stroke-width="${i%2?1.6:1}" opacity=".85" class="lf-shim"/>`).join("")}<path d="M42 40 Q59 34 76 44" stroke="#fff" stroke-width="2" fill="none"/>${[[6,40,9],[18,32,8],[32,40,7],[84,40,8],[100,36,9],[114,44,8],[4,70,6],[112,78,7],[36,62,5],[82,66,5]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.7}" fill="#3f6a3d"/><ellipse cx="${x+1}" cy="${y-1.4}" rx="${r*.6}" ry="${r*.4}" fill="#5a8a4a"/>`).join("")}<ellipse cx="59" cy="126" rx="44" ry="8" fill="#3d72b0"/><ellipse cx="59" cy="124" rx="24" ry="5" fill="#f3f7fa" opacity=".6"/>`+wGround("#4f7a43","#3f6838")+wTufts("#2f5a2d",[[12,140],[98,138],[30,156],[90,158]]),
  "bg-lewfu":wSky("wgV","#5a8acb","#d6e8ee")+`<path d="M0 96 L26 82 L50 92 L78 72 L120 90 V112 H0Z" fill="#8ea7c2"/><path d="M78 72 L88 76 L84 80 L78 77 L72 80Z" fill="#f4f7fa"/><path d="M0 106 Q40 96 80 104 Q100 98 120 102 V134 H0Z" fill="#5d8a5a"/><path d="M70 104 Q62 110 50 114 Q28 120 20 128 Q12 136 0 138 V150 Q24 146 36 136 Q48 126 70 120 Q86 114 92 104Z" fill="#4b80bd"/><path d="M64 108 Q50 116 36 120 M40 128 Q26 134 10 140" stroke="#e6f1fb" stroke-width="1" fill="none" opacity=".7" class="lf-shim"/>`+wGround("#5d9a45","#4a8438")+`<path d="M0 134 Q18 136 30 132 L28 140 Q12 144 0 142Z" fill="#4b80bd"/>`+wTufts("#3a6a2c",[[40,140],[100,136],[70,156],[16,160]])+`<g transform="translate(104 136)"><path d="M0 0 V-26" stroke="#6b4a30" stroke-width="2.4"/>${Array.from({length:9},(_,i)=>`<path d="M0 ${-26+i*1.4} Q${-8+i%3*3} ${-14+i*1.6} ${-10+i*2.4} ${-2+i%2*2}" stroke="#7aa35a" stroke-width="1.2" fill="none"/>`).join("")}</g>`,
+ "makun-kolu":wPoncho("#7a4e2c",[[86,"#efe7d2",5,"#7a4e2c",2,6],[104,"#2a1d14",2,null]]),
+ "ikulla-chod":wShawl("#d9a62a","#c8322f","#2f5fd0"),
+ "trariwe-chod":wSash("#d9a62a","#c8322f","#26242c"),
+ "pifilka":`<path d="M90 114 L101 90" stroke="#7a5536" stroke-width="5" stroke-linecap="round"/><path d="M91.4 111.6 L99.8 93" stroke="#b08a5e" stroke-width="1.2" stroke-linecap="round"/><circle cx="96.6" cy="100.6" r="1.1" fill="#2a1d14"/><path d="M90 114 q-1.6 3.4 .6 5.4 M90.6 114.4 q.6 3.6 2.6 4.6" stroke="#c8322f" stroke-width="1.1" fill="none" stroke-linecap="round"/>`,
+ "challwa-hand":`<path d="M96 100 V105 M96 105 L90 109 M96 105 L102 109" stroke="#6e5a44" stroke-width="1.1" fill="none"/>${[[90,109],[102,109]].map(([x,y])=>`<path d="M${x} ${y} Q${x-5} ${y+11} ${x} ${y+22} Q${x+5} ${y+11} ${x} ${y}Z" fill="#4f7390"/><path d="M${x} ${y+3} Q${x+2.4} ${y+11} ${x} ${y+19}" stroke="#bcd0de" stroke-width="1.1" fill="none"/><path d="M${x} ${y+21} l-3.4 4.6 h6.8Z" fill="#3d5a72"/><circle cx="${x-1}" cy="${y+3.4}" r=".8" fill="#1a1410"/>`).join("")}`,
+ "pet-luan":wPet(`<g transform="translate(23 163) scale(.95)">${lfLuan}</g>`),
+ "bg-puelmapu":wSky("wgU","#5f93cf","#e3e2cc")+`<circle cx="94" cy="28" r="9" fill="#fff3c4"/><circle cx="94" cy="28" r="16" fill="#f6d77a" opacity=".3"/><path d="M0 112 L14 100 L28 106 L44 92 L60 106 V120 H0Z" fill="#9aafc6"/><path d="M39 96 L44 92 L50 97Z" fill="#f4f7fa"/>`+wGround("#cbb066","#b3964e")+`<g fill="#7f8a5a">${[[14,136,5],[104,140,6],[30,158,7],[96,160,5]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.55}"/>`).join("")}</g><g transform="translate(70 126) scale(.42)">${lfLuan}</g>`+wTufts("#a88a42",[[20,146],[50,150],[84,144],[110,154]]),
+ "bg-willimapu":wSky("wgI","#7d8ea4","#c9d3dc")+`<g fill="#9aa6b6" opacity=".85"><ellipse cx="30" cy="22" rx="30" ry="9"/><ellipse cx="94" cy="16" rx="28" ry="9"/></g><path d="M0 104 Q30 80 60 96 Q90 76 120 94 V118 H0Z" fill="#3f5f4a"/><rect y="112" width="120" height="14" fill="#4f7896"/>`+wGround("#5d8a45","#4a7438")+`<g transform="translate(16 140) scale(.6)">${lfLawal}</g><g stroke="#e6edf4" stroke-width=".7" stroke-linecap="round" opacity=".7">${Array.from({length:26},(_,k)=>`<path d="M${(k*29)%120} ${20+((k*41)%120)} l-2 6"/>`).join("")}</g>`,
  ...W_PETS, ...W_BG
 };
 ITEMS.forEach(it=>{ if(W_ART[it.id]) it.svg=W_ART[it.id]; });
@@ -4136,7 +4217,7 @@ const PAL_TROPHY=`<svg viewBox="0 0 120 120" width="140" height="140"><defs><lin
   <g transform="translate(60 38)"><circle r="11" fill="#c8322f"/><circle r="8" fill="none" stroke="#f6d77a" stroke-width="1.4"/><path d="M-5 5 L5 -5 M-3 -6 q5 1 6 6" stroke="#f3efe6" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="4" cy="4" r="2" fill="#f3efe6"/></g></svg>`;
 
 /* --- epew chapters: a serial story bought one chapter at a time --- */
-const EPEW_STORIES=[{t:"Ngürü ka ngülliw",es:"El zorro y los piñones",en:"The fox and the pine nuts"},{t:"Ngürü ka wakag",es:"El zorro y la rana",en:"The fox and the frog"}];
+const EPEW_STORIES=[{t:"Ngürü ka ngülliw",es:"El zorro y los piñones",en:"The fox and the pine nuts"},{t:"Ngürü ka wakag",es:"El zorro y la rana",en:"The fox and the frog"},{t:"Ngürü ka achawall",es:"El zorro y la gallina",en:"The fox and the hen"}];
 const epS=c=>c.s||0;
 /* chapters unlock in order within each story; the first chapter of every story is open */
 const epewPrev=i=>{ for(let k=i-1;k>=0;k--) if(epS(EPEW[k])===epS(EPEW[i])) return k; return -1; };
@@ -4232,7 +4313,50 @@ const EPEW=[
   gloss:[["mülerkey","resulta que estaba","it turned out (she) was"],["puwi","llegó (allá)","arrived (there)"],["wewürken","resulta que gané","it turns out I won"],["chumngechi?","¿cómo?","how?"],["lefkelan","no corro","I don't run"],["kellueneu","me ayudó, me ayudaron","helped me"],["fey mew","entonces, desde entonces","then, from then on"],["ayewelay","ya no se ríe","no longer laughs"]],
   qs:[{es:"¿Quién ganó?",en:"Who won?",o:{es:["La rana","El zorro","Nadie"],en:["The frog","The fox","Nobody"]}},
       {es:"¿Cómo ganó la rana?",en:"How did the frog win?",o:{es:["Sus amigas la ayudaron","Corrió más rápido","El zorro se durmió"],en:["Her friends helped her","She ran faster","The fox fell asleep"]}},
-      {es:"En «ayewelay», ¿qué agrega -we-?",en:"In «ayewelay», what does -we- add?",o:{es:["«Ya no»","«Mañana»","«Los dos»"],en:["«No longer»","«Tomorrow»","«The two»"]}}]}
+      {es:"En «ayewelay», ¿qué agrega -we-?",en:"In «ayewelay», what does -we- add?",o:{es:["«Ya no»","«Mañana»","«Los dos»"],en:["«No longer»","«Tomorrow»","«The two»"]}}]},
+ /* ---- third epew: Ngürü ka achawall (s:2). The two konew are the sourced ones from the Konew section (Mineduc, 4.º básico). ---- */
+ {s:2,t:"Ngürü ka achawall",price:20,lines:[
+  ["Kiñe pun, ngürü akuy ruka mew.","Una noche, el zorro llegó a la casa.","One night, the fox came to the house."],
+  ["Fey pefi kiñe achawall.","Vio una gallina.","He saw a hen."],
+  ["Ngürü pi: «Iyaeyu, achawall!»","El zorro dijo: «¡Te voy a comer, gallina!»","The fox said: «I'm going to eat you, hen!»"],
+  ["Achawall pi: «Kiñe konew piayu.»","La gallina dijo: «Te diré un konew.»","The hen said: «I'll tell you a konew.»"],
+  ["«Kimfilmi, iyaeymi. Kimlafilmi, amutuaymi.»","«Si lo sabes, me comerás. Si no lo sabes, te irás.»","«If you know it, you'll eat me. If you don't, you'll go home.»"],
+  ["Ngürü pi: «May.»","El zorro dijo: «Sí.»","The fox said: «Yes.»"]],
+  gloss:[["kiñe pun","una noche","one night"],["akuy","llegó","arrived"],["iyaeyu","te voy a comer","I'll eat you"],["konew","adivinanza","riddle"],["piayu","te diré","I'll tell you"],["kimfilmi","si lo sabes","if you know it"],["iyaeymi","me comerás","you'll eat me"],["kimlafilmi","si no lo sabes","if you don't know it"],["amutuaymi","te irás (de vuelta)","you'll go back"]],
+  qs:[{es:"¿Qué quería hacer el zorro?",en:"What did the fox want to do?",o:{es:["Comerse a la gallina","Dormir en la casa","Buscar piñones"],en:["Eat the hen","Sleep in the house","Look for pine nuts"]}},
+      {es:"¿Qué propuso la gallina?",en:"What did the hen propose?",o:{es:["Un konew","Una carrera","Un regalo"],en:["A konew","A race","A gift"]}},
+      {es:"En «kimlafilmi», ¿qué marca -la-?",en:"In «kimlafilmi», what does -la- mark?",o:{es:["Negación","Futuro","Plural"],en:["Negation","Future","Plural"]}}]},
+ {s:2,t:"Kiñe konew",price:25,lines:[
+  ["Achawall pi: «Puliwen witraken, pun wüla umawtuken. Chem am ta tatey?»","La gallina dijo: «En la mañana me levanto y en la noche me acuesto. ¿Qué será eso?»","The hen said: «In the morning I get up, and at night I go to sleep. What could that be?»"],
+  ["Ngürü rakiduamküley.","El zorro está pensando.","The fox is thinking."],
+  ["Ngürü pi: «Küyen am?»","El zorro dijo: «¿Será la luna?»","The fox said: «Could it be the moon?»"],
+  ["Achawall pi: «Felelay. Küyen pun mew tripakey.»","La gallina dijo: «No es así. La luna sale de noche.»","The hen said: «No. The moon comes out at night.»"],
+  ["Ngürü pi: «Kütral am?»","El zorro dijo: «¿Será el fuego?»","The fox said: «Could it be the fire?»"],
+  ["Achawall pi: «Felelay!»","La gallina dijo: «¡No es así!»","The hen said: «No, it isn't!»"]],
+  gloss:[["puliwen","en la mañana","in the morning"],["witraken","me levanto (siempre)","I get up (always)"],["umawtuken","me duermo (siempre)","I go to sleep (always)"],["chem am ta tatey?","¿qué será eso?","what could that be?"],["rakiduamküley","está pensando","is thinking"],["felelay","no es así","it isn't so"],["tripakey","sale (siempre)","comes out (always)"]],
+  qs:[{es:"¿Qué dijo primero el zorro?",en:"What did the fox guess first?",o:{es:["La luna","El sol","El fuego"],en:["The moon","The sun","The fire"]}},
+      {es:"¿Por qué no es la luna?",en:"Why isn't it the moon?",o:{es:["La luna sale de noche","La luna es pequeña","La luna duerme de día"],en:["The moon comes out at night","The moon is small","The moon sleeps by day"]}}]},
+ {s:2,t:"Antü",price:30,lines:[
+  ["Ngürü pi: «Kimlan.»","El zorro dijo: «No sé.»","The fox said: «I don't know.»"],
+  ["Achawall pi: «Antüngey! Antü puliwen tripakey.»","La gallina dijo: «¡Es el sol! El sol sale en la mañana.»","The hen said: «It's the sun! The sun comes out in the morning.»"],
+  ["«Kimlafimi. Amutunge!»","«No lo sabías. ¡Vete!»","«You didn't know it. Go home!»"],
+  ["Fey mew, ngürü amutuy mawida mew.","Entonces el zorro se volvió al monte.","So the fox went back to the woods."],
+  ["Achawall ayey.","La gallina se rió.","The hen laughed."]],
+  gloss:[["kimlan","no sé","I don't know"],["antüngey","es el sol","it's the sun"],["kimlafimi","no lo sabes, no lo sabías","you don't / didn't know it"],["amutunge!","¡vete (de vuelta)!","go back!"],["amutuy","se fue de vuelta","went back"],["ayey","se rió","laughed"]],
+  qs:[{es:"¿Cuál era la respuesta del konew?",en:"What was the answer to the konew?",o:{es:["El sol","La luna","La gallina"],en:["The sun","The moon","The hen"]}},
+      {es:"¿Adónde se fue el zorro?",en:"Where did the fox go?",o:{es:["Al monte","Al lago","A la casa"],en:["To the woods","To the lake","To the house"]}},
+      {es:"«Amutunge» es…",en:"«Amutunge» is…",o:{es:["Una orden","Una pregunta","Un konew"],en:["A command","A question","A konew"]}}]},
+ {s:2,t:"Wüle mew",price:35,lines:[
+  ["Wüle mew, ngürü küpatuy ka.","Al día siguiente, el zorro volvió otra vez.","The next day, the fox came back again."],
+  ["Ngürü pi: «Iñche ka kiñe konew nien.»","El zorro dijo: «Yo también tengo un konew.»","The fox said: «I have a konew too.»"],
+  ["«Rünkü rünkütuy, kiñe ñuwa rünküfe. Chem am ta tatey?»","«Salta y salta, una saltarina traviesa. ¿Qué será eso?»","«Hop and hop again, a naughty little hopper. What could that be?»"],
+  ["Achawall pi: «Nerümngey!»","La gallina dijo: «¡Es la pulga!»","The hen said: «It's the flea!»"],
+  ["Ngürü ayey. Achawall ka ayey.","El zorro se rió. La gallina también se rió.","The fox laughed. The hen laughed too."],
+  ["Fey mew, ngürü ka achawall engu konewtukeyngu.","Desde entonces, el zorro y la gallina se dicen konew.","Since then, the fox and the hen tell each other konew."]],
+  gloss:[["wüle mew","al día siguiente","the next day"],["küpatuy","volvió","came back"],["ka","también, otra vez","also, again"],["nien","tengo","I have"],["nerümngey","es la pulga","it's the flea"],["konewtukeyngu","se proponen konew (los dos)","the two tell riddles"]],
+  qs:[{es:"¿Qué trajo el zorro esta vez?",en:"What did the fox bring this time?",o:{es:["Un konew","Piñones","Un caballo"],en:["A konew","Pine nuts","A horse"]}},
+      {es:"¿Quién adivinó el konew del zorro?",en:"Who guessed the fox's konew?",o:{es:["La gallina","El zorro","Nadie"],en:["The hen","The fox","Nobody"]}},
+      {es:"«Konewtukeyngu»: ¿cuántos se dicen konew?",en:"«Konewtukeyngu»: how many tell riddles?",o:{es:["Dos","Uno","Tres o más"],en:["Two","One","Three or more"]}}]}
 ];
 function epew(msg){
   S=null; clearInterval(vidTimer);
