@@ -1,0 +1,294 @@
+[
+{
+"c": "puliwen",
+"m": "Mari mari, pichiche!",
+"es": "¡Buenos días, pequeño/a!",
+"en": "Good morning, little one!"
+},
+{
+"c": "puliwen",
+"m": "Mari mari, ñuke.",
+"es": "Buenos días, mamá.",
+"en": "Good morning, mom."
+},
+{
+"c": "puliwen",
+"m": "Mari mari, chaw.",
+"es": "Buenos días, papá.",
+"en": "Good morning, dad."
+},
+{
+"c": "puliwen",
+"m": "Chumleymi?",
+"es": "¿Cómo estás?",
+"en": "How are you?"
+},
+{
+"c": "puliwen",
+"m": "Kümelen.",
+"es": "Estoy bien.",
+"en": "I'm fine."
+},
+{
+"c": "puliwen",
+"m": "Küme umawtuymi?",
+"es": "¿Dormiste bien?",
+"en": "Did you sleep well?"
+},
+{
+"c": "puliwen",
+"m": "Witrange!",
+"es": "¡Levántate!",
+"en": "Get up!"
+},
+{
+"c": "puliwen",
+"m": "Küchange tami kuwü.",
+"es": "Lávate las manos.",
+"en": "Wash your hands."
+},
+{
+"c": "iyael",
+"m": "Ngüñüleymi?",
+"es": "¿Tienes hambre?",
+"en": "Are you hungry?"
+},
+{
+"c": "iyael",
+"m": "Ngüñülen.",
+"es": "Tengo hambre.",
+"en": "I'm hungry."
+},
+{
+"c": "iyael",
+"m": "Iayiñ!",
+"es": "¡Vamos a comer!",
+"en": "Let's eat!"
+},
+{
+"c": "iyael",
+"m": "Inge tami iyael.",
+"es": "Come tu comida.",
+"en": "Eat your food."
+},
+{
+"c": "iyael",
+"m": "Pütokonge.",
+"es": "Toma agua.",
+"en": "Drink some water."
+},
+{
+"c": "iyael",
+"m": "Ayüfimi?",
+"es": "¿Te gusta?",
+"en": "Do you like it?"
+},
+{
+"c": "iyael",
+"m": "Doy iaymi?",
+"es": "¿Vas a comer más?",
+"en": "Will you eat more?"
+},
+{
+"c": "iyael",
+"m": "Chaltumay.",
+"es": "Muchas gracias.",
+"en": "Thank you very much."
+},
+{
+"c": "tripan",
+"m": "Wütreley. Takuwnge!",
+"es": "Hace frío. ¡Abrígate!",
+"en": "It's cold. Bundle up!"
+},
+{
+"c": "tripan",
+"m": "Amuaiñ!",
+"es": "¡Vamos!",
+"en": "Let's go!"
+},
+{
+"c": "tripan",
+"m": "Amuyu!",
+"es": "¡Vamos los dos!",
+"en": "Let's go, the two of us!"
+},
+{
+"c": "tripan",
+"m": "Chew amuaymi?",
+"es": "¿Adónde vas?",
+"en": "Where are you going?"
+},
+{
+"c": "tripan",
+"m": "Küpange!",
+"es": "¡Ven!",
+"en": "Come here!"
+},
+{
+"c": "tripan",
+"m": "Ñochikechi!",
+"es": "¡Con cuidado!",
+"en": "Carefully!"
+},
+{
+"c": "tripan",
+"m": "Akutuy tami ñuke.",
+"es": "Llegó tu mamá (de vuelta).",
+"en": "Your mom is back."
+},
+{
+"c": "tripan",
+"m": "Pewkallal!",
+"es": "¡Hasta luego!",
+"en": "See you later!"
+},
+{
+"c": "awkantun",
+"m": "Awkantuaiñ!",
+"es": "¡Vamos a jugar!",
+"en": "Let's play!"
+},
+{
+"c": "awkantun",
+"m": "Awkantunge!",
+"es": "¡Juega!",
+"en": "Go and play!"
+},
+{
+"c": "awkantun",
+"m": "Iñche ka!",
+"es": "¡Yo también!",
+"en": "Me too!"
+},
+{
+"c": "awkantun",
+"m": "Eluen!",
+"es": "¡Dámelo!",
+"en": "Give it to me!"
+},
+{
+"c": "awkantun",
+"m": "Allkütunge!",
+"es": "¡Escucha!",
+"en": "Listen!"
+},
+{
+"c": "awkantun",
+"m": "Chem am ta tatey?",
+"es": "¿Qué será eso?",
+"en": "What could that be?",
+"noex": true
+},
+{
+"c": "poyen",
+"m": "Kümey!",
+"es": "¡Muy bien!",
+"en": "Well done!"
+},
+{
+"c": "poyen",
+"m": "Tuteley!",
+"es": "¡Excelente!",
+"en": "Excellent!",
+"noex": true
+},
+{
+"c": "poyen",
+"m": "Rume küme!",
+"es": "¡Muy bien!",
+"en": "Very good!"
+},
+{
+"c": "poyen",
+"m": "Newentuaymi!",
+"es": "¡Ánimo! ¡Ten fuerza!",
+"en": "Be strong! Keep going!"
+},
+{
+"c": "poyen",
+"m": "Ayüwkülen.",
+"es": "Estoy contento/a.",
+"en": "I'm happy."
+},
+{
+"c": "poyen",
+"m": "Ayüeyu.",
+"es": "Te quiero.",
+"en": "I love you.",
+"noex": true
+},
+{
+"c": "pun",
+"m": "Umawtunge!",
+"es": "¡Duérmete!",
+"en": "Go to sleep!"
+},
+{
+"c": "pun",
+"m": "Küme umawtuange.",
+"es": "Que duermas bien.",
+"en": "Sleep well.",
+"alt": [
+"küme umagtuange"
+]
+},
+{
+"c": "pun",
+"m": "Kiñe epew piayu.",
+"es": "Te voy a contar un epew.",
+"en": "I'll tell you an epew."
+},
+{
+"c": "pun",
+"m": "Pewkayal.",
+"es": "Hasta mañana.",
+"en": "See you tomorrow."
+},
+{
+"c": "ramtun",
+"m": "Iney pingeymi?",
+"es": "¿Cómo te llamas?",
+"en": "What's your name?"
+},
+{
+"c": "ramtun",
+"m": "... pingen.",
+"es": "Me llamo ...",
+"en": "My name is ..."
+},
+{
+"c": "ramtun",
+"m": "Tunten tripantu nieymi?",
+"es": "¿Cuántos años tienes?",
+"en": "How old are you?",
+"alt": [
+"tunten tripantu"
+]
+},
+{
+"c": "ramtun",
+"m": "Chew müley tami chaw?",
+"es": "¿Dónde está tu papá?",
+"en": "Where is your dad?"
+},
+{
+"c": "ramtun",
+"m": "Chem ayüymi?",
+"es": "¿Qué quieres?",
+"en": "What do you want?",
+"noex": true
+},
+{
+"c": "ramtun",
+"m": "May.",
+"es": "Sí.",
+"en": "Yes."
+},
+{
+"c": "ramtun",
+"m": "Kimlan.",
+"es": "No sé.",
+"en": "I don't know."
+}
+]
