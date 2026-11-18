@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="theme-color" content="#14122a">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noai, noimageai">
+<title>¿Cómo lo dicen? | Tañi Nemülkawe</title>
+<meta name="description" content="Escribe algo en castellano y mira cómo lo dijeron hablantes de mapudungun en el corpus AVENUE, frase por frase.">
+<link rel="canonical" href="https://brogers36.github.io/Mapudungukeain/diccionario/frases/">
+<link rel="icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="../herramientas.css">
+</head><body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="top"><a class="back" href="../" id="back">← Tañi Nemülkawe</a>
+    <div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es">ES</button><button data-l="en">EN</button></div></div>
+  <h1 id="h1"></h1>
+  <p class="muted" id="intro"></p>
+  <div class="panel">
+    <label for="q" id="lq"></label>
+    <div class="row"><input id="q" type="search" autocomplete="off" autocapitalize="none" spellcheck="false" style="flex:1;min-width:180px">
+      <button class="btn" id="go"></button></div>
+    <div class="chips" role="group" id="side"></div>
+    <div class="chips" role="group" id="vars"></div>
+  </div>
+  <p class="hint" id="status" aria-live="polite"></p>
+  <div id="out" class="list"></div>
+  <p class="hint" id="note"></p>
+  <footer class="foot" id="foot"></footer>
+</div>
+<script>
+/* ¿Cómo lo dicen? © 2026 Brandon M. A. Rogers. Busca en las frases del corpus AVENUE (buscar.js corre aparte). */
+let lang=(()=>{try{return JSON.parse(localStorage.getItem('mpk_lang'))==='en'?'en':'es'}catch(e){return'es'}})();
+const L=(es,en)=>lang==='en'?en:es, $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VAR={N:['Nguluche','Nguluche'],L:['Lafkenche','Lafkenche'],P:['Pewenche','Pewenche']};
+let side='es', vars='NLP', ready=false, total=0, last=null;
+const W=new Worker('buscar.js');
+W.onmessage=ev=>{ const d=ev.data;
+  if('ready' in d){ ready=d.ready; total=d.n||0; $('#status').textContent=ready?'':L('No se pudieron cargar las frases. Revisa la conexión y vuelve a abrir la página.','The phrases could not be loaded. Check the connection and reopen the page.'); if(ready && $('#q').value.trim()) run(); return; }
+  if(d.q!==$('#q').value.trim()) return; show(d); };
+const fold=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function hl(text,q){ const qs=(fold(q).match(/[a-zñü0-9]+/g)||[]).filter(t=>t.length>2).map(t=>t.slice(0,Math.max(3,t.length-2)));
+  return esc(text).replace(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g,w=>qs.some(t=>fold(w).startsWith(t))?`<mark>${w}</mark>`:w); }
+function wordsM(text,q){ const qf=(q.toLowerCase().replace(/'/g,'').match(/[a-zñü]+/g)||[]);
+  return text.split(/(\s+)/).map(p=>{ const w=p.replace(/^[¿¡"(«]+|[.,;:!?")»]+$/g,''); if(!/[a-zA-Zñü]/.test(w)) return esc(p);
+    const k=w.toLowerCase().replace(/'/g,''); const on=side==='arn'&&qf.some(t=>k.startsWith(t));
+    return esc(p).replace(esc(w),`<a class="w${on?' on':''}" href="../#/buscar/${encodeURIComponent(w.toLowerCase())}" title="${L('Analizar en el diccionario','Analyse in the dictionary')}">${esc(w)}</a>`); }).join(''); }
+function show(d){ last=d; const out=$('#out');
+  if(!d.hits.length){ out.innerHTML=`<p class="empty">${L('No hay frases con esas palabras. Prueba con menos palabras o con otra forma del verbo (por ejemplo «comer» en vez de «comimos»).','No phrases with those words. Try fewer words or another form of the verb.')}</p>`; $('#status').textContent=''; return; }
+  $('#status').textContent=L(`${d.hits.length===60?'Las 60 frases más cercanas':d.hits.length+' frases'} de ${total.toLocaleString('es')}.`,`${d.hits.length===60?'The 60 closest phrases':d.hits.length+' phrases'} of ${total.toLocaleString('en')}.`);
+  out.innerHTML=d.hits.map(([m,s,v])=>`<div class="item"><p class="arn" lang="arn">${wordsM(m,d.q)}</p><p class="es">${side==='es'?hl(s,d.q):esc(s)}</p><span class="tag">${VAR[v][lang==='en'?1:0]}</span></div>`).join(''); }
+let t=null;
+function run(){ const q=$('#q').value.trim(); try{ history.replaceState(null,'',q?'#'+encodeURIComponent((side==='arn'?'m:':'')+q):location.pathname); }catch(e){}
+  if(!q){ $('#out').innerHTML=''; $('#status').textContent=''; return; }
+  if(!ready){ $('#status').textContent=L('Cargando las frases de AVENUE (unos 13 MB la primera vez)…','Loading the AVENUE phrases (about 13 MB the first time)…'); return; }
+  W.postMessage({q,side,vars}); }
+function chrome(){ document.documentElement.lang=lang;
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lang));
+  $('#h1').textContent=L('¿Cómo lo dicen?','How do they say it?');
+  $('#intro').innerHTML=L('Escribe algo en castellano y mira cómo lo dijeron hablantes de mapudungun en las conversaciones del corpus <b>AVENUE</b> (Nguluche, Lafkenche y Pewenche). No es un traductor: muestra frases reales con ideas parecidas. Toca una palabra en mapudungun para ver su análisis.','Type something in Spanish and see how Mapudungun speakers said it in the conversations of the <b>AVENUE</b> corpus (Nguluche, Lafkenche and Pewenche). It is not a translator: it shows real sentences with similar ideas. Tap a Mapudungun word to see its analysis.');
+  $('#lq').textContent=side==='es'?L('Frase o palabras en castellano','Phrase or words in Spanish'):L('Palabra en mapudungun','Word in Mapudungun');
+  $('#q').placeholder=side==='es'?L('por ejemplo: no tengo remedio','e.g. no tengo remedio'):L('por ejemplo: kutran','e.g. kutran');
+  $('#go').textContent=L('Buscar','Search');
+  $('#side').innerHTML=[['es',L('Buscar en el castellano','Search the Spanish')],['arn',L('Buscar en el mapudungun','Search the Mapudungun')]].map(([k,n])=>`<button class="chip" data-s="${k}" aria-pressed="${side===k}">${n}</button>`).join('');
+  $('#vars').innerHTML=Object.keys(VAR).map(k=>`<button class="chip" data-v="${k}" aria-pressed="${vars.includes(k)}">${VAR[k][0]}</button>`).join('');
+  $('#note').innerHTML=L('Las traducciones son las del corpus: muchas son libres o aproximadas, y algunas frases mezclan castellano. Las palabras se escriben como en AVENUE (por ejemplo <i>l\'awen\'</i> por <i>lawen</i>). Ver también el <a href="../oraciones/">constructor de oraciones</a>.','The translations are the corpus\'s own: many are free or approximate, and some sentences mix in Spanish. Words are spelled as in AVENUE (e.g. <i>l\'awen\'</i> for <i>lawen</i>). See also the <a href="../oraciones/">sentence builder</a>.');
+  $('#foot').innerHTML=L('© 2026 Brandon M. A. Rogers. Frases: corpus AVENUE. No se permite usar este sitio ni su contenido para entrenar ni alimentar sistemas de inteligencia artificial.','© 2026 Brandon M. A. Rogers. Phrases: AVENUE corpus. This site and its content may not be used to train or feed artificial intelligence systems.');
+  $('#side').querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ side=b.dataset.s; chrome(); run(); });
+  $('#vars').querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{ const k=b.dataset.v; vars=vars.includes(k)?(vars.replace(k,'')||k):vars+k; chrome(); run(); });
+  if(last) show(last); }
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{ lang=b.dataset.l; try{localStorage.setItem('mpk_lang',JSON.stringify(lang))}catch(e){} chrome(); });
+$('#go').onclick=run; $('#q').addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(run,350); });
+$('#q').addEventListener('keydown',e=>{ if(e.key==='Enter'){ clearTimeout(t); run(); } });
+{ const h=decodeURIComponent(location.hash.slice(1)); if(h){ if(h.startsWith('m:')){ side='arn'; $('#q').value=h.slice(2); } else $('#q').value=h; } }
+chrome(); run();
+</script>
+</body></html>

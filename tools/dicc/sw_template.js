@@ -4,7 +4,7 @@ const CACHE = 'nemulkawe-__VERSION__';
 /* Everything the dictionary needs is stored at install, so it works fully offline from the first visit: the word
    analyser (worker.js, stub.js, motor.js) and the data loaded later on demand (datos_es.js for Spanish search,
    ejemplos.js for examples) included. Before, motor.js was only cached when fetched, and the analyser could miss it offline. */
-const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './motor_cond.js', './gramatica.js', './conjugar/', './conjugar/index.html',
+const CORE = ['./', './index.html', './datos.js', './datos_es.js', './ejemplos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './worker.js', './stub.js', './motor.js', './motor_cond.js', './gramatica.js', './conjugar/', './conjugar/index.html', './herramientas.css', './oraciones/', './oraciones/index.html', './frases/', './frases/index.html', './frases/buscar.js',
   /* the verb builder page (conjugar/) has no rules of its own: it loads the verb app's files, one copy for both */
   '../verbos/app.js', '../verbos/app.css', '../verbos/reglas.js', '../verbos/raices.js', '../verbos/datos.js'];
 self.addEventListener('install', e => {
@@ -21,10 +21,13 @@ self.addEventListener('fetch', e => {
   const inScope = url.origin === location.origin && url.pathname.startsWith(scope.pathname);
   /* the dictionary's web page (acerca/) is a separate page: never cache it as the app page */
   if (url.origin === location.origin && url.pathname.startsWith(scope.pathname + 'acerca/')) return;
-  /* the verb builder page: its own cached copy (before, it was stored as the dictionary page and replaced it offline) */
-  if (req.mode === 'navigate' && inScope && url.pathname.startsWith(scope.pathname + 'conjugar/')) {
-    e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./conjugar/index.html', copy)); } return r; })
-      .catch(() => caches.match('./conjugar/index.html')));
+  /* the tool pages (verb builder, sentence builder, ¿Cómo lo dicen?): each its own cached copy (before, the verb builder
+     was stored as the dictionary page and replaced it offline). frases/pares.json (13 MB) is not stored at install: it is
+     cached the first time someone searches, below. */
+  const sub = ['conjugar/', 'oraciones/', 'frases/'].find(d => url.pathname.startsWith(scope.pathname + d));
+  if (req.mode === 'navigate' && inScope && sub) {
+    e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put('./' + sub + 'index.html', copy)); } return r; })
+      .catch(() => caches.match('./' + sub + 'index.html')));
     return;
   }
   /* the verb app's files used by that page live outside this folder (../verbos/): network first, revalidated, cached for offline */

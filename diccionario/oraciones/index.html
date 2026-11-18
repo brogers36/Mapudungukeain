@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="theme-color" content="#14122a">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noai, noimageai">
+<title>Constructor de oraciones | Tañi Nemülkawe</title>
+<meta name="description" content="Arma oraciones simples en mapudungun: quién, qué hace, a quién, cuándo y dónde, con cada pieza explicada y revisada por el analizador.">
+<link rel="canonical" href="https://brogers36.github.io/Mapudungukeain/diccionario/oraciones/">
+<link rel="icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="../herramientas.css">
+</head><body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">← Tañi Nemülkawe</a>
+    <div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es">ES</button><button data-l="en">EN</button></div></div>
+  <h1 id="h1"></h1>
+  <p class="muted" id="intro"></p>
+  <div id="res"></div>
+  <div class="panel"><span class="lab" id="l_subj"></span><div class="chips" id="subj"></div>
+    <label class="hint"><input type="checkbox" id="pron" checked> <span id="l_pron"></span></label></div>
+  <div class="panel"><label class="lab" for="vq" id="l_verb"></label>
+    <input type="search" id="vq" autocomplete="off" autocapitalize="none" spellcheck="false">
+    <div class="picks" id="vpicks"></div></div>
+  <div class="panel"><span class="lab" id="l_obj"></span><div class="chips" id="obj"></div>
+    <div id="objnoun"></div></div>
+  <div class="panel"><span class="lab" id="l_mood"></span><div class="chips" id="mood"></div>
+    <span class="lab" id="l_sel"></span><div class="chips" id="sel"></div></div>
+  <div class="panel"><span class="lab" id="l_when"></span><div class="chips" id="when"></div>
+    <span class="lab" id="l_where"></span><div id="where"></div></div>
+  <p class="hint" id="note"></p>
+  <footer class="foot" id="foot"></footer>
+</div>
+<script src="../../verbos/reglas.js"></script>
+<script src="../../verbos/raices.js"></script>
+<script src="../../verbos/datos.js"></script>
+<script src="../datos.js"></script>
+<script>
+/* Constructor de oraciones. © 2026 Brandon M. A. Rogers. Las formas verbales salen del constructor de verbos
+   (../../verbos/reglas.js: cuadros de J. Becker Peña, cotejo con Smeets 2008); los sustantivos, del diccionario; cada
+   verbo se pasa por el analizador del diccionario (../worker.js) como control, y se cuenta en AVENUE. */
+let lang=(()=>{try{return JSON.parse(localStorage.getItem('mpk_lang'))==='en'?'en':'es'}catch(e){return'es'}})();
+const L=(es,en)=>lang==='en'?en:es, $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fold=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const P={'1s':['yo','I','iñche'],'1d':['nosotros dos','we two','iñchiu'],'1p':['nosotros','we (3+)','iñchiñ'],'2s':['tú','you','eymi'],'2d':['ustedes dos','you two','eymu'],'2p':['ustedes','you (3+)','eymün'],
+  '3s':['él / ella','she / he','fey'],'3d':['ellos dos','they two','feyengu'],'3p':['ellos','they (3+)','feyengün']};
+const O={'none':['nadie (sin objeto)','no one (no object)'],'1s':['a mí','me'],'1d':['a nosotros dos','us two'],'1p':['a nosotros','us (3+)'],'2s':['a ti','you'],'2d':['a ustedes dos','you two'],'2p':['a ustedes','you (3+)'],'3':['a él / ella / eso','her / him / it']};
+const MOODS=[['ind','Afirma o niega','States'],['imp','Pide u ordena','Asks or orders'],['cond','Si… (condición)','If… (condition)']];
+const SELS=['a','fu','ke','le','pe','tu','pa','me','we','rke'];
+const WHEN=[['','—','—'],['kuyfi','antes, antiguamente','long ago'],['wiya','ayer','yesterday'],['fachantü','hoy','today'],['wüle','mañana','tomorrow']];
+/* AVENUE counts, as in the verb builder */
+const CNT=new Map(); { const Lc=VB_DATA.counts.split('\n'); for(const l of Lc){ const k=l.lastIndexOf('\t'); if(k>0) CNT.set(l.slice(0,k),+l.slice(k+1)); } }
+const norm=w=>w.toLowerCase().replace(/ḻ/g,'l').replace(/ṉ/g,'n').replace(/ṯ/g,'t').replace(/v/g,'f').replace(/'/g,'');
+/* verbs: curated or AVENUE-frequent roots first */
+const RW={N:4,NA:4,VN:3,VA:2,A:1};
+function verbSearch(q){ const f=fold(q.trim()); if(!f) return VB_RAICES.filter(r=>RW[r[5]]>=3).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const out=[]; for(const r of VB_RAICES){ const g=fold(lang==='en'&&r[3]?r[3]:r[2]).split(':')[0]; const items=g.split(/[,;]\s*/); let s=0;
+    if(r[0]===f) s=50; else if(r[0].startsWith(f)&&f.length>=2) s=20;
+    if(items.some(x=>x.trim()===f||x.trim()==='to '+f)) s=Math.max(s,40); else if(new RegExp('(^|[^a-zñ])'+f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).test(g)) s=Math.max(s,15);
+    if(s) out.push([s+RW[r[5]]*3+Math.log10(1+r[1]),r]); }
+  return out.sort((a,b)=>b[0]-a[0]).slice(0,10).map(x=>x[1]); }
+/* nouns: the dictionary's curated nouns, then Augusta's */
+const NOUNCAT=new Set(['fam','anim','comida','plant','cult','cuerpo','nat','casa','lugar','ropa','otros']);
+const NOUNS=[]; for(const e of DICC.core){ if(!/\s/.test(e.m)&&(e.p==='s'||NOUNCAT.has(e.t))&&e.t!=='verb') NOUNS.push({m:e.m,es:e.es,en:e.en||'',w:3}); }
+for(const e of DICC.aug){ if(e.p==='s'&&!/\s/.test(e.h)&&e.s) NOUNS.push({m:e.h,es:e.s,en:e.en||'',w:1,aug:1}); }
+function nounSearch(q){ const f=fold(q.trim()); if(f.length<2) return [];
+  const out=[]; for(const n of NOUNS){ const g=fold(lang==='en'&&n.en?n.en:n.es); let s=0;
+    if(n.m===f) s=30; else if(n.m.startsWith(f)) s=12; if(new RegExp('(^|[^a-zñ])(el |la |los |las )?'+f).test(g)) s=Math.max(s,g.startsWith(f)||g.startsWith('el '+f)||g.startsWith('la '+f)?25:10);
+    if(s) out.push([s+n.w*4,n]); }
+  const seen=new Set(); return out.sort((a,b)=>b[0]-a[0]).map(x=>x[1]).filter(n=>!seen.has(n.m)&&seen.add(n.m)).slice(0,8); }
+let S={subj:'1s',root:null,obj:'none',mood:'ind',neg:false,sel:new Set(),pron:true,objN:null,place:null,when:''};
+/* parser check through the dictionary's analyser */
+let W=null,wseq=0; const wwait=new Map();
+function analyse(word){ return new Promise(res=>{ try{ if(!W){ W=new Worker('../worker.js'); W.onmessage=ev=>{ const f=wwait.get(ev.data.id); if(f){ wwait.delete(ev.data.id); f(ev.data.r); } }; }
+  const id=++wseq; wwait.set(id,res); W.postMessage({id,word,sys:'uni'}); setTimeout(()=>{ if(wwait.has(id)){ wwait.delete(id); res(null); } },20000); }catch(e){ res(null); } }); }
+function nounBox(id,cur,label,onpick){ const el=$(id);
+  el.innerHTML=cur?`<div class="row"><span class="pick" aria-pressed="true"><b>${esc(cur.m)}</b> <span>${esc(lang==='en'&&cur.en?cur.en:cur.es)}</span></span><button class="chip" data-x>${L('Quitar','Remove')}</button></div>`
+    :`<input type="search" placeholder="${esc(label)}" autocomplete="off" autocapitalize="none" spellcheck="false"><div class="picks"></div>`;
+  if(cur){ el.querySelector('[data-x]').onclick=()=>{ onpick(null); }; return; }
+  const inp=el.querySelector('input'), pk=el.querySelector('.picks');
+  inp.oninput=()=>{ const r=nounSearch(inp.value); pk.innerHTML=r.map((n,i)=>`<button class="pick" data-i="${i}"><b>${esc(n.m)}</b><span>${esc((lang==='en'&&n.en?n.en:n.es).slice(0,70))}${n.aug?' · Augusta':''}</span></button>`).join('');
+    pk.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>onpick(r[+b.dataset.i])); }; }
+function chips(id,items,cur,cb,dis){ const el=$(id); el.innerHTML=items.map(([k,n,t])=>`<button class="chip" data-k="${esc(k)}" aria-pressed="${cur(k)}"${dis&&dis(k)?' disabled':''}${t?` title="${esc(t)}"`:''}>${n}</button>`).join('');
+  el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>cb(b.dataset.k)); }
+function draw(){
+  document.documentElement.lang=lang; document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===lang));
+  $('#h1').textContent=L('Constructor de oraciones','Sentence builder');
+  $('#intro').innerHTML=L('Elige quién, qué hace, a quién, cuándo y dónde. El verbo sale de las reglas del <a href="../conjugar/">constructor de verbos</a>, cada pieza se explica, y el analizador del diccionario revisa el resultado. Sirve para oraciones simples: para ver cómo lo dicen los hablantes, usa <a href="../frases/">¿Cómo lo dicen?</a>','Choose who, what they do, to whom, when and where. The verb comes from the rules of the <a href="../conjugar/">verb builder</a>, every piece is explained, and the dictionary\'s parser checks the result. It is for simple sentences: to see how speakers say it, use <a href="../frases/">How do they say it?</a>');
+  $('#l_subj').textContent=L('1. ¿Quién?','1. Who?'); $('#l_pron').textContent=L('Decir también el pronombre (iñche, eymi…)','Also say the pronoun (iñche, eymi…)');
+  chips('#subj',Object.keys(P).map(k=>[k,`${P[k][lang==='en'?1:0]} <small>${P[k][2]}</small>`]),k=>S.subj===k,k=>{ S.subj=k; fixObj(); draw(); });
+  $('#pron').checked=S.pron; $('#pron').onchange=e=>{ S.pron=e.target.checked; draw(); };
+  $('#l_verb').textContent=L('2. ¿Qué hace? Busca el verbo en castellano o en mapudungun','2. What do they do? Look up the verb in Spanish or Mapudungun');
+  $('#vq').placeholder=L('por ejemplo: ver, comer, kim','e.g. see, eat, kim');
+  drawVerbs();
+  $('#l_obj').textContent=L('3. ¿A quién o qué?','3. To whom or what?');
+  const objs=['none',...VB.objectsFor(S.mood,S.subj,S.neg).filter(k=>k!=='3inv')];
+  chips('#obj',objs.map(k=>[k,O[k][lang==='en'?1:0]]),k=>S.obj===k,k=>{ S.obj=k; if(k!=='3') S.objN=null; draw(); });
+  if(S.obj==='3') nounBox('#objnoun',S.objN,L('¿Qué o quién? (opcional) por ejemplo: pan, caballo','What or who? (optional) e.g. bread, horse'),n=>{ S.objN=n; draw(); }); else $('#objnoun').innerHTML='';
+  $('#l_mood').textContent=L('4. ¿Cómo?','4. How?');
+  chips('#mood',[...MOODS.map(([k,es,en])=>[k,L(es,en)]),['neg',L('No (negación)','No (negation)')]],k=>k==='neg'?S.neg:S.mood===k,k=>{ if(k==='neg') S.neg=!S.neg; else S.mood=k; fixObj(); draw(); });
+  $('#l_sel').innerHTML=L('Tiempo y matices <small>(opcional)</small>','Time and nuances <small>(optional)</small>');
+  const sufs=VB.SUF.filter(x=>SELS.includes(x.id)).sort((a,b)=>SELS.indexOf(a.id)-SELS.indexOf(b.id));
+  const IMPNO=['a','fu','rke'];   /* an order has no future, impeditive or reportative */
+  if(S.mood==='imp') IMPNO.forEach(k=>S.sel.delete(k));
+  const blocked=id=>(S.mood==='imp'&&IMPNO.includes(id))||VB.EXCL.some(([a,b])=>(a===id&&S.sel.has(b))||(b===id&&S.sel.has(a)))||(VB.SUF.find(x=>x.id===id).needs||[]).some(n=>!S.sel.has(n))&&!S.sel.has(id);
+  chips('#sel',sufs.map(x=>[x.id,`-${x.V}- <small>${esc(lang==='en'?x.en:x.es).split(/[,;:(]/)[0]}</small>`,lang==='en'?x.en:x.es]),k=>S.sel.has(k),k=>{ S.sel.has(k)?S.sel.delete(k):S.sel.add(k); draw(); },blocked);
+  $('#l_when').textContent=L('5. ¿Cuándo? (opcional)','5. When? (optional)');
+  chips('#when',WHEN.map(([k,es,en])=>[k,k?`${k} <small>${L(es,en)}</small>`:'—']),k=>S.when===k,k=>{ S.when=k; draw(); });
+  $('#l_where').textContent=L('6. ¿Dónde? (opcional, con mew «en, a, desde»)','6. Where? (optional, with mew “in, at, to, from”)');
+  nounBox('#where',S.place,L('por ejemplo: casa, campo, río','e.g. house, field, river'),n=>{ S.place=n; draw(); });
+  $('#note').innerHTML=L('Límites: el orden de las palabras en mapudungun es más libre de lo que muestra el constructor; no arma preguntas, oraciones con «que» ni frases nominales largas, y no elige por ti entre sentidos de una palabra. Las formas verbales siguen los cuadros de J. Becker Peña, cotejados con Smeets (2008). Revisa siempre el resultado con una persona hablante.','Limits: Mapudungun word order is freer than the builder shows; it does not build questions, “that” clauses or long noun phrases, and it does not choose between the senses of a word for you. Verb forms follow J. Becker Peña\'s charts, checked against Smeets (2008). Always check the result with a speaker.');
+  $('#foot').textContent=L('© 2026 Brandon M. A. Rogers. Todos los derechos reservados. No se permite usar este sitio ni su contenido para entrenar ni alimentar sistemas de inteligencia artificial.','© 2026 Brandon M. A. Rogers. All rights reserved. This site and its content may not be used to train or feed artificial intelligence systems.');
+  result(); }
+function fixObj(){ const ok=['none',...VB.objectsFor(S.mood,S.subj,S.neg)]; if(!ok.includes(S.obj)) { S.obj='none'; S.objN=null; } }
+function drawVerbs(){ const r=verbSearch($('#vq').value); const pk=$('#vpicks');
+  pk.innerHTML=r.map((v,i)=>`<button class="pick" data-i="${i}" aria-pressed="${!!S.root&&S.root[0]===v[0]}"><b>${esc(v[0])}</b><span>${esc((lang==='en'&&v[3]?v[3]:v[2]).split(':')[0].slice(0,70))}${v[5]==='A'?' · Augusta':''}</span></button>`).join('')||`<p class="hint">${L('No encuentro ese verbo. Prueba con el infinitivo (comer, ver).','No verb found. Try the infinitive (to eat, to see).')}</p>`;
+  pk.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{ S.root=r[+b.dataset.i]; if(S.obj==='none'&&/tr/.test(S.root[4])) S.obj='3'; fixObj(); draw(); }); }
+$('#vq').oninput=drawVerbs;
+let rseq=0;
+async function result(){ const box=$('#res');
+  if(!S.root){ box.innerHTML=`<div class="result"><p class="tr">${L('Elige un verbo (paso 2) para ver la oración.','Choose a verb (step 2) to see the sentence.')}</p></div>`; return; }
+  const sel=[...S.sel], b=VB.build({root:S.root[0],mood:S.mood,subj:S.subj,obj:S.obj==='none'?null:S.obj,neg:S.neg,sel});
+  if(!b){ box.innerHTML=`<div class="result"><p class="warn">${L('Esa combinación no existe en los cuadros (por ejemplo, algunas órdenes negativas con objeto). Cambia la persona, el objeto o el modo.','That combination is not in the charts (for example some negative orders with an object). Change the person, the object or the mood.')}</p></div>`; return; }
+  const verb=b.form, words=[];
+  if(S.when) words.push([S.when,L(WHEN.find(w=>w[0]===S.when)[1],WHEN.find(w=>w[0]===S.when)[2]),'when']);
+  if(S.pron&&S.mood!=='imp') words.push([P[S.subj][2],P[S.subj][lang==='en'?1:0],'pron']);
+  words.push([verb,L('verbo','verb'),'verb']);
+  if(S.objN) words.push([S.objN.m,lang==='en'&&S.objN.en?S.objN.en:S.objN.es,'obj']);
+  if(S.place) words.push([S.place.m+' mew',(lang==='en'&&S.place.en?S.place.en:S.place.es)+L(' (en, a, desde)',' (in, at, to, from)'),'place']);
+  const sent=words.map(w=>w[0]).join(' ');
+  const n=CNT.get(norm(b.word||verb.split(' ').pop()))||0;
+  const parts=[[b.root,lang==='en'&&S.root[3]?S.root[3]:S.root[2].split(':')[0],'raíz'],...b.parts.map(p=>[p[0],(VB.SUF.find(x=>x.gl===p[2])||{})[lang==='en'?'en':'es']||({NEG:L('no','not'),PROH:L('no (en una orden)','not (in an order)'),'2A':L('tú/ustedes actúan sobre mí/nosotros','you act on me/us'),'1A':L('yo/nosotros actuamos sobre ti/ustedes','I/we act on you')})[p[2]]||p[2],p[2]]),[b.ending,L('terminación: ','ending: ')+P[S.subj][lang==='en'?1:0]+(S.obj!=='none'?' → '+O[S.obj][lang==='en'?1:0]:'')+' · '+L(MOODS.find(m=>m[0]===S.mood)[1],MOODS.find(m=>m[0]===S.mood)[2]),'']].filter(p=>p[0]);
+  const alts=[...(b.alts||[]),...(b.smForm&&b.smForm!==verb?[b.smForm+' (Smeets)']:[])];
+  box.innerHTML=`<div class="result"><p class="eyebrow">${L('Tu oración','Your sentence')}</p><p class="sent" lang="arn">${esc(sent)}</p>
+    <p class="tr" id="back">${L('Revisando con el analizador…','Checking with the parser…')}</p>
+    <table class="parts">${words.map(w=>`<tr><td lang="arn">${esc(w[0])}</td><td>${w[2]==='verb'?`<span class="seg">${esc(b.seg)}</span><br>${parts.map(p=>`<b>${esc(p[0])}</b> ${esc(p[1])}`).join(' · ')}`:esc(w[1])}</td></tr>`).join('')}</table>
+    <p class="hint">${n?`<span class="ok">✓</span> ${L(`La forma «${esc(b.word||verb)}» aparece ${n} ${n===1?'vez':'veces'} en AVENUE.`,`The form “${esc(b.word||verb)}” occurs ${n} time${n===1?'':'s'} in AVENUE.`)}`:L(`La forma «${esc(b.word||verb)}» no aparece tal cual en AVENUE: está armada con las reglas.`,`The form “${esc(b.word||verb)}” does not occur as such in AVENUE: it is built by the rules.`)}
+      ${alts.length?'<br>'+L('También: ','Also: ')+alts.map(esc).join(', '):''}</p>
+    <div class="row"><a class="btn ghost" href="../conjugar/#${encodeURIComponent(b.root)}">${L('Todas sus formas','All its forms')}</a><a class="btn ghost" href="../frases/#${encodeURIComponent((S.root[2].split(/[,:;]/)[0]||'').trim())}">${L('¿Cómo lo dicen?','How do they say it?')}</a></div></div>`;
+  const my=++rseq, r=await analyse(b.word||verb.split(' ').pop()); if(my!==rseq) return; const bk=$('#back'); if(!bk) return;
+  if(!r){ bk.textContent=L('El analizador no pudo leer la forma (o no está disponible sin conexión).','The parser could not read the form (or is not available offline).'); return; }
+  const same=String(r.root).replace(/[()]/g,'')===b.root;
+  bk.innerHTML=`${same?'<span class="ok">✓</span>':'<span class="warn">⚠</span>'} ${L('El analizador lo lee','The parser reads it as')} <span class="seg">${esc([r.root,...(r.morphs||[])].join('-'))}</span>${r.mean?`: «${esc(lang==='en'&&r.en?r.en:r.mean)}»`:''}${same?'':' '+L('(otra lectura: revisa la forma)','(a different reading: check the form)')}`; }
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{ lang=b.dataset.l; try{localStorage.setItem('mpk_lang',JSON.stringify(lang))}catch(e){} draw(); });
+{ const h=decodeURIComponent(location.hash.slice(1)); if(h){ const r=VB_RAICES.find(x=>x[0]===h); if(r){ S.root=r; if(/tr/.test(r[4])) S.obj='3'; } } }
+if(!S.root) S.root=VB_RAICES.find(x=>x[0]==='pe');
+S.obj=/tr/.test(S.root[4])?'3':'none';
+draw();
+</script>
+</body></html>
