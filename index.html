@@ -139,6 +139,8 @@ button{font-family:var(--body)}
 .result .coach{justify-content:center}
 @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
 .coach.cheer svg{animation:hop .45s ease-out}
+.coach.host{justify-content:flex-start;align-items:center}
+.coach.host .bubble small{margin-top:4px;line-height:1.4}
 
 /* stages, rewards, wardrobe */
 .stage{display:flex;flex-direction:column;gap:10px}
@@ -2659,6 +2661,7 @@ function menu(){
     <nav class="hub tools" aria-label="${L2("Aprende y practica","Learn and practice")}">${[
       ["help",t().howBtn,L2("Instrucciones","Instructions")],
       ["read",t().reading,L2("Textos con preguntas","Texts with questions")],
+      ["konew","Konew",L2(`Adivinanzas mapuche · ${Object.keys(konewDone).length} de ${KONEW.length}`,`Mapuche riddles · ${Object.keys(konewDone).length} of ${KONEW.length}`)],
       ["pron",t().pron,L2("Cómo suenan las letras","How the letters sound")],
       ["graf",L2("Grafemarios","Writing systems"),L2(`Ahora: ${GRAF_INFO[graf].name}`,`Now: ${GRAF_INFO[graf].name}`)],
       ["tpl",L2("Plantilla verbal","Verb template"),L2("Las 36 posiciones del verbo","The verb's 36 slots")],
@@ -2697,6 +2700,7 @@ function menu(){
   document.getElementById("pron").onclick=()=>{track("open/pronunciation","Pronunciación");pronunciation();};
   document.getElementById("graf").onclick=()=>{track("open/grafemarios","Grafemarios");grafemarios();};
   document.getElementById("tpl").onclick=()=>{track("open/template","Plantilla verbal");template();};
+  document.getElementById("konew").onclick=()=>{track("open/konew","Konew");konew();};
   document.getElementById("read").onclick=()=>{track("open/readings","Lecturas");readingList();};
   document.getElementById("vocab").onclick=()=>vocab();
   document.getElementById("repaso").onclick=()=>openRepaso();
@@ -2763,7 +2767,7 @@ function intro(lvl){
   body = deckHTML + body;
   __back=()=>menu(); app.innerHTML=`${backLink()}
     <div class="top"><div><p class="eyebrow">${esc(gl(lvl))}</p><h2>${esc(titleM(lvl))}</h2></div>${langToggle()}</div>
-    <p class="howline">${t().how(lvl)}</p>
+    ${hostHTML(lvl)}
     ${body}
     <div class="row"><button class="btn" id="go">${t().start}</button>${TPL_LINK.has(lvl.id)?`<button class="btn ghost" id="tplb">${L2("Ver la plantilla verbal","See the verb template")}</button>`:""}<button class="btn ghost" id="bk">${t().back}</button></div>`;
   bindLang(()=>intro(lvl));
@@ -4272,6 +4276,105 @@ function epewRead(i,st){
     st.gain=gain; epewRead(i,st); };
   if(st.checked){ document.getElementById("efb").innerHTML=`<div class="result"><p>${t().score(score,c.qs.length)}</p>${st.gain?`<span class="gain">+${st.gain} ${NUT}</span>`:""}</div>`;
     document.getElementById("enext").onclick=()=>{ if(nx>=0 && epewOwned.includes(nx)) epewRead(nx); else epew(); }; }
+}
+
+// ===== Lesson hosts: each lesson is presented by one of the characters, always the same one for that lesson =====
+const HOST_LINE = {
+  "pangi":{es:"Paso a paso, como el puma en la cordillera.",en:"Step by step, like the puma in the mountains."},
+  "choyke":{es:"¡Corre conmigo! Pero antes mira bien los ejemplos.",en:"Run with me! But look carefully at the examples first."},
+  "rere":{es:"Toc, toc: repito cada palabra hasta que se queda.",en:"Knock, knock: I repeat each word until it sticks."},
+  "wakag":{es:"Salto de palabra en palabra. ¡Tú también puedes!",en:"I hop from word to word. You can too!"},
+  "Tren Tren":{es:"Desde mi cerro te cuido. Lee con calma.",en:"From my hill I look after you. Read calmly."},
+  "Kay Kay":{es:"Del mar traigo palabras nuevas.",en:"I bring new words from the sea."},
+  "mañke":{es:"Desde arriba veo toda la lección.",en:"From up high I can see the whole lesson."},
+  "ngürü":{es:"Dicen que soy astuto. Veamos quién aprende más rápido.",en:"They say I'm clever. Let's see who learns faster."},
+  "achawall":{es:"Me levanto temprano para practicar. ¿Vamos?",en:"I get up early to practise. Shall we?"},
+  "pewen":{es:"Crezco despacio y vivo muchos años. Aprender también es así.",en:"I grow slowly and live for centuries. Learning is like that too."},
+  "machi":{es:"Escucha bien y dilo en voz alta.",en:"Listen well and say it out loud."}
+};
+function hostFor(lvl){ let h=0; for(const ch of String(lvl.id||"")) h=(h*31+ch.charCodeAt(0))>>>0; return CHARS[h%CHARS.length]; }
+function hostHTML(lvl){ const c=hostFor(lvl), ln=HOST_LINE[c.name];
+  return `<div class="coach host"><figure>${c.svg}<figcaption>${esc(c.name)}</figcaption></figure><div class="bubble"><b>¡Mari mari! ${esc(G("Iñche "+c.name+" ngen."))}</b><small>${ln?esc(ln[lang])+" ":""}${t().how(lvl)}</small></div></div>`; }
+
+// ===== Konew: traditional riddles =====
+// Sources: Mineduc, Programa de Estudio Cuarto Año Básico, Sector Lengua Indígena Mapuzugun (p. 50), respelled here in the Unificado;
+// Augusta (1916), Diccionario araucano, s.v. konew (formula and the riddle of the toad, in his spelling).
+const KONEW_P = {
+  witru:{m:"witrü",pic:"🥄",es:"la cuchara",en:"the spoon"}, challa:{m:"challa",pic:{svg:ICON.pot},es:"la olla",en:"the pot"},
+  mamull:{m:"mamüll",pic:{svg:SCN.mamull},es:"el palo",en:"the stick"}, ko:{m:"ko",pic:{svg:SCN.ko},es:"el agua",en:"the water"},
+  nerum:{m:"nerüm",pic:null,es:"la pulga",en:"the flea"}, wakag:{m:"wakag",pic:"🐸",es:"la rana",en:"the frog"},
+  choyke:{m:"choyke",pic:{svg:NAT.animal("choyke")},es:"el ñandú",en:"the rhea"}, ngurU:{m:"ngürü",pic:{coach:"ngürü"},es:"el zorro",en:"the fox"},
+  antu:{m:"antü",pic:{svg:SCN.antu},es:"el sol",en:"the sun"}, kuyen:{m:"küyen",pic:{svg:SCN.kuyen},es:"la luna",en:"the moon"},
+  achawall:{m:"achawall",pic:"🐔",es:"la gallina",en:"the chicken"}, kutral:{m:"kütral",pic:{svg:SCN.kutral},es:"el fuego",en:"the fire"},
+  llallin:{m:"llalliñ",pic:"🕷️",es:"la araña",en:"the spider"}, rere:{m:"rere",pic:{svg:NAT.animal("rere")},es:"el pájaro carpintero",en:"the woodpecker"},
+  pewen:{m:"pewen",pic:{coach:"pewen"},es:"el pewen",en:"the monkey-puzzle tree"}, unum:{m:"üñüm",pic:"🐦",es:"el pájaro",en:"the bird"},
+  sapo:{m:null,pic:"🐸",es:"el sapo",en:"the toad"}, kawellu:{m:"kawellu",pic:"🐎",es:"el caballo",en:"the horse"}
+};
+const KONEW = [
+  {m:"Apolen wechuy, wellilen nagtuy.", es:"Sube llena y baja vacía.", en:"It goes up full and comes down empty.",
+   w:[["apolen","llena","full"],["wechuy","sube","goes up"],["wellilen","vacía","empty"],["nagtuy","baja","comes down"]],
+   a:"witru", d:["challa","mamull","ko"], src:"Mineduc, 4.º básico"},
+  {m:"Rünkü rünkütuy, kiñe ñuwa rünküfe.", es:"Salta y salta, una saltarina traviesa.", en:"Hop and hop again: a naughty little hopper.",
+   w:[["rünkü rünkütuy","salta y salta","hops and hops"],["kiñe","una","a"],["ñuwa","traviesa","naughty"],["rünküfe","saltarina (-fe: la que lo hace)","hopper (-fe: one who does it)"]],
+   a:"nerum", d:["wakag","choyke","ngurU"], src:"Mineduc, 4.º básico"},
+  {m:"Puliwen witraken, pun wüla umawtuken.", es:"En la mañana me levanto y en la noche me acuesto.", en:"In the morning I get up, and at night I go to sleep.",
+   w:[["puliwen","en la mañana","in the morning"],["witraken","me levanto (siempre)","I get up (always)"],["pun","en la noche","at night"],["wüla","recién, después","only then"],["umawtuken","me duermo (siempre)","I go to sleep (always)"]],
+   a:"antu", d:["kuyen","achawall","kutral"], src:"Mineduc, 4.º básico"},
+  {m:"Wechun mu müleki, wechun mu miawki, wechun mu ngürekaki, ti ngürekafe.", es:"Vive en lo alto, anda por lo alto, teje en lo alto, la tejedora.", en:"It lives up high, walks up high, weaves up high: the weaver.",
+   w:[["wechun mu","en lo alto","up high"],["müleki","vive, está","lives, is"],["miawki","anda","walks about"],["ngürekaki","teje","weaves"],["ti ngürekafe","la tejedora","the weaver"]],
+   a:"llallin", d:["rere","unum","pewen"], src:"Mineduc, 4.º básico"},
+  {m:"Chefküpuy rüpü.", es:"A saltos llega al camino.", en:"Hopping, it reaches the path.",
+   w:[["chefküpuy","llega a saltos","reaches it hopping"],["rüpü","el camino","the path"]],
+   a:"sapo", d:["nerum","kawellu","choyke"], src:"Augusta 1916, s.v. konew", aug:true}
+];
+let konewDone=load("konewDone")||{};
+function konewPic(p){ return p.pic==null?"":picHTML(p,{}); }
+function konew(){
+  app.dataset.scr="konew"; S=null; clearInterval(vidTimer);
+  const solved=KONEW.filter((_,i)=>konewDone[i]).length;
+  __back=()=>menu(); app.innerHTML=`${backLink()}
+    <div class="top"><div><p class="eyebrow">${L2("Adivinanzas","Riddles")}</p><h2>Konew</h2></div>${langToggle()}</div>
+    ${coach(`<b>¡${G("Konew")}!</b><small>${L2("Un konew es una adivinanza. Alguien propone el konew y los demás tratan de adivinar qué es.","A konew is a riddle. Someone puts forward the konew and the others try to guess what it is.")}</small>`, true)}
+    <div class="rule">${L2("Augusta (1916) anota esta fórmula para empezar un konew:","Augusta (1916) records this formula for opening a konew:")}
+      <p style="margin:.5em 0 .2em"><b lang="arn">«Iney ñi kimpeno: shingshingkitra mew tranaley kolewa»</b></p>
+      <small>${L2("«Si uno no lo sabe: en la cachimba shingshing se ve el camino (la solución)». Augusta dice que el sentido de <i>kolewa</i> no está claro.","“If one does not know it: in the shingshing pipe the path (the answer) can be seen.” Augusta says the meaning of <i>kolewa</i> is unclear.")}</small></div>
+    <p class="howline">${L2(`Lee el konew en mapudungun y elige qué es. Si lo necesitas, mira las palabras o la traducción. Cada konew que adivines te da ngülliw: <b>3</b> si aciertas a la primera, <b>1</b> si no. Llevas ${solved} de ${KONEW.length}.`,`Read the konew in Mapudungun and choose what it is. If you need to, look at the words or the translation. Each konew you guess earns ngülliw: <b>3</b> on the first try, <b>1</b> otherwise. You have ${solved} of ${KONEW.length}.`)}</p>
+    <div class="levels">${KONEW.map((k,i)=>`<button class="lvl" data-k="${i}"><span class="mt">Konew ${i+1}</span><span class="gl">${konewDone[i]?"✓ "+esc(gl(KONEW_P[k.a])):"?"}</span></button>`).join("")}</div>
+    <p class="note">${L2("Fuentes: Ministerio de Educación de Chile, <i>Programa de Estudio Cuarto Año Básico, Lengua Indígena Mapuzugun</i>, p. 50 (konew 1 a 4, aquí en el grafemario Unificado); Augusta, <i>Diccionario araucano</i> (1916), s.v. <i>konew</i> (konew 5, con su ortografía).","Sources: Chilean Ministry of Education, <i>Programa de Estudio Cuarto Año Básico, Lengua Indígena Mapuzugun</i>, p. 50 (konew 1 to 4, here in the Unificado grafemario); Augusta, <i>Diccionario araucano</i> (1916), s.v. <i>konew</i> (konew 5, in his spelling).")}</p>
+    <div class="row"><button class="btn" id="kgo">${t().start}</button><button class="btn ghost" id="bk">${t().back}</button></div>`;
+  bindLang(konew);
+  document.getElementById("bk").onclick=menu;
+  const first=KONEW.findIndex((_,i)=>!konewDone[i]);
+  document.getElementById("kgo").onclick=()=>konewPlay(first<0?0:first);
+  app.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>konewPlay(+b.dataset.k));
+}
+function konewPlay(i,st){
+  const k=KONEW[i];
+  st=st||{opts:shuffle([k.a,...k.d]), tries:0, won:false, words:false, tr:false, gain:0, wrong:[]};
+  const P=id=>KONEW_P[id], name=p=>p.m?`${esc(G(p.m))} · ${esc(gl(p))}`:esc(gl(p));
+  const txt=k.aug?k.m:G(k.m);
+  __back=()=>konew(); app.innerHTML=`${backLink()}
+    <div class="top"><div><p class="eyebrow">Konew ${i+1} / ${KONEW.length}</p><h2>${L2("¿Qué es?","What is it?")}</h2></div>${langToggle()}</div>
+    ${coach(`<b lang="arn">«${esc(txt)}»</b><small>${L2("¿Chem am? ¿Qué será?","Chem am? What could it be?")}</small>`, st.won)}
+    <div class="chips" style="display:flex;gap:8px;flex-wrap:wrap"><button class="chip" id="kw" aria-pressed="${st.words}">${L2("Palabra por palabra","Word by word")}</button><button class="chip" id="kt" aria-pressed="${st.tr}">${L2("Traducción","Translation")}</button></div>
+    ${st.words?`<div class="tbl-wrap"><table class="par"><tbody>${k.w.map(([m,es,en])=>`<tr><td class="m">${esc(k.aug?m:G(m))}</td><td>${esc(lang==="en"?en:es)}</td></tr>`).join("")}</tbody></table></div>`:""}
+    ${st.tr?`<p class="howline">${esc(gl(k))}</p>`:""}
+    <div class="opts">${st.opts.map(id=>{ const p=P(id), ok=st.won&&id===k.a, bad=st.wrong.includes(id);
+      return `<button class="opt pic-opt${ok?" ok":bad?" bad":""}${st.won&&!ok?" dim":""}" data-o="${id}" ${st.won||bad?"disabled":""}>${konewPic(p)}<span style="display:block;font-size:.95rem;margin-top:6px">${name(p)}</span></button>`}).join("")}</div>
+    <div class="feedback" id="fb" aria-live="polite">${st.won?`<div class="result">${coach(`<b>¡${G(PRAISE[praiseIdx % PRAISE.length])}!</b><small>${L2("Era","It was")} ${name(P(k.a))}. ${esc(gl(k))}</small>`, true)}${st.gain?`<span class="gain">+${st.gain} ${NUT}</span>`:""}${k.aug?`<small class="hint">${L2("Augusta da la solución en castellano: «el sapo».","Augusta gives the answer in Spanish: “el sapo”, the toad.")}</small>`:""}</div>`
+      :st.wrong.length?coach(`<b class="bad">¡${G("Fotrü")}!</b><small>${L2("Ese no es. Lee otra vez el konew e inténtalo de nuevo.","That's not it. Read the konew again and try once more.")}</small>`, false):""}</div>
+    <div class="row">${st.won&&i<KONEW.length-1?`<button class="btn" id="knext">${L2("Siguiente konew","Next konew")}</button>`:""}<button class="btn ghost" id="kback">${L2("Todos los konew","All the konew")}</button></div>
+    <p class="note">${L2("Fuente","Source")}: ${esc(k.src)}</p>`;
+  bindLang(()=>konewPlay(i,st));
+  document.getElementById("kback").onclick=()=>konew();
+  document.getElementById("kw").onclick=()=>{ st.words=!st.words; konewPlay(i,st); };
+  document.getElementById("kt").onclick=()=>{ st.tr=!st.tr; konewPlay(i,st); };
+  const nx=document.getElementById("knext"); if(nx) nx.onclick=()=>konewPlay(i+1);
+  app.querySelectorAll(".opt:not(:disabled)").forEach(b=>b.onclick=()=>{ const id=b.dataset.o; st.tries++;
+    if(id===k.a){ st.won=true; praiseIdx++;
+      if(!konewDone[i]){ st.gain=st.tries===1?3:1; nuts+=st.gain; save("nuts",nuts); konewDone[i]=st.tries; save("konewDone",konewDone); track("konew/"+(i+1),"Konew "+(i+1)); } }
+    else st.wrong.push(id);
+    konewPlay(i,st); });
 }
 
 // ===== Pronunciation (Grafemario Unificado) =====
