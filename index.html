@@ -2238,7 +2238,7 @@ const PEOPLE = [
   {id:"Külapang", type:"wentru", role:"weychafe", skin:SKIN.f, look:{face:"wide",hs:"longtie",brow:"thick",mouth:"flat",build:1.06,shirt:"#2f4a5a",pants:"#3a2e26"}, hair:"#1a1410", hist:1, es:"José Santos Külapang (Quilapán), toqui wenteche (murió en 1875). Desde 1868 encabezó la resistencia contra la ocupación militar chilena de la Araucanía.", en:"José Santos Külapang (Quilapán), wenteche toqui (died 1875). From 1868 he led the resistance against the Chilean military occupation of the Araucanía."}
 ,
   {id:"rütrafe", type:"wentru", skin:SKIN.a, look:{face:"round",fh:"beard",eye:"smile",build:1.1,h:.97,shirt:"#5a4a3c"}, hair:"#1a1410", es:"platero, el que trabaja la plata", en:"silversmith"},
-  {id:"kimeltufe", type:"domo", skin:SKIN.b, look:{face:"oval",hs:"bob",glasses:1,mouth:"grin",shirt:"#4a5f9a"}, hair:"#241a14", es:"profesora, la que enseña", en:"teacher"},
+  {id:"kimelfe", type:"domo", skin:SKIN.b, look:{face:"oval",hs:"bob",glasses:1,mouth:"grin",shirt:"#4a5f9a"}, hair:"#241a14", es:"profesora, la que enseña", en:"teacher"},
   {id:"challwafe", type:"wentru", skin:SKIN.d, look:{face:"wide",hs:"crop",fh:"stubble",eye:"smile",build:1.04,shirt:"#3f5a6e"}, hair:"#241a14", es:"pescador", en:"fisherman"},
   {id:"laku", type:"wentru", elder:true, skin:SKIN.c, look:{face:"round",hs:"receding",fh:"beard",eye:"smile",mouth:"grin",h:.96,shirt:"#9a8a6a",pants:"#4a3a2e"}, hair:"#d6d1c8", es:"abuelo (padre del padre), persona mayor", en:"grandfather (father's father), elder"}
 ];
@@ -2635,7 +2635,8 @@ let best = load("best") || {};
 let nuts = load("nuts"); if(nuts==null) nuts=0;   /* no ?? : older phones (iOS < 13.4, Chrome < 80) stop at it */
 let owned = load("owned") || [];
 let outfits = load("outfits") || {};
-let selPerson = load("selPerson") || PEOPLE[0].id;
+if(outfits["kimeltufe"]&&!outfits["kimelfe"]){ outfits["kimelfe"]=outfits["kimeltufe"]; delete outfits["kimeltufe"]; }   /* renamed character (kimeltufe > kimelfe) */
+let selPerson = load("selPerson") || PEOPLE[0].id; if(selPerson==="kimeltufe") selPerson="kimelfe";
 let S = null;
 
 const t = () => T[lang];
