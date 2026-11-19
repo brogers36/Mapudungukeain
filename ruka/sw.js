@@ -1,5 +1,5 @@
 /* Ruka mew: offline support. Network first so updates arrive as soon as there is a connection; served from the cache offline. */
-const CACHE = 'rukamew-202611181632';
+const CACHE = 'rukamew-202611181705';
 const CORE = ['./', './index.html', './datos.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
