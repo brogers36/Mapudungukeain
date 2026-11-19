@@ -98,6 +98,7 @@ function G(s){ if(graf==='uni') return s; var m=MAP[graf];
 var CATS=[['todo','Todas','All'],['puliwen','Puliwen · la mañana','Puliwen · morning'],['iyael','Iyael · la comida','Iyael · meals'],
   ['tripan','Tripan · salir y llegar','Tripan · going out'],['awkantun','Awkantun · jugar','Awkantun · play'],
   ['poyen','Poyen · cariño y ánimo','Poyen · love and praise'],['pun','Pun · la noche','Pun · night'],['ramtun','Ramtun · preguntas','Ramtun · questions'],
+  ['che','Che · la familia','Che · family'],
   ['fav','★ Mis frases','★ My phrases']];
 var id=function(f){return f.m;};
 function list(){ return FRASES.filter(function(f){ return cat==='todo'||(cat==='fav'?favs[id(f)]:f.c===cat); }); }

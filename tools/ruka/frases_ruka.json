@@ -290,5 +290,186 @@
 "m": "Kimlan.",
 "es": "No sé.",
 "en": "I don't know."
+},
+{
+"c": "puliwen",
+"m": "Mari mari, kuku.",
+"es": "Buenos días, abuela (madre del padre).",
+"en": "Good morning, grandma (father's mother)."
+},
+{
+"c": "puliwen",
+"m": "Mari mari, chuchu.",
+"es": "Buenos días, abuela (madre de la madre).",
+"en": "Good morning, grandma (mother's mother)."
+},
+{
+"c": "puliwen",
+"m": "Mari mari, laku.",
+"es": "Buenos días, abuelo (padre del padre).",
+"en": "Good morning, grandpa (father's father)."
+},
+{
+"c": "puliwen",
+"m": "Kümeleymi?",
+"es": "¿Estás bien?",
+"en": "Are you all right?"
+},
+{
+"c": "iyael",
+"m": "Ipange!",
+"es": "¡Ven a comer!",
+"en": "Come and eat!"
+},
+{
+"c": "iyael",
+"m": "Ko eluen.",
+"es": "Dame agua.",
+"en": "Give me some water."
+},
+{
+"c": "iyael",
+"m": "Eluen kofke.",
+"es": "Dame pan.",
+"en": "Give me some bread."
+},
+{
+"c": "iyael",
+"m": "Pichin müten.",
+"es": "Un poco no más.",
+"en": "Just a little."
+},
+{
+"c": "tripan",
+"m": "Küpatunge!",
+"es": "¡Vuelve para acá!",
+"en": "Come back here!"
+},
+{
+"c": "tripan",
+"m": "Matuke wiñoaymi.",
+"es": "Vas a volver pronto.",
+"en": "You'll be back soon."
+},
+{
+"c": "tripan",
+"m": "Amutuaiñ.",
+"es": "Vamos de vuelta (a la casa).",
+"en": "Let's go back home."
+},
+{
+"c": "tripan",
+"m": "Chew müleymi?",
+"es": "¿Dónde estás?",
+"en": "Where are you?"
+},
+{
+"c": "tripan",
+"m": "Mawüy.",
+"es": "Llueve / llovió.",
+"en": "It's raining / it rained."
+},
+{
+"c": "tripan",
+"m": "Arey may.",
+"es": "Hace calor.",
+"en": "It's hot."
+},
+{
+"c": "awkantun",
+"m": "Kelluen!",
+"es": "¡Ayúdame!",
+"en": "Help me!"
+},
+{
+"c": "awkantun",
+"m": "Fawpüle anüpange.",
+"es": "Siéntate por acá.",
+"en": "Sit down over here."
+},
+{
+"c": "awkantun",
+"m": "Pefimi?",
+"es": "¿Lo ves? / ¿Lo viste?",
+"en": "Do you see it? / Did you see it?"
+},
+{
+"c": "awkantun",
+"m": "Kimfimi?",
+"es": "¿Lo sabes? / ¿Lo conoces?",
+"en": "Do you know it?"
+},
+{
+"c": "poyen",
+"m": "Küme che ngeaymi.",
+"es": "Vas a ser una buena persona.",
+"en": "You're going to be a good person."
+},
+{
+"c": "poyen",
+"m": "Kelluaeyu.",
+"es": "Te voy a ayudar.",
+"en": "I'll help you."
+},
+{
+"c": "pun",
+"m": "Umawtuan.",
+"es": "Voy a dormir.",
+"en": "I'm going to sleep.",
+"noex": true
+},
+{
+"c": "ramtun",
+"m": "Chumngelu am?",
+"es": "¿Por qué?",
+"en": "Why?"
+},
+{
+"c": "ramtun",
+"m": "Chem pimi?",
+"es": "¿Qué dices? / ¿Qué dijiste?",
+"en": "What are you saying? / What did you say?"
+},
+{
+"c": "ramtun",
+"m": "Chew müley trewa?",
+"es": "¿Dónde está el perro?",
+"en": "Where is the dog?"
+},
+{
+"c": "ramtun",
+"m": "Kutranleymi?",
+"es": "¿Estás enfermo/a?",
+"en": "Are you sick?"
+},
+{
+"c": "ramtun",
+"m": "Kutranlen.",
+"es": "Estoy enfermo/a.",
+"en": "I'm sick."
+},
+{
+"c": "che",
+"m": "Tüfa ñi ñuke.",
+"es": "Ésta es mi mamá.",
+"en": "This is my mom."
+},
+{
+"c": "che",
+"m": "Tüfa ñi chaw.",
+"es": "Éste es mi papá.",
+"en": "This is my dad."
+},
+{
+"c": "che",
+"m": "Tüfa ñi lamngen.",
+"es": "Ésta es mi lamngen (hermana; o hermano, si lo dice una mujer).",
+"en": "This is my lamngen (sister; or brother, if a woman says it)."
+},
+{
+"c": "che",
+"m": "Tüfa ñi kuku.",
+"es": "Ésta es mi abuela (madre del padre).",
+"en": "This is my grandmother (father's mother)."
 }
 ]
