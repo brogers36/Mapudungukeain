@@ -450,7 +450,7 @@ function progressHTML(g){ return `<div class="prog"><p class="eyebrow" style="le
   <div class="row"><span>ngülliw</span><b>${+g.nuts||0}</b></div>
   <div class="row"><span>${L("Prendas","Items")}</span><b>${+g.items||0}</b></div></div>`; }
 /* thumbs-up (2026-11-21): on other people's approved posts; on one's own the count shows but can't be pressed */
-function likeBtn(p,me){ if(p.status==="pending") return "";
+function likeBtn(p,me){ if(p.status==="pending" || !("likes" in p)) return "";   /* no likes field: the service hasn't been updated yet */
   const n=+p.likes||0, own=p.uid===me.id;
   if(own) return n?`<span class="like mine" title="${L("Me gusta","Likes")}">👍 ${n}</span>`:"";
   return `<button class="like" data-like="${esc(p.id)}" aria-pressed="${!!p.liked}" title="${p.liked?L("Ya no me gusta","Unlike"):L("Me gusta","Like")}" aria-label="${L("Me gusta","Like")}${n?" ("+n+")":""}">👍${n?" "+n:""}</button>`; }
