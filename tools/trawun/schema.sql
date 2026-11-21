@@ -71,3 +71,11 @@ CREATE TABLE IF NOT EXISTS palin_ans (
   ts    INTEGER NOT NULL,
   PRIMARY KEY (match, round, uid)
 );
+
+-- likes (2026-11-21): one thumbs-up per person per post
+CREATE TABLE IF NOT EXISTS likes (
+  post TEXT NOT NULL,
+  uid  TEXT NOT NULL,
+  ts   INTEGER NOT NULL,
+  PRIMARY KEY (post, uid)
+);

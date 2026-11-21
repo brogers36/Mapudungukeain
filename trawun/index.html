@@ -95,6 +95,10 @@ textarea{resize:vertical;min-height:44px}
 .card .body{padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .card .cap{overflow-wrap:anywhere}
 .card .meta{font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between;gap:6px;align-items:center}
+.card .acts{display:flex;gap:4px;align-items:center}
+.like{background:none;border:1.5px solid var(--panel-2);color:var(--muted);border-radius:999px;padding:3px 9px;font:700 .82rem var(--body);cursor:pointer;white-space:nowrap}
+.like[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ground)}
+.like.mine{border:0;cursor:default;padding:3px 2px}
 .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ground);background:var(--gold);border-radius:999px;padding:2px 8px;align-self:flex-start}
 .tag.pend{background:var(--muted)}
 .prog{padding:14px;display:flex;flex-direction:column;gap:6px;justify-content:safe center;height:100%;width:100%;background:linear-gradient(160deg,#2a2652,#14122a)}
@@ -164,13 +168,16 @@ const Local = {
   async edit(me,id,text){ const d=this._d(); const m=d.msgs.find(x=>x.id===id&&x.uid===me.id); if(!m) throw Object.assign(new Error("not found"),{status:404});
     if(Date.now()-m.ts>EDIT_WINDOW) throw Object.assign(new Error("too old"),{status:403,body:{error:"too old"}});
     if(m.text!==text){ if(m.orig==null) m.orig=m.text; m.text=text; m.edited=Date.now(); } this._s(d); return {ok:true,edited:m.edited||null}; },
-  async posts(){ const d=this._d(), me=Me.get(); return d.posts.filter(p=>!p.hidden && (p.status==="ok" || (me&&p.uid===me.id) || ADMIN)).sort((a,b)=>b.ts-a.ts); },
+  async posts(){ const d=this._d(), me=Me.get(), lk=d.likes||{}; return d.posts.filter(p=>!p.hidden && (p.status==="ok" || (me&&p.uid===me.id) || ADMIN))
+    .map(p=>Object.assign({},p,{likes:(lk[p.id]||[]).length, liked:!!(me&&(lk[p.id]||[]).includes(me.id))})).sort((a,b)=>b.ts-a.ts); },
   async post(me,p){ const d=this._d(); const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     if(p.image){ await Img.put(id,p.image); }
     const row={id,uid:me.id,nick:me.nick,kind:p.kind,cat:p.cat,caption:p.caption||"",outfit:p.outfit||null,progress:p.progress||null,
       status:p.kind==="photo"?"pending":"ok",ts:Date.now()};
     d.posts.push(row); this._s(d); return row; },
   async imgURL(id){ return Img.url(id); },
+  async like(me,id){ const d=this._d(); d.likes=d.likes||{}; const l=d.likes[id]=d.likes[id]||[]; const i=l.indexOf(me.id);
+    if(i>=0) l.splice(i,1); else l.push(me.id); this._s(d); return {liked:i<0, likes:l.length}; },
   async report(me,type,id){ const d=this._d(); const k=type+":"+id; d.reports[k]=(d.reports[k]||[]); if(!d.reports[k].includes(me.id)) d.reports[k].push(me.id);
     const list=type==="msg"?d.msgs:d.posts; const it=list.find(x=>x.id===id); if(it && d.reports[k].length>=3) it.hidden=true; this._s(d); },
   async queue(){ const d=this._d(); return {posts:d.posts.filter(p=>p.status==="pending"||p.hidden||d.reports["post:"+p.id]),
@@ -209,6 +216,7 @@ const Remote = {
     if(p.image) body.image=await blobToB64(p.image); return this._f("/posts",{method:"POST",body:JSON.stringify(body)}); },
   async imgURL(id){ const me=Me.get(); return TRAWUN_API.replace(/\/$/,"")+"/img/"+id+(me?"?key="+encodeURIComponent(me.key):""); },
   report(me,type,id){ return this._f("/report",{method:"POST",body:JSON.stringify({key:me.key,type,id})}); },
+  like(me,id){ return this._f("/like",{method:"POST",body:JSON.stringify({key:me.key,id})}); },
   queue(){ return this._f("/admin/queue",{headers:this._adm()}); },
   act(type,id,action){ return this._f("/admin/act",{method:"POST",headers:this._adm(),body:JSON.stringify({type,id,action})}); },
   notifyTest(){ return this._f("/admin/notify-test",{method:"POST",headers:this._adm(),body:"{}"}); },
@@ -430,7 +438,7 @@ function photosPane(me){
     <div class="grid" id="grid"><p class="empty">${L("Cargando…","Loading…")}</p></div></section>`;
   app.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; LS.set("trawun_cat",cat); photosPane(me); });
   $("#share").onclick=()=>shareDialog(me,"choose");
-  $("#grid").onclick=e=>{ const r=e.target.closest("[data-rep]"); if(r) report(me,"post",r.dataset.rep); };
+  $("#grid").onclick=e=>{ const lb=e.target.closest("[data-like]"); if(lb) return toggleLike(me,lb); const r=e.target.closest("[data-rep]"); if(r) report(me,"post",r.dataset.rep); };
   loadPosts(me);
   const sh=params.get("share"); if(sh){ history.replaceState(null,"",location.pathname); shareDialog(me, sh==="progress"?"progress":"outfit", params.get("p")); }
 }
@@ -441,6 +449,18 @@ function progressHTML(g){ return `<div class="prog"><p class="eyebrow" style="le
   <div class="row"><span>${L("Niveles","Levels")}</span><b>${+g.levels||0}</b></div>
   <div class="row"><span>ngülliw</span><b>${+g.nuts||0}</b></div>
   <div class="row"><span>${L("Prendas","Items")}</span><b>${+g.items||0}</b></div></div>`; }
+/* thumbs-up (2026-11-21): on other people's approved posts; on one's own the count shows but can't be pressed */
+function likeBtn(p,me){ if(p.status==="pending") return "";
+  const n=+p.likes||0, own=p.uid===me.id;
+  if(own) return n?`<span class="like mine" title="${L("Me gusta","Likes")}">👍 ${n}</span>`:"";
+  return `<button class="like" data-like="${esc(p.id)}" aria-pressed="${!!p.liked}" title="${p.liked?L("Ya no me gusta","Unlike"):L("Me gusta","Like")}" aria-label="${L("Me gusta","Like")}${n?" ("+n+")":""}">👍${n?" "+n:""}</button>`; }
+async function toggleLike(me,b){ if(b.disabled) return; b.disabled=true;
+  const was=b.getAttribute("aria-pressed")==="true", n0=+(b.textContent.replace(/\D/g,"")||0), n1=Math.max(0,n0+(was?-1:1));
+  const draw=(on,n)=>{ b.setAttribute("aria-pressed",on); b.textContent="👍"+(n?" "+n:""); b.title=on?L("Ya no me gusta","Unlike"):L("Me gusta","Like"); };
+  draw(!was,n1);
+  try{ const r=await Store.like(me,b.dataset.like); draw(r.liked,r.likes); }
+  catch(e){ draw(was,n0); toast(!e.status?L("Sin conexión: no se guardó tu 👍.","Offline: your 👍 wasn't saved."):e.status===429?L("Vas muy rápido. Espera un poco.","Slow down a little."):L("No se pudo guardar tu 👍.","Couldn't save your 👍.")); }
+  b.disabled=false; }
 async function loadPosts(me){
   const grid=$("#grid"); if(!grid) return;
   let list; try{ list=await Store.posts(); }catch(e){ grid.innerHTML=`<p class="empty">${L("No se pudieron cargar las publicaciones.","Couldn't load the posts.")}</p>`; return; }
@@ -449,7 +469,7 @@ async function loadPosts(me){
   grid.innerHTML=list.map(p=>`<article class="card"><div class="pic" data-img="${p.kind==="photo"?esc(p.id):""}">${p.kind==="outfit"?outfitSVG(p.outfit):p.kind==="progress"?progressHTML(p.progress||{}):""}</div>
     <div class="body">${p.status==="pending"?`<span class="tag pend">${L("Esperando revisión","Waiting for review")}</span>`:`<span class="tag">${esc(CATS()[p.cat]||p.cat)}</span>`}
       ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}
-      <div class="meta"><span><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</span>${p.uid!==me.id?`<button class="ic" data-rep="${esc(p.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button>`:""}</div></div></article>`).join("");
+      <div class="meta"><span><b>${esc(p.nick)}</b> · ${esc(ago(p.ts))}</span><span class="acts">${likeBtn(p,me)}${p.uid!==me.id?`<button class="ic" data-rep="${esc(p.id)}" title="${L("Avisar al moderador","Report to the moderator")}">⚑</button>`:""}</span></div></div></article>`).join("");
   grid.querySelectorAll("[data-img]").forEach(async d=>{ if(!d.dataset.img) return; const u=await Store.imgURL(d.dataset.img); if(u) d.innerHTML=`<img src="${esc(u)}" alt="${esc(L("Foto compartida","Shared photo"))}" loading="lazy">`; });
 }
 

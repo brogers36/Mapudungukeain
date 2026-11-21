@@ -15,6 +15,9 @@
    GET  /posts[?key=]                      -> {posts:[…]}                approved ones, plus the caller's own pending ones
    POST /posts {key, kind, cat, caption, outfit|progress|image}  -> {id, status}
    GET  /img/ID[?key=]                     -> image/jpeg                 approved photos, or the author's own
+   POST /like {key, id}                    -> {liked, likes}            thumbs-up on someone else's post; a second
+                                                                         call takes it back (2026-11-21). /posts gives
+                                                                         each post likes (count) and liked (the caller's)
    POST /report {key, type: msg|post, id}  -> {ok}
    Palin, two players (2026-11-12): both answer the same questions in the game; per round, whoever is right (or right
    first) pushes the pali one step toward the other's goal; three steps is a goal. The game (index.html?palin=ID) plays it.
@@ -63,6 +66,14 @@ async function ensureMsgCols(DB) {
   msgCols = true;
 }
 const EDIT_WINDOW = 24 * 3600000;
+
+/* Likes (2026-11-21): one thumbs-up per person per post, never on one's own. Older databases get the table here. */
+let likeTable = false;
+async function ensureLikes(DB) {
+  if (likeTable) return;
+  await DB.prepare("CREATE TABLE IF NOT EXISTS likes (post TEXT NOT NULL, uid TEXT NOT NULL, ts INTEGER NOT NULL, PRIMARY KEY (post, uid))").run();
+  likeTable = true;
+}
 
 /* ---------- palin between two players ---------- */
 const PAL_N = 10, PAL_ROUND_MS = 20000, PAL_GAP = 3000, PAL_OPEN_MS = 10 * 60000, PAL_START = 7000;
@@ -285,7 +296,10 @@ export default {
       if (P === "/posts" && req.method === "GET") {
         const u = await who(DB, url.searchParams.get("key"));
         const rs = await DB.prepare("SELECT * FROM posts WHERE hidden = 0 AND (status = 'ok' OR uid = ?) ORDER BY ts DESC LIMIT 200").bind(u ? u.id : "-").all();
-        return json({ posts: rs.results.map(postRow) }, 200, h);
+        await ensureLikes(DB);
+        const lk = await DB.prepare("SELECT post, COUNT(*) AS n, MAX(uid = ?) AS mine FROM likes GROUP BY post").bind(u ? u.id : "-").all();
+        const L = {}; for (const r of lk.results) L[r.post] = r;
+        return json({ posts: rs.results.map(r => ({ ...postRow(r), likes: (L[r.id] || {}).n || 0, liked: !!(L[r.id] || {}).mine })) }, 200, h);
       }
       if (P === "/posts" && req.method === "POST") {
         const u = await who(DB, body.key); if (!u) return json({ error: "unknown" }, 401, h); if (u.banned) return json({ error: "blocked" }, 403, h);
@@ -318,6 +332,23 @@ export default {
         const im = await DB.prepare("SELECT data FROM imgs WHERE id = ?").bind(m[1]).first();
         if (!im) return json({ error: "not found" }, 404, h);
         return new Response(new Uint8Array(im.data), { headers: { ...h, "Content-Type": "image/jpeg", "Cache-Control": p.status === "ok" ? "public, max-age=86400" : "no-store" } });
+      }
+
+      if (P === "/like" && req.method === "POST") {
+        const u = await who(DB, body.key); if (!u) return json({ error: "unknown" }, 401, h); if (u.banned) return json({ error: "blocked" }, 403, h);
+        const id = String(body.id || ""); if (!/^p[a-z0-9]{12}$/.test(id)) return json({ error: "bad id" }, 400, h);
+        const p = await DB.prepare("SELECT uid, status, hidden FROM posts WHERE id = ?").bind(id).first();
+        if (!p || p.hidden || p.status !== "ok") return json({ error: "not found" }, 404, h);
+        if (p.uid === u.id) return json({ error: "own post" }, 400, h);
+        await ensureLikes(DB);
+        const recent = await DB.prepare("SELECT COUNT(*) AS n FROM likes WHERE uid = ? AND ts > ?").bind(u.id, now - 600000).first();
+        const del = await DB.prepare("DELETE FROM likes WHERE post = ? AND uid = ?").bind(id, u.id).run();
+        if (!del.meta.changes) {
+          if (recent.n >= 60) return json({ error: "too fast" }, 429, h);
+          await DB.prepare("INSERT OR IGNORE INTO likes (post, uid, ts) VALUES (?, ?, ?)").bind(id, u.id, now).run();
+        }
+        const n = (await DB.prepare("SELECT COUNT(*) AS n FROM likes WHERE post = ?").bind(id).first()).n;
+        return json({ liked: !del.meta.changes, likes: n }, 200, h);
       }
 
       if (P === "/report" && req.method === "POST") {
@@ -356,7 +387,7 @@ export default {
           } else if (action === "hide") await DB.prepare(`UPDATE ${T} SET hidden = 1 WHERE id = ?`).bind(id).run();
           else if (action === "delete") {
             const q = [DB.prepare(`DELETE FROM ${T} WHERE id = ?`).bind(id), DB.prepare("DELETE FROM reports WHERE type = ? AND item = ?").bind(type, id)];
-            if (T === "posts") q.push(DB.prepare("DELETE FROM imgs WHERE id = ?").bind(id));
+            if (T === "posts") { q.push(DB.prepare("DELETE FROM imgs WHERE id = ?").bind(id)); await ensureLikes(DB); q.push(DB.prepare("DELETE FROM likes WHERE post = ?").bind(id)); }
             await DB.batch(q);
           } else if (action === "ban") {
             const row = await DB.prepare(`SELECT uid FROM ${T} WHERE id = ?`).bind(id).first(); if (!row) return json({ error: "not found" }, 404, h);
