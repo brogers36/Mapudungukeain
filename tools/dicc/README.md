@@ -29,7 +29,7 @@ El diccionario (`diccionario/`) es una app aparte que vive en el mismo sitio que
 
 ## Analizador
 
-El diccionario usa el analizador **build 169** (2026-11-22: verbo elegido por los traductores de AVENUE cuando la raíz se usa como verbo y la glosa es un sustantivo, kellu-e-chi «¡ayúdame!», no «¡séme ayudante!»; raíces compuestas abiertas, wiño + chillka-tu-n; pire- «nevar» es raíz, pire-le-y; 2026-11-18: -e-n, -e-l-i y el imperativo -e-chi sin -(m)ew leídos como 2sg→1sg, Smeets 2008: 157-160; el adverbial fam-e-chi, chum-e-chi queda como antes) sin cambios: todos los dictámenes viven en el propio
+El diccionario usa el analizador **build 169** (2026-11-22: verbo elegido por los traductores de AVENUE cuando la raíz se usa como verbo y la glosa es un sustantivo, kellu «ayudar», no «ayudante»; -e-chi es el imperativo de 1sg con -e- inverso, kellu-e-chi «¡que sea yo ayudado!», y -e-n se lee primero como «¡ayúdame!»; raíces compuestas abiertas, wiño + chillka-tu-n; pire- «nevar» es raíz, pire-le-y; 2026-11-18: -e-n, -e-l-i y el imperativo -e-chi sin -(m)ew leídos como 2sg→1sg, Smeets 2008: 157-160; el adverbial fam-e-chi, chum-e-chi queda como antes) sin cambios: todos los dictámenes viven en el propio
 analizador, incluidos «presente o pasado» para las formas sin marca de tiempo (2026-11-07) y *la-lu* «el muerto, el que
 murió» (2026-11-09). `motor_patches.js` y `motor_edits.json` quedan vacíos; úsalos solo para un dictamen que todavía no
 esté en el analizador.
